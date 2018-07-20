@@ -1,0 +1,5 @@
+module CUnbound [system] [extern_c] {
+    header "libunbound/unbound.h"
+    link "unbound"
+    export *
+}
