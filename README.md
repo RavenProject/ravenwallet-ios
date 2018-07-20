@@ -62,13 +62,12 @@ Any jailbreak app can grant itself access to every other app's keychain data. Th
 
 **Raven Wallet** is open source and available under the terms of the MIT license.
 
-Source code is available at https://github.com/RavenProject
+Source code is available at https://github.com/OverstockMedici/ravenwallet-ios-roshii
 
 
 ## Build instructions
 
 Clone the repo.  
-```git submodule update --init --recursive```  
 Install XCode  
 ```open breadwallet.xcodeproj```  
 Build
