@@ -10,7 +10,7 @@ import Foundation
 import BRCore
 
 /// Wrapper for BTC transaction model + metadata
-struct BtcTransaction: Transaction {
+struct RvnTransaction: Transaction {
     
     // MARK: Transaction Properties
     

@@ -57,7 +57,7 @@ struct TxDetailViewModel: TxViewModel {
         if direction == .sent {
             return S.TransactionDetails.addressToHeader
         } else {
-            if tx is BtcTransaction {
+            if tx is RvnTransaction {
                 return S.TransactionDetails.addressViaHeader
             } else {
                 return S.TransactionDetails.addressFromHeader
@@ -85,7 +85,7 @@ extension TxDetailViewModel {
     }
     
     private static func balances(tx: Transaction, showFiatAmount: Bool) -> (String, String) {
-        guard let tx = tx as? BtcTransaction,
+        guard let tx = tx as? RvnTransaction,
             let rate = tx.currency.state.currentRate else { return ("", "") }
         let maxDigits = tx.currency.state.maxDigits
         
@@ -109,7 +109,7 @@ extension TxDetailViewModel {
     /// The fiat exchange rate at the time of transaction
     /// Assumes fiat currency does not change
     private static func exchangeRateText(tx: Transaction) -> String? {
-        guard let tx = tx as? BtcTransaction,
+        guard let tx = tx as? RvnTransaction,
             let rate = tx.metaData?.exchangeRate,
             let symbol = tx.currency.state.currentRate?.currencySymbol else { return nil }
         
@@ -120,7 +120,7 @@ extension TxDetailViewModel {
     }
     
     private static func tokenAmount(tx: Transaction) -> String? {
-        guard let tx = tx as? BtcTransaction else { return nil }
+        guard let tx = tx as? RvnTransaction else { return nil }
         let amount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
                                    selectedRate: nil,
                                    minimumFractionDigits: nil,
@@ -132,7 +132,7 @@ extension TxDetailViewModel {
     /// Fiat amount at current exchange rate and at original rate at time of transaction (if available)
     /// Returns (currentFiatAmount, originalFiatAmount)
     private static func fiatAmounts(tx: Transaction, currentRate: Rate) -> (String, String?) {
-        guard let tx = tx as? BtcTransaction else { return ("", nil) }
+        guard let tx = tx as? RvnTransaction else { return ("", nil) }
         if let txRate = tx.metaData?.exchangeRate {
             let originalRate = Rate(code: currentRate.code,
                                     name: currentRate.name,

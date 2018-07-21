@@ -28,13 +28,13 @@ struct TxListViewModel: TxViewModel {
             case .received:
                 format = isComplete ? S.Transaction.receivedVia : S.Transaction.receivingVia
             }
-            var address = tx.toAddress
+            let address = tx.toAddress
             return String(format: format, address)
         }
     }
 
     func amount(rate: Rate) -> NSAttributedString {
-        guard let tx = tx as? BtcTransaction else { return NSAttributedString(string: "") }
+        guard let tx = tx as? RvnTransaction else { return NSAttributedString(string: "") }
         let text = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
                                  selectedRate: nil,
                                  minimumFractionDigits: nil,

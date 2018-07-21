@@ -309,7 +309,7 @@ class ModalPresenter : Subscriber, Trackable {
         settingsNav.setGrayStyle()
         let sections: [SettingsSections] = [.wallet, .preferences, .currencies, .other]
         
-        let currencySettings: [Setting]  = Store.state.currencies.flatMap { (currency) -> Setting? in
+        let currencySettings: [Setting]  = Store.state.currencies.compactMap { (currency) -> Setting? in
             guard let walletManager = walletManagers[currency.code] else { return nil }
             return Setting(title: currency.name, callback: { [weak self] in
                 guard let `self` = self else { return }
@@ -859,7 +859,7 @@ class SecurityCenterNavigationDelegate : NSObject, UINavigationControllerDelegat
         guard let coordinator = navigationController.topViewController?.transitionCoordinator else { return }
 
         if coordinator.isInteractive {
-            coordinator.notifyWhenInteractionEnds { context in
+            coordinator.notifyWhenInteractionChanges { context in
                 //We only want to style the view controller if the
                 //pop animation wasn't cancelled
                 if !context.isCancelled {
