@@ -64,8 +64,8 @@ class ApplicationController : Subscriber, Trackable {
             btcWalletManager.initPeerManager {
                 btcWalletManager.db?.loadTransactions { txns in
                     btcWalletManager.db?.loadBlocks { blocks in
-                        let preForkTransactions = txns.flatMap{$0}.filter { $0.pointee.blockHeight < C.bCashForkBlockHeight }
-                        let preForkBlocks = blocks.flatMap{$0}.filter { $0.pointee.height < C.bCashForkBlockHeight }
+                        _ = txns.compactMap{$0}.filter { $0.pointee.blockHeight < C.bCashForkBlockHeight }
+                        _ = blocks.compactMap{$0}.filter { $0.pointee.height < C.bCashForkBlockHeight }
                         completion()
                     }
                 }
@@ -248,26 +248,30 @@ class ApplicationController : Subscriber, Trackable {
             launchURL = nil
         }
 
-        if UIApplication.shared.applicationState != .background {
-            if primaryWalletManager.noWallet {
-                UserDefaults.hasShownWelcome = true
-                addWalletCreationListener()
-                Store.perform(action: ShowStartFlow())
-            } else {
-                DispatchQueue.walletQueue.async {
-                    self.walletManagers[UserDefaults.mostRecentSelectedCurrencyCode]?.peerManager?.connect()
-                }
-                startDataFetchers()
-            }
-
-        //For when watch app launches app in background
+//        if UIApplication.shared.applicationState != .background {
+//            if primaryWalletManager.noWallet {
+//                UserDefaults.hasShownWelcome = true
+//                addWalletCreationListener()
+//                Store.perform(action: ShowStartFlow())
+//            } else {
+//                DispatchQueue.walletQueue.async {
+//                    self.walletManagers[UserDefaults.mostRecentSelectedCurrencyCode]?.peerManager?.connect()
+//                }
+//                startDataFetchers()
+//            }
+//
+//        //For when watch app launches app in background
+        if primaryWalletManager.noWallet {
+            addWalletCreationListener()
+            Store.perform(action: ShowStartFlow())
         } else {
             DispatchQueue.walletQueue.async {
                 self.walletManagers[UserDefaults.mostRecentSelectedCurrencyCode]?.peerManager?.connect()
-                if self.fetchCompletionHandler != nil {
-                    self.performBackgroundFetch()
-                }
+//                if self.fetchCompletionHandler != nil {
+//                    self.performBackgroundFetch()
+//                }
             }
+            startDataFetchers()
             for (currencyCode, exchangeUpdater) in exchangeUpdaters {
                 exchangeUpdater.refresh {
                     if currencyCode == Currencies.rvn.code {
