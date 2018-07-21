@@ -96,7 +96,7 @@ import WebKit
         config.processPool = wkProcessPool
         config.allowsInlineMediaPlayback = false
         config.allowsAirPlayForMediaPlayback = false
-        config.requiresUserActionForMediaPlayback = true
+        config.mediaTypesRequiringUserActionForPlayback = .all
         config.allowsPictureInPictureMediaPlayback = false
 
         let request = URLRequest(url: indexUrl)
@@ -111,9 +111,7 @@ import WebKit
         webView?.backgroundColor = UIColor(red: 74.0/255.0, green: 29.0/255.0, blue: 92.0/255.0, alpha: 1.0)
         _ = webView?.load(request)
         webView?.autoresizingMask = [UIViewAutoresizing.flexibleHeight, UIViewAutoresizing.flexibleWidth]
-        if #available(iOS 11, *) {
-            webView?.scrollView.contentInsetAdjustmentBehavior = .never
-        }
+        webView?.scrollView.contentInsetAdjustmentBehavior = .never
         view.addSubview(webView!)
         
         let center = NotificationCenter.default

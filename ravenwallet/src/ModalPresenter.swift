@@ -398,7 +398,7 @@ class ModalPresenter : Subscriber, Trackable {
                     }))
                     alert.addAction(UIAlertAction(title: S.Button.yes, style: .default, handler: { _ in
                         if let url = URL(string: C.reviewLink) {
-                            UIApplication.shared.openURL(url)
+                            UIApplication.shared.open(url)
                         }
                     }))
                     self.topViewController?.present(alert, animated: true, completion: nil)
@@ -735,7 +735,7 @@ class ModalPresenter : Subscriber, Trackable {
                 self?.copyAllAddressesToClipboard()
                 Store.perform(action: Alert.Show(.addressesCopied))
                 if let success = success, let url = URL(string: success) {
-                    UIApplication.shared.openURL(url)
+                    UIApplication.shared.open(url)
                 }
             })
             verify.transitioningDelegate = self?.verifyPinTransitionDelegate

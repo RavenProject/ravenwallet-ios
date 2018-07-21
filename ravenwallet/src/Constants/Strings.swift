@@ -13,13 +13,8 @@ enum S {
     enum Symbols {
 //        static let bits = "μꝚ" /*"\u{a75a}"*/
         static let uRvn = "μR"
-        static var rvn: String {
-            if  #available(iOS 10, *) {
-                return "R"
-            } else {
-                return "R"
-            }
-        }
+        static let rvn = "R"
+        
         static let narrowSpace = "\u{2009}"
         static let lock = "\u{1F512}"
         static let redX = "\u{274C}"
