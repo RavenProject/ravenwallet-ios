@@ -36,8 +36,8 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
         }
     }
 
-    private let bitcoinLabel = UILabel(font: .customBold(size: 14.0), color: .grayTextTint)
-    private let bitcoinSwitch = UISegmentedControl(items: ["μRVN (\(S.Symbols.uRvn))", "RVN (\(S.Symbols.rvn))"])
+    private let ravencoinLabel = UILabel(font: .customBold(size: 14.0), color: .grayTextTint)
+    private let ravencoinSwitch = UISegmentedControl(items: ["μRVN (\(S.Symbols.uRvn))", "RVN (\(S.Symbols.rvn))"])
     private let rateLabel = UILabel(font: .customBody(size: 16.0), color: .darkText)
     private var header: UIView?
 
@@ -110,8 +110,8 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
 
         header.addSubview(rateLabelTitle)
         header.addSubview(rateLabel)
-        header.addSubview(bitcoinLabel)
-        header.addSubview(bitcoinSwitch)
+        header.addSubview(ravencoinLabel)
+        header.addSubview(ravencoinSwitch)
 
         rateLabelTitle.constrain([
             rateLabelTitle.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: C.padding[2]),
@@ -120,23 +120,23 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
             rateLabel.leadingAnchor.constraint(equalTo: rateLabelTitle.leadingAnchor),
             rateLabel.topAnchor.constraint(equalTo: rateLabelTitle.bottomAnchor) ])
 
-        bitcoinLabel.constrain([
-            bitcoinLabel.leadingAnchor.constraint(equalTo: rateLabelTitle.leadingAnchor),
-            bitcoinLabel.topAnchor.constraint(equalTo: rateLabel.bottomAnchor, constant: C.padding[2]) ])
-        bitcoinSwitch.constrain([
-            bitcoinSwitch.leadingAnchor.constraint(equalTo: bitcoinLabel.leadingAnchor),
-            bitcoinSwitch.topAnchor.constraint(equalTo: bitcoinLabel.bottomAnchor, constant: C.padding[1]),
-            bitcoinSwitch.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -C.padding[2]),
-            bitcoinSwitch.widthAnchor.constraint(equalTo: header.widthAnchor, constant: -C.padding[4]) ])
+        ravencoinLabel.constrain([
+            ravencoinLabel.leadingAnchor.constraint(equalTo: rateLabelTitle.leadingAnchor),
+            ravencoinLabel.topAnchor.constraint(equalTo: rateLabel.bottomAnchor, constant: C.padding[2]) ])
+        ravencoinSwitch.constrain([
+            ravencoinSwitch.leadingAnchor.constraint(equalTo: ravencoinLabel.leadingAnchor),
+            ravencoinSwitch.topAnchor.constraint(equalTo: ravencoinLabel.bottomAnchor, constant: C.padding[1]),
+            ravencoinSwitch.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -C.padding[2]),
+            ravencoinSwitch.widthAnchor.constraint(equalTo: header.widthAnchor, constant: -C.padding[4]) ])
 
         if Currencies.rvn.state.maxDigits == 8 {
-            bitcoinSwitch.selectedSegmentIndex = 1
+            ravencoinSwitch.selectedSegmentIndex = 1
         } else {
-            bitcoinSwitch.selectedSegmentIndex = 0
+            ravencoinSwitch.selectedSegmentIndex = 0
         }
 
-        bitcoinSwitch.valueChanged = strongify(self) { myself in
-            let newIndex = myself.bitcoinSwitch.selectedSegmentIndex
+        ravencoinSwitch.valueChanged = strongify(self) { myself in
+            let newIndex = myself.ravencoinSwitch.selectedSegmentIndex
             if newIndex == 1 {
                 Store.perform(action: WalletChange(Currencies.rvn).setMaxDigits(8))
             } else {
@@ -144,7 +144,7 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
             }
         }
 
-        bitcoinLabel.text = S.DefaultCurrency.bitcoinLabel
+        ravencoinLabel.text = S.DefaultCurrency.bitcoinLabel
         rateLabelTitle.text = S.DefaultCurrency.rateLabel
 
         self.header = header
