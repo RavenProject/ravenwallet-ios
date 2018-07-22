@@ -141,8 +141,9 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         let fiatTotal = Store.state.currencies.map {
             let balance = Store.state[$0].balance ?? 0
             let rate = Store.state[$0].currentRate?.rate ?? 0
-            return Double(balance)/$0.baseUnit * rate
+            return Double(balance)/$0.baseUnit * rate * 0.001
         }.reduce(0.0, +)
+        
         let format = NumberFormatter()
         format.isLenient = true
         format.numberStyle = .currency
