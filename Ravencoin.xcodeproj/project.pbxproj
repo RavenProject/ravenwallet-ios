@@ -2899,7 +2899,7 @@
 			isa = PBXGroup;
 			children = (
 				22A9A9971DF63426000F0016 /* libbz2 */,
-				75DC77AB1DAA05B500932D9A /* breadwallet-core */,
+				75DC77AB1DAA05B500932D9A /* core */,
 				755CD3831DAA0E3E0075898E /* unbound */,
 				755CD7031DAA16810075898E /* nettle */,
 				75FEFD1F1DAEE7A400203D3A /* sqlite3 */,
@@ -2907,7 +2907,7 @@
 			name = Modules;
 			sourceTree = "<group>";
 		};
-		75DC77AB1DAA05B500932D9A /* breadwallet-core */ = {
+		75DC77AB1DAA05B500932D9A /* core */ = {
 			isa = PBXGroup;
 			children = (
 				8B137E4F20F90D11006DEB3A /* crypto */,
@@ -2948,8 +2948,8 @@
 				755CD3191DAA0A110075898E /* secp256k1 */,
 				75DC783C1DAA05B500932D9A /* test.c */,
 			);
-			name = "breadwallet-core";
-			path = "Modules/breadwallet-core";
+			name = core;
+			path = Modules/core;
 			sourceTree = "<group>";
 		};
 		75FEFD1F1DAEE7A400203D3A /* sqlite3 */ = {
@@ -4807,8 +4807,8 @@
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/Modules/breadwallet-core",
-					"${SRCROOT}/Modules/breadwallet-core/secp256k1",
+					"${SRCROOT}/Modules/core",
+					"${SRCROOT}/Modules/core/secp256k1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -4821,8 +4821,8 @@
 				CLANG_WARN_COMMA = NO;
 				DEVELOPMENT_TEAM = 4R7S6N88W9;
 				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/Modules/breadwallet-core",
-					"${SRCROOT}/Modules/breadwallet-core/secp256k1",
+					"${SRCROOT}/Modules/core",
+					"${SRCROOT}/Modules/core/secp256k1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -5509,8 +5509,8 @@
 					"BITCOIN_TESTNET=1",
 				);
 				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/Modules/breadwallet-core",
-					"${SRCROOT}/Modules/breadwallet-core/secp256k1",
+					"${SRCROOT}/Modules/core",
+					"${SRCROOT}/Modules/core/secp256k1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -5818,8 +5818,8 @@
 					"BITCOIN_TESTNET=1",
 				);
 				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/Modules/breadwallet-core",
-					"${SRCROOT}/Modules/breadwallet-core/secp256k1",
+					"${SRCROOT}/Modules/core",
+					"${SRCROOT}/Modules/core/secp256k1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -6118,8 +6118,8 @@
 				CLANG_WARN_COMMA = NO;
 				DEVELOPMENT_TEAM = 4R7S6N88W9;
 				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/Modules/breadwallet-core",
-					"${SRCROOT}/Modules/breadwallet-core/secp256k1",
+					"${SRCROOT}/Modules/core",
+					"${SRCROOT}/Modules/core/secp256k1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
