@@ -1,9 +1,9 @@
 //
 //  BRAPIClient+Events.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Samuel Sutch on 7/4/17.
-//  Copyright © 2017 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import Foundation

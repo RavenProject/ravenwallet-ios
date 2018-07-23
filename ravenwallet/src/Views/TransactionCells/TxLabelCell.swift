@@ -1,9 +1,9 @@
 //
 //  TxLabelCell.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2017-12-20.
-//  Copyright © 2017 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit

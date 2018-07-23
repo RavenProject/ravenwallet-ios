@@ -1,6 +1,6 @@
 //
 //  TxListViewModel.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2018-01-13.
 //  Copyright © 2018 breadwallet LLC. All rights reserved.

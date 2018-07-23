@@ -1,9 +1,9 @@
 //
 //  StatusPip.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2017-12-22.
-//  Copyright © 2016 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit

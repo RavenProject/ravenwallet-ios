@@ -1,6 +1,6 @@
 //
 //  SyncingIndicator.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2018-02-16.
 //  Copyright © 2018 breadwallet LLC. All rights reserved.

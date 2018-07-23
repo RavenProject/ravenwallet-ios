@@ -1,9 +1,9 @@
 //
 //  SendViewController.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Adrian Corscadden on 2016-11-30.
-//  Copyright © 2016 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit
@@ -50,7 +50,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     private let amountView: AmountViewController
     private let addressCell: AddressCell
     private let memoCell = DescriptionSendCell(placeholder: S.Send.descriptionLabel)
-    private let sendButton = ShadowButton(title: S.Send.sendLabel, type: .primary)
+    private let sendButton = ShadowButton(title: S.Send.sendLabel, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
     private var currencySwitcherHeightConstraint: NSLayoutConstraint?
     private var pinPadHeightConstraint: NSLayoutConstraint?

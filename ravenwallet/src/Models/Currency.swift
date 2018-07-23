@@ -1,6 +1,6 @@
 //
 //  Currency.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2018-01-10.
 //  Copyright © 2018 breadwallet LLC. All rights reserved.

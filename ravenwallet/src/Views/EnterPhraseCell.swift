@@ -1,9 +1,9 @@
 //
 //  EnterPhraseCell.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Adrian Corscadden on 2017-02-24.
-//  Copyright © 2017 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit
@@ -63,7 +63,7 @@ class EnterPhraseCell : UICollectionViewCell {
     private let label = UILabel(font: .customBody(size: 13.0), color: .secondaryShadow)
     private let nextField = UIButton.icon(image: #imageLiteral(resourceName: "RightArrow"), accessibilityLabel: S.RecoverWallet.rightArrow)
     private let previousField = UIButton.icon(image: #imageLiteral(resourceName: "LeftArrow"), accessibilityLabel: S.RecoverWallet.leftArrow)
-    private let done = UIButton(type: .system)
+    private let done = UIButton(type: .custom)
     fileprivate let separator = UIView(color: .secondaryShadow)
     fileprivate var hasDisplayedInvalidState = false
 
@@ -100,6 +100,7 @@ class EnterPhraseCell : UICollectionViewCell {
         previousField.tintColor = .secondaryGrayText
         nextField.tintColor = .secondaryGrayText
         done.setTitle(S.RecoverWallet.done, for: .normal)
+        done.setTitleColor(.black, for: .normal)
     }
 
     private var accessoryView: UIView {

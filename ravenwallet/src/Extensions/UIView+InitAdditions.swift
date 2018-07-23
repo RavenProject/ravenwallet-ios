@@ -1,9 +1,9 @@
 //
 //  UIView+InitAdditions.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Adrian Corscadden on 2016-12-19.
-//  Copyright © 2016 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit

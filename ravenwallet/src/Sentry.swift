@@ -1,6 +1,6 @@
 //
 //  Sentry.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Adrian Corscadden on 2018-01-15.
 //  Copyright © 2018 breadwallet LLC. All rights reserved.

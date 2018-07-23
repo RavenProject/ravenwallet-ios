@@ -1,9 +1,9 @@
 //
 //  ReScanViewController.swift
-//  breadwallet
+//  ravenwallet
 //
 //  Created by Adrian Corscadden on 2017-04-10.
-//  Copyright © 2017 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit
