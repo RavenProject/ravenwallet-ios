@@ -16,11 +16,8 @@ class SupportCenterContainer : UIViewController {
 
     init(walletManager: WalletManager, apiClient: BRAPIClient) {
         let mountPoint = "/support"
-        #if Debug || Testflight
             webView = BRWebViewController(bundleName: "bread-frontend", mountPoint: mountPoint, walletManager: walletManager, noAuthApiClient: apiClient)
-        #else
-            webView = BRWebViewController(bundleName: "bread-frontend", mountPoint: mountPoint, walletManager: walletManager, noAuthApiClient: apiClient)
-        #endif
+
         webView.startServer()
         webView.preload()
         super.init(nibName: nil, bundle: nil)
@@ -93,7 +90,6 @@ class PresentSupportCenterAnimator : NSObject, UIViewControllerAnimatedTransitio
         }, completion: { _ in
             transitionContext.completeTransition(true)
         })
-
     }
 }
 
