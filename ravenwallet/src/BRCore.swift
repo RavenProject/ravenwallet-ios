@@ -30,16 +30,14 @@ typealias BRTxRef = UnsafeMutablePointer<BRTransaction>
 typealias BRBlockRef = UnsafeMutablePointer<BRMerkleBlock>
 
 private func secureAllocate(allocSize: CFIndex, hint: CFOptionFlags, info: UnsafeMutableRawPointer?)
-    -> UnsafeMutableRawPointer?
-{
+    -> UnsafeMutableRawPointer? {
     guard let ptr = malloc(MemoryLayout<CFIndex>.stride + allocSize) else { return nil }
     // keep track of the size of the allocation so it can be cleansed before deallocation
     ptr.storeBytes(of: allocSize, as: CFIndex.self)
     return ptr.advanced(by: MemoryLayout<CFIndex>.stride)
 }
 
-private func secureDeallocate(ptr: UnsafeMutableRawPointer?, info: UnsafeMutableRawPointer?)
-{
+private func secureDeallocate(ptr: UnsafeMutableRawPointer?, info: UnsafeMutableRawPointer?) {
     guard let ptr = ptr else { return }
     let allocSize = ptr.load(fromByteOffset: -MemoryLayout<CFIndex>.stride, as: CFIndex.self)
     memset(ptr, 0, allocSize) // cleanse allocated memory
@@ -47,8 +45,7 @@ private func secureDeallocate(ptr: UnsafeMutableRawPointer?, info: UnsafeMutable
 }
 
 private func secureReallocate(ptr: UnsafeMutableRawPointer?, newsize: CFIndex, hint: CFOptionFlags,
-                              info: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer?
-{
+                              info: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
     // there's no way to tell ahead of time if the original memory will be deallocted even if the new size is smaller
     // than the old size, so just cleanse and deallocate every time
     guard let ptr = ptr else { return nil }
@@ -547,17 +544,12 @@ protocol BRPeerManagerListener {
 class BRPeerManager {
     let cPtr: OpaquePointer
     let listener: BRPeerManagerListener
-//    let mainNetParams = [BRMainNetParams]
-//    let bcashParams = [BRBCashParams]
-//    let testNetParams = [BRTestNetParams]
-//    let bcashTestNetParams = [BRBCashTestNetParams]
     let currency: CurrencyDef
 
     init?(currency: CurrencyDef, wallet: BRWallet, earliestKeyTime: TimeInterval, blocks: [BRBlockRef?], peers: [BRPeer],
           listener: BRPeerManagerListener) {
         var blockRefs = blocks
-        guard let cPtr = BRPeerManagerNew(/*E.isTestnet ? testNetParams: mainNetParams,*/
-                                          wallet.cPtr, UInt32(earliestKeyTime + NSTimeIntervalSince1970),
+        guard let cPtr = BRPeerManagerNew(wallet.cPtr, UInt32(earliestKeyTime + NSTimeIntervalSince1970),
                                           &blockRefs, blockRefs.count, peers, peers.count) else { return nil }
         self.listener = listener
         self.cPtr = cPtr
@@ -601,10 +593,6 @@ class BRPeerManager {
     var connectionStatus: BRPeerStatus {
         return BRPeerManagerConnectStatus(cPtr)
     }
-    
-//    var connectionStatus: UInt32 {
-//        return BRPeerManagerIsConnected(cPtr)
-//    }
     
     // connect to  peer-to-peer network (also call this whenever networkIsReachable() status changes)
     func connect() {
@@ -684,7 +672,6 @@ class BRPeerManager {
         } else {
             BRPeerManagerSetFixedPeer(cPtr, UInt128(), 0)
         }
-
     }
     
     deinit {
@@ -699,20 +686,6 @@ class BRPeerManager {
             self.completion = completion
         }
     }
-
-    //hack to keep the swift compiler happy
-//    let a = BRBCashCheckpoints
-//    let b = BRBCashDNSSeeds
-//    let c = BRBCashVerifyDifficulty
-//    let d = BRBCashTestNetCheckpoints
-//    let e = BRBCashTestNetDNSSeeds
-//    let f = BRBCashTestNetVerifyDifficulty
-//    let g = BRMainNetDNSSeeds
-//    let h = BRMainNetCheckpoints
-//    let i = BRMainNetVerifyDifficulty
-//    let j = BRTestNetDNSSeeds
-//    let k = BRTestNetCheckpoints
-//    let l = BRTestNetVerifyDifficulty
 }
 
 extension UInt256 : CustomStringConvertible {

@@ -2,7 +2,6 @@
 //  AboutViewController.swift
 //  ravenwallet
 //
-//  Created by Adrian Corscadden on 2017-04-05.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 

@@ -30,10 +30,7 @@ class CoreDatabase {
     private var blockEnt: Int32 = 0
     private var peerEnt: Int32 = 0
     private let queue = DispatchQueue(label: "com.mediciventures.ravenwallet.corecbqueue")
-//    private let queue = DispatchQueue(label: "com.breadwallet.corecbqueue")
 
-
-//    init(dbPath: String = "BreadWallet.sqlite") {
     init(dbPath: String = "RavenWallet.sqlite") {
         self.dbPath = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil,
                                     create: false).appendingPathComponent(dbPath).path
