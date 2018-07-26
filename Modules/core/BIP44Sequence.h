@@ -35,7 +35,7 @@ size_t BIP44PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32
 
 // sets the private key for path m/44H/chain/index to each element in keys
 void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType,
-                      uint32_t account, uint32_t chain,
+//                      uint32_t account, uint32_t chain,
                       const uint32_t indexes[]);
 
 void BIP44AddrKey(BRKey *key, const void *seed, size_t seedLen);

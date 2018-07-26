@@ -108,7 +108,8 @@ size_t BIP44PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32
 
 
 // sets the private key for path m/0H/chain/index to each element in keys
-void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType, uint32_t account, uint32_t chain,
+void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType,
+                      //uint32_t account, uint32_t chain,
                         const uint32_t indexes[]) {
     UInt512 I;
     UInt256 secret, chainCode, s, c;
@@ -126,14 +127,14 @@ void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t s
         // _CKDpriv(&secret, &chainCode, 0 | BIP32_HARD); // path m/0H
         // _CKDpriv(&secret, &chainCode, chain); // path m/0H/chain
 
-        _CKDpriv(&secret, &chainCode, 44 | BIP32_HARD); // path m/44H
-        _CKDpriv(&secret, &chainCode, coinType | BIP32_HARD); // path m/44H/coinType'
-        _CKDpriv(&secret, &chainCode, account | BIP32_HARD); // path m/44H/coinType'/account'
+        _CKDpriv(&secret, &chainCode, BIP44_PURPOSE | BIP32_HARD); // path m/44H
+        _CKDpriv(&secret, &chainCode, BIP44_RVN_COINTYPE | BIP32_HARD); // path m/44H/coinType'
+        _CKDpriv(&secret, &chainCode, BIP44_CHANGE | BIP32_HARD); // path m/44H/coinType'/account'
 
         for (size_t i = 0; i < keysCount; i++) {
             s = secret;
             c = chainCode;
-            _CKDpriv(&s, &c, chain); // path m/44'/coinType'/account'/chain
+            _CKDpriv(&s, &c, BIP44_CHANGE); // path m/44'/coinType'/account'/chain
             _CKDpriv(&s, &c, indexes[i]); // path m/44'/coinType'/account'/chain/index
 
             BRKeySetSecret(&keys[i], &s, 1);

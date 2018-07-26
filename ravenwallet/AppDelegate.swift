@@ -40,6 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 //        FirebaseApp.configure()
         
+        print(Version.sharedInstance.current_version)
+        
         return true
     }
 
