@@ -90,6 +90,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         let yConstraint = NSLayoutConstraint(item: logo, attribute: .centerY, relatedBy: .equal, toItem: subHeaderView, attribute: .centerY, multiplier: 0.5, constant: 0.0)
         logo.constrain([
             logo.constraint(.centerX, toView: subHeaderView, constant: nil),
+            logo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
+            logo.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
             yConstraint])
         
         totalHeader.constrain([
