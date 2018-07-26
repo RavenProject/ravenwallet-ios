@@ -275,6 +275,7 @@
 		8B137EB820F90F76006DEB3A /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9320F90D11006DEB3A /* aes.cpp */; };
 		8B137EB920F90F79006DEB3A /* sph_shabal.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9520F90D11006DEB3A /* sph_shabal.c */; };
 		8B137EBB20F90F83006DEB3A /* echo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9D20F90D11006DEB3A /* echo.c */; };
+		8B69BB69210A322B00F1FE2D /* BIP44Sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB66210A321200F1FE2D /* BIP44Sequence.c */; };
 		CE03EC721EF193810038E3A8 /* String+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03EC711EF193800038E3A8 /* String+Keys.swift */; };
 		CE03EC741EF256AC0038E3A8 /* SimpleUTXO.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03EC731EF256AC0038E3A8 /* SimpleUTXO.swift */; };
 		CE0822641FCD1BD100EF371D /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */; };
@@ -1517,6 +1518,8 @@
 		8B137E9420F90D11006DEB3A /* sph_fugue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sph_fugue.h; sourceTree = "<group>"; };
 		8B137E9520F90D11006DEB3A /* sph_shabal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sph_shabal.c; sourceTree = "<group>"; };
 		8B137E9D20F90D11006DEB3A /* echo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = echo.c; sourceTree = "<group>"; };
+		8B69BB66210A321200F1FE2D /* BIP44Sequence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BIP44Sequence.c; sourceTree = "<group>"; };
+		8B69BB67210A321200F1FE2D /* BIP44Sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIP44Sequence.h; sourceTree = "<group>"; };
 		CE03EC711EF193800038E3A8 /* String+Keys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Keys.swift"; path = "src/Extensions/String+Keys.swift"; sourceTree = "<group>"; };
 		CE03EC731EF256AC0038E3A8 /* SimpleUTXO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleUTXO.swift; path = src/Models/SimpleUTXO.swift; sourceTree = "<group>"; };
 		CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeScreenViewController.swift; path = src/ViewControllers/HomeScreenViewController.swift; sourceTree = "<group>"; };
@@ -2918,6 +2921,8 @@
 				75DC77B21DAA05B500932D9A /* BRBase58.h */,
 				75DC77B31DAA05B500932D9A /* BRBIP32Sequence.c */,
 				75DC77B41DAA05B500932D9A /* BRBIP32Sequence.h */,
+				8B69BB66210A321200F1FE2D /* BIP44Sequence.c */,
+				8B69BB67210A321200F1FE2D /* BIP44Sequence.h */,
 				75DC77B51DAA05B500932D9A /* BRBIP38Key.c */,
 				75DC77B61DAA05B500932D9A /* BRBIP38Key.h */,
 				75DC77B71DAA05B500932D9A /* BRBIP39Mnemonic.c */,
@@ -4075,6 +4080,7 @@
 				755CD9E31DAA1A270075898E /* BRPaymentProtocol.c in Sources */,
 				755CD9E01DAA1A270075898E /* BRCrypto.c in Sources */,
 				755CD9E61DAA1A270075898E /* BRSet.c in Sources */,
+				8B69BB69210A322B00F1FE2D /* BIP44Sequence.c in Sources */,
 				755CD9E21DAA1A270075898E /* BRMerkleBlock.c in Sources */,
 				755CD9DC1DAA1A270075898E /* BRBIP32Sequence.c in Sources */,
 				755CD9E81DAA1A270075898E /* BRWallet.c in Sources */,
