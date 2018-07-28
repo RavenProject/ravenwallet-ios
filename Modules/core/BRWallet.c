@@ -377,63 +377,6 @@ size_t BRWalletUnusedAddrs(BRWallet *wallet, BRAddress addrs[], uint32_t gapLimi
     return j;
 }
 
-size_t WalletBIP44UnusedAddrs(BRWallet *wallet, BRAddress *addrs, uint32_t gapLimit, int internal) {
-    BRAddress *addrChain;
-    size_t i, j = 0, count, startCount;
-    uint32_t chain = (internal) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN;
-    
-    assert(wallet != NULL);
-    assert(gapLimit > 0);
-    pthread_mutex_lock(&wallet->lock);
-    addrChain = (internal) ? wallet->internalChain : wallet->externalChain;
-    i = count = startCount = array_count(addrChain);
-    
-    // keep only the trailing contiguous block of addresses with no transactions
-    while (i > 0 && ! BRSetContains(wallet->usedAddrs, &addrChain[i - 1])) i--;
-    
-    while (i + gapLimit > count) { // generate new addresses up to gapLimit
-        BRKey key;
-        BRAddress address = BR_ADDRESS_NONE;
-        uint8_t pubKey[BIP44PubKey(NULL, 0, wallet->masterPubKey, chain, count)];
-        size_t len = BIP44PubKey(pubKey, sizeof(pubKey), wallet->masterPubKey, chain, (uint32_t)count);
-        
-        if (! BRKeySetPubKey(&key, pubKey, len)) break;
-        if (!BRKeyAddress(&key, address.s, sizeof(address)) || BRAddressEq(&address, &BR_ADDRESS_NONE)) break;
-        array_add(addrChain, address);
-        count++;
-        if (BRSetContains(wallet->usedAddrs, &address)) i = count;
-    }
-    
-    if (addrs && i + gapLimit <= count) {
-        for (j = 0; j < gapLimit; j++) {
-            addrs[j] = addrChain[i + j];
-        }
-    }
-    
-    // was addrChain moved to a new memory location?
-    if (addrChain == (internal ? wallet->internalChain : wallet->externalChain)) {
-        for (i = startCount; i < count; i++) {
-            BRSetAdd(wallet->allAddrs, &addrChain[i]);
-        }
-    }
-    else {
-        if (internal) wallet->internalChain = addrChain;
-        if (! internal) wallet->externalChain = addrChain;
-        BRSetClear(wallet->allAddrs); // clear and rebuild allAddrs
-        
-        for (i = array_count(wallet->internalChain); i > 0; i--) {
-            BRSetAdd(wallet->allAddrs, &wallet->internalChain[i - 1]);
-        }
-        
-        for (i = array_count(wallet->externalChain); i > 0; i--) {
-            BRSetAdd(wallet->allAddrs, &wallet->externalChain[i - 1]);
-        }
-    }
-    
-    pthread_mutex_unlock(&wallet->lock);
-    return j;
-}
-
 // current wallet balance, not including transactions known to be invalid
 uint64_t BRWalletBalance(BRWallet *wallet)
 {
@@ -742,42 +685,6 @@ int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, con
     if (seed) {
         BRBIP32PrivKeyList(keys, internalCount, seed, seedLen, SEQUENCE_INTERNAL_CHAIN, internalIdx);
         BRBIP32PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, SEQUENCE_EXTERNAL_CHAIN, externalIdx);
-        // TODO: XXX wipe seed callback
-        seed = NULL;
-        if (tx) r = BRTransactionSign(tx, forkId, keys, internalCount + externalCount);
-        for (i = 0; i < internalCount + externalCount; i++) BRKeyClean(&keys[i]);
-    }
-    else r = -1; // user canceled authentication
-    
-    return r;
-}
-
-int WalletBIP44SignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, const void *seed, size_t seedLen) {
-    uint32_t j, internalIdx[tx->inCount], externalIdx[tx->inCount];
-    size_t i, internalCount = 0, externalCount = 0;
-    int r = 0;
-    
-    assert(wallet != NULL);
-    assert(tx != NULL);
-    pthread_mutex_lock(&wallet->lock);
-    
-    for (i = 0; tx && i < tx->inCount; i++) {
-        for (j = (uint32_t)array_count(wallet->internalChain); j > 0; j--) {
-            if (BRAddressEq(tx->inputs[i].address, &wallet->internalChain[j - 1])) internalIdx[internalCount++] = j - 1;
-        }
-        
-        for (j = (uint32_t)array_count(wallet->externalChain); j > 0; j--) {
-            if (BRAddressEq(tx->inputs[i].address, &wallet->externalChain[j - 1])) externalIdx[externalCount++] = j - 1;
-        }
-    }
-    
-    pthread_mutex_unlock(&wallet->lock);
-    
-    BRKey keys[internalCount + externalCount];
-    
-    if (seed) {
-        BIP44PrivKeyList(keys, internalCount, seed, seedLen, SEQUENCE_INTERNAL_CHAIN, internalIdx);
-        BIP44PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, SEQUENCE_EXTERNAL_CHAIN, externalIdx);
         // TODO: XXX wipe seed callback
         seed = NULL;
         if (tx) r = BRTransactionSign(tx, forkId, keys, internalCount + externalCount);

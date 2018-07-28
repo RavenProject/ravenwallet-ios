@@ -13,7 +13,6 @@ module BRCore [system] [extern_c] {
     header "BRBIP38Key.h"
     header "BRBIP39Mnemonic.h"
     header "BRBIP32Sequence.h"
-    header "BIP44Sequence.h"
     header "BRTransaction.h"
     header "BRPaymentProtocol.h"
     header "BRAddress.h"
