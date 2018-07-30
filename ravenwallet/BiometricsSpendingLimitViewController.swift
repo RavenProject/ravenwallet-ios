@@ -13,7 +13,7 @@ class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
 
     private let cellIdentifier = "CellIdentifier"
     private let walletManager: WalletManager
-    private let limits: [UInt64] = [0, 1000000, 10000000, 100000000, 1000000000]
+    private let limits: [UInt64] = [0, 100000000*50, 100000000*500, 100000000*1000, 100000000*5000, 100000000*10000]
     private var selectedLimit: UInt64?
     private var header: UIView?
     private let amount = UILabel(font: .customMedium(size: 26.0), color: .darkText)
@@ -72,6 +72,7 @@ class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
             let displayAmount = DisplayAmount(amount: Satoshis(rawValue: limit), selectedRate: nil, minimumFractionDigits: 0, currency: Currencies.rvn)
             cell.textLabel?.text = displayAmount.combinedDescription
         }
+        
         if limits[indexPath.row] == selectedLimit {
             let check = UIImageView(image: #imageLiteral(resourceName: "CircleCheck").withRenderingMode(.alwaysTemplate))
             check.tintColor = C.defaultTintColor
