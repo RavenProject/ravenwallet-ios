@@ -52,7 +52,7 @@ class ScanViewController : UIViewController, Trackable {
     }
 
     init(scanKeyCompletion: @escaping KeyScanCompletion, isValidURI: @escaping (String) -> Bool) {
-        self.currency = Currencies.rvn //TODO:BCH
+        self.currency = Currencies.rvn
         self.scanKeyCompletion = scanKeyCompletion
         self.completion = nil
         self.isValidURI = isValidURI
