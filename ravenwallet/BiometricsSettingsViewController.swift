@@ -18,7 +18,7 @@ class BiometricsSettingsViewController : UIViewController, Subscriber {
         super.init(nibName: nil, bundle: nil)
     }
 
-    private let header = RadialGradientView(backgroundColor: .blue)
+    private let header = SecurityCenterHeader()//RadialGradientView(backgroundColor: .blue)
     private let illustration = LAContext.biometricType() == .face ? UIImageView(image: #imageLiteral(resourceName: "FaceId-Large")) : UIImageView(image: #imageLiteral(resourceName: "TouchId-Large"))
     private let label = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let switchLabel = UILabel(font: .customBold(size: 14.0), color: .darkText)

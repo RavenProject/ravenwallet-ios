@@ -20,7 +20,7 @@ class StartImportViewController : UIViewController {
 
     private let walletManager: WalletManager
     private let currency: CurrencyDef
-    private let header = RadialGradientView(backgroundColor: .blue, offset: 64.0)
+    private let header = SecurityCenterHeader() //RadialGradientView(backgroundColor: .blue, offset: 64.0)
     private let illustration = UIImageView(image: #imageLiteral(resourceName: "ImportIllustration"))
     private let message = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let warning = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
