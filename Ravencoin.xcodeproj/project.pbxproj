@@ -276,6 +276,7 @@
 		8B137EB920F90F79006DEB3A /* sph_shabal.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9520F90D11006DEB3A /* sph_shabal.c */; };
 		8B137EBB20F90F83006DEB3A /* echo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9D20F90D11006DEB3A /* echo.c */; };
 		8B69BB6B210A395A00F1FE2D /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB6A210A395A00F1FE2D /* Version.swift */; };
+		8B69BB6F211113B500F1FE2D /* StartOneTimeWipeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */; };
 		CE03EC721EF193810038E3A8 /* String+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03EC711EF193800038E3A8 /* String+Keys.swift */; };
 		CE03EC741EF256AC0038E3A8 /* SimpleUTXO.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE03EC731EF256AC0038E3A8 /* SimpleUTXO.swift */; };
 		CE0822641FCD1BD100EF371D /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */; };
@@ -1519,6 +1520,7 @@
 		8B137E9520F90D11006DEB3A /* sph_shabal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sph_shabal.c; sourceTree = "<group>"; };
 		8B137E9D20F90D11006DEB3A /* echo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = echo.c; sourceTree = "<group>"; };
 		8B69BB6A210A395A00F1FE2D /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartOneTimeWipeViewController.swift; sourceTree = "<group>"; };
 		CE03EC711EF193800038E3A8 /* String+Keys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Keys.swift"; path = "src/Extensions/String+Keys.swift"; sourceTree = "<group>"; };
 		CE03EC731EF256AC0038E3A8 /* SimpleUTXO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleUTXO.swift; path = src/Models/SimpleUTXO.swift; sourceTree = "<group>"; };
 		CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeScreenViewController.swift; path = src/ViewControllers/HomeScreenViewController.swift; sourceTree = "<group>"; };
@@ -2736,45 +2738,45 @@
 		75A2A7921DA5934300A983D8 /* ravenwallet */ = {
 			isa = PBXGroup;
 			children = (
-				75A2A87C1DA59E4E00A983D8 /* ravenwallet.entitlements */,
 				75A2A7931DA5934300A983D8 /* AppDelegate.swift */,
-				CEC7E593200D7C830056F410 /* Sentry.swift */,
 				CE20C8F11DBAF71500C8397A /* ApplicationController.swift */,
+				2218BD781E8F6CBA0091D5E8 /* AssetBundles.plist */,
+				8B12807920FFEF66002A139F /* Assets.xcassets */,
+				CE4C1CD21ED8BCC70063E184 /* BIP39Words.plist */,
 				754AE0BB1DFE8A46007FD001 /* BRCore.swift */,
+				CED486DD1F70A179007406D3 /* bread-frontend.tar */,
+				CE473D7B1F042F1E00C0ACFD /* coinflip.aiff */,
+				CEE20C321EA5B2EC0086F724 /* Constants */,
+				CE0A68201FB651DA00EF31CD /* CoreDatabase.swift */,
+				CEDA9EDB1FDE0C56005E8D1B /* countries.plist */,
+				CE74F58C1E3BA85600ED5FA9 /* ExchangeUpdater.swift */,
+				CE20C8F01DBAF6E100C8397A /* Extensions */,
+				CE124CFB1E68932C00DFA146 /* FeeUpdater.swift */,
+				CE20C90A1DBC59C500C8397A /* FlowControllers */,
+				CEAA9E9C1DC2F8270066731D /* Fonts */,
+				8B12806F20FB010A002A139F /* GoogleService-Info.plist */,
+				8B12807A20FFEF66002A139F /* Icon.xcassets */,
+				75A2A79F1DA5934300A983D8 /* Info.plist */,
+				CE45C1FC1E7650F5002C3847 /* KVStoreCoordinator.swift */,
+				75A2A79C1DA5934300A983D8 /* LaunchScreen.storyboard */,
+				CED82D4D1E575A5500507A9B /* main.swift */,
+				CE6D0E5A1E14BF8400137DF1 /* Models */,
+				7528D2971ECF655500925DBC /* PaymentProtocol.swift */,
+				CEC6F8441E886723000795B8 /* PaymentRequest.swift */,
+				22A9A9311DF61930000F0016 /* Platform */,
+				75A2A87C1DA59E4E00A983D8 /* ravenwallet.entitlements */,
+				CE3D4C561EF5D5740016B1C8 /* ReachabilityMonitor.swift */,
 				CEE659E61F65A936001FF29D /* RetryTimer.swift */,
 				CE8CD8DC1E2D9EF200785E02 /* Sender.swift */,
-				CE74F58C1E3BA85600ED5FA9 /* ExchangeUpdater.swift */,
-				CE124CFB1E68932C00DFA146 /* FeeUpdater.swift */,
-				CED82D4D1E575A5500507A9B /* main.swift */,
-				CE45C1FC1E7650F5002C3847 /* KVStoreCoordinator.swift */,
-				CEC6F8441E886723000795B8 /* PaymentRequest.swift */,
-				7528D2971ECF655500925DBC /* PaymentProtocol.swift */,
+				CEC7E593200D7C830056F410 /* Sentry.swift */,
+				CE2990171EFD6DAF0093A0F2 /* Strings */,
 				CE4C1CC71ED88B600063E184 /* URLController.swift */,
 				CE916E321EDA800E00D641D6 /* UserDefaultsUpdater.swift */,
-				CE3D4C561EF5D5740016B1C8 /* ReachabilityMonitor.swift */,
-				CE7B40981FA03C9900BA4196 /* Wallet */,
-				CE0A68201FB651DA00EF31CD /* CoreDatabase.swift */,
-				CE473D7B1F042F1E00C0ACFD /* coinflip.aiff */,
-				CE2990171EFD6DAF0093A0F2 /* Strings */,
-				CE30F0E41EB27821004B8EE5 /* Watch */,
-				CEE20C321EA5B2EC0086F724 /* Constants */,
-				CE20C90A1DBC59C500C8397A /* FlowControllers */,
 				CE20C8EF1DBAF6D300C8397A /* ViewControllers */,
-				CE20C90F1DBE5B5100C8397A /* Views */,
 				CEBF33021DDE177F00348FC6 /* ViewModels */,
-				CE6D0E5A1E14BF8400137DF1 /* Models */,
-				CE20C8F01DBAF6E100C8397A /* Extensions */,
-				22A9A9311DF61930000F0016 /* Platform */,
-				CEAA9E9C1DC2F8270066731D /* Fonts */,
-				CE4C1CD21ED8BCC70063E184 /* BIP39Words.plist */,
-				2218BD781E8F6CBA0091D5E8 /* AssetBundles.plist */,
-				CED486DD1F70A179007406D3 /* bread-frontend.tar */,
-				8B12807920FFEF66002A139F /* Assets.xcassets */,
-				8B12807A20FFEF66002A139F /* Icon.xcassets */,
-				75A2A79C1DA5934300A983D8 /* LaunchScreen.storyboard */,
-				75A2A79F1DA5934300A983D8 /* Info.plist */,
-				8B12806F20FB010A002A139F /* GoogleService-Info.plist */,
-				CEDA9EDB1FDE0C56005E8D1B /* countries.plist */,
+				CE20C90F1DBE5B5100C8397A /* Views */,
+				CE7B40981FA03C9900BA4196 /* Wallet */,
+				CE30F0E41EB27821004B8EE5 /* Watch */,
 			);
 			path = ravenwallet;
 			sourceTree = "<group>";
@@ -3037,43 +3039,43 @@
 		CE20C8EF1DBAF6D300C8397A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				CE1E5F241EF081F300BD0F72 /* Import */,
-				CEEC70841E90CCA600EF788E /* Settings */,
-				CEB909F81E5FF20A001804DC /* Recover */,
-				CEC6AA3E1DEFC85700EE5AFD /* RootModals */,
-				CE6D0F951DE8B6B600BD4BCF /* ViewControllerTransitions */,
-				CE760ED71E55F9E000EFAC2B /* SecurityCenter */,
-				CEBF32EF1DDCD30600348FC6 /* AccountViewController.swift */,
-				CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */,
-				CE274A601FD7C902000A4E62 /* RootNavigationController.swift */,
-				CE3840E71FD590BD00437C31 /* AssetListTableView.swift */,
-				CE20C9061DBC587200C8397A /* StartViewController.swift */,
-				CEAA9E8E1DC074410066731D /* StartPaperPhraseViewController.swift */,
-				CEAA9E921DC110E70066731D /* WritePaperPhraseViewController.swift */,
-				CEAA9E981DC262800066731D /* ConfirmPaperPhraseViewController.swift */,
-				CEBF32F51DDCEAF900348FC6 /* TransactionsTableViewController.swift */,
-				CEF3E8351DE60222007C0A9E /* ModalNavigationController.swift */,
-				CE9057191DFF18B2006BA848 /* ScanViewController.swift */,
-				CECCE5A81E0378FB00D99448 /* PinPadViewController.swift */,
-				CE8CD8DE1E2E825000785E02 /* VerifyPinViewController.swift */,
-				CE8CD8E01E31976800785E02 /* LoginViewController.swift */,
-				CE45C1F81E74B400002C3847 /* ManageWalletViewController.swift */,
 				CEEC708B1E95461A00EF788E /* AboutViewController.swift */,
-				CEEC708F1E95D5C100EF788E /* PushNotificationsViewController.swift */,
-				CEEC70931E96A24F00EF788E /* DefaultCurrencyViewController.swift */,
-				CE4DFB2B1E9BE5880014009E /* ReScanViewController.swift */,
-				CE4DFB2D1E9C26DA0014009E /* ShareDataViewController.swift */,
-				CE5E6C951EB8CCF500A476DB /* SupportCenterContainer.swift */,
-				CEEE92F01EBA7CBA00B7AC9C /* RequestAmountViewController.swift */,
+				CEBF32EF1DDCD30600348FC6 /* AccountViewController.swift */,
 				CEF61B111ECF52C700C7EA6A /* AmountViewController.swift */,
-				CEC4CF061F0C48DD00E5C82E /* StartWipeWalletViewController.swift */,
-				CEA05CC21F21B53C00D850F0 /* FeeSelector.swift */,
-				CE8644241F2C160200033129 /* ConfirmationViewController.swift */,
-				CE44BA1A1F33BFC500392A1A /* NodeSelectorViewController.swift */,
-				CEE659E81F664C73001FF29D /* WelcomeViewController.swift */,
+				CE3840E71FD590BD00437C31 /* AssetListTableView.swift */,
 				1B1AFF9E1FB7EF7C00E61908 /* BiometricsSettingsViewController.swift */,
 				1B1AFF9F1FB7EF7C00E61908 /* BiometricsSpendingLimitViewController.swift */,
+				CE8644241F2C160200033129 /* ConfirmationViewController.swift */,
+				CEAA9E981DC262800066731D /* ConfirmPaperPhraseViewController.swift */,
+				CEEC70931E96A24F00EF788E /* DefaultCurrencyViewController.swift */,
+				CEA05CC21F21B53C00D850F0 /* FeeSelector.swift */,
+				CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */,
+				CE8CD8E01E31976800785E02 /* LoginViewController.swift */,
+				CE45C1F81E74B400002C3847 /* ManageWalletViewController.swift */,
+				CEF3E8351DE60222007C0A9E /* ModalNavigationController.swift */,
+				CE44BA1A1F33BFC500392A1A /* NodeSelectorViewController.swift */,
+				CECCE5A81E0378FB00D99448 /* PinPadViewController.swift */,
+				CEEC708F1E95D5C100EF788E /* PushNotificationsViewController.swift */,
+				CEEE92F01EBA7CBA00B7AC9C /* RequestAmountViewController.swift */,
+				CE4DFB2B1E9BE5880014009E /* ReScanViewController.swift */,
+				CE274A601FD7C902000A4E62 /* RootNavigationController.swift */,
+				CE9057191DFF18B2006BA848 /* ScanViewController.swift */,
+				CE4DFB2D1E9C26DA0014009E /* ShareDataViewController.swift */,
+				CEAA9E8E1DC074410066731D /* StartPaperPhraseViewController.swift */,
+				CE20C9061DBC587200C8397A /* StartViewController.swift */,
+				CEC4CF061F0C48DD00E5C82E /* StartWipeWalletViewController.swift */,
+				CE5E6C951EB8CCF500A476DB /* SupportCenterContainer.swift */,
+				CEBF32F51DDCEAF900348FC6 /* TransactionsTableViewController.swift */,
 				7CA238132011A97C00A4A59D /* TxDetailViewController.swift */,
+				CE8CD8DE1E2E825000785E02 /* VerifyPinViewController.swift */,
+				CEE659E81F664C73001FF29D /* WelcomeViewController.swift */,
+				CEAA9E921DC110E70066731D /* WritePaperPhraseViewController.swift */,
+				CE1E5F241EF081F300BD0F72 /* Import */,
+				CEB909F81E5FF20A001804DC /* Recover */,
+				CEC6AA3E1DEFC85700EE5AFD /* RootModals */,
+				CE760ED71E55F9E000EFAC2B /* SecurityCenter */,
+				CEEC70841E90CCA600EF788E /* Settings */,
+				CE6D0F951DE8B6B600BD4BCF /* ViewControllerTransitions */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -3313,6 +3315,7 @@
 				CEB909F41E5FE63D001804DC /* EnterPhraseViewController.swift */,
 				CEB909F61E5FE654001804DC /* EnterPhraseCollectionViewController.swift */,
 				CEB909F91E5FF242001804DC /* RecoverWalletIntroViewController.swift */,
+				8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */,
 			);
 			name = Recover;
 			sourceTree = "<group>";
@@ -3781,7 +3784,7 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -4104,6 +4107,7 @@
 				7C6ACCB61FEB345E0028ABFA /* TxStatusCell.swift in Sources */,
 				CE20C8F61DBAF77D00C8397A /* UIViewController+BRWAdditions.swift in Sources */,
 				222319B01F27985A00008F20 /* BRBrowserViewController.swift in Sources */,
+				8B69BB6F211113B500F1FE2D /* StartOneTimeWipeViewController.swift in Sources */,
 				CE74F58D1E3BA85600ED5FA9 /* ExchangeUpdater.swift in Sources */,
 				CE6DCC251E6001E50044257B /* UIControl+Callback.swift in Sources */,
 				CE0822641FCD1BD100EF371D /* HomeScreenViewController.swift in Sources */,
@@ -5174,6 +5178,7 @@
 		75A2A8161DA5936F00A983D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -5187,6 +5192,7 @@
 		75A2A8171DA5936F00A983D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -5464,6 +5470,7 @@
 		CEA7E68F1F09AC6A001F8C27 /* Screenshots */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -5773,6 +5780,7 @@
 		CEA7E6A21F0AAA84001F8C27 /* Testnet */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -6078,6 +6086,7 @@
 		CEE0EF5B1EBF8D7F0018DB36 /* Testflight */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = TodayExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;

@@ -220,6 +220,25 @@ enum S {
         static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
     }
     
+    enum OneTimeWipe {
+        static let next = NSLocalizedString("OneTimeWipe.next", value:"Start Wipping Process", comment: "Next button label")
+        static let intro = NSLocalizedString("OneTimeWipe.intro", value:"Recover your RVN Wallet with your paper key.", comment: "Recover wallet intro")
+        static let leftArrow = NSLocalizedString("OneTimeWipe.leftArrow", value:"Left Arrow", comment: "Previous button accessibility label")
+        static let rightArrow = NSLocalizedString("OneTimeWipe.rightArrow", value:"Right Arrow", comment: "Next button accessibility label")
+        static let done = NSLocalizedString("OneTimeWipe.done", value:"Done", comment: "Done button text")
+        static let instruction = NSLocalizedString("OneTimeWipe.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
+        static let header = NSLocalizedString("OneTimeWipe.header", value:"Recover Wallet", comment: "Recover wallet header")
+        static let subheader = NSLocalizedString("OneTimeWipe.subheader", value:"Enter the paper key for the wallet you want to recover.", comment: "Recover wallet sub-header")
+        
+        static let headerResetPin = NSLocalizedString("OneTimeWipe.header_reset_pin", value:"Reset PIN", comment: "Reset PIN with paper key: header")
+        static let subheaderResetPin = NSLocalizedString("OneTimeWipe.subheader_reset_pin", value:"To reset your PIN, enter the words from your paper key into the boxes below.", comment: "Reset PIN with paper key: sub-header")
+        static let resetPinInfo = NSLocalizedString("OneTimeWipe.reset_pin_more_info", value:"Tap here for more information.", comment: "Reset PIN with paper key: more information button.")
+        static let invalid = NSLocalizedString("OneTimeWipe.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
+        static let startMessage = NSLocalizedString("OneTimeWipe.startMessage", value: "Wipping your current wallet, will allow you to create a new one that support the new BIP44 convention", comment: "Start wipe wallet view message")
+        static let startWarning = NSLocalizedString("OneTimeWipe.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore your coins, you will need to visit http://ravenwallet.org/bip-39 and enter your Paper Key to retrieve your private keys.", comment: "Start wipe wallet view warning")
+        static let title = NSLocalizedString("OneTimeWipe.title", value: "Wipe your wallet for BIP44 Migration", comment: "Wipe wallet navigation item title.")
+    }
+    
     enum ManageWallet {
         static let title = NSLocalizedString("ManageWallet.title", value:"Manage Wallet", comment: "Manage wallet modal title")
         static let textFieldLabel = NSLocalizedString("ManageWallet.textFeildLabel", value:"Wallet Name", comment: "Change Wallet name textfield label")

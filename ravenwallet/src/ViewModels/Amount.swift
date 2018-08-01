@@ -96,7 +96,6 @@ struct Amount {
     }
 }
 
-// TODO:BCH conslidate DisplayAmount + Amount
 struct DisplayAmount {
     let amount: Satoshis
     let selectedRate: Rate?
