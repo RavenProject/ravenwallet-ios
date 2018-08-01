@@ -230,9 +230,6 @@ class ModalPresenter : Subscriber, Trackable {
                 self?.messagePresenter.presentMessageCompose(bitcoinURL: bitcoinURL, image: image)
             }
             return ModalViewController(childViewController: requestVc)
-        case .buy:
-            presentBuyController("/buy")
-            return nil
         }
         
     }
@@ -559,18 +556,18 @@ class ModalPresenter : Subscriber, Trackable {
         topViewController?.present(nc, animated: true, completion: nil)
     }
 
-    private func wipeWallet() {
+    public func wipeWallet() {
         let alert = UIAlertController(title: S.WipeWallet.alertTitle, message: S.WipeWallet.alertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: nil))
         alert.addAction(UIAlertAction(title: S.WipeWallet.wipe, style: .default, handler: { _ in
-            self.topViewController?.dismiss(animated: true, completion: {
+//            self.topViewController?.dismiss(animated: true, completion: {
                 self.wipeWalletNoPrompt()
-            })
+//            })
         }))
         topViewController?.present(alert, animated: true, completion: nil)
     }
 
-    private func wipeWalletNoPrompt() {
+    public func wipeWalletNoPrompt() {
         let activity = BRActivityViewController(message: S.WipeWallet.wiping)
         self.topViewController?.present(activity, animated: true, completion: nil)
         DispatchQueue.walletQueue.async {
