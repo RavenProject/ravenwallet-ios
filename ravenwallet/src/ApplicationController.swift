@@ -41,37 +41,37 @@ class ApplicationController : Subscriber, Trackable {
 
     init() {
         guardProtected(queue: DispatchQueue.walletQueue) {
-            if UserDefaults.hasBchConnected {
+//            if UserDefaults.hasBchConnected {
                 self.initWallet(completion: self.didAttemptInitWallet)
-            } else {
-                self.initWalletWithMigration(completion: self.didAttemptInitWallet)
-            }
+//            } else {
+//                self.initWalletWithMigration(completion: self.didAttemptInitWallet)
+//            }
         }
     }
 
-    /// Migrate pre-fork BTC transactions to BCH wallet
-    private func initWalletWithMigration(completion: @escaping () -> Void) {
-        let btc = Currencies.rvn
-        guard let btcWalletManager = try? WalletManager(currency: btc, dbPath: btc.dbPath) else { return }
-        walletManagers[btc.code] = btcWalletManager
-        btcWalletManager.initWallet { [unowned self] success in
-            guard success else {
-                completion()
-                return
-            }
-
-            self.exchangeUpdaters[btc.code] = ExchangeUpdater(currency: btc, walletManager: btcWalletManager)
-            btcWalletManager.initPeerManager {
-                btcWalletManager.db?.loadTransactions { txns in
-                    btcWalletManager.db?.loadBlocks { blocks in
-                        _ = txns.compactMap{$0}.filter { $0.pointee.blockHeight < C.bCashForkBlockHeight }
-                        _ = blocks.compactMap{$0}.filter { $0.pointee.height < C.bCashForkBlockHeight }
-                        completion()
-                    }
-                }
-            }
-        }
-    }
+//    /// Migrate pre-fork BTC transactions to BCH wallet
+//    private func initWalletWithMigration(completion: @escaping () -> Void) {
+//        let btc = Currencies.rvn
+//        guard let btcWalletManager = try? WalletManager(currency: btc, dbPath: btc.dbPath) else { return }
+//        walletManagers[btc.code] = btcWalletManager
+//        btcWalletManager.initWallet { [unowned self] success in
+//            guard success else {
+//                completion()
+//                return
+//            }
+//
+//            self.exchangeUpdaters[btc.code] = ExchangeUpdater(currency: btc, walletManager: btcWalletManager)
+//            btcWalletManager.initPeerManager {
+//                btcWalletManager.db?.loadTransactions { txns in
+//                    btcWalletManager.db?.loadBlocks { blocks in
+//                        _ = txns.compactMap{$0}.filter { $0.pointee.blockHeight < C.bCashForkBlockHeight }
+//                        _ = blocks.compactMap{$0}.filter { $0.pointee.height < C.bCashForkBlockHeight }
+//                        completion()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private func initWallet(completion: @escaping () -> Void) {
         let dispatchGroup = DispatchGroup()
@@ -90,7 +90,7 @@ class ApplicationController : Subscriber, Trackable {
         walletManagers[currency.code] = walletManager
         walletManager.initWallet { success in
             guard success else {
-                // always keep BTC wallet manager, even if not initialized, since it the primaryWalletManager and needed for onboarding
+                // always keep RVN wallet manager, even if not initialized, since it the primaryWalletManager and needed for onboarding
                 if !currency.matches(Currencies.rvn) {
                     walletManager.db?.close()
                     walletManager.db?.delete()
@@ -331,7 +331,28 @@ class ApplicationController : Subscriber, Trackable {
             let accountViewController = AccountViewController(walletManager: walletManager)
             nc.pushViewController(accountViewController, animated: true)
         }
+        
+////        Open Ravencoin Account View Controller without having to check UserDefaults
+//        let walletManager = self.walletManagers[Currencies.rvn.code]
+//        let accountViewController = AccountViewController(walletManager: walletManager!)
+//        nc.pushViewController(accountViewController, animated: true)
 
+        /*// Opens Wipping view controller for only one time in app's life cycle
+        if(!UserDefaults.standard.bool(forKey: "wipe1.0")) {
+            let startWipe = StartOneTimeWipeViewController {
+                guard let walletManager = self.walletManagers[Currencies.rvn.code] else { return }
+                let recover = EnterPhraseViewController(walletManager: walletManager, reason: .validateForOneTimeWipingWallet( {_ in 
+                    self.modalPresenter?.wipeWallet()
+                }))
+                nc.pushViewController(recover, animated: true)
+            }
+            
+            nc.pushViewController(startWipe, animated: true)
+            
+            UserDefaults.standard.set(true, forKey: "wipe1.0")
+            UserDefaults.standard.synchronize()
+        }*/
+        
         window.rootViewController = nc
     }
 

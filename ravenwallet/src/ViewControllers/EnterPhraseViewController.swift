@@ -12,6 +12,7 @@ enum PhraseEntryReason {
     case setSeed(EnterPhraseCallback)
     case validateForResettingPin(EnterPhraseCallback)
     case validateForWipingWallet(()->Void)
+    case validateForOneTimeWipingWallet(EnterPhraseCallback)
 }
 
 typealias EnterPhraseCallback = (String) -> Void
@@ -31,6 +32,8 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             self.customTitle = S.RecoverWallet.headerResetPin
         case .validateForWipingWallet(_):
             self.customTitle = S.WipeWallet.title
+        case .validateForOneTimeWipingWallet(_):
+            self.customTitle = S.OneTimeWipe.title
         }
 
         super.init(nibName: nil, bundle: nil)
@@ -148,6 +151,11 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             saveEvent("enterPhrase.wipeWallet")
             titleLabel.text = S.WipeWallet.title
             subheader.text = S.WipeWallet.instruction
+        case .validateForOneTimeWipingWallet(_):
+            saveEvent("enterPhrase.oneTimeWipeWallet")
+            titleLabel.text = S.OneTimeWipe.title
+            subheader.text = S.OneTimeWipe.instruction
+            faq.isHidden = true
         }
 
         scrollView.delegate = self
@@ -178,6 +186,9 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
         case .validateForWipingWallet(let callback):
             guard self.walletManager.authenticate(phrase: phrase) else { errorLabel.isHidden = false; return }
             return callback()
+        case .validateForOneTimeWipingWallet(let callback):
+            guard self.walletManager.authenticate(phrase: phrase) else { errorLabel.isHidden = false; return }
+            return callback(phrase)
         }
     }
 

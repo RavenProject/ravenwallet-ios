@@ -68,3 +68,6 @@ Screenshots/shots
 
 ravenwallet/Icon.xcassets/AppIcon-Internal.appiconset
 ravenwallet/Config.plist
+ravenwallet/OnetimeWipeViewController.swift
+ravenwallet/Icon.xcassets/AppIcon-Internal.appiconset/icon87x87.png
+ravenwallet/Icon.xcassets/AppIcon-Internal.appiconset/icon80x80.png
