@@ -263,7 +263,7 @@ void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t s
         } else {
             // Bip32 default derivation path
             _CKDpriv(&secret, &chainCode, 0 | BIP32_HARD);  // path m/0H
-            _CKDpriv(&secret, &chainCode, chain);           // path m/0H/chain
+//            _CKDpriv(&secret, &chainCode, chain);           // path m/0H/chain
         }
         
         for (size_t i = 0; i < keysCount; i++) {
@@ -361,14 +361,11 @@ void BRBIP32APIAuthKey(BRKey *key, const void *seed, size_t seedLen)
     BRBIP32PrivKeyPath(key, seed, seedLen, 2, 1 | BIP32_HARD, 0);
 }
 
-
-
 // initial key used for bip44 address derivation,- path m/44'/175'/0'
-void BIP44AddrKey(BRKey *key, const void *seed, size_t seedLen)
-{
-    BRBIP32PrivKeyPath(key, seed, seedLen, 5, BIP44_PURPOSE | BIP32_HARD, 175 | BIP32_HARD, 0 | BIP32_HARD);
-}
-
+//void BIP44AddrKey(BRKey *key, const void *seed, size_t seedLen)
+//{
+//    BRBIP32PrivKeyPath(key, seed, seedLen, 5, BIP44_PURPOSE | BIP32_HARD, 175 | BIP32_HARD, 0 | BIP32_HARD);
+//}
 
 // key used for bip44 authentication,- path m/42'
 void BIP44AuthKey(BRKey *key, const void *seed, size_t seedLen)
