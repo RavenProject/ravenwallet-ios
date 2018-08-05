@@ -14,9 +14,10 @@ class ModalPresenter : Subscriber, Trackable {
     //MARK: - Public
     let primaryWalletManager: WalletManager
     let walletManagers: [String: WalletManager]
-    lazy var supportCenter: SupportCenterContainer = {
-        return SupportCenterContainer(walletManager: self.primaryWalletManager, apiClient: self.noAuthApiClient)
-    }()
+//    lazy var supportCenter: SupportCenterContainer = {
+//        return SupportCenterContainer(walletManager: self.primaryWalletManager, apiClient: self.noAuthApiClient)
+//    }()
+    let supportCenter = SupportWebViewController()
     
     init(walletManagers: [String: WalletManager], window: UIWindow, apiClient: BRAPIClient) {
         self.window = window
@@ -199,9 +200,9 @@ class ModalPresenter : Subscriber, Trackable {
     func presentFaq(articleId: String? = nil) {
         supportCenter.modalPresentationStyle = .overFullScreen
         supportCenter.modalPresentationCapturesStatusBarAppearance = true
-        supportCenter.transitioningDelegate = supportCenter
-        //TODO:AC - add currency
-        let url = articleId == nil ? "/support?" : "/support/article?slug=\(articleId!)"
+//        supportCenter.transitioningDelegate = supportCenter
+
+        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
         supportCenter.navigate(to: url)
         topViewController?.present(supportCenter, animated: true, completion: {})
     }

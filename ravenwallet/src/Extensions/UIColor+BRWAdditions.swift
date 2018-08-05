@@ -113,6 +113,11 @@ extension UIColor {
     static var blue: UIColor {
         return UIColor(red: 46.0/255.0, green: 62.0/255.0, blue: 128.0/255.0, alpha: 1.0)
     }
+    
+    static var webBlue: UIColor {
+        return UIColor(red: 40.0/255.0, green: 54.0/255.0, blue: 116.0/255.0, alpha: 1.0)
+    }
+
 
     static var whiteTint: UIColor {
         return UIColor(red: 245.0/255.0, green: 247.0/255.0, blue: 250.0/255.0, alpha: 1.0)
