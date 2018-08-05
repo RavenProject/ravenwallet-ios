@@ -24,19 +24,18 @@ class SupportWebViewController: UIViewController, WKNavigationDelegate {
     
     func navigate(to: String) {
         url = URL(string: "http://ravenwallet.org/\(to)")!
+        webView.load(URLRequest(url: url!))
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.load(URLRequest(url: url!))
-        
-        // 2
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
         toolbarItems = [refresh]
         navigationController?.isToolbarHidden = false
         
         view.backgroundColor = .webBlue
+        webView.backgroundColor = .webBlue
         
         view.addSubview(webView)
         view.addSubview(close)

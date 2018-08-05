@@ -200,9 +200,10 @@ class ModalPresenter : Subscriber, Trackable {
     func presentFaq(articleId: String? = nil) {
         supportCenter.modalPresentationStyle = .overFullScreen
         supportCenter.modalPresentationCapturesStatusBarAppearance = true
-//        supportCenter.transitioningDelegate = supportCenter
 
-        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
+//        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
+        let url = articleId == nil ? "/support?" : "/support/\(articleId!)"
+
         supportCenter.navigate(to: url)
         topViewController?.present(supportCenter, animated: true, completion: {})
     }
