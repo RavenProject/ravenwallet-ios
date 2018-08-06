@@ -15,6 +15,12 @@ class SecurityCenterHeader : UIView, GradientDrawable {
     }
 }
 
+class OrangeGradientHeader : UIView, GradientDrawable {
+    override func draw(_ rect: CGRect) {
+        drawGradient(start: UIColor.orangeGradientStart, end: UIColor.orangeGradientEnd, rect)
+    }
+}
+
 private let headerHeight: CGFloat = 222.0
 private let fadeStart: CGFloat = 185.0
 private let fadeEnd: CGFloat = 160.0

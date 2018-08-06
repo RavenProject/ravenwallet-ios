@@ -50,13 +50,10 @@ extension UIColor {
 
     // MARK: Gradient
     static var gradientStart: UIColor {
-//        return UIColor(red: 74.0/255.0, green: 29.0/255.0, blue: 92.0/255.0, alpha: 1.0)
         return UIColor(red:0/255.0, green:10/255.0, blue:69/255.0, alpha:1.0)
     }
 
     static var gradientEnd: UIColor {
-//        return UIColor(red: 109.0/255.0, green: 43.0/255.0, blue: 136.0/255.0, alpha: 1.0)
-        
         return UIColor(red:46/255.0, green:62/255.0, blue:128/255.0, alpha:1.0)
     }
 
@@ -143,11 +140,11 @@ extension UIColor {
     }
 
     static var orangeGradientStart: UIColor {
-        return UIColor(red: 246.0/255.0, green: 135.0/255.0, blue: 47.0/255.0, alpha: 1.0)
+        return UIColor(red: 241.0/255.0, green: 91.0/255.0, blue: 35.0/255.0, alpha: 1.0)
     }
     
     static var orangeGradientEnd: UIColor {
-        return UIColor(red: 241.0/255.0, green: 91.0/255.0, blue: 35.0/255.0, alpha: 1.0)
+        return UIColor(red: 246.0/255.0, green: 135.0/255.0, blue: 47.0/255.0, alpha: 1.0)
     }
     
     static var txListGreen: UIColor {

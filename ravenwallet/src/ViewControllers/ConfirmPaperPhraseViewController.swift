@@ -26,6 +26,7 @@ class ConfirmPaperPhraseViewController : UIViewController {
     lazy private var confirmSecondPhrase: ConfirmPhrase = { ConfirmPhrase(text: String(format:S.ConfirmPaperPhrase.word, "\(self.indices.1 + 1)"), word: self.words[self.indices.1]) }()
     private let submit = ShadowButton(title: S.Button.submit, type: .primary)
     private let header = SecurityCenterHeader()//RadialGradientView(backgroundColor: .blue)
+    private let subHeader = OrangeGradientHeader()
     private let pin: String
     private let walletManager: WalletManager
     private let callback: () -> Void
@@ -76,7 +77,8 @@ class ConfirmPaperPhraseViewController : UIViewController {
 
     private func addSubviews() {
         view.addSubview(header)
-        header.addSubview(label)
+        view.addSubview(subHeader)
+        subHeader.addSubview(label)
         view.addSubview(confirmFirstPhrase)
         view.addSubview(confirmSecondPhrase)
         view.addSubview(submit)
@@ -85,10 +87,16 @@ class ConfirmPaperPhraseViewController : UIViewController {
     private func addConstraints() {
         header.constrainTopCorners(sidePadding: 0, topPadding: 0)
         header.constrain([
-            header.constraint(.height, constant: 152.0) ])
+            header.constraint(.height, constant: 100.0) ])
+        subHeader.constrain([
+            subHeader.constraint(.height, constant: 100.0),
+            subHeader.topAnchor.constraint(equalTo: header.bottomAnchor),
+            subHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            subHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ])
         label.constrainBottomCorners(sidePadding: C.padding[1], bottomPadding: C.padding[2])
         confirmFirstPhrase.constrain([
-            confirmFirstPhrase.constraint(toBottom: header, constant: 0.0),
+            confirmFirstPhrase.constraint(toBottom: subHeader, constant: 0.0),
             confirmFirstPhrase.constraint(.width, toView: view, constant: 0.0),
             confirmFirstPhrase.constraint(.centerX, toView: view, constant: 0.0) ])
         confirmSecondPhrase.constrain([

@@ -20,7 +20,9 @@ class StartPaperPhraseViewController : UIViewController {
     private let button: ShadowButton
     private let illustration = UIImageView(image: #imageLiteral(resourceName: "PaperKey"))
     private let pencil = UIImageView(image: #imageLiteral(resourceName: "Pencil"))
+    private let subHeader = OrangeGradientHeader()
     private let explanation = UILabel.wrapping(font: UIFont.customBody(size: 16.0))
+    private let important = UILabel.wrapping(font: UIFont.customBody(size: 22.0))
     private let header = SecurityCenterHeader()//RadialGradientView(backgroundColor: .blue, offset: 64.0)
     private let footer = UILabel.wrapping(font: .customBody(size: 13.0), color: .secondaryGrayText)
     private let callback: () -> Void
@@ -28,6 +30,11 @@ class StartPaperPhraseViewController : UIViewController {
     override func viewDidLoad() {
         view.backgroundColor = .white
         explanation.text = S.StartPaperPhrase.body
+        explanation.textColor = .white
+        
+        important.text = S.StartPaperPhrase.important
+        important.textColor = .white
+        
         addSubviews()
         addConstraints()
         button.tap = { [weak self] in
@@ -42,9 +49,12 @@ class StartPaperPhraseViewController : UIViewController {
 
     private func addSubviews() {
         view.addSubview(header)
-        header.addSubview(illustration)
-        illustration.addSubview(pencil)
-        view.addSubview(explanation)
+        subHeader.addSubview(explanation)
+        subHeader.addSubview(important)
+        view.addSubview(subHeader)
+        view.addSubview(illustration)
+//        illustration.addSubview(pencil)
+//        view.addSubview(explanation)
         view.addSubview(button)
         view.addSubview(footer)
     }
@@ -52,29 +62,34 @@ class StartPaperPhraseViewController : UIViewController {
     private func addConstraints() {
         header.constrainTopCorners(sidePadding: 0, topPadding: 0)
         header.constrain([
-            header.constraint(.height, constant: 220.0) ])
+              header.constraint(.height, constant: 100.0) ])
         illustration.constrain([
-            illustration.constraint(.width, constant: 64.0),
-            illustration.constraint(.height, constant: 84.0),
-            illustration.constraint(.centerX, toView: header, constant: nil),
-            illustration.constraint(.bottom, toView: header, constant: -C.padding[4]) ])
-        pencil.constrain([
-            pencil.constraint(.width, constant: 32.0),
-            pencil.constraint(.height, constant: 32.0),
-            pencil.constraint(.leading, toView: illustration, constant: 44.0),
-            pencil.constraint(.top, toView: illustration, constant: -4.0) ])
+            illustration.constraint(.width, constant: 127.0),
+            illustration.constraint(.height, constant: 130.0),
+            illustration.constraint(.centerX, toView: view, constant: nil),
+            illustration.topAnchor.constraint(equalTo: subHeader.bottomAnchor, constant: C.padding[15]) ])
+        subHeader.constrain([
+            subHeader.constraint(.height, constant: 200.0),
+            subHeader.topAnchor.constraint(equalTo: header.bottomAnchor),
+            subHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            subHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ])
+        important.constrain([
+            important.topAnchor.constraint(equalTo: subHeader.topAnchor, constant: C.padding[2]),
+            important.constraint(.leading, toView: subHeader, constant: C.padding[2]),
+            important.constraint(.trailing, toView: subHeader, constant: -C.padding[2]) ])
         explanation.constrain([
-            explanation.constraint(toBottom: header, constant: C.padding[3]),
-            explanation.constraint(.leading, toView: view, constant: C.padding[2]),
-            explanation.constraint(.trailing, toView: view, constant: -C.padding[2]) ])
+            explanation.topAnchor.constraint(equalTo: important.bottomAnchor, constant: C.padding[2]),
+            explanation.constraint(.leading, toView: subHeader, constant: C.padding[2]),
+            explanation.constraint(.trailing, toView: subHeader, constant: -C.padding[2]) ])
         button.constrain([
             button.leadingAnchor.constraint(equalTo: footer.leadingAnchor),
-            button.bottomAnchor.constraint(equalTo: footer.topAnchor, constant: -C.padding[2]),
+            button.bottomAnchor.constraint(equalTo: footer.topAnchor, constant: -C.padding[4]),
             button.trailingAnchor.constraint(equalTo: footer.trailingAnchor),
             button.constraint(.height, constant: C.Sizes.buttonHeight) ])
         footer.constrain([
             footer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
-            footer.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[2]),
+            footer.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[4]),
             footer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]) ])
     }
 

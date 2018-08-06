@@ -15,6 +15,7 @@ class WritePaperPhraseViewController: UIViewController {
     private let label = UILabel.wrapping(font: UIFont.customBody(size: 16.0))
     private let stepLabel = UILabel.wrapping(font: UIFont.customMedium(size: 13.0))
     private let header = SecurityCenterHeader() //RadialGradientView(backgroundColor: .blue)
+    private let subHeader = OrangeGradientHeader()
     
     private lazy var phraseViews: [PhraseView] = {
         guard let phraseString = self.walletManager.seedPhrase(pin: self.pin) else { return [] }
@@ -81,7 +82,8 @@ class WritePaperPhraseViewController: UIViewController {
     
     private func addSubviews() {
         view.addSubview(header)
-        header.addSubview(label)
+        subHeader.addSubview(label)
+        view.addSubview(subHeader)
         view.addSubview(stepLabel)
         view.addSubview(proceed)
         view.addSubview(previous)
@@ -92,7 +94,15 @@ class WritePaperPhraseViewController: UIViewController {
 
         header.constrainTopCorners(sidePadding: 0, topPadding: 0)
         header.constrain([
-            header.constraint(.height, constant: 152.0) ])
+            header.constraint(.height, constant: 100.0) ])
+        
+        subHeader.constrain([
+            subHeader.constraint(.height, constant: 80.0),
+            subHeader.topAnchor.constraint(equalTo: header.bottomAnchor),
+            subHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            subHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ])
+        
         label.constrainBottomCorners(sidePadding: C.padding[3], bottomPadding: C.padding[2])
 
         phraseViews.enumerated().forEach { index, phraseView in
