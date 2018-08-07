@@ -66,8 +66,8 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             print("upgrading to authenticated keychain scheme")
             BRBIP39DeriveKey(&seed, seedPhrase, nil)
-            //            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0)
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, 44)
+            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
             seed = UInt512() // clear seed
             try setKeychainItem(key: KeychainKey.mnemonic, item: seedPhrase, authenticated: true)
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: mpk))
@@ -235,8 +235,8 @@ extension WalletManager : WalletAuthenticator {
                 else { return false }
             CFStringNormalize(nfkdPhrase, .KD)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-            //            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0)
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, 44)
+            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
             seed = UInt512() // clear seed
             let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
             guard mpkData?.masterPubKey == mpk else { return false }
@@ -338,8 +338,8 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             try setKeychainItem(key: KeychainKey.mnemonic, item: nfkdPhrase as String?, authenticated: true)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-            //            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0)
-            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, 44)
+            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
             seed = UInt512() // clear seed
             if self.earliestKeyTime < BIP39CreationTime { self.earliestKeyTime = BIP39CreationTime }
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: self.masterPubKey))
@@ -353,6 +353,13 @@ extension WalletManager : WalletAuthenticator {
     func setRandomSeedPhrase() -> String? {
         guard noWallet else { return nil }
         guard var words = rawWordList else { return nil }
+//        // make sure to have the Bip44 when a new wallet is created
+//        guard UserDefaults.standard.set(true, forKey: "Bip44") else {
+//            UserDefaults.standard.set(false, forKey: "Bip44")
+//            return nil
+//        }
+        UserDefaults.standard.set(true, forKey: "Bip44")
+        
         let time = Date.timeIntervalSinceReferenceDate
         
         // we store the wallet creation time on the keychain because keychain data persists even when app is deleted
@@ -404,8 +411,8 @@ extension WalletManager : WalletAuthenticator {
                     else { return false }
                 CFStringNormalize(nfkdPhrase, .KD)
                 BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-                //                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0)
-                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, 44)
+                let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
                 
                 seed = UInt512() // clear seed
                 let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)

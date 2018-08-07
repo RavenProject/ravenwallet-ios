@@ -659,7 +659,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput out
 // forkId is 0 for bitcoin, 0x40 for b-cash
 // seed is the master private key (wallet seed) corresponding to the master public key given when the wallet was created
 // returns true if all inputs were signed, or false if there was an error or not all inputs were able to be signed
-int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, const void *seed, size_t seedLen)
+int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, const void *seed, size_t seedLen, int walletType)
 {
     uint32_t j, internalIdx[tx->inCount], externalIdx[tx->inCount];
     size_t i, internalCount = 0, externalCount = 0;
@@ -684,10 +684,8 @@ int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, con
     BRKey keys[internalCount + externalCount];
 
     if (seed) {
-//        BRBIP32PrivKeyList(keys, internalCount, seed, seedLen, SEQUENCE_INTERNAL_CHAIN, internalIdx);
-//        BRBIP32PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, SEQUENCE_EXTERNAL_CHAIN, externalIdx);
-        BIP44PrivKeyList(keys, internalCount, seed, seedLen, BIP44_RVN_COINTYPE, BIP44_DEFAULT_ACCOUNT, SEQUENCE_INTERNAL_CHAIN, internalIdx, 44);
-        BIP44PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, BIP44_RVN_COINTYPE, BIP44_DEFAULT_ACCOUNT, SEQUENCE_EXTERNAL_CHAIN, externalIdx, 44);
+        BIP44PrivKeyList(keys, internalCount, seed, seedLen, BIP44_RVN_COINTYPE, BIP44_DEFAULT_ACCOUNT, SEQUENCE_INTERNAL_CHAIN, internalIdx, walletType);
+        BIP44PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, BIP44_RVN_COINTYPE, BIP44_DEFAULT_ACCOUNT, SEQUENCE_EXTERNAL_CHAIN, externalIdx, walletType);
 
         // TODO: XXX wipe seed callback
         seed = NULL;
