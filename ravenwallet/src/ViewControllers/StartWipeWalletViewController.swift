@@ -16,7 +16,7 @@ class StartWipeWalletViewController : UIViewController {
     }
 
     private let didTapNext: () -> Void
-    private let header = SecurityCenterHeader()
+    private let header = BlueGradiantCenterHeader()
     private let subHeader = OrangeGradientHeader()
     private let illustration = UIImageView(image: #imageLiteral(resourceName: "RestoreIllustration"))
     private let message = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
