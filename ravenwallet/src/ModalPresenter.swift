@@ -14,9 +14,10 @@ class ModalPresenter : Subscriber, Trackable {
     //MARK: - Public
     let primaryWalletManager: WalletManager
     let walletManagers: [String: WalletManager]
-    lazy var supportCenter: SupportCenterContainer = {
-        return SupportCenterContainer(walletManager: self.primaryWalletManager, apiClient: self.noAuthApiClient)
-    }()
+//    lazy var supportCenter: SupportCenterContainer = {
+//        return SupportCenterContainer(walletManager: self.primaryWalletManager, apiClient: self.noAuthApiClient)
+//    }()
+    let supportCenter = SupportWebViewController()
     
     init(walletManagers: [String: WalletManager], window: UIWindow, apiClient: BRAPIClient) {
         self.window = window
@@ -119,7 +120,7 @@ class ModalPresenter : Subscriber, Trackable {
             guard let trigger = $0 else { return }
             if case let .lightWeightAlert(message) = trigger {
                 self.showLightWeightAlert(message: message)
-            }
+            }  
         })
         Store.subscribe(self, name: .showAlert(nil), callback: {
             guard let trigger = $0 else { return }
@@ -144,10 +145,10 @@ class ModalPresenter : Subscriber, Trackable {
         vc.modalPresentationStyle = .overFullScreen
         vc.modalPresentationCapturesStatusBarAppearance = true
         configuration?(vc)
-        topViewController?.present(vc, animated: true) {
-            Store.perform(action: RootModalActions.Present(modal: .none))
-            Store.trigger(name: .hideStatusBar)
-        }
+//        topViewController?.present(vc, animated: true) {
+//            Store.perform(action: RootModalActions.Present(modal: .none))
+//            Store.trigger(name: .hideStatusBar)
+//        }
     }
 
     private func handleAlertChange(_ type: AlertType) {
@@ -199,9 +200,10 @@ class ModalPresenter : Subscriber, Trackable {
     func presentFaq(articleId: String? = nil) {
         supportCenter.modalPresentationStyle = .overFullScreen
         supportCenter.modalPresentationCapturesStatusBarAppearance = true
-        supportCenter.transitioningDelegate = supportCenter
-        //TODO:AC - add currency
-        let url = articleId == nil ? "/support?" : "/support/article?slug=\(articleId!)"
+
+//        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
+        let url = articleId == nil ? "/support?" : "/support/\(articleId!)"
+
         supportCenter.navigate(to: url)
         topViewController?.present(supportCenter, animated: true, completion: {})
     }
@@ -288,7 +290,6 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func presentLoginScan() {
-        //TODO:BCH URL support
         guard let top = topViewController else { return }
         let present = presentScan(parent: top, currency: Currencies.rvn)
         Store.perform(action: RootModalActions.Present(modal: .none))

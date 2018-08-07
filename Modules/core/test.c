@@ -1511,7 +1511,7 @@ int BRBIP32SequenceTests()
     if (! UInt256Eq(key.secret, u256_hex_decode("00136c1ad038f9a00871895322a487ed14f1cdc4d22ad351cfa1a0d235975dd7")))
         r = 0, fprintf(stderr, "***FAILED*** %s: BRBIP32PrivKey() test 2\n", __func__);
     
-    BRMasterPubKey mpk = BRBIP32MasterPubKey(&seed, sizeof(seed));
+    BRMasterPubKey mpk = BIP44MasterPubKey(&seed, sizeof(seed));
     
 //    printf("000102030405060708090a0b0c0d0e0f/0H fp:%08x chain:%s pubkey:%02x%s\n", be32(mpk.fingerPrint),
 //           u256_hex_encode(mpk.chainCode), mpk.pubKey[0], u256_hex_encode(*(UInt256 *)&mpk.pubKey[1]));
@@ -1521,17 +1521,17 @@ int BRBIP32SequenceTests()
 //        mpk.pubKey[0] != 0x03 ||
 //        ! UInt256Eq(*(UInt256 *)&mpk.pubKey[1],
 //                    u256_hex_decode("5a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56")))
-//        r = 0, fprintf(stderr, "***FAILED*** %s: BRBIP32MasterPubKey() test\n", __func__);
+//        r = 0, fprintf(stderr, "***FAILED*** %s: BIP44MasterPubKey() test\n", __func__);
 
     uint8_t pubKey[33];
 
-    BRBIP32PubKey(pubKey, sizeof(pubKey), mpk, SEQUENCE_EXTERNAL_CHAIN, 0);
+    BIP44PubKey(pubKey, sizeof(pubKey), mpk, SEQUENCE_EXTERNAL_CHAIN, 0);
     printf("000102030405060708090a0b0c0d0e0f/0H/0/0 pub = %02x%s\n", pubKey[0],
            u256_hex_encode(*(UInt256 *)&pubKey[1]));
     if (pubKey[0] != 0x02 ||
         ! UInt256Eq(*(UInt256 *)&pubKey[1],
                     u256_hex_decode("7b6a7dd645507d775215a9035be06700e1ed8c541da9351b4bd14bd50ab61428")))
-        r = 0, fprintf(stderr, "***FAILED*** %s: BRBIP32PubKey() test\n", __func__);
+        r = 0, fprintf(stderr, "***FAILED*** %s: BIP44PubKey() test\n", __func__);
 
     UInt512 dk;
     BRAddress addr;
@@ -1681,7 +1681,7 @@ static void walletTxDeleted(void *info, UInt256 txHash, int notifyUser, int reco
 int BRWalletTests()
 {
     int r = 1;
-    BRMasterPubKey mpk = BRBIP32MasterPubKey("", 1);
+    BRMasterPubKey mpk = BIP44MasterPubKey("", 1);
     BRWallet *w = BRWalletNew(NULL, 0, mpk);
     UInt256 secret = u256_hex_decode("0000000000000000000000000000000000000000000000000000000000000001"),
             inHash = u256_hex_decode("0000000000000000000000000000000000000000000000000000000000000001");
@@ -2517,7 +2517,7 @@ int main(int argc, const char *argv[])
 //    
 //    //BRBIP39DeriveKey(seed.u8, "video tiger report bid suspect taxi mail argue naive layer metal surface", NULL);
 //    BRBIP39DeriveKey(seed.u8, "axis husband project any sea patch drip tip spirit tide bring belt", NULL);
-//    mpk = BRBIP32MasterPubKey(&seed, sizeof(seed));
+//    mpk = BIP44MasterPubKey(&seed, sizeof(seed));
 //
 //    wallet = BRWalletNew(NULL, 0, mpk);
 //    BRWalletSetCallbacks(wallet, wallet, walletBalanceChanged, walletTxAdded, walletTxUpdated, walletTxDeleted);

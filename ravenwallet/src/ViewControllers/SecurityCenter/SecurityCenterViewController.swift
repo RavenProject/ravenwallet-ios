@@ -9,7 +9,13 @@
 import UIKit
 import LocalAuthentication
 
-class SecurityCenterHeader : UIView, GradientDrawable {
+class BlueGradiantCenterHeader : UIView, GradientDrawable {
+    override func draw(_ rect: CGRect) {
+        drawGradient(rect)
+    }
+}
+
+class OrangeGradiantCenterHeader : UIView, GradientDrawable {
     override func draw(_ rect: CGRect) {
         drawGradient(rect)
     }
@@ -44,7 +50,7 @@ class SecurityCenterViewController : UIViewController, Subscriber {
     }
 
     fileprivate var headerBackgroundHeight: NSLayoutConstraint?
-    private let headerBackground = SecurityCenterHeader()
+    private let headerBackground = BlueGradiantCenterHeader()
     private let header: ModalHeaderView
     fileprivate let shield = UIImageView(image: #imageLiteral(resourceName: "shield"))
     private let scrollView = UIScrollView()
