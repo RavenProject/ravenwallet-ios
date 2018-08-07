@@ -248,7 +248,6 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                 self.currentPrompt = nil
             }
             currentPrompt!.continueButton.tap = { [unowned self] in
-                // TODO:BCH move out of home screen
                 if let trigger = type.trigger(currency: Currencies.rvn) {
                     Store.trigger(name: trigger)
                 }

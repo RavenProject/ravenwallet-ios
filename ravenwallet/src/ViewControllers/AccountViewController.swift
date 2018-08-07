@@ -29,7 +29,6 @@ class AccountViewController : UIViewController, Subscriber {
         headerView.isWatchOnly = walletManager.isWatchOnly
         footerView.sendCallback     = { Store.perform(action: RootModalActions.Present(modal: .send(currency: walletManager.currency))) }
         footerView.receiveCallback  = { Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency))) }
-//        footerView.buyCallback      = { Store.perform(action: RootModalActions.Present(modal: .buy)) }
     }
 
     //MARK: - Private

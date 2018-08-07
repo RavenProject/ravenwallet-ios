@@ -120,7 +120,7 @@ class ModalPresenter : Subscriber, Trackable {
             guard let trigger = $0 else { return }
             if case let .lightWeightAlert(message) = trigger {
                 self.showLightWeightAlert(message: message)
-            }
+            }  
         })
         Store.subscribe(self, name: .showAlert(nil), callback: {
             guard let trigger = $0 else { return }
@@ -145,10 +145,10 @@ class ModalPresenter : Subscriber, Trackable {
         vc.modalPresentationStyle = .overFullScreen
         vc.modalPresentationCapturesStatusBarAppearance = true
         configuration?(vc)
-        topViewController?.present(vc, animated: true) {
-            Store.perform(action: RootModalActions.Present(modal: .none))
-            Store.trigger(name: .hideStatusBar)
-        }
+//        topViewController?.present(vc, animated: true) {
+//            Store.perform(action: RootModalActions.Present(modal: .none))
+//            Store.trigger(name: .hideStatusBar)
+//        }
     }
 
     private func handleAlertChange(_ type: AlertType) {
@@ -290,7 +290,6 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func presentLoginScan() {
-        //TODO:BCH URL support
         guard let top = topViewController else { return }
         let present = presentScan(parent: top, currency: Currencies.rvn)
         Store.perform(action: RootModalActions.Present(modal: .none))

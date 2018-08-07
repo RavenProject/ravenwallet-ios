@@ -11,9 +11,9 @@ import WebKit
 class SupportWebViewController: UIViewController, WKNavigationDelegate {
     var webView = WKWebView()
     var url = URL(string: "http://ravenwallet.org/support")
-    private let close = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
-    private let logo = UIImageView(image: #imageLiteral(resourceName: "Logo"))
-    private let support = UIImageView(image: #imageLiteral(resourceName: "support"))
+    private let close = UIImageView(image: #imageLiteral(resourceName: "WebClose"))
+//    private let logo = UIImageView(image: #imageLiteral(resourceName: "Logo"))
+//    private let support = UIImageView(image: #imageLiteral(resourceName: "support"))
 
     
 //    override func loadView() {
