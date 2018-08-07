@@ -145,10 +145,10 @@ class ModalPresenter : Subscriber, Trackable {
         vc.modalPresentationStyle = .overFullScreen
         vc.modalPresentationCapturesStatusBarAppearance = true
         configuration?(vc)
-//        topViewController?.present(vc, animated: true) {
-//            Store.perform(action: RootModalActions.Present(modal: .none))
-//            Store.trigger(name: .hideStatusBar)
-//        }
+        topViewController?.present(vc, animated: true) {
+            Store.perform(action: RootModalActions.Present(modal: .none))
+            Store.trigger(name: .hideStatusBar)
+        }
     }
 
     private func handleAlertChange(_ type: AlertType) {
