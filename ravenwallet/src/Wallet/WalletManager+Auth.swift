@@ -442,7 +442,7 @@ extension WalletManager : WalletAuthenticator {
             if let bundleId = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: bundleId)
             }
-            try BRAPIClient(authenticator: self).kv?.rmdb()
+//            try BRAPIClient(authenticator: self).kv?.rmdb()
             try? FileManager.default.removeItem(at: BRReplicatedKVStore.dbPath)
             try setKeychainItem(key: KeychainKey.apiAuthKey, item: nil as Data?)
             try setKeychainItem(key: KeychainKey.spendLimit, item: nil as Int64?)
@@ -531,8 +531,8 @@ extension WalletManager : WalletAuthenticator {
         public static let pinFailTime = "pinfailheight"
         public static let apiAuthKey = "authprivkey"
         public static let ethPrivKey = "ethprivkey"
-        public static let userAccount = "https://api.breadwallet.com"
-        //        public static let userAccount = "https://ravencoin.network/api"
+//        public static let userAccount = "https://api.breadwallet.com"
+        public static let userAccount = "https://ravencoin.network/api"
         public static let seed = "seed" // deprecated
     }
     

@@ -34,6 +34,7 @@ struct C {
     static let secondsInDay: TimeInterval = 86400
     static let maxMoney: UInt64 = 21000000000*100000000
     static let satoshis: UInt64 = 100000000
+    // TODO Update those information starting from here
     static let walletQueue = "com.breadwallet.walletqueue"
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"

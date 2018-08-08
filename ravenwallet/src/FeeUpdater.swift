@@ -22,15 +22,17 @@ class FeeUpdater : Trackable {
     }
 
     func refresh(completion: @escaping () -> Void) {
-        walletManager.apiClient?.feePerKb(code: walletManager.currency.code) { newFees, error in
-            guard error == nil else { print("feePerKb error: \(String(describing: error))"); completion(); return }
-            guard newFees.regular < self.maxFeePerKB && newFees.economy > self.minFeePerKB else {
-                self.saveEvent("wallet.didUseDefaultFeePerKB")
-                return
-            }
-            Store.perform(action: WalletChange(self.walletManager.currency).setFees(newFees))
-            completion()
-        }
+//        walletManager.apiClient?.feePerKb(code: walletManager.currency.code) { newFees, error in
+//            guard error == nil else { print("feePerKb error: \(String(describing: error))"); completion(); return }
+//            guard newFees.regular < self.maxFeePerKB && newFees.economy > self.minFeePerKB else {
+//                self.saveEvent("wallet.didUseDefaultFeePerKB")
+//                return
+//            }
+//            Store.perform(action: WalletChange(self.walletManager.currency).setFees(newFees))
+//            completion()
+//        }
+        let newFees = Fees(regular: maxFeePerKB, economy: txFeePerKb, timestamp: Date().timeIntervalSince1970)
+        Store.perform(action: WalletChange(self.walletManager.currency).setFees(newFees))
 
         if timer == nil {
             timer = Timer.scheduledTimer(timeInterval: feeUpdateInterval, target: self, selector: #selector(intervalRefresh), userInfo: nil, repeats: true)

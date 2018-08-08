@@ -40,11 +40,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 //        FirebaseApp.configure()
         
-        print(Version.sharedInstance.current_version)
-        
+//        print(Version.sharedInstance.current_version)
         return true
     }
-
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
         UIApplication.shared.applicationIconBadgeNumber = 0
     }

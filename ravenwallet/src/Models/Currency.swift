@@ -3,7 +3,7 @@
 //  ravenwallet
 //
 //  Created by Ehsan Rezaie on 2018-01-10.
-//  Copyright © 2018 breadwallet LLC. All rights reserved.
+//  Copyright © 2018 Raven Team LLC. All rights reserved.
 //
 
 import Foundation
@@ -117,6 +117,7 @@ struct Currencies {
                              symbol: S.Symbols.rvn,
                              colors: (UIColor(red: 46.0/255.0, green: 62.0/255.0, blue: 128.0/255.0, alpha: 1.0),
                                       UIColor(red: 34.0/255.0, green: 45.0/255.0, blue: 105.0/255.0, alpha: 1.0)),
+                             // TODO change this to new path
                              dbPath: "BreadWallet.sqlite",
                              forkId: 0,
                              urlScheme: "Raven")

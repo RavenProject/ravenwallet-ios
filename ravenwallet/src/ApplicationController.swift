@@ -130,7 +130,7 @@ class ApplicationController : Subscriber, Trackable {
                 }
             }
         }
-        updateAssetBundles()
+//        updateAssetBundles()
         if !hasPerformedWalletDependentInitialization && didInitWallet {
             didInitWalletManager()
         }
@@ -182,8 +182,8 @@ class ApplicationController : Subscriber, Trackable {
         }
         exchangeUpdaters.values.forEach { $0.refresh(completion: {}) }
         feeUpdaters.values.forEach { $0.refresh() }
-        walletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
-        walletManager.apiClient?.updateFeatureFlags()
+//        walletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
+//        walletManager.apiClient?.updateFeatureFlags()
     }
 
     func retryAfterIsReachable() {
@@ -194,8 +194,8 @@ class ApplicationController : Subscriber, Trackable {
         }
         exchangeUpdaters.values.forEach { $0.refresh(completion: {}) }
         feeUpdaters.values.forEach { $0.refresh() }
-        walletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
-        walletManager.apiClient?.updateFeatureFlags()
+//        walletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
+//        walletManager.apiClient?.updateFeatureFlags()
     }
 
     func didEnterBackground() {
@@ -209,7 +209,7 @@ class ApplicationController : Subscriber, Trackable {
         if !Store.state.isLoginRequired {
             UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: timeSinceLastExitKey)
         }
-        primaryWalletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
+//        primaryWalletManager.apiClient?.kv?.syncAllKeys { print("KV finished syncing. err: \(String(describing: $0))") }
     }
 
     func performFetch(_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -315,6 +315,8 @@ class ApplicationController : Subscriber, Trackable {
         
         home.didTapSupport = {
             self.modalPresenter?.presentFaq()
+//            Wipping Backup for tests ... I'am Stupid
+//            self.modalPresenter?.wipeWallet()
         }
         
         home.didTapSecurity = {
@@ -337,28 +339,29 @@ class ApplicationController : Subscriber, Trackable {
 //        let accountViewController = AccountViewController(walletManager: walletManager!)
 //        nc.pushViewController(accountViewController, animated: true)
 
-        /*// Opens Wipping view controller for only one time in app's life cycle
-        if(!UserDefaults.standard.bool(forKey: "wipe1.0")) {
-            let startWipe = StartOneTimeWipeViewController {
-                guard let walletManager = self.walletManagers[Currencies.rvn.code] else { return }
-                let recover = EnterPhraseViewController(walletManager: walletManager, reason: .validateForOneTimeWipingWallet( {_ in 
-                    self.modalPresenter?.wipeWallet()
-                }))
-                nc.pushViewController(recover, animated: true)
-            }
-            
-            nc.pushViewController(startWipe, animated: true)
-            
-            UserDefaults.standard.set(true, forKey: "wipe1.0")
-            UserDefaults.standard.synchronize()
-        }*/
+        // Opens Wipping view controller for only one time in app's life cycle
+//        if(!UserDefaults.standard.bool(forKey: "wipe1.0")) {
+//            let startWipe = StartOneTimeWipeViewController {
+//                guard let walletManager = self.walletManagers[Currencies.rvn.code] else { return }
+//                let recover = EnterPhraseViewController(walletManager: walletManager, reason: .validateForOneTimeWipingWallet( {_ in
+//                    self.modalPresenter?.wipeWallet()
+//                }))
+//                nc.pushViewController(recover, animated: true)
+//            }
+//
+//            nc.pushViewController(startWipe, animated: true)
+//
+//            UserDefaults.standard.set(true, forKey: "wipe1.0")
+//            UserDefaults.standard.synchronize()
+//
+//        }
         
         window.rootViewController = nc
     }
 
     private func startDataFetchers() {
-        primaryWalletManager.apiClient?.updateFeatureFlags()
-        initKVStoreCoordinator()
+//        primaryWalletManager.apiClient?.updateFeatureFlags()
+//        initKVStoreCoordinator()
         feeUpdaters.values.forEach { $0.refresh() }
         defaultsUpdater?.refresh()
         primaryWalletManager.apiClient?.events?.up()
@@ -380,31 +383,31 @@ class ApplicationController : Subscriber, Trackable {
         })
     }
     
-    private func updateAssetBundles() {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let myself = self else { return }
-            myself.noAuthApiClient.updateBundles { errors in
-                for (n, e) in errors {
-                    print("Bundle \(n) ran update. err: \(String(describing: e))")
-                }
-                DispatchQueue.main.async {
-                    let _ = myself.modalPresenter?.supportCenter // Initialize support center
-                }
-            }
-        }
-    }
+//    private func updateAssetBundles() {
+//        DispatchQueue.global(qos: .utility).async { [weak self] in
+//            guard let myself = self else { return }
+//            myself.noAuthApiClient.updateBundles { errors in
+//                for (n, e) in errors {
+//                    print("Bundle \(n) ran update. err: \(String(describing: e))")
+//                }
+//                DispatchQueue.main.async {
+//                    let _ = myself.modalPresenter?.supportCenter // Initialize support center
+//                }
+//            }
+//        }
+//    }
 
-    private func initKVStoreCoordinator() {
-        guard let kvStore = primaryWalletManager.apiClient?.kv else { return }
-        guard kvStoreCoordinator == nil else { return }
-        kvStore.syncAllKeys { [weak self] error in
-            print("KV finished syncing. err: \(String(describing: error))")
-            self?.walletManagers[Currencies.rvn.code]?.kvStore = kvStore
-            self?.kvStoreCoordinator = KVStoreCoordinator(kvStore: kvStore)
-            self?.kvStoreCoordinator?.retreiveStoredWalletInfo()
-            self?.kvStoreCoordinator?.listenForWalletChanges()
-        }
-    }
+//    private func initKVStoreCoordinator() {
+////        guard let kvStore = primaryWalletManager.apiClient?.kv else { return }
+//        guard kvStoreCoordinator == nil else { return }
+//        kvStore.syncAllKeys { [weak self] error in
+//            print("KV finished syncing. err: \(String(describing: error))")
+//            self?.walletManagers[Currencies.rvn.code]?.kvStore = kvStore
+//            self?.kvStoreCoordinator = KVStoreCoordinator(kvStore: kvStore)
+//            self?.kvStoreCoordinator?.retreiveStoredWalletInfo()
+//            self?.kvStoreCoordinator?.listenForWalletChanges()
+//        }
+//    }
 
     private func offMainInitialization() {
         DispatchQueue.global(qos: .background).async {

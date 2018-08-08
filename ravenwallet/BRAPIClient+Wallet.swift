@@ -23,35 +23,35 @@ extension BRAPIClient {
         task.resume()
     }
 
-    func feePerKb(code: String, _ handler: @escaping (_ fees: Fees, _ error: String?) -> Void) {
-        let param = ""
-        let req = URLRequest(url: url("/fee-per-kb\(param)"))
-        let task = self.dataTaskWithRequest(req) { (data, response, err) -> Void in
-            var regularFeePerKb: uint_fast64_t = 0
-            var economyFeePerKb: uint_fast64_t = 0
-            var errStr: String? = nil
-            if err == nil {
-                do {
-                    let parsedObject: Any? = try JSONSerialization.jsonObject(
-                        with: data!, options: JSONSerialization.ReadingOptions.allowFragments)
-                    if let top = parsedObject as? NSDictionary, let regular = top["fee_per_kb"] as? NSNumber, let economy = top["fee_per_kb_economy"] as? NSNumber {
-                        regularFeePerKb = regular.uint64Value
-                        economyFeePerKb = economy.uint64Value
-                    }
-                } catch (let e) {
-                    self.log("fee-per-kb: error parsing json \(e)")
-                }
-                if regularFeePerKb == 0 || economyFeePerKb == 0 {
-                    errStr = "invalid json"
-                }
-            } else {
-                self.log("fee-per-kb network error: \(String(describing: err))")
-                errStr = "bad network connection"
-            }
-            handler(Fees(regular: regularFeePerKb, economy: economyFeePerKb, timestamp: Date().timeIntervalSince1970), errStr)
-        }
-        task.resume()
-    }
+//    func feePerKb(code: String, _ handler: @escaping (_ fees: Fees, _ error: String?) -> Void) {
+//        let param = ""
+//        let req = URLRequest(url: url("/fee-per-kb\(param)"))
+//        let task = self.dataTaskWithRequest(req) { (data, response, err) -> Void in
+//            var regularFeePerKb: uint_fast64_t = 0
+//            var economyFeePerKb: uint_fast64_t = 0
+//            var errStr: String? = nil
+//            if err == nil {
+//                do {
+//                    let parsedObject: Any? = try JSONSerialization.jsonObject(
+//                        with: data!, options: JSONSerialization.ReadingOptions.allowFragments)
+//                    if let top = parsedObject as? NSDictionary, let regular = top["fee_per_kb"] as? NSNumber, let economy = top["fee_per_kb_economy"] as? NSNumber {
+//                        regularFeePerKb = regular.uint64Value
+//                        economyFeePerKb = economy.uint64Value
+//                    }
+//                } catch (let e) {
+//                    self.log("fee-per-kb: error parsing json \(e)")
+//                }
+//                if regularFeePerKb == 0 || economyFeePerKb == 0 {
+//                    errStr = "invalid json"
+//                }
+//            } else {
+//                self.log("fee-per-kb network error: \(String(describing: err))")
+//                errStr = "bad network connection"
+//            }
+//            handler(Fees(regular: regularFeePerKb, economy: economyFeePerKb, timestamp: Date().timeIntervalSince1970), errStr)
+//        }
+//        task.resume()
+//    }
     
     func ravenMultiplier(_ handler: @escaping (_ mult: Double, _ error: String?) -> Void) {
         let request = URLRequest(url: URL(string: ravenMultiplierURL)!)
@@ -79,6 +79,7 @@ extension BRAPIClient {
         }
         task.resume()
     }
+    
     func exchangeRates(code: String, isFallback: Bool = false, _ ratio : Double, _ handler: @escaping (_ rates: [Rate],
         _ multiplier: Double, _ error: String?) -> Void) {
         let param = ""

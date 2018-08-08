@@ -136,24 +136,24 @@ import WebKit
                 let activity = BRActivityViewController(message: S.Webview.dismiss)
                 myself.present(activity, animated: true, completion: nil)
                 guard let apiClient = self?.walletManager.apiClient else { return }
-                apiClient.updateBundles(completionHandler: { results in
-                    results.forEach({ message, err in
-                        if err != nil {
-                            print("[BRWebViewController] error updating bundle: \(String(describing: err))")
-                        }
-                        // give the webview another chance to load
-                        DispatchQueue.main.async {
-                            self?.refresh()
-                        }
-                        // XXX(sam): log this event so we know how frequently it happens
-                        DispatchQueue.main.asyncAfter(deadline: timeout) {
-                            Store.trigger(name: .showStatusBar)
-                            self?.dismiss(animated: true) {
-                                self?.notifyUserOfLoadFailure()
-                            }
-                        }
-                    })
-                })
+//                apiClient.updateBundles(completionHandler: { results in
+//                    results.forEach({ message, err in
+//                        if err != nil {
+//                            print("[BRWebViewController] error updating bundle: \(String(describing: err))")
+//                        }
+//                        // give the webview another chance to load
+//                        DispatchQueue.main.async {
+//                            self?.refresh()
+//                        }
+//                        // XXX(sam): log this event so we know how frequently it happens
+//                        DispatchQueue.main.asyncAfter(deadline: timeout) {
+//                            Store.trigger(name: .showStatusBar)
+//                            self?.dismiss(animated: true) {
+//                                self?.notifyUserOfLoadFailure()
+//                            }
+//                        }
+//                    })
+//                })
             }
         }
     }
@@ -248,22 +248,22 @@ import WebKit
         let router = BRHTTPRouter()
         server.prependMiddleware(middleware: router)
         
-        if let archive = AssetArchive(name: bundleName, apiClient: apiClient) {
-            // basic file server for static assets
-            let fileMw = BRHTTPFileMiddleware(baseURL: archive.extractedUrl)
-            server.prependMiddleware(middleware: fileMw)
-            
-            // middleware to always return index.html for any unknown GET request (facilitates window.history style SPAs)
-            let indexMw = BRHTTPIndexMiddleware(baseURL: fileMw.baseURL)
-            server.prependMiddleware(middleware: indexMw)
-            
-            // enable debug if it is turned on
-            if let debugUrl = debugEndpoint {
-                let url = URL(string: debugUrl)
-                fileMw.debugURL = url
-                indexMw.debugURL = url
-            }
-        }
+//        if let archive = AssetArchive(name: bundleName, apiClient: apiClient) {
+//            // basic file server for static assets
+//            let fileMw = BRHTTPFileMiddleware(baseURL: archive.extractedUrl)
+//            server.prependMiddleware(middleware: fileMw)
+//
+//            // middleware to always return index.html for any unknown GET request (facilitates window.history style SPAs)
+//            let indexMw = BRHTTPIndexMiddleware(baseURL: fileMw.baseURL)
+//            server.prependMiddleware(middleware: indexMw)
+//
+//            // enable debug if it is turned on
+//            if let debugUrl = debugEndpoint {
+//                let url = URL(string: debugUrl)
+//                fileMw.debugURL = url
+//                indexMw.debugURL = url
+//            }
+//        }
         
         // geo plugin provides access to onboard geo location functionality
         router.plugin(BRGeoLocationPlugin())
@@ -278,7 +278,7 @@ import WebKit
         router.plugin(BRLinkPlugin(fromViewController: self))
         
         // kvstore plugin provides access to the shared replicated kv store
-        router.plugin(BRKVStorePlugin(client: apiClient))
+//        router.plugin(BRKVStorePlugin(client: apiClient))
         
         // GET /_close closes the browser modal
         router.get("/_close") { [weak self] (request, match) -> BRHTTPResponse in

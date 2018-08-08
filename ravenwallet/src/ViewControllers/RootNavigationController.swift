@@ -22,6 +22,7 @@ class RootNavigationController : UINavigationController {
                 present(loginView, animated: false, completion: {
                     self.tempLoginView.remove()
                     //todo - attempt show welcome here
+//                    self.attemptShowWelcomeView(loginView: loginView)
                 })
             }
         }
@@ -51,15 +52,15 @@ class RootNavigationController : UINavigationController {
         self.delegate = self
     }
 
-    //TODO: unused
-    private func attemptShowWelcomeView() {
+
+    private func attemptShowWelcomeView(loginView: UIViewController) {
         if !UserDefaults.hasShownWelcome {
             let welcome = WelcomeViewController()
             welcome.transitioningDelegate = welcomeTransitingDelegate
             welcome.modalPresentationStyle = .overFullScreen
             welcome.modalPresentationCapturesStatusBarAppearance = true
             welcomeTransitingDelegate.shouldShowMaskView = false
-            //loginView.present(welcome, animated: true, completion: nil)
+            loginView.present(welcome, animated: true, completion: nil)
             UserDefaults.hasShownWelcome = true
         }
     }

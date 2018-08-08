@@ -21,7 +21,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     private let currencyList = AssetListTableView()
     private let subHeaderView = UIView()
     private var logo: UIImageView = {
-        let image = UIImageView(image: #imageLiteral(resourceName: "LogoGradient"))
+//        let image = UIImageView(image: #imageLiteral(resourceName: "LogoGradient"))
+        let image = UIImageView(image: #imageLiteral(resourceName: "newLogo"))
         image.contentMode = .scaleAspectFit
         return image
     }()
@@ -90,8 +91,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         let yConstraint = NSLayoutConstraint(item: logo, attribute: .centerY, relatedBy: .equal, toItem: subHeaderView, attribute: .centerY, multiplier: 0.5, constant: 0.0)
         logo.constrain([
             logo.constraint(.centerX, toView: subHeaderView, constant: nil),
-            logo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
-            logo.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
+            logo.trailingAnchor.constraint(equalTo: subHeaderView.trailingAnchor, constant: -C.padding[2]),
+            logo.leadingAnchor.constraint(equalTo: subHeaderView.leadingAnchor, constant: C.padding[2]),
             yConstraint])
         
         totalHeader.constrain([
@@ -101,7 +102,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             ])
         total.constrain([
             total.trailingAnchor.constraint(equalTo: subHeaderView.trailingAnchor, constant: -C.padding[2]),
-            total.bottomAnchor.constraint(equalTo: subHeaderView.bottomAnchor, constant: -C.padding[2]) ])
+//            total.bottomAnchor.constraint(equalTo: subHeaderView.bottomAnchor, constant: -C.padding[2]),
+            total.topAnchor.constraint(equalTo: totalHeader.bottomAnchor/*, constant: C.padding[2]*/)])
         
         promptHiddenConstraint = prompt.heightAnchor.constraint(equalToConstant: 0.0)
         prompt.constrain([

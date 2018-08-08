@@ -17,8 +17,8 @@ class SupportWebViewController: UIViewController, WKNavigationDelegate {
 
     
 //    override func loadView() {
-//        webView = WKWebView()
-//        webView.navigationDelegate = self
+////        webView = WKWebView()
+////        webView.navigationDelegate = self
 ////        view = webView
 //    }
     
@@ -49,7 +49,7 @@ class SupportWebViewController: UIViewController, WKNavigationDelegate {
 
         webView.constrain([
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.topAnchor.constraint(equalTo: /*view.topAnchor*/close.bottomAnchor/*, constant: C.padding[2]*/),
+            webView.topAnchor.constraint(equalTo: /*view.topAnchor*/close.bottomAnchor, constant: C.padding[2]),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor) ])
 

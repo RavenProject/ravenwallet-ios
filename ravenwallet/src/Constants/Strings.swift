@@ -599,8 +599,8 @@ enum S {
     }
     
     enum Welcome {
-        static let title = NSLocalizedString("Welcome.title", value: "Welcome to BRD!", comment: "Welcome view title")
-        static let body = NSLocalizedString("Welcome.body", value: "Breadwallet has changed its name to BRD, with a brand new look and some new features.\n\nIf you need help, look for the (?) in the top right of most screens.", comment: "Welcome view body text")
+        static let title = NSLocalizedString("Welcome.title", value: "Welcome to RVN Wallet!", comment: "Welcome view title")
+        static let body = NSLocalizedString("Welcome.body", value: "// has changed its name to //, with a brand new look and some new features.\n\nIf you need help, look for the (?) in the top right of most screens.", comment: "Welcome view body text")
     }
     
     enum Crowdsale {

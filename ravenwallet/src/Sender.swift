@@ -20,14 +20,14 @@ private let protocolPaymentTimeout: TimeInterval = 20.0
 
 class Sender {
 
-    init(walletManager: WalletManager, kvStore: BRReplicatedKVStore, currency: CurrencyDef) {
+    init(walletManager: WalletManager, /*kvStore: BRReplicatedKVStore,*/ currency: CurrencyDef) {
         self.walletManager = walletManager
-        self.kvStore = kvStore
+//        self.kvStore = kvStore
         self.currency = currency
     }
 
     private let walletManager: WalletManager
-    private let kvStore: BRReplicatedKVStore
+//    private let kvStore: BRReplicatedKVStore
     private let currency: CurrencyDef
     var transaction: BRTxRef?
     var protocolRequest: PaymentProtocolRequest?
@@ -131,11 +131,11 @@ class Sender {
                                   feeRate: Double(feePerKb),
                                   deviceId: UserDefaults.standard.deviceID,
                                   comment: comment)
-        do {
-            let _ = try kvStore.set(metaData)
-        } catch let error {
-            print("could not update metadata: \(error)")
-        }
+//        do {
+//            let _ = try kvStore.set(metaData)
+//        } catch let error {
+//            print("could not update metadata: \(error)")
+//        }
         Store.trigger(name: .txMemoUpdated(tx.pointee.txHash.description))
     }
 
@@ -151,8 +151,8 @@ class Sender {
 
         let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: protocolPaymentTimeout)
 
-        request.setValue("application/bitcoin-payment", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/bitcoin-paymentack", forHTTPHeaderField: "Accept")
+        request.setValue("application/ravencoin-payment", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/ravencoin-paymentack", forHTTPHeaderField: "Accept")
         request.httpMethod = "POST"
         request.httpBody = Data(bytes: payment!.bytes)
 

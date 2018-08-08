@@ -79,7 +79,7 @@ class AccountViewController : UIViewController, Subscriber {
         addTransactionsView()
         addSubviews()
         addConstraints()
-        addSubscriptions()
+//        addSubscriptions()
         addAppLifecycleNotificationEvents()
         setInitialData()
     }

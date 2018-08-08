@@ -48,6 +48,10 @@ class ModalPresenter : Subscriber, Trackable {
                         selector: { $0.rootModal != $1.rootModal},
                         callback: { self.presentModal($0.rootModal) })
         
+//        static func lazySubscribe(_ subscriber: Subscriber, selector: @escaping Selector, callback: @escaping (State) -> Void) {
+//            Store.shared.lazySubscribe(subscriber, selector: selector, callback: callback)
+//        }
+        
         Store.lazySubscribe(self,
                         selector: { $0.alert != $1.alert && $1.alert != .none },
                         callback: { self.handleAlertChange($0.alert) })
@@ -244,8 +248,8 @@ class ModalPresenter : Subscriber, Trackable {
             return nil
         }
         guard let walletManager = walletManagers[currency.code] else { return nil }
-        guard let kvStore = walletManager.apiClient?.kv else { return nil }
-        let sendVC = SendViewController(sender: Sender(walletManager: walletManager, kvStore: kvStore, currency: currency),
+//        guard let kvStore = walletManager.apiClient?.kv else { return nil }
+        let sendVC = SendViewController(sender: Sender(walletManager: walletManager/*, kvStore: kvStore*/, currency: currency),
                                         walletManager: walletManager,
                                         initialRequest: currentRequest,
                                         currency: currency)

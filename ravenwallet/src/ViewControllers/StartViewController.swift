@@ -35,6 +35,7 @@ class StartViewController : UIViewController {
         image.contentMode = .scaleAspectFit
         return image
     }()
+    // Hidden
     private var faq: UIButton
 
     override func viewDidLoad() {
@@ -50,7 +51,7 @@ class StartViewController : UIViewController {
         message.lineBreakMode = .byWordWrapping
         message.numberOfLines = 0
         message.textAlignment = .center
-        faq.tintColor = .whiteTint
+//        faq.tintColor = .whiteTint
     }
 
     private func addSubviews() {
@@ -60,7 +61,7 @@ class StartViewController : UIViewController {
         view.addSubview(message)
         view.addSubview(create)
         view.addSubview(recover)
-        view.addSubview(faq)
+//        view.addSubview(faq)
     }
 
     private func addConstraints() {
@@ -86,11 +87,11 @@ class StartViewController : UIViewController {
             create.constraint(.centerX, toView: recover, constant: nil),
             create.constraint(.width, toView: recover, constant: nil),
             create.constraint(.height, constant: C.Sizes.buttonHeight) ])
-        faq.constrain([
-            faq.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: C.padding[2]),
-            faq.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
-            faq.widthAnchor.constraint(equalToConstant: 44.0),
-            faq.heightAnchor.constraint(equalToConstant: 44.0) ])
+//        faq.constrain([
+//            faq.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: C.padding[2]),
+//            faq.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
+//            faq.widthAnchor.constraint(equalToConstant: 44.0),
+//            faq.heightAnchor.constraint(equalToConstant: 44.0) ])
     }
 
     private func addButtonActions() {

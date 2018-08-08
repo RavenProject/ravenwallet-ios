@@ -1,6 +1,6 @@
 //
 //  BRActivityView.swift
-//  BreadWallet
+//  RavenWallet
 //
 //  Created by Samuel Sutch on 6/17/16.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
