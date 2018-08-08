@@ -148,9 +148,11 @@ extension BRAPIClient {
         }.resume()
     }
 
+//    private let mainURL = "https://ravencoin.network/api/addrs/utxo"
+//    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
     func fetchUTXOS(address: String, currency: CurrencyDef, completion: @escaping ([[String: Any]]?)->Void) {
-        let path = currency.matches(Currencies.rvn) ? "/q/addrs/utxo" : "/q/addrs/utxo?currency=bch"
-        var req = URLRequest(url: url(path))
+        let path = "https://ravencoin.network/api/addrs/utxo"
+        var req = URLRequest(url: URL(string: path)!)
         req.httpMethod = "POST"
         req.httpBody = "addrs=\(address)".data(using: .utf8)
         dataTaskWithRequest(req, handler: { data, resp, error in
@@ -161,16 +163,6 @@ extension BRAPIClient {
                 completion(json)
         }).resume()
     }
-}
-
-struct ExchangeRateResponse : Codable {
-    let status: String
-    let message: String
-    let result: EthRate
-}
-
-struct EthRate : Codable {
-    let ethbtc: String
 }
 
 private func pushNotificationEnvironment() -> String {
