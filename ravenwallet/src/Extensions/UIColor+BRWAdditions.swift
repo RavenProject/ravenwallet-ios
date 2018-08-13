@@ -12,7 +12,6 @@ extension UIColor {
 
     // MARK: Buttons
     static var primaryButton: UIColor {
-//        return UIColor(red: 76.0/255.0, green: 152.0/255.0, blue: 252.0/255.0, alpha: 1.0)
         return UIColor(red:46/255.0, green:62/255.0, blue:128/255.0, alpha:1.0)
     }
 
@@ -94,9 +93,7 @@ extension UIColor {
     }
 
     static var purple: UIColor {
-//        return UIColor(red: 209.0/255.0, green: 125.0/255.0, blue: 245.0/255.0, alpha: 1.0)
         return UIColor(red: 74.0/255.0, green: 29.0/255.0, blue: 92.0/255.0, alpha: 1.0)
-        
     }
 
     static var darkPurple: UIColor {
@@ -114,7 +111,6 @@ extension UIColor {
     static var webBlue: UIColor {
         return UIColor(red: 40.0/255.0, green: 54.0/255.0, blue: 116.0/255.0, alpha: 1.0)
     }
-
 
     static var whiteTint: UIColor {
         return UIColor(red: 245.0/255.0, green: 247.0/255.0, blue: 250.0/255.0, alpha: 1.0)
@@ -153,7 +149,8 @@ extension UIColor {
     }
     
     static var txListGreen: UIColor {
-        return UIColor(red: 0.0, green: 169.0/255.0, blue: 157.0/255.0, alpha: 1.0)
+//        return UIColor(red: 0.0, green: 169.0/255.0, blue: 157.0/255.0, alpha: 1.0)
+        return UIColor(red: 23.0/255.0, green: 175.0/255.0, blue: 99.0/255.0, alpha: 1.0)
     }
     
     static var blueButtonText: UIColor {
@@ -173,7 +170,11 @@ extension UIColor {
     }
     
     static var receivedGreen: UIColor {
-        return UIColor(red: 155.0/255.0, green: 213.0/255.0, blue: 85.0/255.0, alpha: 1.0)
+        return UIColor(red: 23.0/255.0, green: 175.0/255.0, blue: 99.0/255.0, alpha: 1.0)
+    }
+    
+    static var sentRed: UIColor {
+        return UIColor(red: 208.0/255.0, green: 10.0/255.0, blue: 10.0/255.0, alpha:1.0)
     }
     
     static var statusIndicatorActive: UIColor {

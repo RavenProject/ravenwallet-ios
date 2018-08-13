@@ -40,7 +40,7 @@ struct TxListViewModel: TxViewModel {
                                  minimumFractionDigits: nil,
                                  currency: tx.currency,
                                  negative: (tx.direction == .sent)).description
-        let color: UIColor = (tx.direction == .received) ? .green : .red
+        let color: UIColor = (tx.direction == .received) ? .receivedGreen : .sentRed
         
         return NSMutableAttributedString(string: text,
                                          attributes: [.foregroundColor: color])
