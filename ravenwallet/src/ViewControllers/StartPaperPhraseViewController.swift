@@ -21,6 +21,7 @@ class StartPaperPhraseViewController : UIViewController {
     private let illustration = UIImageView(image: #imageLiteral(resourceName: "PaperKey"))
     private let pencil = UIImageView(image: #imageLiteral(resourceName: "Pencil"))
     private let subHeader = OrangeGradientHeader()
+//    private let invisibleView = UIView()
     private let explanation = UILabel.wrapping(font: UIFont.customBody(size: 16.0))
     private let important = UILabel.wrapping(font: UIFont.customBody(size: 22.0))
     private let header = BlueGradiantCenterHeader()//RadialGradientView(backgroundColor: .blue, offset: 64.0)
@@ -52,6 +53,8 @@ class StartPaperPhraseViewController : UIViewController {
         subHeader.addSubview(explanation)
         subHeader.addSubview(important)
         view.addSubview(subHeader)
+//        view.addSubview(invisibleView)
+//        invisibleView.addSubview(illustration)
         view.addSubview(illustration)
 //        illustration.addSubview(pencil)
 //        view.addSubview(explanation)
@@ -63,17 +66,26 @@ class StartPaperPhraseViewController : UIViewController {
         header.constrainTopCorners(sidePadding: 0, topPadding: 0)
         header.constrain([
               header.constraint(.height, constant: 100.0) ])
-        illustration.constrain([
-            illustration.constraint(.width, constant: 127.0),
-            illustration.constraint(.height, constant: 130.0),
-            illustration.constraint(.centerX, toView: view, constant: nil),
-            illustration.topAnchor.constraint(equalTo: subHeader.bottomAnchor, constant: C.padding[15]) ])
         subHeader.constrain([
             subHeader.constraint(.height, constant: 200.0),
             subHeader.topAnchor.constraint(equalTo: header.bottomAnchor),
             subHeader.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             subHeader.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ])
+//        invisibleView.constrain([
+//            invisibleView.constraint(.width, constant: 0),
+//            invisibleView.constraint(.height, constant: 0),
+//            invisibleView.topAnchor.constraint(equalTo: subHeader.bottomAnchor),
+//            invisibleView.bottomAnchor.constraint(equalTo: button.topAnchor),
+//            invisibleView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            invisibleView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+//            ])
+        illustration.constrain([
+            illustration.constraint(.width, constant: 127.0),
+            illustration.constraint(.height, constant: 130.0),
+            illustration.constraint(.centerX, toView: /*invisibleView*/view, constant: nil),
+//            illustration.constraint(.centerY, toView: /*invisibleView*/view, constant: nil),
+            illustration.topAnchor.constraint(equalTo: subHeader.bottomAnchor, constant: C.padding[15]) ])
         important.constrain([
             important.topAnchor.constraint(equalTo: subHeader.topAnchor, constant: C.padding[2]),
             important.constraint(.leading, toView: subHeader, constant: C.padding[2]),

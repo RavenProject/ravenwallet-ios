@@ -104,7 +104,8 @@ struct Raven: CurrencyDef {
         case 8:
             return S.Symbols.rvn
         default:
-            return S.Symbols.uRvn
+//            return S.Symbols.uRvn
+            return S.Symbols.rvn
         }
     }
 }

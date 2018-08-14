@@ -31,7 +31,11 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef BITCOIN_TESTNET
+#define MAX_PROOF_OF_WORK 0x207fffff
+#else
 #define MAX_PROOF_OF_WORK 0x1e00ffff  //0x1d00ffff    // highest value for difficulty target (higher values are less difficult)
+#endif
 #define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
 inline static int _ceil_log2(int x)
@@ -280,7 +284,7 @@ int BRMerkleBlockIsValid(const BRMerkleBlock *block, uint32_t currentTime)
     
     for (int i = sizeof(t) - 1; r && i >= 0; i--) { // check proof-of-work
         if (block->blockHash.u8[i] < t.u8[i]) break;
-        //if (block->blockHash.u8[i] > t.u8[i]) r = 0;   //TODO - Make sure this line works - Removing proof of work check temporarily
+//        if (block->blockHash.u8[i] > t.u8[i]) r = 0;   //TODO - Make sure this line works - Removing proof of work check temporarily
     }
     
     return r;

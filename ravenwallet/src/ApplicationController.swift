@@ -157,6 +157,7 @@ class ApplicationController : Subscriber, Trackable {
     private func reinitWalletManager(callback: @escaping () -> Void) {
         Store.removeAllSubscriptions()
         Store.perform(action: Reset())
+        UserDefaults.standard.removeObject(forKey: "Bip44")
         self.setup()
         
         DispatchQueue.walletQueue.async {

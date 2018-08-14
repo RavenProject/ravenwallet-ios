@@ -135,7 +135,7 @@ struct DisplayAmount {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-currency.state.maxDigits), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        guard let string = btcFormat.string(from: number) else { return "" }
+        guard let string = rvnFormat.string(from: number) else { return "" }
         return string
     }
 
@@ -156,7 +156,7 @@ struct DisplayAmount {
         return format
     }
 
-    var btcFormat: NumberFormatter {
+    var rvnFormat: NumberFormatter {
         let format = NumberFormatter()
         format.isLenient = true
         format.numberStyle = .currency
