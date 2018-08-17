@@ -9,7 +9,7 @@
 import Foundation
 
 class Version {
-    var DVersion = "1.1.0"
+    var DVersion = "1.1.0" // Default
     static var sharedInstance = Version()
     
     let current_version : String

@@ -37,41 +37,11 @@ class ApplicationController : Subscriber, Trackable {
     private var hasPerformedWalletDependentInitialization = false
     private var didInitWallet = false
 
-    // MARK: -
-
     init() {
         guardProtected(queue: DispatchQueue.walletQueue) {
-//            if UserDefaults.hasBchConnected {
                 self.initWallet(completion: self.didAttemptInitWallet)
-//            } else {
-//                self.initWalletWithMigration(completion: self.didAttemptInitWallet)
-//            }
         }
     }
-
-//    /// Migrate pre-fork BTC transactions to BCH wallet
-//    private func initWalletWithMigration(completion: @escaping () -> Void) {
-//        let btc = Currencies.rvn
-//        guard let btcWalletManager = try? WalletManager(currency: btc, dbPath: btc.dbPath) else { return }
-//        walletManagers[btc.code] = btcWalletManager
-//        btcWalletManager.initWallet { [unowned self] success in
-//            guard success else {
-//                completion()
-//                return
-//            }
-//
-//            self.exchangeUpdaters[btc.code] = ExchangeUpdater(currency: btc, walletManager: btcWalletManager)
-//            btcWalletManager.initPeerManager {
-//                btcWalletManager.db?.loadTransactions { txns in
-//                    btcWalletManager.db?.loadBlocks { blocks in
-//                        _ = txns.compactMap{$0}.filter { $0.pointee.blockHeight < C.bCashForkBlockHeight }
-//                        _ = blocks.compactMap{$0}.filter { $0.pointee.height < C.bCashForkBlockHeight }
-//                        completion()
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private func initWallet(completion: @escaping () -> Void) {
         let dispatchGroup = DispatchGroup()
@@ -157,7 +127,7 @@ class ApplicationController : Subscriber, Trackable {
     private func reinitWalletManager(callback: @escaping () -> Void) {
         Store.removeAllSubscriptions()
         Store.perform(action: Reset())
-        UserDefaults.standard.removeObject(forKey: "Bip44")
+//        UserDefaults.standard.removeObject(forKey: "Bip44")
         self.setup()
         
         DispatchQueue.walletQueue.async {
@@ -379,6 +349,7 @@ class ApplicationController : Subscriber, Trackable {
     private func addWalletCreationListener() {
         Store.subscribe(self, name: .didCreateOrRecoverWallet, callback: { _ in
             DispatchQueue.walletQueue.async {
+                
                 self.initWallet(completion: self.didInitWalletManager)
             }
         })

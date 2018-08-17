@@ -38,9 +38,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIView.swizzleSetFrame()
         applicationController.launch(application: application, options: launchOptions)
         
+//        UserDefaults.standard.set(true, forKey: "Bip44") // force Bip44 for tests
+        
 //        FirebaseApp.configure()
         
 //        print(Version.sharedInstance.current_version)
+        
         return true
     }
     

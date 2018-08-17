@@ -152,6 +152,8 @@ extension BRAPIClient {
 //    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
     func fetchUTXOS(address: String, currency: CurrencyDef, completion: @escaping ([[String: Any]]?)->Void) {
         let path = "https://ravencoin.network/api/addrs/utxo"
+        // Todo take testnet in consideration
+//        let path = "https://network.ravencoin.network/api/addrs/utxo"
         var req = URLRequest(url: URL(string: path)!)
         req.httpMethod = "POST"
         req.httpBody = "addrs=\(address)".data(using: .utf8)

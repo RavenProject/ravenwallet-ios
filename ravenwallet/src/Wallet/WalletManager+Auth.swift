@@ -66,8 +66,9 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             print("upgrading to authenticated keychain scheme")
             BRBIP39DeriveKey(&seed, seedPhrase, nil)
-            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
+//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
             seed = UInt512() // clear seed
             try setKeychainItem(key: KeychainKey.mnemonic, item: seedPhrase, authenticated: true)
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: mpk))
@@ -235,8 +236,9 @@ extension WalletManager : WalletAuthenticator {
                 else { return false }
             CFStringNormalize(nfkdPhrase, .KD)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
+//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/ Int32(type))
             seed = UInt512() // clear seed
             let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
             guard mpkData?.masterPubKey == mpk else { return false }
@@ -338,8 +340,9 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             try setKeychainItem(key: KeychainKey.mnemonic, item: nfkdPhrase as String?, authenticated: true)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
-            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
+//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
             seed = UInt512() // clear seed
             if self.earliestKeyTime < BIP39CreationTime { self.earliestKeyTime = BIP39CreationTime }
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: self.masterPubKey))
@@ -353,12 +356,12 @@ extension WalletManager : WalletAuthenticator {
     func setRandomSeedPhrase() -> String? {
         guard noWallet else { return nil }
         guard var words = rawWordList else { return nil }
-//        // make sure to have the Bip44 when a new wallet is created
-//        guard UserDefaults.standard.set(true, forKey: "Bip44") else {
-//            UserDefaults.standard.set(false, forKey: "Bip44")
-//            return nil
-//        }
-        UserDefaults.standard.set(true, forKey: "Bip44")
+
+        // forceBip44 through the wallet
+        let isforced = self.forceBip44DevPath(stage: "creation", activate: true)
+        if (isforced) { print("success") }
+        else { print("failure") }
+        //        let walletType = self.walletManagers[Currencies.rvn.code]?.walletType()
         
         let time = Date.timeIntervalSinceReferenceDate
         
@@ -411,8 +414,9 @@ extension WalletManager : WalletAuthenticator {
                     else { return false }
                 CFStringNormalize(nfkdPhrase, .KD)
                 BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-                let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
-                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(walletType))
+//                let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
                 
                 seed = UInt512() // clear seed
                 let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
@@ -427,6 +431,23 @@ extension WalletManager : WalletAuthenticator {
             return true
         }
         catch { return false }
+    }
+    
+    // change wallet keys derivation path by setting a flag in the keychain
+    // when flag exists wallet creation or recovery will go directly to Bip44 otherwise to default: (Bip32) m/0H/0/k
+    // Uninstalling the app, or wipping the wallet does remove the flag. It's here to say forever ... FOREVER
+    func forceBip44DevPath(stage: String, activate: Bool) -> Bool {
+        do {
+            try setKeychainItem(key: KeychainKey.walletType , item: Int64(44))
+                return true
+        } catch { return false }
+    }
+    
+    
+    // the wallet type either Bip44 DP:m/44H/0H/0H/0/k or m/0H/0/k
+    func getWalletType() -> Int32? {
+        let type: Int32 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+        return type
     }
     
     // wipe the existing wallet from the keychain
@@ -530,10 +551,11 @@ extension WalletManager : WalletAuthenticator {
         public static let pinFailCount = "pinfailcount"
         public static let pinFailTime = "pinfailheight"
         public static let apiAuthKey = "authprivkey"
-        public static let ethPrivKey = "ethprivkey"
+//        public static let ethPrivKey = "ethprivkey"
 //        public static let userAccount = "https://api.breadwallet.com"
         public static let userAccount = "https://ravencoin.network/api"
         public static let seed = "seed" // deprecated
+        public static let walletType = "bip44"
     }
     
     private struct DefaultsKey {
@@ -549,7 +571,8 @@ extension WalletManager : WalletAuthenticator {
                 guard let wallet = wallet else { return false }
                 guard let phrase: String = try keychainItem(key: KeychainKey.mnemonic) else { return false }
                 BRBIP39DeriveKey(&seed, phrase, nil)
-                return wallet.signTransaction(tx, forkId: forkId, seed: &seed)
+                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+                return wallet.signTransaction(tx, forkId: forkId, seed: &seed, type: Int32(type))
             }
             catch { return false }
         }
