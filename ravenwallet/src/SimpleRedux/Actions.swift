@@ -124,8 +124,8 @@ struct WalletChange: Trackable {
 enum CurrencyChange {
     struct toggle: Action {
         let reduce: Reducer = {
-            UserDefaults.isBtcSwapped = !$0.isBtcSwapped
-            return $0.mutate(isBtcSwapped: !$0.isBtcSwapped)
+            UserDefaults.isBtcSwapped = !$0.isSwapped
+            return $0.mutate(isBtcSwapped: !$0.isSwapped)
         }
     }
 

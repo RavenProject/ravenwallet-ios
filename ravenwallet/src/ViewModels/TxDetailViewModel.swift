@@ -75,7 +75,7 @@ extension TxDetailViewModel {
         fiatAmount = fiatAmounts.0
         originalFiatAmount = fiatAmounts.1
         
-        let balances = TxDetailViewModel.balances(tx: tx, showFiatAmount: Store.state.isBtcSwapped)
+        let balances = TxDetailViewModel.balances(tx: tx, showFiatAmount: Store.state.isSwapped)
         
         startingBalance = balances.0
         endingBalance = balances.1

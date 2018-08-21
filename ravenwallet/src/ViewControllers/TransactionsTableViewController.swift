@@ -18,7 +18,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         self.walletManager = walletManager
         self.currency = walletManager.currency
         self.didSelectTransaction = didSelectTransaction
-        self.isBtcSwapped = Store.state.isBtcSwapped
+        self.isSwapped = Store.state.isSwapped
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -41,7 +41,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
     private var allTransactions: [Transaction] = [] {
         didSet { transactions = allTransactions }
     }
-    private var isBtcSwapped: Bool {
+    private var isSwapped: Bool {
         didSet { reload() }
     }
     private var rate: Rate? {
@@ -49,7 +49,6 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
     }
     private let emptyMessage = UILabel.wrapping(font: .customBody(size: 16.0), color: .grayTextTint)
     
-    //TODO:BCH replace with recommend rescan / tx failed prompt
     private var currentPrompt: Prompt? {
         didSet {
             if currentPrompt != nil && oldValue == nil {
@@ -88,8 +87,8 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
     
     private func setupSubscriptions() {
         Store.subscribe(self,
-                        selector: { $0.isBtcSwapped != $1.isBtcSwapped },
-                        callback: { self.isBtcSwapped = $0.isBtcSwapped })
+                        selector: { $0.isSwapped != $1.isSwapped },
+                        callback: { self.isSwapped = $0.isSwapped })
         Store.subscribe(self,
                         selector: { $0[self.currency].currentRate != $1[self.currency].currentRate},
                         callback: {
@@ -100,7 +99,6 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         })
         
         Store.subscribe(self, selector: { $0[self.currency].recommendRescan != $1[self.currency].recommendRescan }, callback: { _ in
-            //TODO:BCH show failed tx
         })
         
         Store.subscribe(self, name: .txMemoUpdated(""), callback: {
@@ -215,7 +213,7 @@ extension TransactionsTableViewController {
             let rate = rate {
             let viewModel = TxListViewModel(tx: transactions[indexPath.row])
             transactionCell.setTransaction(viewModel,
-                                           isBtcSwapped: isBtcSwapped,
+                                           isBtcSwapped: isSwapped,
                                            rate: rate,
                                            maxDigits: currency.state.maxDigits,
                                            isSyncing: currency.state.syncState != .success)

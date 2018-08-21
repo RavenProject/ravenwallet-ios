@@ -193,8 +193,8 @@ class StartImportViewController : UIViewController {
             guard let rate = Currencies.rvn.state.currentRate else { return }
             let balanceAmount = Amount(amount: balance, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
             let feeAmount = Amount(amount: fee, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
-            let balanceText = Store.state.isBtcSwapped ? balanceAmount.localCurrency : balanceAmount.bits
-            let feeText = Store.state.isBtcSwapped ? feeAmount.localCurrency : feeAmount.bits
+            let balanceText = Store.state.isSwapped ? balanceAmount.localCurrency : balanceAmount.bits
+            let feeText = Store.state.isSwapped ? feeAmount.localCurrency : feeAmount.bits
             let message = String(format: S.Import.confirm, balanceText, feeText)
             let alert = UIAlertController(title: S.Import.title, message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))

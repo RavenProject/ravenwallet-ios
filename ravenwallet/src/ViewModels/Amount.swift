@@ -120,7 +120,7 @@ struct DisplayAmount {
     }
 
     var combinedDescription: String {
-        return Store.state.isBtcSwapped ? "\(fiatDescription) (\(bitcoinDescription))" : "\(bitcoinDescription) (\(fiatDescription))"
+        return Store.state.isSwapped ? "\(fiatDescription) (\(bitcoinDescription))" : "\(bitcoinDescription) (\(fiatDescription))"
     }
 
     private var fiatDescription: String {

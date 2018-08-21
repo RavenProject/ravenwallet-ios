@@ -85,7 +85,7 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     init(currency: CurrencyDef) {
         
         self.currency = currency
-        self.isBtcSwapped = Store.state.isBtcSwapped
+        self.isBtcSwapped = Store.state.isSwapped
         if let rate = currency.state.currentRate {
             let maxDigits = currency.state.maxDigits
             let placeholderAmount = Amount(amount: 0, rate: rate, maxDigits: maxDigits, currency: currency)
@@ -225,8 +225,8 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
 
     private func addSubscriptions() {
         Store.lazySubscribe(self,
-                            selector: { $0.isBtcSwapped != $1.isBtcSwapped },
-                            callback: { self.isBtcSwapped = $0.isBtcSwapped })
+                            selector: { $0.isSwapped != $1.isSwapped },
+                            callback: { self.isBtcSwapped = $0.isSwapped })
         Store.lazySubscribe(self,
                             selector: { $0[self.currency].currentRate != $1[self.currency].currentRate},
                             callback: {

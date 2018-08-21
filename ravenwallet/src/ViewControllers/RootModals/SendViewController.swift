@@ -249,7 +249,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             if let minOutput = walletManager.wallet?.minOutputAmount {
                 guard amount.rawValue >= minOutput else {
                     let minOutputAmount = Amount(amount: minOutput, rate: Rate.empty, maxDigits: currency.state.maxDigits, currency: currency)
-                    let message = String(format: S.PaymentProtocol.Errors.smallPayment, minOutputAmount.string(isBtcSwapped: Store.state.isBtcSwapped))
+                    let message = String(format: S.PaymentProtocol.Errors.smallPayment, minOutputAmount.string(isBtcSwapped: Store.state.isSwapped))
                     return showAlert(title: S.Alert.error, message: message, buttonLabel: S.Button.ok)
                 }
             }

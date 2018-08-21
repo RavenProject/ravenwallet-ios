@@ -314,8 +314,8 @@ extension WalletManager : BRWalletListener {
         if let rate = currency.state.currentRate {
             let maxDigits = currency.state.maxDigits
             let amount = Amount(amount: amount, rate: rate, maxDigits: maxDigits, currency: currency)
-            let primary = Store.state.isBtcSwapped ? amount.localCurrency : amount.bits
-            let secondary = Store.state.isBtcSwapped ? amount.bits : amount.localCurrency
+            let primary = Store.state.isSwapped ? amount.localCurrency : amount.bits
+            let secondary = Store.state.isSwapped ? amount.bits : amount.localCurrency
             let message = String(format: S.TransactionDetails.received, "\(primary) (\(secondary))")
             Store.trigger(name: .lightWeightAlert(message))
             showLocalNotification(message: message)

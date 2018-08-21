@@ -15,7 +15,7 @@ struct State {
     let isStartFlowVisible: Bool
     let isLoginRequired: Bool
     let rootModal: RootModal
-    let isBtcSwapped: Bool //move to CurrencyState
+    let isSwapped: Bool //move to CurrencyState
     let alert: AlertType
     let isBiometricsEnabled: Bool
     let defaultCurrencyCode: String
@@ -50,7 +50,7 @@ extension State {
         return State(   isStartFlowVisible: false,
                         isLoginRequired: true,
                         rootModal: .none,
-                        isBtcSwapped: UserDefaults.isBtcSwapped,
+                        isSwapped: UserDefaults.isBtcSwapped,
                         alert: .none,
                         isBiometricsEnabled: UserDefaults.isBiometricsEnabled,
                         defaultCurrencyCode: UserDefaults.defaultCurrencyCode,
@@ -74,7 +74,7 @@ extension State {
         return State(isStartFlowVisible: isStartFlowVisible ?? self.isStartFlowVisible,
                      isLoginRequired: isLoginRequired ?? self.isLoginRequired,
                      rootModal: rootModal ?? self.rootModal,
-                     isBtcSwapped: isBtcSwapped ?? self.isBtcSwapped,
+                     isSwapped: isBtcSwapped ?? self.isSwapped,
                      alert: alert ?? self.alert,
                      isBiometricsEnabled: isBiometricsEnabled ?? self.isBiometricsEnabled,
                      defaultCurrencyCode: defaultCurrencyCode ?? self.defaultCurrencyCode,
