@@ -125,7 +125,7 @@ class ApplicationController : Subscriber, Trackable {
     }
     
     private func reinitWalletManager(callback: @escaping () -> Void) {
-        Store.removeAllSubscriptions()
+//        Store.removeAllSubscriptions()
         Store.perform(action: Reset())
 //        UserDefaults.standard.removeObject(forKey: "Bip44")
         self.setup()
@@ -206,6 +206,9 @@ class ApplicationController : Subscriber, Trackable {
             homeScreen.primaryWalletManager = primaryWalletManager
         }
         hasPerformedWalletDependentInitialization = true
+        if modalPresenter != nil {
+            Store.unsubscribe(modalPresenter!)
+        }
         modalPresenter = ModalPresenter(walletManagers: walletManagers, window: window, apiClient: noAuthApiClient)
         startFlowController = StartFlowPresenter(walletManager: primaryWalletManager, rootViewController: rootViewController)
         
@@ -350,8 +353,8 @@ class ApplicationController : Subscriber, Trackable {
     /// Handles new wallet creation or recovery
     private func addWalletCreationListener() {
         Store.subscribe(self, name: .didCreateOrRecoverWallet, callback: { _ in
+            self.walletManagers.removeAll() // remove the empty wallet managers
             DispatchQueue.walletQueue.async {
-                
                 self.initWallet(completion: self.didInitWalletManager)
             }
         })

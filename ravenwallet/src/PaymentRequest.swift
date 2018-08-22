@@ -91,7 +91,7 @@ struct PaymentRequest {
             request = NSMutableURLRequest(url: remoteRequest! as URL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5.0) //TODO - fix !
         }
 
-        request.setValue("application/bitcoin-paymentrequest", forHTTPHeaderField: "Accept")
+//        request.setValue("application/bitcoin-paymentrequest", forHTTPHeaderField: "Accept")
 
         URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
             guard error == nil else { return completion(nil) }
@@ -108,6 +108,8 @@ struct PaymentRequest {
                 }
                 completion(nil)
             } else {
+                print("\"\(response.mimeType?.lowercased() ?? "")\"\n")
+                print("\(String(data: data, encoding: .utf8) ?? "")\n")
                 completion(nil)
             }
         }.resume()
