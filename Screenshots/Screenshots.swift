@@ -45,6 +45,13 @@ class Screenshots: XCTestCase {
         staticText.tap()
         staticText.tap()
         staticText.tap()
+        
+        // go back to home screen if needed
+        let backButton = app.navigationBars.buttons.element(boundBy: 0)
+        if backButton.exists {
+            backButton.tap()
+        }
+        
         snapshot("0TxList")
 
         app.buttons["MENU"].tap()
