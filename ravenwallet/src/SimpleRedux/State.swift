@@ -150,7 +150,8 @@ struct WalletState {
                            fees: nil,
                            recommendRescan: false,
                            maxDigits: UserDefaults.maxDigits,
-                           connectionStatus: BRPeerStatusDisconnected)
+                           connectionStatus: BRPeerStatusDisconnected,
+                           isBtcSwapped: false)
     }
 
     func mutate(    displayOrder: Int? = nil,
@@ -188,7 +189,8 @@ struct WalletState {
                            fees: fees ?? self.fees,
                            recommendRescan: recommendRescan ?? self.recommendRescan,
                            maxDigits: maxDigits ?? self.maxDigits,
-                           connectionStatus: connectionStatus ?? self.connectionStatus)
+                           connectionStatus: connectionStatus ?? self.connectionStatus,
+                           isBtcSwapped: false)
     }
 }
 
