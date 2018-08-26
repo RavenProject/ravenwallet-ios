@@ -83,7 +83,7 @@ class EnterPhraseCollectionViewController : UICollectionViewController {
         enterPhraseCell.didEnterSpace = {
             enterPhraseCell.didTapNext?()
         }
-
+        
         if indexPath.item == 0 {
             enterPhraseCell.disablePreviousButton()
         } else if indexPath.item == 11 {
