@@ -66,8 +66,8 @@ extension UserDefaults {
 
     //
     // 2 - bits
-    // 5 - mBTC
-    // 8 - BTC
+    // 5 - mRVN
+    // 8 - RVN
     //
     static var maxDigits: Int {
         get {
@@ -76,7 +76,7 @@ extension UserDefaults {
             }
             let maxDigits = defaults.integer(forKey: maxDigitsKey)
             if maxDigits == 5 {
-                return 8 //Convert mBTC to BTC
+                return 8 //Convert mRVN to RVN
             } else {
                 return maxDigits
             }
@@ -138,7 +138,6 @@ extension UserDefaults {
         set { defaults.set(newValue, forKey: hasShownWelcomeKey) }
     }
 
-    // TODO:BCH not used, remove?
     static var fees: Fees? {
         //Returns nil if feeCacheTimeout exceeded
         get {

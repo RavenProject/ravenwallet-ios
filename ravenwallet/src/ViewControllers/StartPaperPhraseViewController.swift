@@ -24,7 +24,7 @@ class StartPaperPhraseViewController : UIViewController {
 //    private let invisibleView = UIView()
     private let explanation = UILabel.wrapping(font: UIFont.customBody(size: 16.0))
     private let important = UILabel.wrapping(font: UIFont.customBody(size: 22.0))
-    private let header = BlueGradiantCenterHeader()//RadialGradientView(backgroundColor: .blue, offset: 64.0)
+    private let header = BlueGradiantCenterHeader()
     private let footer = UILabel.wrapping(font: .customBody(size: 13.0), color: .secondaryGrayText)
     private let callback: () -> Void
 

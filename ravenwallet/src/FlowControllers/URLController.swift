@@ -73,6 +73,7 @@ class URLController : Trackable {
         }
     }
 
+    //TODO ravenize
     private func isBitcoinUri(url: URL, uri: String?) -> URL? {
         guard let uri = uri else { return nil }
         guard let bitcoinUrl = URL(string: uri) else { return nil }

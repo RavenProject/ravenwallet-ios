@@ -64,28 +64,10 @@ class AccountFooterView: UIView, Subscriber, Trackable {
         receive.backgroundColor = currency.colors.0
         receive.addTarget(self, action: #selector(AccountFooterView.receive), for: .touchUpInside)
         let receiveButton = UIBarButtonItem(customView: receive)
-
-//        let buy = UIButton.rounded(title: S.Button.buy)
-//        buy.tintColor = .white
-//        buy.backgroundColor = currency.colors.0
-//        buy.addTarget(self, action: #selector(AccountFooterView.buy), for: .touchUpInside)
-//        let buyButton = UIBarButtonItem(customView: buy)
         
         let paddingWidth = C.padding[2]
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
-//        if currency.matches(Currencies.rvn) && BRAPIClient.featureEnabled(.buyBitcoin) {
-//            toolbar.items = [
-//                flexibleSpace,
-//                sendButton,
-//                flexibleSpace,
-//                receiveButton,
-//                flexibleSpace,
-//                buyButton,
-//                flexibleSpace,
-//            ]
-//            buttonCount = 3
-//        } else {
             toolbar.items = [
                 flexibleSpace,
                 sendButton,
@@ -94,21 +76,16 @@ class AccountFooterView: UIView, Subscriber, Trackable {
                 flexibleSpace,
             ]
             buttonCount = 2
-//        }
         
         let buttonWidth = (self.bounds.width - (paddingWidth * CGFloat(buttonCount+1))) / CGFloat(buttonCount)
         let buttonHeight = CGFloat(44.0)
-        [sendButton, receiveButton/*, buyButton*/].forEach {
+        [sendButton, receiveButton].forEach {
             $0.customView?.frame = CGRect(x: 0, y: 0, width: buttonWidth, height: buttonHeight)
         }
     }
 
     @objc private func send() { sendCallback?() }
     @objc private func receive() { receiveCallback?() }
-//    @objc private func buy() {
-//        saveEvent("menu.didTapBuyBitcoin")
-//        buyCallback?()
-//    }
 
     required init(coder aDecoder: NSCoder) {
         fatalError("This class does not support NSCoding")

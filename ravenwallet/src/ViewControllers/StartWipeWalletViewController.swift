@@ -22,7 +22,6 @@ class StartWipeWalletViewController : UIViewController {
     private let message = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let warning = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let button = ShadowButton(title: S.RecoverWallet.next, type: .primary)
-//    private let bullet = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
 
     override func viewDidLoad() {
         
@@ -40,7 +39,6 @@ class StartWipeWalletViewController : UIViewController {
         view.addSubview(illustration)
         subHeader.addSubview(message)
         subHeader.addSubview(warning)
-//        view.addSubview(bullet)
         view.addSubview(button)
     }
 
@@ -64,14 +62,9 @@ class StartWipeWalletViewController : UIViewController {
             message.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
             message.topAnchor.constraint(equalTo: header.bottomAnchor, constant: C.padding[2]),
             message.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]) ])
-//        bullet.constrain([
-//            bullet.leadingAnchor.constraint(equalTo: message.leadingAnchor),
-//            bullet.topAnchor.constraint(equalTo: message.bottomAnchor, constant: C.padding[4]),
-//            bullet.widthAnchor.constraint(equalToConstant: 16.0),
-//            bullet.heightAnchor.constraint(equalToConstant: 16.0) ])
         warning.constrain([
-            warning.leadingAnchor.constraint(equalTo: /*bullet*/view.leadingAnchor, constant: C.padding[2]),
-            warning.topAnchor.constraint(equalTo: /*bullet*/message.bottomAnchor, constant: C.padding[2]),
+            warning.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
+            warning.topAnchor.constraint(equalTo: message.bottomAnchor, constant: C.padding[2]),
             warning.trailingAnchor.constraint(equalTo: message.trailingAnchor, constant: C.padding[2]) ])
         button.constrain([
             button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[3]),

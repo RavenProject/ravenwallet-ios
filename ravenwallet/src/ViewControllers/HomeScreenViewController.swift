@@ -21,7 +21,6 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     private let currencyList = AssetListTableView()
     private let subHeaderView = UIView()
     private var logo: UIImageView = {
-//        let image = UIImageView(image: #imageLiteral(resourceName: "LogoGradient"))
         let image = UIImageView(image: #imageLiteral(resourceName: "newLogo"))
         image.contentMode = .scaleAspectFit
         return image
@@ -102,8 +101,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             ])
         total.constrain([
             total.trailingAnchor.constraint(equalTo: subHeaderView.trailingAnchor, constant: -C.padding[2]),
-//            total.bottomAnchor.constraint(equalTo: subHeaderView.bottomAnchor, constant: -C.padding[2]),
-            total.topAnchor.constraint(equalTo: totalHeader.bottomAnchor/*, constant: C.padding[2]*/)])
+            total.topAnchor.constraint(equalTo: totalHeader.bottomAnchor)])
         
         promptHiddenConstraint = prompt.heightAnchor.constraint(equalToConstant: 0.0)
         prompt.constrain([

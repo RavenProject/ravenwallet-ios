@@ -15,27 +15,6 @@ extension String {
         return BRAddressIsValid(self) != 0
     }
 
-//    var isValidBCHAddress: Bool {
-//        return bitcoinAddr.isValidAddress
-//    }
-//
-//    var bCashAddr: String {
-//        var addr = [CChar](repeating: 0, count: 55)
-//        BRBCashAddrEncode(&addr, self)
-//        return String(cString: addr)
-//    }
-//
-//    var bitcoinAddr: String {
-//        var addr = [CChar](repeating: 0, count: 36)
-//        BRBCashAddrDecode(&addr, self)
-//        return String(cString: addr)
-//    }
-//
-//    var isValidEthAddress: Bool {
-//        let pattern = "^0[xX][0-9a-fA-F]{40}$"
-//        return range(of: pattern, options: .regularExpression) != nil
-//    }
-
     var sanitized: String {
         return applyingTransform(.toUnicodeName, reverse: false) ?? ""
     }

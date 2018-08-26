@@ -80,12 +80,7 @@ class TxAmountCell: UITableViewCell, Subscriber {
         let amountText = NSMutableAttributedString(string: viewModel.amount,
                                                    attributes: [.font: largeFont,
                                                                 .foregroundColor: tokenColor])
-        // TODO:BCH custom font for currency code
-        //        amountText.append(NSAttributedString(string: " " + viewModel.currency.symbol.uppercased(),
-//                                                  attributes: [.font: smallFont,
-//                                                               .foregroundColor: tokenColor]))
         tokenAmountLabel.attributedText = amountText
-        
         
         // fiat amount label
         

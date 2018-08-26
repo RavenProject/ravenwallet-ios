@@ -79,7 +79,6 @@ class ShadowButton: UIControl {
                 if isSelected {
                     container.layer.borderColor = UIColor.primaryButton.cgColor
                     imageView?.tintColor = .primaryButton
-//                    label.textColor = .primaryButton
                 } else {
                     setColors()
                 }

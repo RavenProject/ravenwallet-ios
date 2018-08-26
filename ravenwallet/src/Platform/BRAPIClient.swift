@@ -72,8 +72,6 @@ open class BRAPIClient : NSObject, URLSessionDelegate, URLSessionTaskDelegate, B
     var proto = "https"
     
     // host is the server(s) on which the API is hosted
-    //TODO Change this to new api host
-//    var host = "api.breadwallet.com"
     var host = "api.ravenwallet.com"
     
     // isFetchingAuth is set to true when a request is currently trying to renew authentication (the token)

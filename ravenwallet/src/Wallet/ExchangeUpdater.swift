@@ -23,14 +23,6 @@ class ExchangeUpdater : Subscriber {
                             Store.perform(action: WalletChange(self.currency).setExchangeRate(currentRate))
         })
     }
-
-//    func old_refresh(completion: @escaping () -> Void) {
-//        walletManager.apiClient?.exchangeRates(code: currency.code) { rates, error in
-//            guard let currentRate = rates.first( where: { $0.code == Store.state.defaultCurrencyCode }) else { completion(); return }
-//            Store.perform(action: WalletChange(self.currency).setExchangeRates(currentRate: currentRate, rates: rates))
-//            completion()
-//        }
-//    }
     
     func refresh(completion: @escaping () -> Void) {
         
@@ -43,7 +35,7 @@ class ExchangeUpdater : Subscriber {
                 let aRate = Rate(code: currentRate.code, name: currentRate.name, rate: currentRate.rate * ratio_to_btc);
                 
                 Store.perform(action: WalletChange(self.currency).setExchangeRates(currentRate: aRate, rates: rates))
-                
+
                 completion()
             })
         }

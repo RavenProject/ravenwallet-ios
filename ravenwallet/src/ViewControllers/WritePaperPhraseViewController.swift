@@ -14,7 +14,7 @@ class WritePaperPhraseViewController: UIViewController {
     private let pin: String
     private let label = UILabel.wrapping(font: UIFont.customBody(size: 16.0))
     private let stepLabel = UILabel.wrapping(font: UIFont.customMedium(size: 13.0))
-    private let header = BlueGradiantCenterHeader() //RadialGradientView(backgroundColor: .blue)
+    private let header = BlueGradiantCenterHeader() 
     private let subHeader = OrangeGradientHeader()
     
     private lazy var phraseViews: [PhraseView] = {

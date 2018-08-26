@@ -48,7 +48,6 @@ class AboutViewController : UIViewController {
         logoBackground.constrain([
             logoBackground.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoBackground.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: C.padding[3]),
-//            logoBackground.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
             logoBackground.heightAnchor.constraint(equalTo: logoBackground.widthAnchor, multiplier: 342.0/553.0)
             ])
         logo.constrain(toSuperviewEdges: nil)

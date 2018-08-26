@@ -56,23 +56,5 @@ class CheckView : UIView, AnimatableIcon {
 
         UIColor.white.setFill()
         checkcircle.fill()
-
-        //This is the non-animated check left here for now as a reference
-//        let check = UIBezierPath()
-//        check.move(to: CGPoint(x: 30.06, y: 51.34))
-//        check.addCurve(to: CGPoint(x: 30.06, y: 44.75), controlPoint1: CGPoint(x: 28.19, y: 49.52), controlPoint2: CGPoint(x: 28.19, y: 46.57))
-//        check.addCurve(to: CGPoint(x: 36.9, y: 44.69), controlPoint1: CGPoint(x: 32, y: 42.87), controlPoint2: CGPoint(x: 35.03, y: 42.87))
-//        check.addLine(to: CGPoint(x: 42.67, y: 50.3))
-//        check.addLine(to: CGPoint(x: 58.62, y: 34.79))
-//        check.addCurve(to: CGPoint(x: 65.39, y: 34.8), controlPoint1: CGPoint(x: 60.49, y: 32.98), controlPoint2: CGPoint(x: 63.53, y: 32.98))
-//        check.addCurve(to: CGPoint(x: 65.46, y: 41.45), controlPoint1: CGPoint(x: 67.33, y: 36.68), controlPoint2: CGPoint(x: 67.33, y: 39.63))
-//        check.addLine(to: CGPoint(x: 45.33, y: 61.02))
-//        check.addCurve(to: CGPoint(x: 40.01, y: 61.02), controlPoint1: CGPoint(x: 43.86, y: 62.44), controlPoint2: CGPoint(x: 41.48, y: 62.44))
-//        check.addLine(to: CGPoint(x: 30.06, y: 51.34))
-//        check.close()
-//        check.move(to: CGPoint(x: 30.06, y: 51.34))
-//
-//        UIColor.green.setFill()
-//        check.fill()
     }
 }

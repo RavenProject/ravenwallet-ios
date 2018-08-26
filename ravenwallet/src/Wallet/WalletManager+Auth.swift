@@ -415,9 +415,8 @@ extension WalletManager : WalletAuthenticator {
                     else { return false }
                 CFStringNormalize(nfkdPhrase, .KD)
                 BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-//                let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
                 let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
+                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
                 
                 seed = UInt512() // clear seed
                 let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
@@ -445,7 +444,6 @@ extension WalletManager : WalletAuthenticator {
     }
     
     
-    // the wallet type either Bip44 DP:m/44H/0H/0H/0/k or m/0H/0/k
     func getWalletType() -> Int32? {
         let type: Int32 = try! keychainItem(key: KeychainKey.walletType) ?? 0
         return type
@@ -464,7 +462,6 @@ extension WalletManager : WalletAuthenticator {
             if let bundleId = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: bundleId)
             }
-//            try BRAPIClient(authenticator: self).kv?.rmdb()
             try? FileManager.default.removeItem(at: BRReplicatedKVStore.dbPath)
             try setKeychainItem(key: KeychainKey.apiAuthKey, item: nil as Data?)
             try setKeychainItem(key: KeychainKey.spendLimit, item: nil as Int64?)
@@ -552,8 +549,6 @@ extension WalletManager : WalletAuthenticator {
         public static let pinFailCount = "pinfailcount"
         public static let pinFailTime = "pinfailheight"
         public static let apiAuthKey = "authprivkey"
-//        public static let ethPrivKey = "ethprivkey"
-//        public static let userAccount = "https://api.breadwallet.com"
         public static let userAccount = "https://ravencoin.network/api"
         public static let seed = "seed" // deprecated
         public static let walletType = "bip44"

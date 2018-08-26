@@ -14,9 +14,6 @@ class ModalPresenter : Subscriber, Trackable {
     //MARK: - Public
     let primaryWalletManager: WalletManager
     let walletManagers: [String: WalletManager]
-//    lazy var supportCenter: SupportCenterContainer = {
-//        return SupportCenterContainer(walletManager: self.primaryWalletManager, apiClient: self.noAuthApiClient)
-//    }()
     let supportCenter = SupportWebViewController()
     
     init(walletManagers: [String: WalletManager], window: UIWindow, apiClient: BRAPIClient) {
@@ -52,18 +49,14 @@ class ModalPresenter : Subscriber, Trackable {
                         selector: { $0.rootModal != $1.rootModal},
                         callback: { [weak self] in self?.presentModal($0.rootModal) })
         
-//        static func lazySubscribe(_ subscriber: Subscriber, selector: @escaping Selector, callback: @escaping (State) -> Void) {
-//            Store.shared.lazySubscribe(subscriber, selector: selector, callback: callback)
-//        }
-        
         Store.lazySubscribe(self,
                         selector: { $0.alert != $1.alert && $1.alert != .none },
                         callback: { [weak self] in self?.handleAlertChange($0.alert) })
         
-        Store.subscribe(self, name: .presentFaq(""/*, nil*/), callback: { [weak self] in
+        Store.subscribe(self, name: .presentFaq(""), callback: { [weak self] in
             guard let trigger = $0 else { return }
             if case .presentFaq(let articleId) = trigger {
-                self?.presentFaq(articleId: articleId/*, currency: currency*/)
+                self?.presentFaq(articleId: articleId)
             }
         })
 
@@ -252,7 +245,6 @@ class ModalPresenter : Subscriber, Trackable {
             return nil
         }
         guard let walletManager = walletManagers[currency.code] else { return nil }
-//        guard let kvStore = walletManager.apiClient?.kv else { return nil }
         let sendVC = SendViewController(sender: Sender(walletManager: walletManager/*, kvStore: kvStore*/, currency: currency),
                                         walletManager: walletManager,
                                         initialRequest: currentRequest,
@@ -323,8 +315,6 @@ class ModalPresenter : Subscriber, Trackable {
                 let currencySettings = [
                     SettingsSections.currency: [
                         Setting(title: S.Settings.importTile, callback: {
-//                            settingsNav.dismiss(animated: true, completion: {
-//                                self.presentKeyImport(walletManager: walletManager)
                                 settingsNav.dismiss(animated: true, completion: { [weak self] in
                                     self?.presentKeyImport(walletManager: walletManager)
                             })
@@ -367,11 +357,6 @@ class ModalPresenter : Subscriber, Trackable {
                 })
             ],
             SettingsSections.preferences: [
-                //                Setting(title: S.Settings.notifications, accessoryText: {
-                //                    return Store.state.isPushNotificationsEnabled ? S.PushNotifications.on : S.PushNotifications.off
-                //                }, callback: {
-                //                    settingsNav.pushViewController(PushNotificationsViewController(), animated: true)
-                //                }),
                 Setting(title: LAContext.biometricType() == .face ? S.Settings.faceIdLimit : S.Settings.touchIdLimit, accessoryText: {
                     guard let rate = Currencies.rvn.state.currentRate else { return "" }
                     let amount = Amount(amount: walletManager.spendingLimit, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
@@ -665,7 +650,6 @@ class ModalPresenter : Subscriber, Trackable {
                 if !attemptConfirmRequest() {
                     modalTransitionDelegate.reset()
                     topVC.dismiss(animated: true, completion: {
-                        //TODO:BCH
                         Store.perform(action: RootModalActions.Present(modal: .send(currency: Currencies.rvn)))
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { //This is a hack because present has no callback
                             let _ = attemptConfirmRequest()
@@ -735,7 +719,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func handleCopyAddresses(success: String?, error: String?) {
-        let walletManager = primaryWalletManager // TODO:BCH
+        let walletManager = primaryWalletManager
         let alert = UIAlertController(title: S.URLHandling.addressListAlertTitle, message: S.URLHandling.addressListAlertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: S.URLHandling.copy, style: .default, handler: { [weak self] _ in
@@ -785,7 +769,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func copyAllAddressesToClipboard() {
-        guard let wallet = primaryWalletManager.wallet else { return } // TODO:BCH
+        guard let wallet = primaryWalletManager.wallet else { return }
         let addresses = wallet.allAddresses.filter({wallet.addressIsUsed($0)})
         UIPasteboard.general.string = addresses.joined(separator: "\n")
     }

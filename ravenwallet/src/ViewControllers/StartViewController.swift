@@ -51,7 +51,6 @@ class StartViewController : UIViewController {
         message.lineBreakMode = .byWordWrapping
         message.numberOfLines = 0
         message.textAlignment = .center
-//        faq.tintColor = .whiteTint
     }
 
     private func addSubviews() {

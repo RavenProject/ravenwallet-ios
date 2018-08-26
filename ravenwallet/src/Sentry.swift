@@ -11,7 +11,7 @@ import Foundation
 struct SentryEvent : Codable {
     let event_id: String = UUID().uuidString.replacingOccurrences(of: "-", with: "")
     let timestamp = Date()
-    let logger = "com.breadwallet.ios.logger"
+    let logger = "com.rvnwallet.ios.logger"
     let platform = "cocoa"
     let message: String
 }

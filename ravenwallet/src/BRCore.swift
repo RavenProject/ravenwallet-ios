@@ -454,7 +454,6 @@ class BRWallet {
     // seed is the master private key (wallet seed) corresponding to the master public key given when wallet was created
     // returns true if all inputs were signed, or false if there was an error or not all inputs were able to be signed
     func signTransaction(_ tx: BRTxRef, forkId: Int, seed: inout UInt512, type: Int32) -> Bool {
-//        let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
         return BRWalletSignTransaction(cPtr, tx, Int32(forkId), &seed, MemoryLayout<UInt512>.stride, type/*Int32(walletType)*/) != 0
     }
     

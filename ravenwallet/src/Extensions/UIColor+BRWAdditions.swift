@@ -149,7 +149,6 @@ extension UIColor {
     }
     
     static var txListGreen: UIColor {
-//        return UIColor(red: 0.0, green: 169.0/255.0, blue: 157.0/255.0, alpha: 1.0)
         return UIColor(red: 23.0/255.0, green: 175.0/255.0, blue: 99.0/255.0, alpha: 1.0)
     }
     

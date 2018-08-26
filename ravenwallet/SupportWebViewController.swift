@@ -12,15 +12,6 @@ class SupportWebViewController: UIViewController, WKNavigationDelegate {
     var webView = WKWebView()
     var url = URL(string: "http://ravenwallet.org/support")
     private let close = UIImageView(image: #imageLiteral(resourceName: "WebClose"))
-//    private let logo = UIImageView(image: #imageLiteral(resourceName: "Logo"))
-//    private let support = UIImageView(image: #imageLiteral(resourceName: "support"))
-
-    
-//    override func loadView() {
-////        webView = WKWebView()
-////        webView.navigationDelegate = self
-////        view = webView
-//    }
     
     func navigate(to: String) {
         url = URL(string: "http://ravenwallet.org/\(to)")!
@@ -44,35 +35,18 @@ class SupportWebViewController: UIViewController, WKNavigationDelegate {
         close.isUserInteractionEnabled = true
         close.addGestureRecognizer(tapGestureRecognizer)
         
-//        view.addSubview(logo)
-//        view.addSubview(support)
-
         webView.constrain([
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.topAnchor.constraint(equalTo: /*view.topAnchor*/close.bottomAnchor, constant: C.padding[2]),
+            webView.topAnchor.constraint(equalTo: close.bottomAnchor, constant: C.padding[2]),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor) ])
 
         close.constrain([
-            close.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor/*, constant: C.padding[2]*/),
+            close.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             close.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
             close.widthAnchor.constraint(equalToConstant: 22.0),
             close.heightAnchor.constraint(equalToConstant: 22.0) ])
         
-//        support.center = view.center
-//        logo.constrain([
-//            logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: C.padding[2]),
-//            logo.trailingAnchor.constraint(equalTo: support.trailingAnchor),
-//            logo.leadingAnchor.constraint(equalTo: support.leadingAnchor)])
-//
-//        support.constrain([
-//            support.topAnchor.constraint(equalTo: logo.bottomAnchor, constant: C.padding[1])//,
-////            support.trailingAnchor.constraint(equalTo: logo.trailingAnchor),
-////            support.leadingAnchor.constraint(equalTo: logo.leadingAnchor)
-//        ])
-
-        
-//        addTopCorners()
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

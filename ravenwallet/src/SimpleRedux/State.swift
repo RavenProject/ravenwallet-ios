@@ -129,7 +129,7 @@ struct WalletState {
     let recommendRescan: Bool
     let maxDigits: Int // this is bits vs bitcoin setting
     let connectionStatus: BRPeerStatus
-//    let isBtcSwapped: Bool // show amounts as fiat setting
+    let isBtcSwapped: Bool // show amounts as fiat setting
     
     
     static func initial(_ currency: CurrencyDef, displayOrder: Int) -> WalletState {

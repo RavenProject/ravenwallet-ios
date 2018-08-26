@@ -31,7 +31,6 @@ extension TxViewModel {
     var isValid: Bool { return tx.isValid }
     var comment: String? { return tx.comment }
     
-    // BTC does not have "from" address, only "sent to" or "received at"
     var displayAddress: String {
 
             return tx.toAddress

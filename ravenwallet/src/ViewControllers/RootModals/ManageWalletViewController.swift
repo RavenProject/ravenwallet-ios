@@ -105,7 +105,6 @@ class ManageWalletViewController : UIViewController, ModalPresentable, Subscribe
         if name.utf8.count > maxWalletNameLength {
             name = String(name[..<name.index(name.startIndex, offsetBy: maxWalletNameLength)])
         }
-        //TODO:BCH multi-currency support
         Store.perform(action: WalletChange(Currencies.rvn).setWalletName(name))
     }
 

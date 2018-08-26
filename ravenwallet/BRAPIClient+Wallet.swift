@@ -91,13 +91,13 @@ extension BRAPIClient {
                     guard let array = parsedData as? [Any] else {
                         return handler([], 1.0, "/rates didn't return an array")
                     }
-                    handler(array.compactMap { Rate(dictionary: $0, ratio: ratio/*, reciprocalCode: code*/) }, 1.0, nil)
+                    handler(array.compactMap { Rate(dictionary: $0, ratio: ratio) }, 1.0, nil)
                 } else {
                     guard let dict = parsedData as? [String: Any],
                         let array = dict["body"] as? [Any] else {
                             return self.exchangeRates(code: code, isFallback: true, ratio, handler)
                     }
-                    handler(array.compactMap { Rate(dictionary: $0, ratio: ratio/*, reciprocalCode: code*/) }, 1.0, nil)
+                    handler(array.compactMap { Rate(dictionary: $0, ratio: ratio) }, 1.0, nil)
                 }
             } else {
                 if isFallback {
