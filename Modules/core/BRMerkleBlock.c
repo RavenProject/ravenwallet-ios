@@ -36,7 +36,11 @@
 #else
 #define MAX_PROOF_OF_WORK 0x1e00ffff  //0x1d00ffff    // highest value for difficulty target (higher values are less difficult)
 #endif
-#define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
+
+//#define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments    // 2016 bitcoin blocks
+#define TARGET_TIMESPAN   ((14*24*6) * 60) // the targeted timespan between difficulty target adjustments   // 2016 ravencoin blocks
+#define DGW_TARGET_TIMESPAN   (1 * 60) // the targeted timespan between difficulty target adjustments       // 1 ravencoin block
+
 
 inline static int _ceil_log2(int x)
 {
@@ -316,51 +320,115 @@ int BRMerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash)
 // targeted time between transitions (14*24*60*60 seconds). If the new difficulty is more than 4x or less than 1/4 of
 // the previous difficulty, the change is limited to either 4x or 1/4. There is also a minimum difficulty value
 // intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
-int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, uint32_t transitionTime)
-{
+int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, const BRSet *blocks) {
     int r = 1;
     
     assert(block != NULL);
     assert(previous != NULL);
+    assert(blocks != NULL);
     
-    if ((block->height == 6047) || (block->height == 6048))   //TODO: Remove this debug
-        assert(1);
+    if (!previous || !UInt256Eq(block->prevBlock, previous->blockHash) || block->height != previous->height + 1) r = 0;
     
-    if (! previous || !UInt256Eq(block->prevBlock, previous->blockHash) || block->height != previous->height + 1) r = 0;
-    if (r && (block->height % BLOCK_DIFFICULTY_INTERVAL) == 0 && transitionTime == 0) r = 0;
-    
-#if BITCOIN_TESTNET
-    // TODO: implement testnet difficulty rule check
-    return r; // don't worry about difficulty on testnet for now
+    if (block->height >= DGW_START_BLOCK) {
+        
+        int32_t DGWTarget = DarkGravityWaveTargetV3(previous, blocks);
+        int32_t diff = block->target - DGWTarget;
+        
+        {
+            static int pastCount = 0;
+            if (pastCount < DGW_PAST_BLOCKS) {
+#if TESTNET
+                // TODO: implement testnet difficulty rule check
+                return r; // don't worry about difficulty on testnet for now
+#elif REGTEST
+                // TODO: implement regtest difficulty rule check
+                return r; // don't worry about difficulty on regtest for now
 #endif
-    
-    if (r && (block->height % BLOCK_DIFFICULTY_INTERVAL) == 0) {
-        // target is in "compact" format, where the most significant byte is the size of resulting value in bytes, next
-        // bit is the sign, and the remaining 23bits is the value after having been right shifted by (size - 3)*8 bits
-        static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffff;
-        int timespan = (int)((int64_t)previous->timestamp - (int64_t)transitionTime), size = previous->target >> 24;
-        uint64_t target = previous->target & 0x00ffffff;
-    
-        // limit difficulty transition to -75% or +400%
-        if (timespan < TARGET_TIMESPAN/4) timespan = TARGET_TIMESPAN/4;
-        if (timespan > TARGET_TIMESPAN*4) timespan = TARGET_TIMESPAN*4;
-    
-        // TARGET_TIMESPAN happens to be a multiple of 256, and since timespan is at least TARGET_TIMESPAN/4, we don't
-        // lose precision when target is multiplied by timespan and then divided by TARGET_TIMESPAN/256
-        target *= timespan;
-        target /= TARGET_TIMESPAN >> 8;
-        size--; // decrement size since we only divided by TARGET_TIMESPAN/256
-    
-        while (size < 1 || target > 0x007fffff) target >>= 8, size++; // normalize target for "compact" format
-    
-        // limit to MAX_PROOF_OF_WORK
-        if (size > maxsize || (size == maxsize && target > maxtarget)) target = maxtarget, size = maxsize;
-    
-        //if (block->target != ((uint32_t)target | size << 24)) r = 0;    //TODO: Determine if this is critical for early Raven
+                if (block->height == 338778) r = block->target == 0x1b07cf3a ? 1 : 0;
+            } else {
+                r = (abs(diff) < 2) ? 1 : 0;
+            }
+            pastCount++;
+        }
     }
-    else if (r && block->target != previous->target) r = 0;
-    
     return r;
+}
+
+
+int DarkGravityWaveTargetV3(const BRMerkleBlock *previous, const BRSet *blockSet) {
+    
+    BRMerkleBlock *previousBlock = BRSetGet(blockSet, previous);
+    
+    int32_t nActualTimespan = 0;
+    int64_t lastBlockTime = 0;
+    int32_t blockCount = 0;
+    UInt256 sumTargets = UINT256_ZERO;
+    
+    if (!previousBlock || previousBlock->height == 0 || previousBlock->height < DGW_START_BLOCK) {
+        // This is the first block or the height is < transition block
+        // Return minimal required work.
+        return MAX_PROOF_OF_WORK;
+    }
+    
+    BRMerkleBlock *currentBlock = previousBlock;
+    
+    // loop over the past 180 blocks
+    for (blockCount = 1; currentBlock && currentBlock->height > 0 && blockCount <= DGW_PAST_BLOCKS; blockCount++) {
+        
+        // Calculate average difficulty based on the blockSet we iterate over
+        if (blockCount <= DGW_PAST_BLOCKS) {
+            UInt256 currentTarget = setCompact(currentBlock->target);
+            
+            if (blockCount == 1) {
+                sumTargets = add(currentTarget, currentTarget);
+            } else {
+                sumTargets = add(sumTargets, currentTarget);
+            }
+        }
+        
+        // If this is the second iteration (LastBlockTime was set)
+        if (lastBlockTime > 0) {
+            // Calculate time difference between previous block and current block
+            int64_t currentBlockTime = currentBlock->timestamp;
+            int64_t diff = ((lastBlockTime) - (currentBlockTime));
+            // Increment the actual timespan
+            nActualTimespan += diff;
+        }
+        // Set lastBlockTime to the block time for the block in current iteration
+        lastBlockTime = currentBlock->timestamp;
+        
+        if (previousBlock == NULL) {
+            assert(currentBlock);
+            break;
+        }
+        currentBlock = BRSetGet(blockSet, &currentBlock->prevBlock);
+    }
+    
+    UInt256 blockCount256 = ((UInt256) {.u64 = {blockCount, 0, 0, 0}});
+    // darkTarget is the difficulty
+    UInt256 darkTarget = divide(sumTargets, blockCount256);
+    
+    // nTargetTimespan is the time that the CountBlocks should have taken to be generated.
+    int32_t nTargetTimespan = (blockCount - 1) * DGW_TARGET_TIMESPAN;
+    
+    // Limit the re-adjustment to 3x or 0.33x
+    // We don't want to increase/decrease diff too much.
+    if (nActualTimespan < nTargetTimespan / 3)
+        nActualTimespan = nTargetTimespan / 3;
+    if (nActualTimespan > nTargetTimespan * 3)
+        nActualTimespan = nTargetTimespan * 3;
+    
+    // Calculate the new difficulty based on actual and target timespan.
+    darkTarget = divide(multiplyThis32(darkTarget, nActualTimespan), ((UInt256) {.u64 = {nTargetTimespan, 0, 0, 0}}));
+    
+    uint32_t compact = getCompact(darkTarget);
+    
+    // Change to minimal diff if calculated value is less
+    if (compact > MAX_PROOF_OF_WORK) {
+        compact = MAX_PROOF_OF_WORK;
+    }
+    
+    return compact; // return new DGW diff
 }
 
 // frees memory allocated by BRMerkleBlockParse

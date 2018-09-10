@@ -28,15 +28,27 @@
 #include "BRInt.h"
 #include <stddef.h>
 #include <inttypes.h>
+#include "BRSet.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define BLOCK_DIFFICULTY_INTERVAL 2016 // number of blocks between difficulty target adjustments
-#define BLOCK_UNKNOWN_HEIGHT      INT32_MAX
-#define BLOCK_MAX_TIME_DRIFT      (2*60*60) // the furthest in the future a block is allowed to be timestamped
-
+#define BLOCK_DIFFICULTY_INTERVAL           2016    // number of blocks between difficulty target adjustments
+#define DGW_BLOCK_DIFFICULTY_INTERVAL       1       // number of blocks between difficulty target adjustments after DGW3
+#define BLOCK_UNKNOWN_HEIGHT                INT32_MAX
+#define BLOCK_MAX_TIME_DRIFT                (2*60*60) // the furthest in the future a block is allowed to be timestamped
+    
+#define DGW_PAST_BLOCKS                     180
+    
+#ifdef TESTNET
+#define DGW_START_BLOCK         1440
+#elif REGTEST
+#define DGW_START_BLOCK         0
+#else
+#define DGW_START_BLOCK         338778
+#endif
+    
 typedef struct {
     UInt256 blockHash;
     uint32_t version;
@@ -85,7 +97,9 @@ int BRMerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash);
 // verifies the block difficulty target is correct for the block's position in the chain
 // transitionTime is the timestamp of the block at the previous difficulty transition
 // transitionTime may be 0 if block->height is not a multiple of BLOCK_DIFFICULTY_INTERVAL
-int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, uint32_t transitionTime);
+int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, const BRSet *blocks);
+
+int DarkGravityWaveTargetV3(const BRMerkleBlock *previous, const BRSet *blockSet);
 
 // returns a hash value for block suitable for use in a hashtable
 inline static size_t BRMerkleBlockHash(const void *block)

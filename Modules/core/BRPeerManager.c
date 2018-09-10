@@ -54,6 +54,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
     { 247968, "00000304caec54e449453cf020cebeb7e767971fae73a2db286186ef42137e2b", 1529405484, 0x1e035229 }
 };
 
+
 static const char *dns_seeds[] = {
     "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com."
 };
@@ -63,9 +64,25 @@ static const char *dns_seeds[] = {
 // blockchain checkpoints - these are also used as starting points for partial chain downloads, so they need to be at
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
-    {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },  //Ravenized
-    { 135072, "0000000000011c7885185adde826aef7cffeb806103d561374601936bec7f25b", 1521769273, 0x1b05643f }, //Make sure timestamp is same as "time" in block header
-    { 245952, "0000000000036654e656cc42f1ac4fa956e41f19cdd1de9fbd84c6f1896daf9a", 1528396105, 0x1b039b27 }
+    {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
+    {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
+    {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
+    {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
+    {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
+    { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
+    { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
+    { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
+    { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
+    { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
+    { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
+    { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
+    { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
+    { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
+    { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
+    { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
+    { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
+    { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
+    { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
 };
 
 static const char *dns_seeds[] = {
@@ -1170,7 +1187,7 @@ static int _BRPeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *bloc
     }
 
     // verify block difficulty
-    if (r && ! BRMerkleBlockVerifyDifficulty(block, prev, transitionTime)) {
+    if (r && ! BRMerkleBlockVerifyDifficulty(block, prev, manager->blocks)) {
         peer_log(peer, "relayed block with invalid difficulty target %x, blockHash: %s", block->target,
                  u256_hex_encode(block->blockHash));
         r = 0;

@@ -53,7 +53,6 @@ extern "C" {
 #endif
 
 #if BITCOIN_TESTNET
-//#define STANDARD_PORT 18767
 #define STANDARD_PORT 18768
 #else
 #define STANDARD_PORT 8767
