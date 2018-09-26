@@ -13,16 +13,16 @@ class ReceiveInterfaceController : WKInterfaceController {
     @IBOutlet var image: WKInterfaceImage!
     @IBOutlet var label: WKInterfaceLabel!
 
+    @objc func update1() {
+        guard let data = WatchDataManager.shared.data else { return }
+        image.setImage(data.qrCode)
+    }
+    
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(ReceiveInterfaceController.update), name: .ApplicationDataDidUpdateNotification, object: nil)
-        update()
-    }
-
-    @objc func update() {
-        guard let data = WatchDataManager.shared.data else { return }
-        image.setImage(data.qrCode)
+        NotificationCenter.default.addObserver(self, selector: #selector(ReceiveInterfaceController.update1), name: .ApplicationDataDidUpdateNotification, object: nil)
+        update1()
     }
 }

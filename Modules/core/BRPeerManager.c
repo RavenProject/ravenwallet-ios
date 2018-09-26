@@ -56,7 +56,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 
 
 static const char *dns_seeds[] = {
-    "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com."
+    "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com."
 };
 
 #else // main net
@@ -83,10 +83,11 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
     { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
     { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
     { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+    { 342719, "0000000000007746a534115a723c8aaefaad1dd0df61a1890855603bb2ef827d", 1535832293, 0x1b02088e }
 };
 
 static const char *dns_seeds[] = {
-    "seed-raven.ravencoin.org.", "seed-raven.bitactivate.com."
+    "seed-raven.ravencoin.com.", "seed-raven.ravencoin.org.", "seed-raven.bitactivate.com."
 };
 
 #endif
@@ -1157,16 +1158,16 @@ static int _BRPeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *bloc
     int r = 1;
     
     // check if we hit a difficulty transition, and find previous transition time
-    if ((block->height % BLOCK_DIFFICULTY_INTERVAL) == 0) {
+    if ((block->height % (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL)) == 0) {
         BRMerkleBlock *b = block;
         UInt256 prevBlock;
 
-        for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
+        for (uint32_t i = 0; b && i < (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL); i++) {
             b = BRSetGet(manager->blocks, &b->prevBlock);
         }
 
         if (! b) {
-            peer_log(peer, "missing previous difficulty tansition time, can't verify blockHash: %s",
+            peer_log(peer, "missing previous difficulty transition time, can't verify blockHash: %s",
                      u256_hex_encode(block->blockHash));
             r = 0;
         }
@@ -1179,7 +1180,7 @@ static int _BRPeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *bloc
             b = BRSetGet(manager->blocks, &prevBlock);
             if (b) prevBlock = b->prevBlock;
 
-            if (b && (b->height % BLOCK_DIFFICULTY_INTERVAL) != 0) {
+            if (b && (b->height % (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL)) != 0) {
                 BRSetRemove(manager->blocks, b);
                 BRMerkleBlockFree(b);
             }

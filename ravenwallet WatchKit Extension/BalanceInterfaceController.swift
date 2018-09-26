@@ -21,19 +21,10 @@ class BalanceInterfaceController: WKInterfaceController {
         super.awake(withContext: context)
     }
     
-    override func willActivate() {
-        // This method is called when watch view controller is about to be visible to user
-        super.willActivate()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(BalanceInterfaceController.update), name: .ApplicationDataDidUpdateNotification, object: nil)
-
-        update()
-    }
-
-    @objc func update() {
+    @objc func update2() {
         if let data = WatchDataManager.shared.data {
             loadingIndicator.setHidden(true)
-
+            
             if data.hasWallet {
                 bitsBalance.setText(data.balance)
                 localBalance.setText(data.localBalance)
@@ -48,6 +39,15 @@ class BalanceInterfaceController: WKInterfaceController {
             localBalance.setText("")
             noWallet.setText("")
         }
+    }
+    
+    override func willActivate() {
+        // This method is called when watch view controller is about to be visible to user
+        super.willActivate()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(BalanceInterfaceController.update2), name: .ApplicationDataDidUpdateNotification, object: nil)
+        
+        update2()
     }
 
     

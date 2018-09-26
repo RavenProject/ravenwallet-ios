@@ -72,8 +72,7 @@ extension BRAddress: CustomStringConvertible, Hashable {
         self.init()
         let cStr = [CChar](string.utf8CString)
         guard cStr.count <= MemoryLayout<BRAddress>.size else { return nil }
-        UnsafeMutableRawPointer(mutating: &self.s).assumingMemoryBound(to: CChar.self).assign(from: cStr,
-                                                                                              count: cStr.count)
+        UnsafeMutableRawPointer(mutating: &self.s).assumingMemoryBound(to: CChar.self).assign(from: cStr, count: cStr.count)
     }
     
     init?(scriptPubKey: [UInt8]) {
@@ -106,7 +105,7 @@ extension BRAddress: CustomStringConvertible, Hashable {
     }
     
     public var description: String {
-        return String(cString: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
+        return ""//String(cString: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
     }
     
     public var hashValue: Int {
