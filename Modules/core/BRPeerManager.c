@@ -87,7 +87,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 };
 
 static const char *dns_seeds[] = {
-    "seed-raven.ravencoin.com.", "seed-raven.ravencoin.org.", "seed-raven.bitactivate.com."
+    "seed-raven.bitactivate.com.", "seed-raven.ravencoin.org.", "seed-raven.ravencoin.com."
 };
 
 #endif
