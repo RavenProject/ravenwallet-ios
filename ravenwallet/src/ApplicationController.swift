@@ -72,6 +72,7 @@ class ApplicationController : Subscriber, Trackable {
             }
             self.exchangeUpdaters[currency.code] = ExchangeUpdater(currency: currency, walletManager: walletManager)
             walletManager.initPeerManager {
+                walletManager.peerManager?.connect()
                 dispatchGroup.leave()
             }
         }
@@ -304,15 +305,29 @@ class ApplicationController : Subscriber, Trackable {
     }
 
     /// Handles new wallet creation or recovery
+//    private func addWalletCreationListener() {
+//        Store.subscribe(self, name: .didCreateOrRecoverWallet, callback: { _ in
+//            self.walletManagers.removeAll() // remove the empty wallet managers
+//            DispatchQueue.walletQueue.async {
+//                self.initWallet(completion: self.didInitWalletManager)
+//            }
+//        })
+//    }
+
+    /// Handles new wallet creation or recovery
     private func addWalletCreationListener() {
         Store.subscribe(self, name: .didCreateOrRecoverWallet, callback: { _ in
-            self.walletManagers.removeAll() // remove the empty wallet managers
             DispatchQueue.walletQueue.async {
-                self.initWallet(completion: self.didInitWalletManager)
+                self.primaryWalletManager?.initWallet { _ in
+                    self.primaryWalletManager?.initPeerManager {
+                        self.primaryWalletManager?.peerManager?.connect()
+                        self.startDataFetchers()
+                    }
+                }
             }
         })
     }
-
+    
     private func offMainInitialization() {
         DispatchQueue.global(qos: .background).async {
             let _ = Rate.symbolMap //Initialize currency symbol map

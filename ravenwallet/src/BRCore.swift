@@ -90,8 +90,7 @@ extension BRAddress: CustomStringConvertible, Hashable {
 
     var scriptPubKey: [UInt8]? {
         var script = [UInt8](repeating: 0, count: 25)
-        let count = BRAddressScriptPubKey(&script, script.count,
-                                          UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
+        let count = BRAddressScriptPubKey(&script, script.count, UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
         guard count > 0 else { return nil }
         if count < script.count { script.removeSubrange(count...) }
         return script
@@ -105,7 +104,7 @@ extension BRAddress: CustomStringConvertible, Hashable {
     }
     
     public var description: String {
-        return ""//String(cString: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
+        return String(cString: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
     }
     
     public var hashValue: Int {
@@ -243,6 +242,12 @@ extension BRTxInput {
 }
 
 extension BRTxOutput {
+    init(_ address: String, _ amount: UInt64) {
+        self.init()
+        self.amount = amount
+        BRTxOutputSetAddress(&self, address)
+    }
+    
     var swiftAddress: String {
         get { return String(cString: UnsafeRawPointer([self.address]).assumingMemoryBound(to: CChar.self)) }
         set { BRTxOutputSetAddress(&self, newValue) }
