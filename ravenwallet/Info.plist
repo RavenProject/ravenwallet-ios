@@ -50,7 +50,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>1.0.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -85,7 +85,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>24</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -105,8 +105,6 @@
 	<string>Used to determine where you are - never recorded or shared with anyone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Used to scan barcodes</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Used for user authentication</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>CircularPro-Bold.otf</string>
