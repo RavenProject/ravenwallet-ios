@@ -57,6 +57,8 @@ class WalletDisabledView : UIView {
         addSubview(blur)
         addSubview(label)
         addSubview(faq)
+// Apple rejected app because the FAQ button launched an invalid URL. Hidding for now to get through approval.
+        faq.isHidden = true
         addSubview(reset)
     }
 
