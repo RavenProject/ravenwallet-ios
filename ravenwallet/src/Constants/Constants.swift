@@ -39,9 +39,9 @@ struct C {
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
-    static let feedbackEmail = "feedback@breadapp.com"
-    static let iosEmail = "ios@breadapp.com"
-    static let reviewLink = "https://itunes.apple.com/app/breadwallet-bitcoin-wallet/id885251393?action=write-review"
+    static let feedbackEmail = "support@ravenwallet.org"
+    static let iosEmail = "support@ravenwallet.org"
+    static let reviewLink = "https://itunes.apple.com/us/app/rvn-wallet/id1371751946?action=write-review"
     static var standardPort: Int {
         return E.isTestnet ? 18767 : 8767
     }
