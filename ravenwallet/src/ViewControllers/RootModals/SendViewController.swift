@@ -35,8 +35,8 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
         amountView = AmountViewController(currency: currency, isPinPadExpandedAtLaunch: false)
 
         super.init(nibName: nil, bundle: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
     //MARK - Private
@@ -192,14 +192,14 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             }
         }
 
-        let attributes: [NSAttributedStringKey: Any] = [
-            NSAttributedStringKey.font: UIFont.customBody(size: 14.0),
-            NSAttributedStringKey.foregroundColor: color
+        let attributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.font: UIFont.customBody(size: 14.0),
+            NSAttributedString.Key.foregroundColor: color
         ]
 
-        let feeAttributes: [NSAttributedStringKey: Any] = [
-            NSAttributedStringKey.font: UIFont.customBody(size: 14.0),
-            NSAttributedStringKey.foregroundColor: feeColor
+        let feeAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.font: UIFont.customBody(size: 14.0),
+            NSAttributedString.Key.foregroundColor: feeColor
         ]
 
         return (NSAttributedString(string: balanceOutput, attributes: attributes), NSAttributedString(string: feeOutput, attributes: feeAttributes))

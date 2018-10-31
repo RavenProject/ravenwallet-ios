@@ -68,7 +68,7 @@ class AccountViewController : UIViewController, Subscriber {
                     isJailbroken = true
                 }
             }
-            NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
+            NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { note in
                 self.showJailbreakWarnings(isJailbroken: isJailbroken)
             }
             showJailbreakWarnings(isJailbroken: isJailbroken)
