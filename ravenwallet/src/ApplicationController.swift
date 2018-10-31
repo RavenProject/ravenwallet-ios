@@ -87,9 +87,9 @@ class ApplicationController : Subscriber, Trackable {
         }
     }
 
-    func launch(application: UIApplication, options: [UIApplicationLaunchOptionsKey: Any]?) {
+    func launch(application: UIApplication, options: [UIApplication.LaunchOptionsKey: Any]?) {
         self.application = application
-        application.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+        application.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
         setup()
         handleLaunchOptions(options)
         reachability.didChange = { isReachable in
@@ -250,7 +250,7 @@ class ApplicationController : Subscriber, Trackable {
     }
 
     private func setupAppearance() {
-        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.font: UIFont.header]
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.font: UIFont.header]
     }
 
     private func setupRootViewController() {
@@ -334,7 +334,7 @@ class ApplicationController : Subscriber, Trackable {
         }
     }
 
-    private func handleLaunchOptions(_ options: [UIApplicationLaunchOptionsKey: Any]?) {
+    private func handleLaunchOptions(_ options: [UIApplication.LaunchOptionsKey: Any]?) {
         if let url = options?[.url] as? URL {
             do {
                 let file = try Data(contentsOf: url)

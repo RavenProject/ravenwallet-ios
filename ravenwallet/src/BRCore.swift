@@ -104,7 +104,9 @@ extension BRAddress: CustomStringConvertible, Hashable {
     }
     
     public var description: String {
-        return String(cString: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self))
+        let addressBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 36)
+        addressBytes.initialize(from: UnsafeRawPointer([self.s]).assumingMemoryBound(to: CChar.self), count: 36)
+        return String(cString: addressBytes)
     }
     
     public var hashValue: Int {
@@ -169,8 +171,7 @@ extension BRKey {
             let count = BRKeyBIP38Key(&self, nil, 0, nfcPhrase as String)
             var data = CFDataCreateMutable(secureAllocator, count) as Data
             data.count = count
-            guard data.withUnsafeMutableBytes({ BRKeyBIP38Key(&self, $0, count, nfcPhrase as String) }) != 0
-                else { return nil }
+            guard data.withUnsafeMutableBytes({ BRKeyPrivKey(&self, $0, count) }) != 0 else { return nil }
             return CFStringCreateFromExternalRepresentation(secureAllocator, data as CFData,
                                                             CFStringBuiltInEncodings.UTF8.rawValue) as String
         }
@@ -249,7 +250,11 @@ extension BRTxOutput {
     }
     
     var swiftAddress: String {
-        get { return String(cString: UnsafeRawPointer([self.address]).assumingMemoryBound(to: CChar.self)) }
+        get {
+            let addressBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 36)
+            addressBytes.initialize(from: UnsafeRawPointer([self.address]).assumingMemoryBound(to: CChar.self), count: 36)
+            return String(cString: addressBytes)
+        }
         set { BRTxOutputSetAddress(&self, newValue) }
     }
     

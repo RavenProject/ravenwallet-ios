@@ -67,7 +67,7 @@ class WritePaperPhraseViewController: UIViewController {
         addConstraints()
         addButtonTargets()
 
-        NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: nil) { [weak self] note in
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: nil) { [weak self] note in
             self?.dismiss(animated: true, completion: nil)
         }
 

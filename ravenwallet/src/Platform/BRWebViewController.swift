@@ -88,18 +88,18 @@ import WebKit
         webView?.navigationDelegate = self
         webView?.backgroundColor = UIColor(red: 74.0/255.0, green: 29.0/255.0, blue: 92.0/255.0, alpha: 1.0)
         _ = webView?.load(request)
-        webView?.autoresizingMask = [UIViewAutoresizing.flexibleHeight, UIViewAutoresizing.flexibleWidth]
+        webView?.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight, UIView.AutoresizingMask.flexibleWidth]
         webView?.scrollView.contentInsetAdjustmentBehavior = .never
         view.addSubview(webView!)
         
         let center = NotificationCenter.default
-        center.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: .main) { [weak self] (_) in
+        center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.didAppear = true
             if let info = self?.webViewInfo {
                 self?.sendToAllSockets(data: info)
             }
         }
-        center.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: .main) { [weak self] (_) in
+        center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.didAppear = false
             if let info = self?.webViewInfo {
                 self?.sendToAllSockets(data: info)
