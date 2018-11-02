@@ -8,6 +8,7 @@
 
 import UIKit
 import BRCore
+import UserNotifications
 
 private let timeSinceLastExitKey = "TimeSinceLastExit"
 private let shouldRequireLoginTimeoutKey = "ShouldRequireLoginTimeoutKey"
@@ -421,14 +422,16 @@ extension ApplicationController {
         Store.subscribe(self, name: .registerForPushNotificationToken, callback: { _ in
             let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
             self.application?.registerUserNotificationSettings(settings)
+            // *** use UNUserNotificationCenter ***
         })
     }
 
-    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
-        if !notificationSettings.types.isEmpty {
-            application.registerForRemoteNotifications()
-        }
-    }
+//    BMEX UIUserNotificationSettings was deprecated
+//    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
+//        if !notificationSettings.types.isEmpty {
+//            application.registerForRemoteNotifications()
+//        }
+//    }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 //        guard let apiClient = walletManager?.apiClient else { return }

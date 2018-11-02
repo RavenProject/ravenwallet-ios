@@ -144,42 +144,6 @@ UINavigationControllerDelegate, CameraOverlayDelegate {
         resp.provide(204, json: nil)
     }
     
-    open func imagePickerController(_ picker: UIImagePickerController,
-                                    didFinishPickingMediaWithInfo info: [String : Any]) {
-        defer {
-            DispatchQueue.main.async {
-                picker.dismiss(animated: true, completion: nil)
-            }
-        }
-        guard let resp = self.response else {
-            return
-        }
-        guard var img = info[UIImagePickerController.InfoKey.originalImage.rawValue] as? UIImage else {
-            print("[BRCameraPlugin] error picking image... original image doesnt exist. data: \(info)")
-            resp.provide(500)
-            response = nil
-            return
-        }
-        resp.request.queue.async {
-            defer {
-                self.response = nil
-            }
-            do {
-                if let overlay = self.picker?.cameraOverlayView as? CameraOverlay {
-                    if let croppedImg = overlay.cropImage(img) {
-                        img = croppedImg
-                    }
-                }
-                let id = try self.writeImage(img)
-                print(["[BRCameraPlugin] wrote image to \(id)"])
-                resp.provide(200, json: ["id": id])
-            } catch let e {
-                print("[BRCameraPlugin] error writing image: \(e)")
-                resp.provide(500)
-            }
-        }
-    }
-    
     func takePhoto() {
         self.picker?.takePicture()
     }
@@ -220,6 +184,44 @@ UINavigationControllerDelegate, CameraOverlayDelegate {
         let picUrl = picDirUrl.appendingPathComponent("\(name).jpeg")
         try dat.write(to: picUrl, options: [])
         return name
+    }
+}
+
+extension BRCameraPlugin {
+    open func imagePickerController(_ picker: UIImagePickerController,
+                                    didFinishPickingMediaWithInfo info: [String : Any]) {
+        defer {
+            DispatchQueue.main.async {
+                picker.dismiss(animated: true, completion: nil)
+            }
+        }
+        guard let resp = self.response else {
+            return
+        }
+        guard var img = info[UIImagePickerController.InfoKey.originalImage.rawValue] as? UIImage else {
+            print("[BRCameraPlugin] error picking image... original image doesnt exist. data: \(info)")
+            resp.provide(500)
+            response = nil
+            return
+        }
+        resp.request.queue.async {
+            defer {
+                self.response = nil
+            }
+            do {
+                if let overlay = self.picker?.cameraOverlayView as? CameraOverlay {
+                    if let croppedImg = overlay.cropImage(img) {
+                        img = croppedImg
+                    }
+                }
+                let id = try self.writeImage(img)
+                print(["[BRCameraPlugin] wrote image to \(id)"])
+                resp.provide(200, json: ["id": id])
+            } catch let e {
+                print("[BRCameraPlugin] error writing image: \(e)")
+                resp.provide(500)
+            }
+        }
     }
 }
 
