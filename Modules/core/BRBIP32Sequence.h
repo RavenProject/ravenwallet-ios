@@ -67,7 +67,7 @@ extern "C" {
 //    size_t BIP44xPubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32_t chain, uint32_t index, UInt256 *chainCode,
 //                             uint32_t *fingerPrint);
     
-    BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen, uint32_t account, uint32_t coinType, const int isBip44DP);
+    BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen, uint32_t account, uint32_t coinType);
     
 //    // writes the public key for path N(m/0H/chain/index) to pubKey
 //    // returns number of bytes written, or pubKeyLen needed if pubKey is NULL
@@ -83,7 +83,7 @@ extern "C" {
     
     // sets the private key for path m/44H/chain/index to each element in keys
     void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType, uint32_t account, uint32_t chain,
-                            const uint32_t indexes[], const int isBip44DP);
+                            const uint32_t indexes[]);
     
     // sets the private key for the specified path to key
     // depth is the number of arguments used to specify the path

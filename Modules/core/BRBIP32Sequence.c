@@ -105,38 +105,8 @@ static void _CKDpub(BRECPoint *K, UInt256 *c, uint32_t i) {
     }
 }
 
-//// returns the master public key for the default BIP32 wallet layout - derivation path N(m/0H)
-//BRMasterPubKey BRBIP32MasterPubKey(const void *seed, size_t seedLen) {
-//    BRMasterPubKey mpk = BR_MASTER_PUBKEY_NONE;
-//    UInt512 I;
-//    UInt256 secret, chain;
-//    BRKey key;
-//
-//    assert(seed != NULL || seedLen == 0);
-//
-//    if (seed || seedLen == 0) {
-//        BRHMAC(&I, BRSHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
-//        secret = *(UInt256 *)&I;
-//        chain = *(UInt256 *)&I.u8[sizeof(UInt256)];
-//        var_clean(&I);
-//
-//        BRKeySetSecret(&key, &secret, 1);
-//        mpk.fingerPrint = BRKeyHash160(&key).u32[0];
-//
-//        _CKDpriv(&secret, &chain, 0 | BIP32_HARD); // path m/0H
-//
-//        mpk.chainCode = chain;
-//        BRKeySetSecret(&key, &secret, 1);
-//        var_clean(&secret, &chain);
-//        BRKeyPubKey(&key, &mpk.pubKey, sizeof(mpk.pubKey)); // path N(m/0H)
-//        BRKeyClean(&key);
-//    }
-//
-//    return mpk;
-//}
-
 // returns the master public key for the default BIP32 wallet layout - derivation path N(m/44'/coinType'/account')
-BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen,  uint32_t coinType, uint32_t account, const int isBip44DP) {
+BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen,  uint32_t coinType, uint32_t account) {
     BRMasterPubKey mpk = BR_MASTER_PUBKEY_NONE;
     UInt512 I;
     UInt256 secret, chain;
@@ -153,16 +123,11 @@ BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen,  uint32_t coi
         BRKeySetSecret(&key, &secret, 1);
         mpk.fingerPrint = BRKeyHash160(&key).u32[0];
 
-        // TODO find a good condition
-        if( isBip44DP == BIP44_PURPOSE) {
             // Bip44 derivation path!
             _CKDpriv(&secret, &chain, BIP44_PURPOSE | BIP32_HARD); // path m/44H
             _CKDpriv(&secret, &chain, coinType      | BIP32_HARD); // path m/44H/coinType'
             _CKDpriv(&secret, &chain, account       | BIP32_HARD); // path m/44H/coinType'/account'
-        } else {
-            // Bip32 default derication path
-            _CKDpriv(&secret, &chain, 0 | BIP32_HARD); // path m/0H
-        }
+
         mpk.chainCode = chain;
         BRKeySetSecret(&key, &secret, 1);
         var_clean(&secret, &chain);
@@ -172,27 +137,6 @@ BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen,  uint32_t coi
     
     return mpk;
 }
-
-
-//// writes the public key for path N(m/chain/index) to pubKey
-//// returns number of bytes written, or pubKeyLen needed if pubKey is NULL
-//size_t BRBIP32PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32_t chain, uint32_t index) {
-//    UInt256 chainCode = mpk.chainCode;
-//
-//    assert(memcmp(&mpk, &BR_MASTER_PUBKEY_NONE, sizeof(mpk)) != 0);
-//
-//    if (pubKey && sizeof(BRECPoint) <= pubKeyLen) {
-//        *(BRECPoint *)pubKey = *(BRECPoint *)mpk.pubKey;
-//
-//        _CKDpub((BRECPoint *)pubKey, &chainCode, chain); // path N(m/0H/chain)
-//        _CKDpub((BRECPoint *)pubKey, &chainCode, index); // index'th key in chain
-//
-//        var_clean(&chainCode);
-//    }
-//
-//    return (! pubKey || sizeof(BRECPoint) <= pubKeyLen) ? sizeof(BRECPoint) : 0;
-//}
-
 
 // writes the public key for path N(m/44H/coinType'/account') to pubKey
 // returns number of bytes written, or pubKeyLen needed if pubKey is NULL
@@ -213,28 +157,6 @@ size_t BIP44PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32
     return (! pubKey || sizeof(BRECPoint) <= pubKeyLen) ? sizeof(BRECPoint) : 0;
 }
 
-////TODO this method will be removed once all the serialization code is moved to this file.
-//// TODO: USED? Or has this been refactored out?
-//size_t BIP44xPubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32_t chain, uint32_t index, UInt256 *chainCode,
-//                         uint32_t *fingerPrint) {
-//    BRKey key;
-//    assert(memcmp(&mpk, &BR_MASTER_PUBKEY_NONE, sizeof(mpk)) != 0);
-//
-//    if (pubKey && sizeof(BRECPoint) <= pubKeyLen) {
-//        *(BRECPoint *)pubKey = *(BRECPoint *)mpk.pubKey;
-//        _CKDpub((BRECPoint *)pubKey, chainCode, chain); // path N(m/44'/account'/chain)
-//        //We need the fingerprint of the parent public key
-//        BRKeySetPubKey(&key, pubKey, sizeof(BRECPoint));
-//
-//        _CKDpub((BRECPoint *)pubKey, chainCode, index); // index'th key in chain
-//
-//    }
-//
-//    *fingerPrint = BRKeyHash160(&key).u32[0];
-//
-//    return (! pubKey || sizeof(BRECPoint) <= pubKeyLen) ? sizeof(BRECPoint) : 0;
-//}
-
 // sets the private key for path m/44H/175H/0H/chain/index to key
 void BRBIP32PrivKey(BRKey *key, const void *seed, size_t seedLen, uint32_t chain, uint32_t index){
     BRBIP32PrivKeyPath(key, seed, seedLen, 3, 0 | BIP32_HARD, chain, index);
@@ -242,7 +164,7 @@ void BRBIP32PrivKey(BRKey *key, const void *seed, size_t seedLen, uint32_t chain
 
 // sets the private key for path m/44H/cointype'/account'/chain/index to each element in keys
 void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType, uint32_t account, uint32_t chain,
-                        const uint32_t indexes[], const int isBip44DP) {
+                        const uint32_t indexes[]) {
     UInt512 I;
     UInt256 secret, chainCode, s, c;
     
@@ -256,15 +178,10 @@ void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t s
         chainCode = *(UInt256 *)&I.u8[sizeof(UInt256)];
         var_clean(&I);
         
-        if( isBip44DP == BIP44_PURPOSE ) {
             _CKDpriv(&secret, &chainCode, BIP44_PURPOSE | BIP32_HARD); // path m/44H
             _CKDpriv(&secret, &chainCode, coinType      | BIP32_HARD); // path m/44H/coinType'
             _CKDpriv(&secret, &chainCode, account       | BIP32_HARD); // path m/44H/coinType'/account'
-        } else {
-            // Bip32 default derivation path
-            _CKDpriv(&secret, &chainCode, 0 | BIP32_HARD);  // path m/0H
-//            _CKDpriv(&secret, &chainCode, chain);           // path m/0H/chain
-        }
+
         
         for (size_t i = 0; i < keysCount; i++) {
             s = secret;
