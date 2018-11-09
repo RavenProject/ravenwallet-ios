@@ -60,6 +60,7 @@ class ApplicationController : Subscriber, Trackable {
         guard let currency = currency as? Raven else { return }
         guard let walletManager = try? WalletManager(currency: currency, dbPath: currency.dbPath) else { return }
         walletManagers[currency.code] = walletManager
+        self.exchangeUpdaters[currency.code] = ExchangeUpdater(currency: currency, walletManager: walletManager)
         walletManager.initWallet { success in
             guard success else {
                 // always keep RVN wallet manager, even if not initialized, since it the primaryWalletManager and needed for onboarding
@@ -71,7 +72,6 @@ class ApplicationController : Subscriber, Trackable {
                 dispatchGroup.leave()
                 return
             }
-            self.exchangeUpdaters[currency.code] = ExchangeUpdater(currency: currency, walletManager: walletManager)
             walletManager.initPeerManager {
                 walletManager.peerManager?.connect()
                 dispatchGroup.leave()
