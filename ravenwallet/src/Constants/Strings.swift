@@ -220,6 +220,16 @@ enum S {
         static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
     }
     
+        static let title = NSLocalizedString("TermsOfUse.title", value:"Almost done! Let's review.", comment: "TermsOfUse Title")
+        static let info = NSLocalizedString("TermsOfUse.info", value:"RaveCoin is different - it cannot be safely held with a bankor web service.", comment: "TermsOfUse Info")
+        enum Cells {
+            static let firstTermDescription = NSLocalizedString("TermsOfUse.firstTermDescription", value:"I understand that the keys to my funds are held securely on this device and that they do not exist anywhere else.", comment: "PIN button description")
+            static let secondTermDescription = NSLocalizedString("TermsOfUse.secondTermDescription", value:"I understand that if I lose this device, or upgrade to a new device, the keys to my funds can only be recovered with the 12 words I have written down.", comment: "Touch ID/FaceID button description")
+            static let acceptDescription = NSLocalizedString("TermsOfUse.acceptDescription", value:"I have read, understood, and agree to the Terms of Use.", comment: "Face ID button title")
+        }
+        static let confirmButton = NSLocalizedString("TermsOfUse.confirmButton", value:"Confirm & Finish", comment: "Share via email button label")
+    }
+    
     enum OneTimeWipe {
         static let next = NSLocalizedString("OneTimeWipe.next", value:"Start Wipping Process", comment: "Next button label")
         static let intro = NSLocalizedString("OneTimeWipe.intro", value:"Recover your RVN Wallet with your paper key.", comment: "Recover wallet intro")
@@ -609,5 +619,9 @@ enum S {
         static let retry = NSLocalizedString("Crowdsale.retry", value: "Retry", comment: "Retry Identity verification button")
         static let agree = NSLocalizedString("Crowdsale.agree", value: "Agree", comment: "Agree to legal terms button")
         static let decline = NSLocalizedString("Crowdsale.decline", value: "Decline", comment: "Decline to legal terms button")
+    }
+    
+    enum WipeSetting {
+        static let title = NSLocalizedString("WipeSetting.title", value: "Erase All Data", comment: "Wipe wallet")
     }
 }
