@@ -407,6 +407,9 @@ class ModalPresenter : Subscriber, Trackable {
                                 let nodeSelector = NodeSelectorViewController(walletManager: walletManager)
                                 settingsNav.pushViewController(nodeSelector, animated: true)
                             }),
+                            Setting(title: S.WipeSetting.title, callback: {
+                                self.wipeWallet()
+                            })
                         ],
                     ]
 
