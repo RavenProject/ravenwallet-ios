@@ -220,6 +220,7 @@ enum S {
         static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
     }
     
+    enum TermsOfUse {
         static let title = NSLocalizedString("TermsOfUse.title", value:"Almost done! Let's review.", comment: "TermsOfUse Title")
         static let info = NSLocalizedString("TermsOfUse.info", value:"RaveCoin is different - it cannot be safely held with a bankor web service.", comment: "TermsOfUse Info")
         enum Cells {
