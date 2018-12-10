@@ -55,7 +55,7 @@ class VerifyPinViewController : UIViewController, ContentBoxPresenter {
         contentBox.addSubview(titleLabel)
         contentBox.addSubview(body)
         contentBox.addSubview(pinView)
-        addChildViewController(pinPad, layout: {
+        addChild(pinPad, layout: {
             pinPad.view.constrain([
                 pinPad.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 pinPad.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: LAContext.biometricType() == .face ? -C.padding[3] : 0.0),

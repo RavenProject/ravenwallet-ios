@@ -1,5 +1,5 @@
 //
-//  BRBIP39Mnemonic.h
+//  BIP39Mnemonic.h
 //
 //  Created by Aaron Voisine on 9/7/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -39,13 +39,13 @@ extern "C" {
 #define BIP39_WORDLIST_COUNT 2048       // number of words in a BIP39 wordlist
 
 // returns number of bytes written to phrase including NULL terminator, or phraseLen needed if phrase is NULL
-size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char *wordList[], const uint8_t *data, size_t dataLen);
+size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char **wordList, const uint8_t *data, size_t dataLen);
 
 // returns number of bytes written to data, or dataLen needed if data is NULL
-size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char *wordList[], const char *phrase);
+size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char **wordList, const char *phrase);
 
 // verifies that all phrase words are contained in wordlist and checksum is valid
-int BRBIP39PhraseIsValid(const char *wordList[], const char *phrase);
+int BRBIP39PhraseIsValid(const char **wordList, const char *phrase);
 
 // key64 must hold 64 bytes (512 bits), phrase and passphrase must be unicode NFKD normalized
 // http://www.unicode.org/reports/tr15/#Norm_Forms

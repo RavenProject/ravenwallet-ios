@@ -26,7 +26,7 @@
 import Foundation
 import UIKit
 import SystemConfiguration
-import BRCore
+import Core
 import AVFoundation
 
 extension NSNotification.Name {
@@ -278,6 +278,10 @@ extension WalletManager : BRWalletListener {
 
     func txAdded(_ tx: BRTxRef) {
         db?.txAdded(tx)
+        //BMEX test if asset not nil
+        if AssetValidator.shared.checkInvalidAsset(asset: tx.pointee.asset) {
+            db?.assetAdded(tx, walletManager: self)
+        }
     }
 
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {

@@ -147,6 +147,7 @@ class WritePaperPhraseViewController: UIViewController {
     }
 
     @objc private func proceedTapped() {
+        print("BMEX word " + String(currentPhraseIndex) + " : " + phraseViews[currentPhraseIndex].phrase)
         guard currentPhraseIndex < phraseViews.count - 1 else { callback(); return }
         if currentPhraseIndex == 0 {
             showBothButtons()

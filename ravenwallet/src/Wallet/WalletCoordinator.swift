@@ -47,6 +47,7 @@ class WalletCoordinator : Subscriber, Trackable {
             })
 
             Store.subscribe(self, name: .rescan(currency), callback: { _ in
+                UserDefaults.hasRescannedBlockChain = true
                 Store.perform(action: WalletChange(currency).setRecommendScan(false))
                 Store.perform(action: WalletChange(currency).setIsRescanning(true))
                 DispatchQueue.walletQueue.async {

@@ -25,7 +25,7 @@
 
 
 import Foundation
-import BRCore
+import Core
 
 let BRAPIClientErrorDomain = "BRApiClientErrorDomain"
 

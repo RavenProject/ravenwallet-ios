@@ -1,5 +1,5 @@
 //
-//  BRInt.h
+//  Int.h
 //
 //  Created by Aaron Voisine on 8/16/15.
 //  Copyright (c) 2015 breadwallet LLC.
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRInt_h
-#define BRInt_h
+#ifndef Int_h
+#define Int_h
 
 #include <inttypes.h>
 #include <assert.h>
@@ -77,12 +77,12 @@ inline static int UInt256Eq(UInt256 a, UInt256 b)
     return (a.u64[0] == b.u64[0] && a.u64[1] == b.u64[1] && a.u64[2] == b.u64[2] && a.u64[3] == b.u64[3]);
 }
 
-    inline static int UInt256SupEq(UInt256 a, UInt256 b)
-    {
-        return (a.u64[3] > b.u64[3]) || ((a.u64[3] == b.u64[3]) && ((a.u64[2] > b.u64[2]) ||
-                                                                    ((a.u64[2] == b.u64[2]) && ((a.u64[1] > b.u64[1]) || ((a.u64[1] == b.u64[1]) && (a.u64[0] >= b.u64[0]))))));
-    }
-    
+inline static int UInt256SupEq(UInt256 a, UInt256 b)
+{
+    return (a.u64[3] > b.u64[3]) || ((a.u64[3] == b.u64[3]) && ((a.u64[2] > b.u64[2]) ||
+                                                                ((a.u64[2] == b.u64[2]) && ((a.u64[1] > b.u64[1]) || ((a.u64[1] == b.u64[1]) && (a.u64[0] >= b.u64[0]))))));
+}
+
 inline static int UInt512Eq(UInt512 a, UInt512 b)
 {
     return (a.u64[0] == b.u64[0] && a.u64[1] == b.u64[1] && a.u64[2] == b.u64[2] && a.u64[3] == b.u64[3] &&
@@ -120,6 +120,7 @@ inline static UInt256 UInt256Reverse(UInt256 u)
 #define UINT128_ZERO ((UInt128) { .u64 = { 0, 0 } })
 #define UINT160_ZERO ((UInt160) { .u32 = { 0, 0, 0, 0, 0 } })
 #define UINT256_ZERO ((UInt256) { .u64 = { 0, 0, 0, 0 } })
+#define UINT256_MAX ((UInt256) { .u64 = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF } })
 #define UINT512_ZERO ((UInt512) { .u64 = { 0, 0, 0, 0, 0, 0, 0, 0 } })
 
 // hex encoding/decoding
@@ -299,137 +300,147 @@ inline static UInt256 UInt256Get(const void *b32)
     } };
 }
 
-    //UInt256 functions
-    inline static uint8_t bits(UInt256 number)
-    {
-        for (int pos = 8 - 1; pos >= 0; pos--) {
-            if (number.u32[pos]) {
-                for (int bits = 31; bits > 0; bits--) {
-                    if (number.u32[pos] & 1 << bits)
-                        return 32 * pos + bits + 1;
-                }
-                return 32 * pos + 1;
+//UInt256 functions
+inline static uint8_t bits(UInt256 number)
+{
+    for (int pos = 8 - 1; pos >= 0; pos--) {
+        if (number.u32[pos]) {
+            for (int bits = 31; bits > 0; bits--) {
+                if (number.u32[pos] & 1 << bits)
+                    return 32 * pos + bits + 1;
             }
+            return 32 * pos + 1;
         }
-        return 0;
     }
-    inline static UInt256 add(UInt256 a, UInt256 b) {
-        uint64_t carry = 0;
-        UInt256 r = UINT256_ZERO;
-        for (int i = 0; i < 8; i++) {
-            uint64_t sum = (uint64_t)a.u32[i] + (uint64_t)b.u32[i] + carry;
-            r.u32[i] = (uint32_t)sum;
-            carry = sum >> 32;
-        }
+    return 0;
+}
+
+inline static UInt256 add(UInt256 a, UInt256 b) {
+    uint64_t carry = 0;
+    UInt256 r = UINT256_ZERO;
+    for (int i = 0; i < 8; i++) {
+        uint64_t sum = (uint64_t)a.u32[i] + (uint64_t)b.u32[i] + carry;
+        r.u32[i] = (uint32_t)sum;
+        carry = sum >> 32;
+    }
+    return r;
+}
+
+inline static UInt256 addOne(UInt256 a) {
+    UInt256 r = ((UInt256) { .u64 = { 1, 0, 0, 0 } });
+    return add(a, r);
+}
+
+inline static UInt256 neg(UInt256 a) {
+    UInt256 r = UINT256_ZERO;
+    for (int i = 0; i < 4; i++) {
+        r.u64[i] = ~a.u64[i];
+    }
+    return r;
+}
+
+inline static UInt256 subtract(UInt256 a, UInt256 b) {
+    return add(a,addOne(neg(b)));
+}
+
+inline static UInt256 shiftLeft(UInt256 a, uint8_t bits) {
+    UInt256 r = UINT256_ZERO;
+    int k = bits / 64;
+    bits = bits % 64;
+    for (int i = 0; i < 4; i++) {
+        if (i + k + 1 < 4 && bits != 0)
+            r.u64[i + k + 1] |= (a.u64[i] >> (64 - bits));
+        if (i + k < 4)
+            r.u64[i + k] |= (a.u64[i] << bits);
+    }
+    return r;
+}
+
+inline static UInt256 shiftRight(UInt256 a, uint8_t bits) {
+    UInt256 r = UINT256_ZERO;
+    int k = bits / 64;
+    bits = bits % 64;
+    for (int i = 0; i < 4; i++) {
+        if (i - k - 1 >= 0 && bits != 0)
+            r.u64[i - k - 1] |= (a.u64[i] << (64 - bits));
+        if (i - k >= 0)
+            r.u64[i - k] |= (a.u64[i] >> bits);
+    }
+    return r;
+}
+
+inline static UInt256 divide (UInt256 a,UInt256 b)
+{
+    UInt256 div = b;     // make a copy, so we can shift.
+    UInt256 num = a;     // make a copy, so we can subtract.
+    UInt256 r = UINT256_ZERO;                  // the quotient.
+    int num_bits = bits(num);
+    int div_bits = bits(div);
+    assert (div_bits != 0);
+    if (div_bits > num_bits) // the result is certainly 0.
         return r;
-    }
-    inline static UInt256 addOne(UInt256 a) {
-        UInt256 r = ((UInt256) { .u64 = { 1, 0, 0, 0 } });
-        return add(a, r);
-    }
-    inline static UInt256 neg(UInt256 a) {
-        UInt256 r = UINT256_ZERO;
-        for (int i = 0; i < 4; i++) {
-            r.u64[i] = ~a.u64[i];
+    int shift = num_bits - div_bits;
+    div = shiftLeft(div, shift); // shift so that div and nun align.
+    while (shift >= 0) {
+        if (UInt256SupEq(num,div)) {
+            num = subtract(num,div);
+            r.u32[shift / 32] |= (1 << (shift & 31)); // set a bit of the result.
         }
-        return r;
+        div = shiftRight(div, 1); // shift back.
+        shift--;
     }
-    inline static UInt256 subtract(UInt256 a, UInt256 b) {
-        return add(a,addOne(neg(b)));
+    // num now contains the remainder of the division.
+    return r;
+}
+
+inline static UInt256 multiplyThis32 (UInt256 a,uint32_t b)
+{
+    uint64_t carry = 0;
+    for (int i = 0; i < 8; i++) {
+        uint64_t n = carry + (uint64_t)b * (uint64_t)a.u32[i];
+        a.u32[i] = n & 0xffffffff;
+        carry = n >> 32;
     }
-    inline static UInt256 shiftLeft(UInt256 a, uint8_t bits) {
-        UInt256 r = UINT256_ZERO;
-        int k = bits / 64;
-        bits = bits % 64;
-        for (int i = 0; i < 4; i++) {
-            if (i + k + 1 < 4 && bits != 0)
-                r.u64[i + k + 1] |= (a.u64[i] >> (64 - bits));
-            if (i + k < 4)
-                r.u64[i + k] |= (a.u64[i] << bits);
-        }
-        return r;
+    return a;
+}
+
+inline static UInt256 setCompact(int32_t nCompact)
+{
+    int nSize = nCompact >> 24;
+    UInt256 nWord = UINT256_ZERO;
+    nWord.u32[0] = nCompact & 0x007fffff;
+    if (nSize <= 3) {
+        nWord = shiftRight(nWord, 8 * (3 - nSize));
+    } else {
+        nWord = shiftLeft(nWord, 8 * (nSize - 3));
     }
-    inline static UInt256 shiftRight(UInt256 a, uint8_t bits) {
-        UInt256 r = UINT256_ZERO;
-        int k = bits / 64;
-        bits = bits % 64;
-        for (int i = 0; i < 4; i++) {
-            if (i - k - 1 >= 0 && bits != 0)
-                r.u64[i - k - 1] |= (a.u64[i] << (64 - bits));
-            if (i - k >= 0)
-                r.u64[i - k] |= (a.u64[i] >> bits);
-        }
-        return r;
+    return nWord;
+}
+
+inline static uint32_t getCompact(UInt256 number)
+{
+    int nSize = (bits(number) + 7) / 8;
+    uint32_t nCompact = 0;
+    if (nSize <= 3) {
+        nCompact = number.u32[0] << 8 * (3 - nSize);
+    } else {
+        UInt256 bn = shiftRight(number, 8 * (nSize - 3));
+        nCompact = bn.u32[0];
     }
-    inline static UInt256 divide (UInt256 a,UInt256 b)
-    {
-        UInt256 div = b;     // make a copy, so we can shift.
-        UInt256 num = a;     // make a copy, so we can subtract.
-        UInt256 r = UINT256_ZERO;                  // the quotient.
-        int num_bits = bits(num);
-        int div_bits = bits(div);
-        assert (div_bits != 0);
-        if (div_bits > num_bits) // the result is certainly 0.
-            return r;
-        int shift = num_bits - div_bits;
-        div = shiftLeft(div, shift); // shift so that div and nun align.
-        while (shift >= 0) {
-            if (UInt256SupEq(num,div)) {
-                num = subtract(num,div);
-                r.u32[shift / 32] |= (1 << (shift & 31)); // set a bit of the result.
-            }
-            div = shiftRight(div, 1); // shift back.
-            shift--;
-        }
-        // num now contains the remainder of the division.
-        return r;
+    // The 0x00800000 bit denotes the sign.
+    // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
+    if (nCompact & 0x00800000) {
+        nCompact >>= 8;
+        nSize++;
     }
-    inline static UInt256 multiplyThis32 (UInt256 a,uint32_t b)
-    {
-        uint64_t carry = 0;
-        for (int i = 0; i < 8; i++) {
-            uint64_t n = carry + (uint64_t)b * (uint64_t)a.u32[i];
-            a.u32[i] = n & 0xffffffff;
-            carry = n >> 32;
-        }
-        return a;
-    }
-    inline static UInt256 setCompact(int32_t nCompact)
-    {
-        int nSize = nCompact >> 24;
-        UInt256 nWord = UINT256_ZERO;
-        nWord.u32[0] = nCompact & 0x007fffff;
-        if (nSize <= 3) {
-            nWord = shiftRight(nWord, 8 * (3 - nSize));
-        } else {
-            nWord = shiftLeft(nWord, 8 * (nSize - 3));
-        }
-        return nWord;
-    }
-    inline static uint32_t getCompact(UInt256 number)
-    {
-        int nSize = (bits(number) + 7) / 8;
-        uint32_t nCompact = 0;
-        if (nSize <= 3) {
-            nCompact = number.u32[0] << 8 * (3 - nSize);
-        } else {
-            UInt256 bn = shiftRight(number, 8 * (nSize - 3));
-            nCompact = bn.u32[0];
-        }
-        // The 0x00800000 bit denotes the sign.
-        // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
-        if (nCompact & 0x00800000) {
-            nCompact >>= 8;
-            nSize++;
-        }
-        assert((nCompact & ~0x007fffff) == 0);
-        assert(nSize < 256);
-        nCompact |= nSize << 24;
-        return nCompact;
-    }
-    
+    assert((nCompact & ~0x007fffff) == 0);
+    assert(nSize < 256);
+    nCompact |= nSize << 24;
+    return nCompact;
+}
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // BRInt_h
+#endif // Int_h

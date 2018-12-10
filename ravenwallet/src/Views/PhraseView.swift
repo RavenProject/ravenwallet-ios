@@ -10,7 +10,7 @@ import UIKit
 
 class PhraseView: UIView {
 
-    private let phrase: String
+    let phrase: String
     private let label = UILabel()
 
 

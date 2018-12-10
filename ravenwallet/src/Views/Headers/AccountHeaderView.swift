@@ -112,14 +112,6 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     }
 
     private func setData() {
-        for family: String in UIFont.familyNames
-        {
-            print("\(family)")
-            for names: String in UIFont.fontNames(forFamilyName: family)
-            {
-                print("== \(names)")
-            }
-        }
         currencyName.textColor = .white
         currencyName.textAlignment = .center
         currencyName.text = currency.name
@@ -225,8 +217,12 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
 
     private func addSubscriptions() {
         Store.lazySubscribe(self,
-                            selector: { $0.isSwapped != $1.isSwapped },
-                            callback: { self.isBtcSwapped = $0.isSwapped })
+                            selector: {
+                                $0.isSwapped != $1.isSwapped
+        },
+                            callback: {
+                                self.isBtcSwapped = $0.isSwapped
+        })
         Store.lazySubscribe(self,
                             selector: { $0[self.currency].currentRate != $1[self.currency].currentRate},
                             callback: {

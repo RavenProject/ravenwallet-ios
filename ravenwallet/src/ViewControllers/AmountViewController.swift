@@ -149,7 +149,7 @@ class AmountViewController : UIViewController, Trackable {
             feeLabel.topAnchor.constraint(equalTo: balanceLabel.bottomAnchor),
             feeLabel.trailingAnchor.constraint(equalTo: editFee.leadingAnchor, constant: C.padding[1]) ])
         pinPadHeight = pinPad.view.heightAnchor.constraint(equalToConstant: 0.0)
-        addChildViewController(pinPad, layout: {
+        addChild(pinPad, layout: {
             pinPad.view.constrain([
                 pinPad.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 pinPad.view.topAnchor.constraint(equalTo: border.bottomAnchor),

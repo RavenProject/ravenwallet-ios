@@ -1,5 +1,5 @@
 //
-//  BRPaymentProtocol.h
+//  PaymentProtocol.h
 //
 //  Created by Aaron Voisine on 9/7/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRPaymentProtocol_h
-#define BRPaymentProtocol_h
+#ifndef PaymentProtocol_h
+#define PaymentProtocol_h
 
 #include "BRTransaction.h"
 #include "BRAddress.h"
@@ -49,14 +49,14 @@ typedef struct {
     size_t merchDataLen;
 } BRPaymentProtocolDetails;
 
-// returns a newly allocated details struct that must be freed by calling BRPaymentProtocolDetailsFree()
-BRPaymentProtocolDetails *BRPaymentProtocolDetailsNew(const char *network, const BRTxOutput outputs[], size_t outCount,
+// returns a newly allocated details struct that must be freed by calling PaymentProtocolDetailsFree()
+BRPaymentProtocolDetails *BRPaymentProtocolDetailsNew(const char *network, const BRTxOutput *outputs, size_t outCount,
                                                       uint64_t time, uint64_t expires, const char *memo,
                                                       const char *paymentURL, const uint8_t *merchantData,
                                                       size_t merchDataLen);
 
 // buf must contain a serialized details struct
-// returns a details struct that must be freed by calling BRPaymentProtocolDetailsFree()
+// returns a details struct that must be freed by calling PaymentProtocolDetailsFree()
 BRPaymentProtocolDetails *BRPaymentProtocolDetailsParse(const uint8_t *buf, size_t bufLen);
 
 // writes serialized details struct to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -75,13 +75,13 @@ typedef struct {
     size_t sigLen;
 } BRPaymentProtocolRequest;
 
-// returns a newly allocated request struct that must be freed by calling BRPaymentProtocolRequestFree()
+// returns a newly allocated request struct that must be freed by calling PaymentProtocolRequestFree()
 BRPaymentProtocolRequest *BRPaymentProtocolRequestNew(uint32_t version, const char *pkiType, const uint8_t *pkiData,
                                                       size_t pkiDataLen, BRPaymentProtocolDetails *details,
                                                       const uint8_t *signature, size_t sigLen);
 
 // buf must contain a serialized request struct
-// returns a request struct that must be freed by calling BRPaymentProtocolRequestFree()
+// returns a request struct that must be freed by calling PaymentProtocolRequestFree()
 BRPaymentProtocolRequest *BRPaymentProtocolRequestParse(const uint8_t *buf, size_t bufLen);
 
 // writes serialized request struct to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -102,28 +102,28 @@ void BRPaymentProtocolRequestFree(BRPaymentProtocolRequest *req);
 typedef struct {
     uint8_t *merchantData; // from request->details->merchantData, optional
     size_t merchDataLen;
-    BRTransaction **transactions; // array of signed BRTransaction struct references to satisfy outputs from details
+    BRTransaction **transactions; // array of signed Transaction struct references to satisfy outputs from details
     size_t txCount;
     BRTxOutput *refundTo; // where to send refunds, if a refund is necessary, refundTo[n].amount defaults to 0
     size_t refundToCount;
     char *memo; // human-readable message for the merchant, optional
 } BRPaymentProtocolPayment;
 
-// returns a newly allocated payment struct that must be freed by calling BRPaymentProtocolPaymentFree()
+// returns a newly allocated payment struct that must be freed by calling PaymentProtocolPaymentFree()
 BRPaymentProtocolPayment *BRPaymentProtocolPaymentNew(const uint8_t *merchantData, size_t merchDataLen,
-                                                      BRTransaction *transactions[], size_t txCount,
-                                                      const uint64_t refundToAmounts[],
-                                                      const BRAddress refundToAddresses[], size_t refundToCount,
+                                                      BRTransaction **transactions, size_t txCount,
+                                                      const uint64_t *refundToAmounts,
+                                                      const BRAddress *refundToAddresses, size_t refundToCount,
                                                       const char *memo);
 
 // buf must contain a serialized payment struct
-// returns a payment struct that must be freed by calling BRPaymentProtocolPaymentFree()
+// returns a payment struct that must be freed by calling PaymentProtocolPaymentFree()
 BRPaymentProtocolPayment *BRPaymentProtocolPaymentParse(const uint8_t *buf, size_t bufLen);
 
 // writes serialized payment struct to buf and returns number of bytes written, or total bufLen needed if buf is NULL
 size_t BRPaymentProtocolPaymentSerialize(const BRPaymentProtocolPayment *payment, uint8_t *buf, size_t bufLen);
 
-// frees memory allocated for payment struct (does not call BRTransactionFree() on transactions)
+// frees memory allocated for payment struct (does not call TransactionFree() on transactions)
 void BRPaymentProtocolPaymentFree(BRPaymentProtocolPayment *payment);
 
 typedef struct {
@@ -131,11 +131,11 @@ typedef struct {
     char *memo; // human-readable message for customer, optional
 } BRPaymentProtocolACK;
 
-// returns a newly allocated ACK struct that must be freed by calling BRPaymentProtocolACKFree()
+// returns a newly allocated ACK struct that must be freed by calling PaymentProtocolACKFree()
 BRPaymentProtocolACK *BRPaymentProtocolACKNew(BRPaymentProtocolPayment *payment, const char *memo);
 
 // buf must contain a serialized ACK struct
-// returns an ACK struct that must be freed by calling BRPaymentProtocolACKFree()
+// returns an ACK struct that must be freed by calling PaymentProtocolACKFree()
 BRPaymentProtocolACK *BRPaymentProtocolACKParse(const uint8_t *buf, size_t bufLen);
 
 // writes serialized ACK struct to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -146,7 +146,7 @@ void BRPaymentProtocolACKFree(BRPaymentProtocolACK *ack);
 
 typedef struct {
     BRKey senderPubKey; // sender's public key, required
-    uint64_t amount; // amount is integer-number-of-satoshis, defaults to 0
+    uint64_t amount; // amount is integer-number-of-corbies, defaults to 0
     char *pkiType; // none / x509+sha256, default is "none"
     uint8_t *pkiData; // depends on pkiType, optional
     size_t pkiDataLen;
@@ -156,7 +156,7 @@ typedef struct {
     size_t sigLen;
 } BRPaymentProtocolInvoiceRequest;
 
-// returns a newly allocated invoice request struct that must be freed by calling BRPaymentProtocolInvoiceRequestFree()
+// returns a newly allocated invoice request struct that must be freed by calling PaymentProtocolInvoiceRequestFree()
 BRPaymentProtocolInvoiceRequest *BRPaymentProtocolInvoiceRequestNew(BRKey *senderPubKey, uint64_t amount,
                                                                     const char *pkiType, uint8_t *pkiData,
                                                                     size_t pkiDataLen, const char *memo,
@@ -164,7 +164,7 @@ BRPaymentProtocolInvoiceRequest *BRPaymentProtocolInvoiceRequestNew(BRKey *sende
                                                                     size_t sigLen);
     
 // buf must contain a serialized invoice request
-// returns an invoice request struct that must be freed by calling BRPaymentProtocolInvoiceRequestFree()
+// returns an invoice request struct that must be freed by calling PaymentProtocolInvoiceRequestFree()
 BRPaymentProtocolInvoiceRequest *BRPaymentProtocolInvoiceRequestParse(const uint8_t *buf, size_t bufLen);
     
 // writes serialized invoice request to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -184,11 +184,11 @@ size_t BRPaymentProtocolInvoiceRequestDigest(BRPaymentProtocolInvoiceRequest *re
 void BRPaymentProtocolInvoiceRequestFree(BRPaymentProtocolInvoiceRequest *req);
 
 typedef enum {
-    BRPaymentProtocolMessageTypeUnknown = 0,
-    BRPaymentProtocolMessageTypeInvoiceRequest = 1,
-    BRPaymentProtocolMessageTypeRequest = 2,
-    BRPaymentProtocolMessageTypePayment = 3,
-    BRPaymentProtocolMessageTypeACK = 4
+    PaymentProtocolMessageTypeUnknown = 0,
+    PaymentProtocolMessageTypeInvoiceRequest = 1,
+    PaymentProtocolMessageTypeRequest = 2,
+    PaymentProtocolMessageTypePayment = 3,
+    PaymentProtocolMessageTypeACK = 4
 } BRPaymentProtocolMessageType;
 
 typedef struct {
@@ -201,13 +201,13 @@ typedef struct {
     size_t identLen;
 } BRPaymentProtocolMessage;
 
-// returns a newly allocated message struct that must be freed by calling BRPaymentProtocolMessageFree()
+// returns a newly allocated message struct that must be freed by calling PaymentProtocolMessageFree()
 BRPaymentProtocolMessage *BRPaymentProtocolMessageNew(BRPaymentProtocolMessageType msgType, const uint8_t *message,
                                                       size_t msgLen, uint64_t statusCode, const char *statusMsg,
                                                       const uint8_t *identifier, size_t identLen);
     
 // buf must contain a serialized message
-// returns an message struct that must be freed by calling BRPaymentProtocolMessageFree()
+// returns an message struct that must be freed by calling PaymentProtocolMessageFree()
 BRPaymentProtocolMessage *BRPaymentProtocolMessageParse(const uint8_t *buf, size_t bufLen);
     
 // writes serialized message struct to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -231,7 +231,7 @@ typedef struct {
     char *statusMsg; // human-readable payment protocol status message, optional
 } BRPaymentProtocolEncryptedMessage;
 
-// returns a newly allocated encrypted message struct that must be freed with BRPaymentProtocolEncryptedMessageFree()
+// returns a newly allocated encrypted message struct that must be freed with PaymentProtocolEncryptedMessageFree()
 // message is the un-encrypted serialized payment protocol message
 // one of either receiverKey or senderKey must contain a private key, and the other must contain only a public key
 BRPaymentProtocolEncryptedMessage *BRPaymentProtocolEncryptedMessageNew(BRPaymentProtocolMessageType msgType,
@@ -241,8 +241,8 @@ BRPaymentProtocolEncryptedMessage *BRPaymentProtocolEncryptedMessageNew(BRPaymen
                                                                         const uint8_t *identifier, size_t identLen,
                                                                         uint64_t statusCode, const char *statusMsg);
     
-// buf must contain a serialized encrytped message
-// returns an encrypted message struct that must be freed by calling BRPaymentProtocolEncryptedMessageFree()
+// buf must contain a serialized encrypted message
+// returns an encrypted message struct that must be freed by calling PaymentProtocolEncryptedMessageFree()
 BRPaymentProtocolEncryptedMessage *BRPaymentProtocolEncryptedMessageParse(const uint8_t *buf, size_t bufLen);
     
 // writes serialized encrypted message to buf and returns number of bytes written, or total bufLen needed if buf is NULL
@@ -260,4 +260,4 @@ void BRPaymentProtocolEncryptedMessageFree(BRPaymentProtocolEncryptedMessage *ms
 }
 #endif
 
-#endif // BRPaymentProtocol_h
+#endif // PaymentProtocol_h

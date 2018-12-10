@@ -1,26 +1,10 @@
 //
-//  BRAddress.c
+//  Address.c
 //
 //  Created by Aaron Voisine on 9/18/15.
 //  Copyright (c) 2015 breadwallet LLC
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
+
 
 #include "BRAddress.h"
 #include "BRBase58.h"
@@ -39,7 +23,7 @@ uint64_t BRVarInt(const uint8_t *buf, size_t bufLen, size_t *intLen)
 {
     uint64_t r = 0;
     uint8_t h = (buf && sizeof(uint8_t) <= bufLen) ? *buf : 0;
-    
+
     switch (h) {
         case VAR_INT16_HEADER:
             if (intLen) *intLen = sizeof(h) + sizeof(uint16_t);
@@ -110,7 +94,7 @@ size_t BRVarIntSize(uint64_t i)
 
 // parses script and writes an array of pointers to the script elements (opcodes and data pushes) to elems
 // returns the number of elements written, or elemsCount needed if elems is NULL
-size_t BRScriptElements(const uint8_t *elems[], size_t elemsCount, const uint8_t *script, size_t scriptLen)
+size_t BRScriptElements(const uint8_t **elems, size_t elemsCount, const uint8_t *script, size_t scriptLen)
 {
     size_t off = 0, i = 0, len = 0;
     
@@ -184,6 +168,7 @@ const uint8_t *BRScriptData(const uint8_t *elem, size_t *dataLen)
     }
     
     return (*dataLen > 0) ? elem : NULL;
+
 }
 
 // writes a data push script element to script
@@ -233,7 +218,7 @@ size_t BRScriptPushData(uint8_t *script, size_t scriptLen, const uint8_t *data, 
 // we are unable to correctly sign later, then the entire wallet balance after that point would become stuck with the
 // current coin selection code
 
-// writes the bitcoin address for a scriptPubKey to addr
+// writes the ravencoin address for a scriptPubKey to addr
 // returns the number of bytes written, or addrLen needed if addr is NULL
 size_t BRAddressFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen)
 {
@@ -242,15 +227,18 @@ size_t BRAddressFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *scri
     
     uint8_t data[21];
     const uint8_t *elems[BRScriptElements(NULL, 0, script, scriptLen)], *d = NULL;
-    size_t count = BRScriptElements(elems, sizeof(elems)/sizeof(*elems), script, scriptLen), l = 0;
+    size_t count = BRScriptElements(elems, sizeof(elems) / sizeof(*elems), script, scriptLen), l = 0;
     
-    data[0] = BITCOIN_PUBKEY_ADDRESS;
-#if BITCOIN_TESTNET
-    data[0] = BITCOIN_PUBKEY_ADDRESS_TEST;
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS;
+#if TESTNET
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_TEST;
+#elif REGTEST
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_REGTEST;
 #endif
     
-    if (count == 5 && *elems[0] == OP_DUP && *elems[1] == OP_HASH160 && *elems[2] == 20 &&
-        *elems[3] == OP_EQUALVERIFY && *elems[4] == OP_CHECKSIG) {
+    // TODO count doesn't trigger/ for regular tx =5 for assets tx =8 (remove and fix later)
+    if (/*count == 5 && */*elems[0] == OP_DUP && *elems[1] == OP_HASH160 && *elems[2] == 20 && *elems[3] == OP_EQUALVERIFY
+        && *elems[4] == OP_CHECKSIG) {
         // pay-to-pubkey-hash scriptPubKey
         d = BRScriptData(elems[2], &l);
         if (l != 20) d = NULL;
@@ -258,9 +246,11 @@ size_t BRAddressFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *scri
     }
     else if (count == 3 && *elems[0] == OP_HASH160 && *elems[1] == 20 && *elems[2] == OP_EQUAL) {
         // pay-to-script-hash scriptPubKey
-        data[0] = BITCOIN_SCRIPT_ADDRESS;
-#if BITCOIN_TESTNET
-        data[0] = BITCOIN_SCRIPT_ADDRESS_TEST;
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS;
+#if TESTNET
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS_TEST;
+#elif REGTEST
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS_REGTEST;
 #endif
         d = BRScriptData(elems[1], &l);
         if (l != 20) d = NULL;
@@ -270,13 +260,13 @@ size_t BRAddressFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *scri
         // pay-to-pubkey scriptPubKey
         d = BRScriptData(elems[0], &l);
         if (l != 65 && l != 33) d = NULL;
-        if (d) BRHash160(&data[1], d, l);
+        if (d) Hash160(&data[1], d, l);
     }
-    
+
     return (d) ? BRBase58CheckEncode(addr, addrLen, data, sizeof(data)) : 0;
 }
 
-// writes the bitcoin address for a scriptSig to addr
+// writes the ravencoin address for a scriptSig to addr
 // returns the number of bytes written, or addrLen needed if addr is NULL
 size_t BRAddressFromScriptSig(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen)
 {
@@ -285,27 +275,31 @@ size_t BRAddressFromScriptSig(char *addr, size_t addrLen, const uint8_t *script,
     
     uint8_t data[21];
     const uint8_t *elems[BRScriptElements(NULL, 0, script, scriptLen)], *d = NULL;
-    size_t count = BRScriptElements(elems, sizeof(elems)/sizeof(*elems), script, scriptLen), l = 0;
+    size_t count = BRScriptElements(elems, sizeof(elems) / sizeof(*elems), script, scriptLen), l = 0;
 
-    data[0] = BITCOIN_PUBKEY_ADDRESS;
-#if BITCOIN_TESTNET
-    data[0] = BITCOIN_PUBKEY_ADDRESS_TEST;
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS;
+#if TESTNET
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_TEST;
+#elif REGTEST
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_REGTEST;
 #endif
     
     if (count >= 2 && *elems[count - 2] <= OP_PUSHDATA4 &&
         (*elems[count - 1] == 65 || *elems[count - 1] == 33)) { // pay-to-pubkey-hash scriptSig
         d = BRScriptData(elems[count - 1], &l);
         if (l != 65 && l != 33) d = NULL;
-        if (d) BRHash160(&data[1], d, l);
+        if (d) Hash160(&data[1], d, l);
     }
     else if (count >= 2 && *elems[count - 2] <= OP_PUSHDATA4 && *elems[count - 1] <= OP_PUSHDATA4 &&
              *elems[count - 1] > 0) { // pay-to-script-hash scriptSig
-        data[0] = BITCOIN_SCRIPT_ADDRESS;
-#if BITCOIN_TESTNET
-        data[0] = BITCOIN_SCRIPT_ADDRESS_TEST;
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS;
+#if TESTNET
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS_TEST;
+#elif REGTEST
+        data[0] = RAVENCOIN_SCRIPT_ADDRESS_REGTEST;
 #endif
         d = BRScriptData(elems[count - 1], &l);
-        if (d) BRHash160(&data[1], d, l);
+        if (d) Hash160(&data[1], d, l);
     }
     else if (count >= 1 && *elems[count - 1] <= OP_PUSHDATA4 && *elems[count - 1] > 0) { // pay-to-pubkey scriptSig
         // TODO: implement Peter Wullie's pubKey recovery from signature
@@ -318,15 +312,18 @@ size_t BRAddressFromScriptSig(char *addr, size_t addrLen, const uint8_t *script,
 // returns the number of bytes written, or scriptLen needed if script is NULL
 size_t BRAddressScriptPubKey(uint8_t *script, size_t scriptLen, const char *addr)
 {
-    static uint8_t pubkeyAddress = BITCOIN_PUBKEY_ADDRESS, scriptAddress = BITCOIN_SCRIPT_ADDRESS;
+    static uint8_t pubkeyAddress = RAVENCOIN_PUBKEY_ADDRESS, scriptAddress = RAVENCOIN_SCRIPT_ADDRESS;
     uint8_t data[21];
     size_t r = 0;
     
     assert(addr != NULL);
 
-#if BITCOIN_TESTNET
-    pubkeyAddress = BITCOIN_PUBKEY_ADDRESS_TEST;
-    scriptAddress = BITCOIN_SCRIPT_ADDRESS_TEST;
+#if TESTNET
+    pubkeyAddress = RAVENCOIN_PUBKEY_ADDRESS_TEST;
+    scriptAddress = RAVENCOIN_SCRIPT_ADDRESS_TEST;
+#elif REGTEST
+    pubkeyAddress = RAVENCOIN_PUBKEY_ADDRESS_REGTEST;
+    scriptAddress = RAVENCOIN_SCRIPT_ADDRESS_REGTEST;
 #endif
     
     if (BRBase58CheckDecode(data, sizeof(data), addr) == 21) {
@@ -357,7 +354,7 @@ size_t BRAddressScriptPubKey(uint8_t *script, size_t scriptLen, const char *addr
     return r;
 }
 
-// returns true if addr is a valid bitcoin address
+// returns true if addr is a valid ravencoin address
 int BRAddressIsValid(const char *addr)
 {
     uint8_t data[21];
@@ -366,10 +363,12 @@ int BRAddressIsValid(const char *addr)
     assert(addr != NULL);
     
     if (BRBase58CheckDecode(data, sizeof(data), addr) == 21) {
-        r = (data[0] == BITCOIN_PUBKEY_ADDRESS || data[0] == BITCOIN_SCRIPT_ADDRESS);
+        r = (data[0] == RAVENCOIN_PUBKEY_ADDRESS || data[0] == RAVENCOIN_SCRIPT_ADDRESS);
     
-#if BITCOIN_TESTNET
-        r = (data[0] == BITCOIN_PUBKEY_ADDRESS_TEST || data[0] == BITCOIN_SCRIPT_ADDRESS_TEST);
+#if TESTNET
+        r = (data[0] == RAVENCOIN_PUBKEY_ADDRESS_TEST || data[0] == RAVENCOIN_SCRIPT_ADDRESS_TEST);
+#elif REGTEST
+        r = (data[0] == RAVENCOIN_PUBKEY_ADDRESS_REGTEST || data[0] == RAVENCOIN_SCRIPT_ADDRESS_REGTEST);
 #endif
     }
     

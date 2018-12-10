@@ -1,5 +1,5 @@
 //
-//  BRPeerManager.h
+//  PeerManager.h
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
@@ -29,6 +29,7 @@
 #include "BRMerkleBlock.h"
 #include "BRTransaction.h"
 #include "BRWallet.h"
+#include "ChainParams.h"
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -38,20 +39,20 @@ extern "C" {
 
 #define PEER_MAX_CONNECTIONS 3
 
-typedef struct BRPeerManagerStruct BRPeerManager;
+typedef struct PeerManagerStruct BRPeerManager;
 
-// returns a newly allocated BRPeerManager struct that must be freed by calling BRPeerManagerFree()
-BRPeerManager *BRPeerManagerNew(BRWallet *wallet, uint32_t earliestKeyTime, BRMerkleBlock *blocks[], size_t blocksCount,
-                                const BRPeer peers[], size_t peersCount);
+// returns a newly allocated PeerManager struct that must be freed by calling PeerManagerFree()
+BRPeerManager *BRPeerManagerNew(BRWallet *wallet, uint32_t earliestKeyTime, BRMerkleBlock **blocks, size_t blocksCount,
+                                const BRPeer *peers, size_t peersCount);
 
-// not thread-safe, set callbacks once before calling BRPeerManagerConnect()
+// not thread-safe, set callbacks once before calling PeerManagerConnect()
 // info is a void pointer that will be passed along with each callback call
 // void syncStarted(void *) - called when blockchain syncing starts
 // void syncStopped(void *, int) - called when blockchain syncing stops, error is an errno.h code
 // void txStatusUpdate(void *) - called when transaction status may have changed such as when a new block arrives
-// void saveBlocks(void *, int, BRMerkleBlock *[], size_t) - called when blocks should be saved to the persistent store
+// void saveBlocks(void *, int, MerkleBlock *[], size_t) - called when blocks should be saved to the persistent store
 // - if replace is true, remove any previously saved blocks first
-// void savePeers(void *, int, const BRPeer[], size_t) - called when peers should be saved to the persistent store
+// void savePeers(void *, int, const Peer[], size_t) - called when peers should be saved to the persistent store
 // - if replace is true, remove any previously saved peers first
 // int networkIsReachable(void *) - must return true when networking is available, false otherwise
 // void threadCleanup(void *) - called before a thread terminates to faciliate any needed cleanup
@@ -68,15 +69,15 @@ void BRPeerManagerSetCallbacks(BRPeerManager *manager, void *info,
 // set address to UINT128_ZERO to revert to default behavior
 void BRPeerManagerSetFixedPeer(BRPeerManager *manager, UInt128 address, uint16_t port);
 
+// current connect status
+BRPeerStatus BRPeerManagerConnectStatus(BRPeerManager *manager);
+
 // true if currently connected to at least one peer
 int BRPeerManagerIsConnected(BRPeerManager *manager);
 
-    // true if currently connected to at least one peer
-   BRPeerStatus BRPeerManagerConnectStatus(BRPeerManager *manager);
-    
 // connect to bitcoin peer-to-peer network (also call this whenever networkIsReachable() status changes)
 void BRPeerManagerConnect(BRPeerManager *manager);
-    
+
 // disconnect from bitcoin peer-to-peer network (may cause syncFailed(), saveBlocks() or savePeers() callbacks to fire)
 void BRPeerManagerDisconnect(BRPeerManager *manager);
 
@@ -103,14 +104,17 @@ size_t BRPeerManagerPeerCount(BRPeerManager *manager);
 // description of the peer most recently used to sync blockchain data
 const char *BRPeerManagerDownloadPeerName(BRPeerManager *manager);
 
-// publishes tx to bitcoin network (do not call BRTransactionFree() on tx afterward)
+// publishes tx to RAVENCOIN network (do not call TransactionFree() on tx afterward)
 void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *info,
                             void (*callback)(void *info, int error));
 
 // number of connected peers that have relayed the given unconfirmed transaction
 size_t BRPeerManagerRelayCount(BRPeerManager *manager, UInt256 txHash);
 
-// frees memory allocated for manager (call BRPeerManagerDisconnect() first if connected)
+// return the ChainParams used to create this peer manager
+const ChainParams *BRPeerManagerChainParams(BRPeerManager *manager);
+
+// frees memory allocated for manager (call PeerManagerDisconnect() first if connected)
 void BRPeerManagerFree(BRPeerManager *manager);
 
 #ifdef __cplusplus

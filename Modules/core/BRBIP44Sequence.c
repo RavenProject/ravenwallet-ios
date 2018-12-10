@@ -4,36 +4,26 @@
 //  Created by Aaron Voisine on 8/19/15.
 //  Copyright (c) 2015 breadwallet LLC
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
-#include "BRBIP32Sequence.h"
+
+#include "BRBIP44Sequence.h"
 #include "BRCrypto.h"
 #include "BRBase58.h"
-#include "BRInt.h"
 #include <string.h>
 #include <assert.h>
-#include <stdarg.h>
-//#include <android/log.h>
 
 #define BIP32_SEED_KEY "Bitcoin seed"
-#define BIP32_XPRV     "\x04\x88\xAD\xE4"
-#define BIP32_XPUB     "\x04\x88\xB2\x1E"
+
+#ifdef TESTNET
+#define BIP32_XPRV     "\x04\x88\xAD\xE4" //
+#define BIP32_XPUB     "\x04\x88\xB2\x1E" //
+#elif REGTEST
+#define BIP32_XPRV     "\x04\x35\x83\x94" //
+#define BIP32_XPUB     "\x04\x35\x87\xCF" //
+#else
+#define BIP32_XPRV     "\x04\x35\x83\x94" //
+#define BIP32_XPUB     "\x04\x35\x87\xCF" //
+#endif
 
 // BIP32 is a scheme for deriving chains of addresses from a seed value
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
@@ -59,14 +49,14 @@ static void _CKDpriv(UInt256 *k, UInt256 *c, uint32_t i) {
     if (i & BIP32_HARD) {
         buf[0] = 0;
         UInt256Set(&buf[1], *k);
-    }
-    else BRSecp256k1PointGen((BRECPoint *)buf, k);
+    } else
+        BRSecp256k1PointGen((BRECPoint *) buf, k);
     
     UInt32SetBE(&buf[sizeof(BRECPoint)], i);
-    
-    BRHMAC(&I, BRSHA512, sizeof(UInt512), c, sizeof(*c), buf, sizeof(buf)); // I = HMAC-SHA512(c, k|P(k) || i)
-    
-    BRSecp256k1ModAdd(k, (UInt256 *)&I); // k = IL + k (mod n)
+
+    HMAC(&I, SHA512, sizeof(UInt512), c, sizeof(*c), buf, sizeof(buf)); // I = HMAC-SHA512(c, k|P(k) || i)
+
+    BRSecp256k1ModAdd(k, (UInt256 *) &I); // k = IL + k (mod n)
     *c = *(UInt256 *)&I.u8[sizeof(UInt256)]; // c = IR
     
     var_clean(&I);
@@ -81,7 +71,7 @@ static void _CKDpriv(UInt256 *k, UInt256 *c, uint32_t i) {
 // - Check whether i >= 2^31 (whether the child is a hardened key).
 //     - If so (hardened child): return failure
 //     - If not (normal child): let I = HMAC-SHA512(Key = cpar, Data = serP(Kpar) || ser32(i)).
-// - Split I into two 32-byte sequences, IL and IR.
+// - Split I into two 32-byte sequences, IL and IR.v
 // - The returned child key Ki is point(parse256(IL)) + Kpar.
 // - The returned chain code ci is IR.
 // - In case parse256(IL) >= n or Ki is the point at infinity, the resulting key is invalid, and one should proceed with
@@ -90,81 +80,114 @@ static void _CKDpriv(UInt256 *k, UInt256 *c, uint32_t i) {
 static void _CKDpub(BRECPoint *K, UInt256 *c, uint32_t i) {
     uint8_t buf[sizeof(*K) + sizeof(i)];
     UInt512 I;
-    
+
     if ((i & BIP32_HARD) != BIP32_HARD) { // can't derive private child key from public parent key
         *(BRECPoint *)buf = *K;
         UInt32SetBE(&buf[sizeof(*K)], i);
-        
-        BRHMAC(&I, BRSHA512, sizeof(UInt512), c, sizeof(*c), buf, sizeof(buf)); // I = HMAC-SHA512(c, P(K) || i)
+
+        HMAC(&I, SHA512, sizeof(UInt512), c, sizeof(*c), buf, sizeof(buf)); // I = HMAC-SHA512(c, P(K) || i)
         
         *c = *(UInt256 *)&I.u8[sizeof(UInt256)]; // c = IR
-        BRSecp256k1PointAdd(K, (UInt256 *)&I); // K = P(IL) + K
-        
+        BRSecp256k1PointAdd(K, (UInt256 *) &I); // K = P(IL) + K
+
         var_clean(&I);
         mem_clean(buf, sizeof(buf));
     }
 }
 
-// returns the master public key for the default BIP32 wallet layout - derivation path N(m/44'/coinType'/account')
-BRMasterPubKey BIP44MasterPubKey(const void *seed, size_t seedLen,  uint32_t coinType, uint32_t account) {
-    BRMasterPubKey mpk = BR_MASTER_PUBKEY_NONE;
+// returns the master public key for the default BIP32 wallet layout - derivation path N(m/0H)
+BRMasterPubKey BRBIP32MasterPubKey(const void *seed, size_t seedLen)
+{
+    BRMasterPubKey mpk = MASTER_PUBKEY_NONE;
     UInt512 I;
     UInt256 secret, chain;
     BRKey key;
-    
+
     assert(seed != NULL || seedLen == 0);
     
     if (seed || seedLen == 0) {
-        BRHMAC(&I, BRSHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
         secret = *(UInt256 *)&I;
         chain = *(UInt256 *)&I.u8[sizeof(UInt256)];
         var_clean(&I);
-        
+
         BRKeySetSecret(&key, &secret, 1);
         mpk.fingerPrint = BRKeyHash160(&key).u32[0];
-
-            // Bip44 derivation path!
-            _CKDpriv(&secret, &chain, BIP44_PURPOSE | BIP32_HARD); // path m/44H
-            _CKDpriv(&secret, &chain, coinType      | BIP32_HARD); // path m/44H/coinType'
-            _CKDpriv(&secret, &chain, account       | BIP32_HARD); // path m/44H/coinType'/account'
-
+        
+        _CKDpriv(&secret, &chain, 0 | BIP32_HARD); // path m/0H
+    
         mpk.chainCode = chain;
         BRKeySetSecret(&key, &secret, 1);
         var_clean(&secret, &chain);
-        BRKeyPubKey(&key, &mpk.pubKey, sizeof(mpk.pubKey)); // path N(m/44H/175H/0) // path N(m/0H)
+        BRKeyPubKey(&key, &mpk.pubKey, sizeof(mpk.pubKey)); // path N(m/0H)
         BRKeyClean(&key);
     }
     
     return mpk;
 }
 
-// writes the public key for path N(m/44H/coinType'/account') to pubKey
+// returns the master public key for the default BIP32 wallet layout - derivation path N(m/44'/coinType'/account')
+BRMasterPubKey BRBIP44MasterPubKey(const void *seed, size_t seedLen, uint32_t coinType, uint32_t account,
+                                   const int isBip44DP) {
+    BRMasterPubKey mpk = MASTER_PUBKEY_NONE;
+    UInt512 I;
+    UInt256 secret, chain;
+    BRKey key;
+
+    assert(seed != NULL || seedLen == 0);
+
+    if (seed || seedLen == 0) {
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        secret = *(UInt256 *)&I;
+        chain = *(UInt256 *)&I.u8[sizeof(UInt256)];
+        var_clean(&I);
+
+        BRKeySetSecret(&key, &secret, 1);
+        mpk.fingerPrint = BRKeyHash160(&key).u32[0];
+
+        // TODO find a good condition
+            // Bip44 derivation path!
+            _CKDpriv(&secret, &chain, BIP44_PURPOSE | BIP32_HARD); // path m/44H
+            _CKDpriv(&secret, &chain, coinType      | BIP32_HARD); // path m/44H/coinType'
+            _CKDpriv(&secret, &chain, account       | BIP32_HARD); // path m/44H/coinType'/account'
+        mpk.chainCode = chain;
+        BRKeySetSecret(&key, &secret, 1);
+        var_clean(&secret, &chain);
+        BRKeyPubKey(&key, &mpk.pubKey, sizeof(mpk.pubKey)); // path N(m/44H/175H/0) // path N(m/0H)
+        BRKeyClean(&key);
+    }
+
+    return mpk;
+}
+
+// writes the public key for path N(m/0H/chain/index) to pubKey
 // returns number of bytes written, or pubKeyLen needed if pubKey is NULL
-size_t BIP44PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32_t chain, uint32_t index ) {
+size_t BRBIP32PubKey(uint8_t *pubKey, size_t pubKeyLen, BRMasterPubKey mpk, uint32_t chain, uint32_t index)
+{
     UInt256 chainCode = mpk.chainCode;
     
-    assert(memcmp(&mpk, &BR_MASTER_PUBKEY_NONE, sizeof(mpk)) != 0);
+    assert(memcmp(&mpk, &MASTER_PUBKEY_NONE, sizeof(mpk)) != 0);
     
     if (pubKey && sizeof(BRECPoint) <= pubKeyLen) {
         *(BRECPoint *)pubKey = *(BRECPoint *)mpk.pubKey;
-        
-        _CKDpub((BRECPoint *)pubKey, &chainCode, chain); // path N(m/44'/account'/chain)
+
+        _CKDpub((BRECPoint *)pubKey, &chainCode, chain); // path N(m/0H/chain)
         _CKDpub((BRECPoint *)pubKey, &chainCode, index); // index'th key in chain
-        
+
         var_clean(&chainCode);
     }
     
     return (! pubKey || sizeof(BRECPoint) <= pubKeyLen) ? sizeof(BRECPoint) : 0;
 }
 
-// sets the private key for path m/44H/175H/0H/chain/index to key
-void BRBIP32PrivKey(BRKey *key, const void *seed, size_t seedLen, uint32_t chain, uint32_t index){
+// sets the private key for path m/0H/chain/index to key
+void BRBIP32PrivKey(BRKey *key, const void *seed, size_t seedLen, uint32_t chain, uint32_t index) {
     BRBIP32PrivKeyPath(key, seed, seedLen, 3, 0 | BIP32_HARD, chain, index);
 }
 
-// sets the private key for path m/44H/cointype'/account'/chain/index to each element in keys
-void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType, uint32_t account, uint32_t chain,
-                        const uint32_t indexes[]) {
+// sets the private key for path m/0H/chain/index to each element in keys
+void BRBIP32PrivKeyList(BRKey *keys, size_t keysCount, const void *seed, size_t seedLen, uint32_t chain,
+                        const uint32_t *indexes) {
     UInt512 I;
     UInt256 secret, chainCode, s, c;
     
@@ -173,22 +196,18 @@ void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t s
     assert(indexes != NULL || keysCount == 0);
     
     if (keys && keysCount > 0 && (seed || seedLen == 0) && indexes) {
-        BRHMAC(&I, BRSHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
         secret = *(UInt256 *)&I;
         chainCode = *(UInt256 *)&I.u8[sizeof(UInt256)];
         var_clean(&I);
-        
-            _CKDpriv(&secret, &chainCode, BIP44_PURPOSE | BIP32_HARD); // path m/44H
-            _CKDpriv(&secret, &chainCode, coinType      | BIP32_HARD); // path m/44H/coinType'
-            _CKDpriv(&secret, &chainCode, account       | BIP32_HARD); // path m/44H/coinType'/account'
 
-        
+        _CKDpriv(&secret, &chainCode, 0 | BIP32_HARD); // path m/0H
+        _CKDpriv(&secret, &chainCode, chain); // path m/0H/chain
+    
         for (size_t i = 0; i < keysCount; i++) {
             s = secret;
             c = chainCode;
-            _CKDpriv(&s, &c, chain); // path m/44'/coinType'/account'/chain
-            _CKDpriv(&s, &c, indexes[i]); // path m/44'/coinType'/account'/chain/index
-            
+            _CKDpriv(&s, &c, indexes[i]); // index'th key in chain
             BRKeySetSecret(&keys[i], &s, 1);
         }
         
@@ -196,11 +215,45 @@ void BIP44PrivKeyList(BRKey keys[], size_t keysCount, const void *seed, size_t s
     }
 }
 
+// sets the private key for path m/44H/cointype'/account'/chain/index to each element in keys
+void BRBIP44PrivKeyList(BRKey *keys, size_t keysCount, const void *seed, size_t seedLen, uint32_t coinType,
+                        uint32_t account, uint32_t chain, const uint32_t *indexes) {
+    UInt512 I;
+    UInt256 secret, chainCode, s, c;
+
+    assert(keys != NULL || keysCount == 0);
+    assert(seed != NULL || seedLen == 0);
+    assert(indexes != NULL || keysCount == 0);
+
+    if (keys && keysCount > 0 && (seed || seedLen == 0) && indexes) {
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        secret = *(UInt256 *)&I;
+        chainCode = *(UInt256 *)&I.u8[sizeof(UInt256)];
+        var_clean(&I);
+
+            _CKDpriv(&secret, &chainCode, BIP44_PURPOSE | BIP32_HARD); // path m/44H
+            _CKDpriv(&secret, &chainCode, coinType      | BIP32_HARD); // path m/44H/coinType'
+            _CKDpriv(&secret, &chainCode, account       | BIP32_HARD); // path m/44H/coinType'/account'
+
+        for (size_t i = 0; i < keysCount; i++) {
+            s = secret;
+            c = chainCode;
+            _CKDpriv(&s, &c, chain); // path m/44'/coinType'/account'/chain
+            _CKDpriv(&s, &c, indexes[i]); // path m/44'/coinType'/account'/chain/index
+
+            BRKeySetSecret(&keys[i], &s, 1);
+        }
+
+        var_clean(&secret, &chainCode, &c, &s);
+    }
+}
+
 // sets the private key for the specified path to key
 // depth is the number of arguments used to specify the path
-void BRBIP32PrivKeyPath(BRKey *key, const void *seed, size_t seedLen, int depth, ...) {
+void BRBIP32PrivKeyPath(BRKey *key, const void *seed, size_t seedLen, int depth, ...)
+{
     va_list ap;
-    
+
     va_start(ap, depth);
     BRBIP32vPrivKeyPath(key, seed, seedLen, depth, ap);
     va_end(ap);
@@ -217,15 +270,15 @@ void BRBIP32vPrivKeyPath(BRKey *key, const void *seed, size_t seedLen, int depth
     assert(depth >= 0);
     
     if (key && (seed || seedLen == 0)) {
-        BRHMAC(&I, BRSHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
         secret = *(UInt256 *)&I;
         chainCode = *(UInt256 *)&I.u8[sizeof(UInt256)];
         var_clean(&I);
-        
+     
         for (int i = 0; i < depth; i++) {
             _CKDpriv(&secret, &chainCode, va_arg(vlist, uint32_t));
         }
-        
+
         BRKeySetSecret(key, &secret, 1);
         var_clean(&secret, &chainCode);
     }
@@ -255,39 +308,17 @@ size_t BRBIP32SerializeMasterPubKey(char *str, size_t strLen, BRMasterPubKey mpk
     return 0;
 }
 
-// writes the base58check encoded serialized public key (xpub) to str
-// returns number of bytes written including NULL terminator, or strLen needed if str is NULL
-size_t BRBIP32SerializePubKey(char *str, size_t strLen, BRMasterPubKey mpk)
-{
-    // TODO: XXX implement
-    //uint8_t pubKey[BIP44PubKey(NULL, )];
-    
-    return 0;
-}
-
 // returns a master public key give a base58check encoded serialized master public key (xpub)
 BRMasterPubKey BRBIP32ParseMasterPubKey(const char *str)
 {
     // TODO: XXX implement
-    return BR_MASTER_PUBKEY_NONE;
+    return MASTER_PUBKEY_NONE;
 }
 
 // key used for authenticated API calls, i.e. bitauth: https://github.com/bitpay/bitauth - path m/1H/0
 void BRBIP32APIAuthKey(BRKey *key, const void *seed, size_t seedLen)
 {
     BRBIP32PrivKeyPath(key, seed, seedLen, 2, 1 | BIP32_HARD, 0);
-}
-
-// initial key used for bip44 address derivation,- path m/44'/175'/0'
-//void BIP44AddrKey(BRKey *key, const void *seed, size_t seedLen)
-//{
-//    BRBIP32PrivKeyPath(key, seed, seedLen, 5, BIP44_PURPOSE | BIP32_HARD, 175 | BIP32_HARD, 0 | BIP32_HARD);
-//}
-
-// key used for bip44 authentication,- path m/42'
-void BIP44AuthKey(BRKey *key, const void *seed, size_t seedLen)
-{
-    BRBIP32PrivKeyPath(key, seed, seedLen, 1, 42 | BIP32_HARD);
 }
 
 // key used for BitID: https://github.com/bitid/bitid/blob/master/BIP_draft.md
@@ -301,12 +332,13 @@ void BRBIP32BitIDKey(BRKey *key, const void *seed, size_t seedLen, uint32_t inde
         UInt256 hash;
         size_t uriLen = strlen(uri);
         uint8_t data[sizeof(index) + uriLen];
-        
+
         UInt32SetLE(data, index);
         memcpy(&data[sizeof(index)], uri, uriLen);
-        BRSHA256(&hash, data, sizeof(data));
+        SHA256(&hash, data, sizeof(data));
         BRBIP32PrivKeyPath(key, seed, seedLen, 5, 13 | BIP32_HARD, UInt32GetLE(&hash.u32[0]) | BIP32_HARD,
                            UInt32GetLE(&hash.u32[1]) | BIP32_HARD, UInt32GetLE(&hash.u32[2]) | BIP32_HARD,
                            UInt32GetLE(&hash.u32[3]) | BIP32_HARD); // path m/13H/aH/bH/cH/dH
     }
 }
+

@@ -12,12 +12,13 @@ import LocalAuthentication
 enum PromptType {
     case biometrics
     case paperKey
+    case rescanBlockChain
     case upgradePin
     case noPasscode
     case shareData
 
     static var defaultOrder: [PromptType] = {
-        return [.upgradePin, .paperKey, .noPasscode, .biometrics, .shareData]
+        return [.upgradePin, .rescanBlockChain, .paperKey, .noPasscode, .biometrics, .shareData]
     }()
     
     static func nextPrompt(walletManager: WalletManager) -> PromptType? {
@@ -31,6 +32,7 @@ enum PromptType {
         case .upgradePin: return S.Prompts.UpgradePin.title
         case .noPasscode: return S.Prompts.NoPasscode.title
         case .shareData: return S.Prompts.ShareData.title
+        case .rescanBlockChain: return S.Prompts.RescanBlockChain.title
         }
     }
     
@@ -41,6 +43,7 @@ enum PromptType {
         case .upgradePin: return "upgradePinPrompt"
         case .noPasscode: return "noPasscodePrompt"
         case .shareData: return "shareDataPrompt"
+        case .rescanBlockChain: return "rescanBlockChain"
         }
     }
 
@@ -51,6 +54,7 @@ enum PromptType {
         case .upgradePin: return S.Prompts.UpgradePin.body
         case .noPasscode: return S.Prompts.NoPasscode.body
         case .shareData: return S.Prompts.ShareData.body
+        case .rescanBlockChain: return S.Prompts.RescanBlockChain.body
         }
     }
 
@@ -62,6 +66,7 @@ enum PromptType {
         case .upgradePin: return .promptUpgradePin
         case .noPasscode: return nil
         case .shareData: return .promptShareData
+        case .rescanBlockChain: return .recommendRescanAsset
         }
     }
 
@@ -77,6 +82,8 @@ enum PromptType {
             return !LAContext.isPasscodeEnabled
         case .shareData:
             return !UserDefaults.hasAquiredShareDataPermission && !UserDefaults.hasPromptedShareData
+        case .rescanBlockChain:
+            return !UserDefaults.hasRescannedBlockChain //BMEX todo: check if wallet need rescan
         }
     }
 }

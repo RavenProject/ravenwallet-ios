@@ -125,7 +125,9 @@ extension TxDetailViewModel {
                                    selectedRate: nil,
                                    minimumFractionDigits: nil,
                                    currency: tx.currency,
-                                   negative: (tx.direction == .sent))
+                                   negative: (tx.direction == .sent),
+                                   locale: Locale(identifier: "fr_FR"),
+                                   asset: tx.asset)
         return amount.description
     }
     

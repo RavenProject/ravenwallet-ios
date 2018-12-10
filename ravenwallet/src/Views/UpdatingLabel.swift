@@ -55,7 +55,7 @@ class UpdatingLabel : UILabel {
 
     private func startTimer() {
         timer = CADisplayLink(target: self, selector: #selector(UpdatingLabel.update))
-        timer?.frameInterval = 2
+        timer?.preferredFramesPerSecond = 2
         timer?.add(to: .main, forMode: RunLoop.Mode.default)
         timer?.add(to: .main, forMode: RunLoop.Mode.tracking)
     }

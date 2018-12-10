@@ -1,26 +1,9 @@
 //
-//  BRBIP39Mnemonic.c
+//  BIP39Mnemonic.c
 //
 //  Created by Aaron Voisine on 9/7/15.
 //  Copyright (c) 2015 breadwallet LLC
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #include "BRBIP39Mnemonic.h"
 #include "BRCrypto.h"
@@ -29,7 +12,7 @@
 #include <assert.h>
 
 // returns number of bytes written to phrase including NULL terminator, or phraseLen needed if phrase is NULL
-size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char *wordList[], const uint8_t *data, size_t dataLen)
+size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char **wordList, const uint8_t *data, size_t dataLen)
 {
     uint32_t x;
     uint8_t buf[dataLen + 32];
@@ -42,7 +25,7 @@ size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char *wordList[], con
     if (! data || (dataLen % 4) != 0) return 0; // data length must be a multiple of 32 bits
     
     memcpy(buf, data, dataLen);
-    BRSHA256(&buf[dataLen], data, dataLen); // append SHA256 checksum
+    SHA256(&buf[dataLen], data, dataLen); // append SHA256 checksum
 
     for (i = 0; i < dataLen*3/4; i++) {
         x = UInt32GetBE(&buf[i*11/8]);
@@ -60,7 +43,7 @@ size_t BRBIP39Encode(char *phrase, size_t phraseLen, const char *wordList[], con
 }
 
 // returns number of bytes written to data, or dataLen needed if data is NULL
-size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char *wordList[], const char *phrase)
+size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char **wordList, const char *phrase)
 {
     uint32_t x, y, count = 0, idx[24], i;
     uint8_t b = 0, hash[32];
@@ -93,8 +76,8 @@ size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char *wordList[], cons
             b = ((x*BIP39_WORDLIST_COUNT + y) >> ((i*8/11 + 2)*11 - (i + 1)*8)) & 0xff;
             buf[i] = b;
         }
-    
-        BRSHA256(hash, buf, count*4/3);
+
+        SHA256(hash, buf, count * 4 / 3);
 
         if (b >> (8 - count/3) == (hash[0] >> (8 - count/3))) { // verify checksum
             r = count*4/3;
@@ -110,8 +93,8 @@ size_t BRBIP39Decode(uint8_t *data, size_t dataLen, const char *wordList[], cons
     return (! data || r <= dataLen) ? r : 0;
 }
 
-// verifies that all phrase words are contained in wordlist and checksum is valid
-int BRBIP39PhraseIsValid(const char *wordList[], const char *phrase)
+// verifies that all phrase words are contained in wordList and checksum is valid
+int BRBIP39PhraseIsValid(const char **wordList, const char *phrase)
 {
     assert(wordList != NULL);
     assert(phrase != NULL);
@@ -131,7 +114,7 @@ void BRBIP39DeriveKey(void *key64, const char *phrase, const char *passphrase)
     if (phrase) {
         strcpy(salt, "mnemonic");
         if (passphrase) strcpy(salt + strlen("mnemonic"), passphrase);
-        BRPBKDF2(key64, 64, BRSHA512, 512/8, phrase, strlen(phrase), salt, strlen(salt), 2048);
+        PBKDF2(key64, 64, SHA512, 512 / 8, phrase, strlen(phrase), salt, strlen(salt), 2048);
         mem_clean(salt, sizeof(salt));
     }
 }

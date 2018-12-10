@@ -14,7 +14,7 @@ enum CloseButtonSide {
 }
 
 extension UIViewController {
-    func addChildViewController(_ viewController: UIViewController, layout: () -> Void) {
+    func addChild(_ viewController: UIViewController, layout: () -> Void) {
         addChild(viewController)
         view.addSubview(viewController.view)
         layout()

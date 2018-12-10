@@ -23,7 +23,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 import Foundation
-import BRCore
+import Core
 import libbz2
 import UIKit
 
@@ -65,7 +65,7 @@ public extension String {
         let resultCount = result.count
         return result.withUnsafeMutableBytes { (resultBytes: UnsafeMutablePointer<CUnsignedChar>) -> String in
             data.withUnsafeBytes { (dataBytes) -> Void in
-                BRMD5(resultBytes, dataBytes, data.count)
+                MD5(resultBytes, dataBytes, data.count)
             }
             var hash = String()
             for i in 0..<resultCount {
@@ -283,7 +283,7 @@ public extension Data {
         var data = Data(count: 20)
         data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) in
             self.withUnsafeBytes({ (selfBytes: UnsafePointer<UInt8>) in
-                BRSHA1(bytes, selfBytes, self.count)
+                SHA1(bytes, selfBytes, self.count)
             })
         }
         return data
@@ -293,7 +293,7 @@ public extension Data {
         var data = Data(count: 32)
         data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) in
             self.withUnsafeBytes({ (selfBytes: UnsafePointer<UInt8>) in
-                BRSHA256(bytes, selfBytes, self.count)
+                SHA256(bytes, selfBytes, self.count)
             })
         }
         return data
@@ -363,9 +363,9 @@ public extension Data {
         var null =  CChar(0)
         var sk = key.secret
         return withUnsafePointer(to: &sk) {
-            let outSize = BRChacha20Poly1305AEADEncrypt(nil, 0, $0, nonce, inData, data.count, &null, 0)
+            let outSize = Chacha20Poly1305AEADEncrypt(nil, 0, $0, nonce, inData, data.count, &null, 0)
             var outData = [UInt8](repeating: 0, count: outSize)
-            BRChacha20Poly1305AEADEncrypt(&outData, outSize, $0, nonce, inData, data.count, &null, 0)
+            Chacha20Poly1305AEADEncrypt(&outData, outSize, $0, nonce, inData, data.count, &null, 0)
             return Data(nonce + outData)
         }
     }
@@ -378,9 +378,9 @@ public extension Data {
         var null =  CChar(0)
         var sk = key.secret
         return withUnsafePointer(to: &sk) {
-            let outSize = BRChacha20Poly1305AEADDecrypt(nil, 0, $0, nonce, inData, inData.count, &null, 0)
+            let outSize = Chacha20Poly1305AEADDecrypt(nil, 0, $0, nonce, inData, inData.count, &null, 0)
             var outData = [UInt8](repeating: 0, count: outSize)
-            BRChacha20Poly1305AEADDecrypt(&outData, outSize, $0, nonce, inData, inData.count, &null, 0)
+            Chacha20Poly1305AEADDecrypt(&outData, outSize, $0, nonce, inData, inData.count, &null, 0)
             return Data(outData)
         }
     }

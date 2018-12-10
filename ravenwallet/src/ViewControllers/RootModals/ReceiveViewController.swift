@@ -141,6 +141,7 @@ class ReceiveViewController : UIViewController, Subscriber, Trackable {
     private func setReceiveAddress() {
         guard let addressText = currency.state.receiveAddress else { return }
         address.text = addressText
+        print("BMEX " + addressText);
         qrCode.image = UIImage.qrCode(data: "\(address.text!)".data(using: .utf8)!, color: CIColor(color: .black))?
             .resize(CGSize(width: qrSize, height: qrSize))!
     }

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import BRCore
+import Core
 import MachO
 
 let accountHeaderHeight: CGFloat = 152.0
@@ -141,7 +141,11 @@ class AccountViewController : UIViewController, Subscriber {
     }
 
     private func addSubscriptions() {
-        Store.subscribe(self, selector: { $0.isLoginRequired != $1.isLoginRequired }, callback: { self.isLoginRequired = $0.isLoginRequired })
+        Store.subscribe(self, selector: {
+            $0.isLoginRequired != $1.isLoginRequired
+        }, callback: {
+                self.isLoginRequired = $0.isLoginRequired
+        })
         Store.subscribe(self, name: .showStatusBar, callback: { _ in
             self.shouldShowStatusBar = true
         })
@@ -159,7 +163,7 @@ class AccountViewController : UIViewController, Subscriber {
 
     private func addTransactionsView() {
         view.backgroundColor = .whiteTint
-        addChildViewController(transactionsTableView, layout: {
+        addChild(transactionsTableView, layout: {
             if #available(iOS 11.0, *) {
                 transactionsTableView.view.constrain([
                     transactionsTableView.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),

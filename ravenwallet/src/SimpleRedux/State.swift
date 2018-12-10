@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import BRCore
+import Core
 
 private let maxFeePerKB: UInt64 = ((1000100*1000 + 190)/191)
 
@@ -97,9 +97,16 @@ enum RootModal {
     case none
     case send(currency: CurrencyDef)
     case receive(currency: CurrencyDef)
+    case selectAsset(asset: Asset)
     case loginAddress
     case loginScan
     case requestAmount(currency: CurrencyDef)
+    case addressBook(currency: CurrencyDef, initialAddress: String?, type:ActionAddressType, callback: () -> Void)//BEMX
+    case sendWithAddress(currency: CurrencyDef, initialAddress: String? )
+    case transferAsset(asset: Asset, initialAddress: String?)
+    case createAsset(initialAddress: String?)
+    case manageOwnedAsset(asset: Asset, initialAddress: String?)
+
 }
 
 enum SyncState {
@@ -214,7 +221,7 @@ func ==(lhs: WalletState, rhs: WalletState) -> Bool {
         lhs.connectionStatus == rhs.connectionStatus
 }
 
-extension RootModal : Equatable {}
+extension RootModal : Equatable {} //BMEX
 
 func ==(lhs: RootModal, rhs: RootModal) -> Bool {
     switch(lhs, rhs) {
@@ -222,8 +229,20 @@ func ==(lhs: RootModal, rhs: RootModal) -> Bool {
         return true
     case (.send(let lhsCurrency), .send(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code
+    case (.addressBook(let lhsCurrency, _, _, _), .addressBook(let rhsCurrency, _, _, _)):
+        return lhsCurrency.code == rhsCurrency.code
+    case (.sendWithAddress(let lhsCurrency, _), .sendWithAddress(let rhsCurrency, _)):
+        return lhsCurrency.code == rhsCurrency.code
+    case (.transferAsset(let lhsAsset, _), .transferAsset(let rhsAsset, _)):
+        return lhsAsset.name == rhsAsset.name
+    case (.createAsset(_), .createAsset(_)):
+        return true
+    case (.manageOwnedAsset(let lhsAsset, _), .manageOwnedAsset(let rhsAsset, _)):
+        return lhsAsset.name == rhsAsset.name
     case (.receive(let lhsCurrency), .receive(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code
+    case (.selectAsset(let lhsAsset), .selectAsset(let rhsAsset)):
+        return lhsAsset.name == rhsAsset.name
     case (.loginAddress, .loginAddress):
         return true
     case (.loginScan, .loginScan):

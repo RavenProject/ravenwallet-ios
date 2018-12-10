@@ -31,10 +31,15 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     private var promptHiddenConstraint: NSLayoutConstraint!
 
     var didSelectCurrency : ((CurrencyDef) -> Void)?
+    var didSelectAsset : ((Asset) -> Void)?
+    var didSelectShowMoreAsset: (() -> Void)?
     var didTapSecurity: (() -> Void)?
     var didTapSupport: (() -> Void)?
     var didTapSettings: (() -> Void)?
-    
+    var didTapAddressBook: ((CurrencyDef) -> Void)?
+    var didTapCreateAsset: (() -> Void)?
+    var didTapTutorial: (() -> Void)?
+
     // MARK: -
     
     init(primaryWalletManager: WalletManager?) {
@@ -44,9 +49,14 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
 
     override func viewDidLoad() {
         currencyList.didSelectCurrency = didSelectCurrency
+        currencyList.didSelectAsset = didSelectAsset //BMEX
+        currencyList.didSelectShowMoreAsset = didSelectShowMoreAsset
         currencyList.didTapSecurity = didTapSecurity
         currencyList.didTapSupport = didTapSupport
         currencyList.didTapSettings = didTapSettings
+        currencyList.didTapAddressBook = didTapAddressBook
+        currencyList.didTapCreateAsset = didTapCreateAsset
+        currencyList.didTapTutorial = didTapTutorial
         
         addSubviews()
         addConstraints()
@@ -82,7 +92,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         } else {
             subHeaderView.constrain([
                 subHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                subHeaderView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: 0.0),
+                subHeaderView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0.0),
                 subHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 subHeaderView.heightAnchor.constraint(equalToConstant: height) ])
         }
@@ -111,7 +121,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             promptHiddenConstraint
             ])
         
-        addChildViewController(currencyList, layout: {
+        addChild(currencyList, layout: {
             currencyList.view.constrain([
                 currencyList.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 currencyList.view.topAnchor.constraint(equalTo: prompt.bottomAnchor),
@@ -190,6 +200,11 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         })
         Store.subscribe(self, name: .didWritePaperKey, callback: { _ in
             if self.currentPrompt?.type == .paperKey {
+                self.currentPrompt = nil
+            }
+        })
+        Store.subscribe(self, name: .didRescanBlockChain, callback: { _ in
+            if self.currentPrompt?.type == .rescanBlockChain {
                 self.currentPrompt = nil
             }
         })

@@ -1,5 +1,5 @@
 //
-//  BRCrypto.c
+//  Crypto.c
 //
 //  Created by Aaron Voisine on 8/8/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -76,7 +76,7 @@
 // basic sha1 operation
 #define sha1(x, y, z) (t = rol32(a, 5) + (x) + e + (y) + (z), e = d, d = c, c = rol32(b, 30), b = a, a = t)
 
-static void _BRSHA1Compress(uint32_t *r, uint32_t *x)
+static void _SHA1Compress(uint32_t *r, uint32_t *x)
 {
     int i = 0;
     uint32_t a = r[0], b = r[1], c = r[2], d = r[3], e = r[4], t;
@@ -92,7 +92,7 @@ static void _BRSHA1Compress(uint32_t *r, uint32_t *x)
 }
 
 // sha-1 - not recommended for cryptographic use
-void BRSHA1(void *md20, const void *data, size_t len)
+void SHA1(void *md20, const void *data, size_t len)
 {
     size_t i;
     uint32_t x[80], buf[] = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0 }; // initial buffer values
@@ -103,14 +103,14 @@ void BRSHA1(void *md20, const void *data, size_t len)
     for (i = 0; i < len; i += 64) { // process data in 64 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 64 < len) ? 64 : len - i);
         if (i + 64 > len) break;
-        _BRSHA1Compress(buf, x);
+        _SHA1Compress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 64 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 56) _BRSHA1Compress(buf, x), memset(x, 0, 64); // length goes to next block
+    if (len - i >= 56) _SHA1Compress(buf, x), memset(x, 0, 64); // length goes to next block
     x[14] = be32((uint32_t)(len >> 29)), x[15] = be32((uint32_t)(len << 3)); // append length in bits
-    _BRSHA1Compress(buf, x); // finalize
+    _SHA1Compress(buf, x); // finalize
     for (i = 0; i < 5; i++) buf[i] = be32(buf[i]); // endian swap
     memcpy(md20, buf, 20); // write to md
     mem_clean(x, sizeof(x));
@@ -130,7 +130,7 @@ void BRSHA1(void *md20, const void *data, size_t len)
 #define s2(x) (ror32((x), 7) ^ ror32((x), 18) ^ ((x) >> 3))
 #define s3(x) (ror32((x), 17) ^ ror32((x), 19) ^ ((x) >> 10))
 
-static void _BRSHA256Compress(uint32_t *r, uint32_t *x)
+static void _SHA256Compress(uint32_t *r, const uint32_t *x)
 {
     static const uint32_t k[] = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -160,7 +160,7 @@ static void _BRSHA256Compress(uint32_t *r, uint32_t *x)
     mem_clean(w, sizeof(w));
 }
 
-void BRSHA224(void *md28, const void *data, size_t len) {
+void SHA224(void *md28, const void *data, size_t len) {
     size_t i;
     uint32_t x[16], buf[] = { 0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511,
                               0x64f98fa7, 0xbefa4fa4 }; // initial buffer values
@@ -171,21 +171,21 @@ void BRSHA224(void *md28, const void *data, size_t len) {
     for (i = 0; i < len; i += 64) { // process data in 64 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 64 < len) ? 64 : len - i);
         if (i + 64 > len) break;
-        _BRSHA256Compress(buf, x);
+        _SHA256Compress(buf, x);
     }
 
     memset((uint8_t *)x + (len - i), 0, 64 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 56) _BRSHA256Compress(buf, x), memset(x, 0, 64); // length goes to next block
+    if (len - i >= 56) _SHA256Compress(buf, x), memset(x, 0, 64); // length goes to next block
     x[14] = be32((uint32_t)(len >> 29)), x[15] = be32((uint32_t)(len << 3)); // append length in bits
-    _BRSHA256Compress(buf, x); // finalize
+    _SHA256Compress(buf, x); // finalize
     for (i = 0; i < 7; i++) buf[i] = be32(buf[i]); // endian swap
     memcpy(md28, buf, 28); // write to md
     mem_clean(x, sizeof(x));
     mem_clean(buf, sizeof(buf));
 }
 
-void BRSHA256(void *md32, const void *data, size_t len)
+void SHA256(void *md32, const void *data, size_t len)
 {
     size_t i;
     uint32_t x[16], buf[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c,
@@ -197,14 +197,14 @@ void BRSHA256(void *md32, const void *data, size_t len)
     for (i = 0; i < len; i += 64) { // process data in 64 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 64 < len) ? 64 : len - i);
         if (i + 64 > len) break;
-        _BRSHA256Compress(buf, x);
+        _SHA256Compress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 64 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 56) _BRSHA256Compress(buf, x), memset(x, 0, 64); // length goes to next block
+    if (len - i >= 56) _SHA256Compress(buf, x), memset(x, 0, 64); // length goes to next block
     x[14] = be32((uint32_t)(len >> 29)), x[15] = be32((uint32_t)(len << 3)); // append length in bits
-    _BRSHA256Compress(buf, x); // finalize
+    _SHA256Compress(buf, x); // finalize
     for (i = 0; i < 8; i++) buf[i] = be32(buf[i]); // endian swap
     memcpy(md32, buf, 32); // write to md
     mem_clean(x, sizeof(x));
@@ -212,14 +212,14 @@ void BRSHA256(void *md32, const void *data, size_t len)
 }
 
 // double-sha-256 = sha-256(sha-256(x))
-void BRSHA256_2(void *md32, const void *data, size_t len)
+void SHA256_2(void *md32, const void *data, size_t len)
 {
     uint8_t t[32];
 
     assert(md32 != NULL);
     assert(data != NULL || len == 0);
-    BRSHA256(t, data, len);
-    BRSHA256(md32, t, sizeof(t));
+    SHA256(t, data, len);
+    SHA256(md32, t, sizeof(t));
 }
 
 int GetNibble(const uint8_t *data, int index)
@@ -244,7 +244,7 @@ void trim512to256(void* in_512, void* out_256)
     memcpy((void*)out_256, (void*)in_512, 32);
 }
 
-void BRX16R(void *md32, const void *data, size_t len)
+void X16R(void *md32, const void *data, size_t len)
 {
     assert(md32 != NULL);
     assert(data != NULL || len == 0);
@@ -383,7 +383,7 @@ void BRX16R(void *md32, const void *data, size_t len)
 #define S2(x) (ror64((x), 1) ^ ror64((x), 8) ^ ((x) >> 7))
 #define S3(x) (ror64((x), 19) ^ ror64((x), 61) ^ ((x) >> 6))
 
-static void _BRSHA512Compress(uint64_t *r, uint64_t *x)
+static void _SHA512Compress(uint64_t *r, const uint64_t *x)
 {
     static const uint64_t k[] = {
         0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
@@ -421,7 +421,7 @@ static void _BRSHA512Compress(uint64_t *r, uint64_t *x)
     mem_clean(w, sizeof(w));
 }
 
-void BRSHA384(void *md48, const void *data, size_t len)
+void SHA384(void *md48, const void *data, size_t len)
 {
     size_t i;
     uint64_t x[16], buf[] = { 0xcbbb9d5dc1059ed8, 0x629a292a367cd507, 0x9159015a3070dd17, 0x152fecd8f70e5939,
@@ -433,21 +433,21 @@ void BRSHA384(void *md48, const void *data, size_t len)
     for (i = 0; i < len; i += 128) { // process data in 128 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 128 < len) ? 128 : len - i);
         if (i + 128 > len) break;
-        _BRSHA512Compress(buf, x);
+        _SHA512Compress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 128 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 112) _BRSHA512Compress(buf, x), memset(x, 0, 128); // length goes to next block
+    if (len - i >= 112) _SHA512Compress(buf, x), memset(x, 0, 128); // length goes to next block
     x[14] = 0, x[15] = be64((uint64_t)len*8); // append length in bits
-    _BRSHA512Compress(buf, x); // finalize
+    _SHA512Compress(buf, x); // finalize
     for (i = 0; i < 6; i++) buf[i] = be64(buf[i]); // endian swap
     memcpy(md48, buf, 48); // write to md
     mem_clean(x, sizeof(x));
     mem_clean(buf, sizeof(buf));
 }
 
-void BRSHA512(void *md64, const void *data, size_t len)
+void SHA512(void *md64, const void *data, size_t len)
 {
     size_t i;
     uint64_t x[16], buf[] = { 0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
@@ -459,14 +459,14 @@ void BRSHA512(void *md64, const void *data, size_t len)
     for (i = 0; i < len; i += 128) { // process data in 128 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 128 < len) ? 128 : len - i);
         if (i + 128 > len) break;
-        _BRSHA512Compress(buf, x);
+        _SHA512Compress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 128 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 112) _BRSHA512Compress(buf, x), memset(x, 0, 128); // length goes to next block
+    if (len - i >= 112) _SHA512Compress(buf, x), memset(x, 0, 128); // length goes to next block
     x[14] = 0, x[15] = be64((uint64_t)len*8); // append length in bits
-    _BRSHA512Compress(buf, x); // finalize
+    _SHA512Compress(buf, x); // finalize
     for (i = 0; i < 8; i++) buf[i] = be64(buf[i]); // endian swap
     memcpy(md64, buf, 64); // write to md
     mem_clean(x, sizeof(x));
@@ -484,7 +484,7 @@ void BRSHA512(void *md64, const void *data, size_t len)
 #define rmd(a, b, c, d, e, f, g, h, i, j) ((a) = rol32((f) + (b) + le32(c) + (d), (e)) + (g), (f) = (g), (g) = (h),\
                                            (h) = rol32((i), 10), (i) = (j), (j) = (a))
 
-static void _BRRMDCompress(uint32_t *r, uint32_t *x)
+static void _RMDCompress(uint32_t *r, const uint32_t *x)
 {
     // left line
     static const int rl1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, // round 1, id
@@ -531,7 +531,7 @@ static void _BRRMDCompress(uint32_t *r, uint32_t *x)
 }
 
 // ripemd-160: http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
-void BRRMD160(void *md20, const void *data, size_t len)
+void RMD160(void *md20, const void *data, size_t len)
 {
     size_t i;
     uint32_t x[16], buf[] = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0 }; // initial buffer values
@@ -542,14 +542,14 @@ void BRRMD160(void *md20, const void *data, size_t len)
     for (i = 0; i <= len; i += 64) { // process data in 64 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 64 < len) ? 64 : len - i);
         if (i + 64 > len) break;
-        _BRRMDCompress(buf, x);
+        _RMDCompress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 64 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 56) _BRRMDCompress(buf, x), memset(x, 0, 64); // length goes to next block
+    if (len - i >= 56) _RMDCompress(buf, x), memset(x, 0, 64); // length goes to next block
     x[14] = le32((uint32_t)(len << 3)), x[15] = le32((uint32_t)(len >> 29)); // append length in bits
-    _BRRMDCompress(buf, x); // finalize
+    _RMDCompress(buf, x); // finalize
     for (i = 0; i < 5; i++) buf[i] = le32(buf[i]); // endian swap
     memcpy(md20, buf, 20); // write to md
     mem_clean(x, sizeof(x));
@@ -557,15 +557,15 @@ void BRRMD160(void *md20, const void *data, size_t len)
 }
 
 // bitcoin hash-160 = ripemd-160(sha-256(x))
-void BRHash160(void *md20, const void *data, size_t len)
+void Hash160(void *md20, const void *data, size_t len)
 {
     uint8_t t[32];
     
     assert(md20 != NULL);
     assert(data != NULL || len == 0);
-    
-    BRSHA256(t, data, len);
-    BRRMD160(md20, t, sizeof(t));
+
+    SHA256(t, data, len);
+    RMD160(md20, t, sizeof(t));
 }
 
 // basic md5 functions
@@ -578,7 +578,7 @@ void BRHash160(void *md20, const void *data, size_t len)
 #define md5(f, a, b, c, d, x, k, s, t) ((a) += f((b), (c), (d)) + le32(x) + (k), (a) = rol32(a, s), (a) += (b),\
                                         (t) = (d), (d) = (c), (c) = (b), (b) = (a), (a) = (t))
 
-static void _BRMD5Compress(uint32_t *r, uint32_t *x)
+static void _MD5Compress(uint32_t *r, const uint32_t *x)
 {
     static const uint32_t k[] = {
         0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -606,7 +606,7 @@ static void _BRMD5Compress(uint32_t *r, uint32_t *x)
 }
 
 // md5 - for non-cyptographic use only
-void BRMD5(void *md16, const void *data, size_t len)
+void MD5(void *md16, const void *data, size_t len)
 {
     size_t i;
     uint32_t x[16], buf[] = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476 }; // initial buffer values
@@ -617,14 +617,14 @@ void BRMD5(void *md16, const void *data, size_t len)
     for (i = 0; i <= len; i += 64) { // process data in 64 byte blocks
         memcpy(x, (const uint8_t *)data + i, (i + 64 < len) ? 64 : len - i);
         if (i + 64 > len) break;
-        _BRMD5Compress(buf, x);
+        _MD5Compress(buf, x);
     }
     
     memset((uint8_t *)x + (len - i), 0, 64 - (len - i)); // clear remainder of x
     ((uint8_t *)x)[len - i] = 0x80; // append padding
-    if (len - i >= 56) _BRMD5Compress(buf, x), memset(x, 0, 64); // length goes to next block
+    if (len - i >= 56) _MD5Compress(buf, x), memset(x, 0, 64); // length goes to next block
     x[14] = le32((uint32_t)(len << 3)), x[15] = le32((uint32_t)(len >> 29)); // append length in bits
-    _BRMD5Compress(buf, x); // finalize
+    _MD5Compress(buf, x); // finalize
     for (i = 0; i < 4; i++) buf[i] = le32(buf[i]); // endian swap
     memcpy(md16, buf, 16); // write to md
     mem_clean(x, sizeof(x));
@@ -638,7 +638,7 @@ void BRMD5(void *md16, const void *data, size_t len)
 #define fmix32(h) ((h) ^= (h) >> 16, (h) *= 0x85ebca6b, (h) ^= (h) >> 13, (h) *= 0xc2b2ae35, (h) ^= (h) >> 16)
 
 // murmurHash3 (x86_32): https://code.google.com/p/smhasher/ - for non-cryptographic use only
-uint32_t BRMurmur3_32(const void *data, size_t len, uint32_t seed)
+uint32_t Murmur3_32(const void *data, size_t len, uint32_t seed)
 {
     uint32_t h = seed, k = 0;
     size_t i, count = len/4;
@@ -668,8 +668,8 @@ uint32_t BRMurmur3_32(const void *data, size_t len, uint32_t seed)
 // HMAC(key, data) = hash((key xor opad) || hash((key xor ipad) || data))
 // opad = 0x5c5c5c...5c5c
 // ipad = 0x363636...3636
-void BRHMAC(void *mac, void (*hash)(void *, const void *, size_t), size_t hashLen, const void *key, size_t keyLen,
-            const void *data, size_t dataLen)
+void HMAC(void *mac, void (*hash)(void *, const void *, size_t), size_t hashLen, const void *key, size_t keyLen,
+          const void *data, size_t dataLen)
 {
     size_t i, blockLen = (hashLen > 32) ? 128 : 64;
     uint8_t k[hashLen];
@@ -700,8 +700,8 @@ void BRHMAC(void *mac, void (*hash)(void *, const void *, size_t), size_t hashLe
 // hmac-drbg with no prediction resistance or additional input
 // K and V must point to buffers of size hashLen, and ps (personalization string) may be NULL
 // to generate additional drbg output, use K and V from the previous call, and set seed, nonce and ps to NULL
-void BRHMACDRBG(void *out, size_t outLen, void *K, void *V, void (*hash)(void *, const void *, size_t), size_t hashLen,
-                const void *seed, size_t seedLen, const void *nonce, size_t nonceLen, const void *ps, size_t psLen)
+void HMACDRBG(void *out, size_t outLen, void *K, void *V, void (*hash)(void *, const void *, size_t), size_t hashLen,
+              const void *seed, size_t seedLen, const void *nonce, size_t nonceLen, const void *ps, size_t psLen)
 {
     size_t i, bufLen = hashLen + 1 + seedLen + nonceLen + psLen;
     uint8_t buf[bufLen];
@@ -724,25 +724,25 @@ void BRHMACDRBG(void *out, size_t outLen, void *K, void *V, void (*hash)(void *,
     memcpy(&buf[hashLen + 1], seed, seedLen);
     memcpy(&buf[hashLen + 1 + seedLen], nonce, nonceLen);
     memcpy(&buf[hashLen + 1 + seedLen + nonceLen], ps, psLen);
-    BRHMAC(K, hash, hashLen, K, hashLen, buf, bufLen); // K = HMAC(K, V || 0x00 || entropy || nonce || ps)
-    BRHMAC(V, hash, hashLen, K, hashLen, V, hashLen);  // V = HMAC(K, V)
+    HMAC(K, hash, hashLen, K, hashLen, buf, bufLen); // K = HMAC(K, V || 0x00 || entropy || nonce || ps)
+    HMAC(V, hash, hashLen, K, hashLen, V, hashLen);  // V = HMAC(K, V)
     
     if (seed || nonce || ps) {
         memcpy(buf, V, hashLen);
         buf[hashLen] = 0x01;
-        BRHMAC(K, hash, hashLen, K, hashLen, buf, bufLen); // K = HMAC(K, V || 0x01 || entropy || nonce || ps)
-        BRHMAC(V, hash, hashLen, K, hashLen, V, hashLen);  // V = HMAC(K, V)
+        HMAC(K, hash, hashLen, K, hashLen, buf, bufLen); // K = HMAC(K, V || 0x01 || entropy || nonce || ps)
+        HMAC(V, hash, hashLen, K, hashLen, V, hashLen);  // V = HMAC(K, V)
     }
     
     mem_clean(buf, bufLen);
     
     for (i = 0; i*hashLen < outLen; i++) {
-        BRHMAC(V, hash, hashLen, K, hashLen, V, hashLen); // V = HMAC(K, V)
+        HMAC(V, hash, hashLen, K, hashLen, V, hashLen); // V = HMAC(K, V)
         memcpy((uint8_t *)out + i*hashLen, V, (i*hashLen + hashLen <= outLen) ? hashLen : outLen % hashLen);
     }
 }
 
-static void _BRPoly1305Compress(uint32_t h[5], const void *key32, const void *data, size_t len, int final)
+static void _Poly1305Compress(uint32_t *h, const void *key32, const void *data, size_t len, int final)
 {
     uint32_t x[4], b, t0, t1, t2, t3, t4, r0, r1, r2, r3, r4;
     uint64_t d0, d1, d2, d3, d4;
@@ -811,15 +811,15 @@ static void _BRPoly1305Compress(uint32_t h[5], const void *key32, const void *da
 
 // poly1305 authenticator: https://tools.ietf.org/html/rfc7539
 // NOTE: must use constant time mem comparison when verifying mac to defend against timing attacks
-void BRPoly1305(void *mac16, const void *key32, const void *data, size_t len)
+void Poly1305(void *mac16, const void *key32, const void *data, size_t len)
 {
     uint32_t h[5] = { 0, 0, 0, 0, 0 };
     
     assert(mac16 != NULL);
     assert(data != NULL || len == 0);
     assert(key32 != NULL);
-    
-    _BRPoly1305Compress(h, key32, data, len, 1);
+
+    _Poly1305Compress(h, key32, data, len, 1);
     memcpy(mac16, h, 16);
     mem_clean(h, sizeof(h));
 }
@@ -829,7 +829,7 @@ void BRPoly1305(void *mac16, const void *key32, const void *data, size_t len)
                         (a) += (b), (d) = rol32((d) ^ (a), 8), (c) += (d), (b) = rol32((b) ^ (c), 7))
 
 // chacha20 stream cypher: https://cr.yp.to/chacha.html
-void BRChacha20(void *out, const void *key32, const void *iv8, const void *data, size_t len, uint64_t counter)
+void Chacha20(void *out, const void *key32, const void *iv8, const void *data, size_t len, uint64_t counter)
 {
     static const char sigma[16] = "expand 32-byte k";
     uint32_t b[16], s[16], x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;
@@ -875,8 +875,8 @@ void BRChacha20(void *out, const void *key32, const void *iv8, const void *data,
 }
 
 // chacha20-poly1305 authenticated encryption with associated data (AEAD): https://tools.ietf.org/html/rfc7539
-size_t BRChacha20Poly1305AEADEncrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
-                                     const void *data, size_t dataLen, const void *ad, size_t adLen)
+size_t Chacha20Poly1305AEADEncrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
+                                   const void *data, size_t dataLen, const void *ad, size_t adLen)
 {
     const void *iv = (const uint8_t *)nonce12 + 4;
     uint64_t counter = 0, macKey[4] = { 0, 0, 0, 0 }, pad[2] = { 0, 0 };
@@ -890,26 +890,26 @@ size_t BRChacha20Poly1305AEADEncrypt(void *out, size_t outLen, const void *key32
     assert(data != NULL || dataLen == 0);
     assert(ad != NULL || adLen == 0);
     
-    memcpy(&((uint32_t *)&counter)[1], nonce12, sizeof(uint32_t));    
-    BRChacha20(macKey, key32, iv, macKey, sizeof(macKey), le64(counter));
-    _BRPoly1305Compress(h, macKey, ad, (adLen/16)*16, 0);
+    memcpy(&((uint32_t *)&counter)[1], nonce12, sizeof(uint32_t));
+    Chacha20(macKey, key32, iv, macKey, sizeof(macKey), le64(counter));
+    _Poly1305Compress(h, macKey, ad, (adLen / 16) * 16, 0);
     memcpy(pad, (const uint8_t *)ad + (adLen/16)*16, adLen % 16);
-    if (adLen % 16) _BRPoly1305Compress(h, macKey, pad, 16, 0);
-    BRChacha20(out, key32, iv, data, dataLen, le64(counter) + 1);
-    _BRPoly1305Compress(h, macKey, out, (dataLen/16)*16, 0);
+    if (adLen % 16) _Poly1305Compress(h, macKey, pad, 16, 0);
+    Chacha20(out, key32, iv, data, dataLen, le64(counter) + 1);
+    _Poly1305Compress(h, macKey, out, (dataLen / 16) * 16, 0);
     pad[0] = pad[1] = 0;
     memcpy(pad, (const uint8_t *)out + (dataLen/16)*16, dataLen % 16);
-    if (dataLen % 16) _BRPoly1305Compress(h, macKey, pad, 16, 0);
+    if (dataLen % 16) _Poly1305Compress(h, macKey, pad, 16, 0);
     pad[0] = le64(adLen);
     pad[1] = le64(dataLen);
-    _BRPoly1305Compress(h, macKey, pad, 16, 1);
+    _Poly1305Compress(h, macKey, pad, 16, 1);
     mem_clean(macKey, sizeof(macKey));
     memcpy((uint8_t *)out + dataLen, h, 16);
     return dataLen + 16;
 }
 
-size_t BRChacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
-                                     const void *data, size_t dataLen, const void *ad, size_t adLen)
+size_t Chacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
+                                   const void *data, size_t dataLen, const void *ad, size_t adLen)
 {
     const void *iv = (const uint8_t *)nonce12 + 4;
     uint64_t counter = 0, macKey[4] = { 0, 0, 0, 0 }, pad[2] = { 0, 0 };
@@ -925,21 +925,21 @@ size_t BRChacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32
 
     outLen = dataLen - 16;
     memcpy(&((uint32_t *)&counter)[1], nonce12, sizeof(uint32_t));
-    BRChacha20(macKey, key32, iv, macKey, sizeof(macKey), le64(counter));
-    _BRPoly1305Compress(h, macKey, ad, (adLen/16)*16, 0);
+    Chacha20(macKey, key32, iv, macKey, sizeof(macKey), le64(counter));
+    _Poly1305Compress(h, macKey, ad, (adLen / 16) * 16, 0);
     memcpy(pad, (const uint8_t *)ad + (adLen/16)*16, adLen % 16);
-    if (adLen % 16) _BRPoly1305Compress(h, macKey, pad, 16, 0);
-    _BRPoly1305Compress(h, macKey, data, (outLen/16)*16, 0);
+    if (adLen % 16) _Poly1305Compress(h, macKey, pad, 16, 0);
+    _Poly1305Compress(h, macKey, data, (outLen / 16) * 16, 0);
     pad[0] = pad[1] = 0;
     memcpy(pad, (const uint8_t *)data + (outLen/16)*16, outLen % 16);
-    if (outLen % 16) _BRPoly1305Compress(h, macKey, pad, 16, 0);
+    if (outLen % 16) _Poly1305Compress(h, macKey, pad, 16, 0);
     pad[0] = le64(adLen);
     pad[1] = le64(outLen);
-    _BRPoly1305Compress(h, macKey, pad, 16, 1);
+    _Poly1305Compress(h, macKey, pad, 16, 1);
     mem_clean(macKey, sizeof(macKey));
     memcpy(mac, (const uint8_t *)data + outLen, 16);
     if ((mac[0] ^ h[0]) | (mac[1] ^ h[1]) | (mac[2] ^ h[2]) | (mac[3] ^ h[3]) != 0) outLen = 0; // constant time compare
-    BRChacha20(out, key32, iv, data, outLen, le64(counter) + 1);
+    Chacha20(out, key32, iv, data, outLen, le64(counter) + 1);
     return outLen;
 }
 
@@ -949,8 +949,8 @@ size_t BRChacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32
 // U2 = hmac_hash(pw, U1)
 // ...
 // Urounds = hmac_hash(pw, Urounds-1)
-void BRPBKDF2(void *dk, size_t dkLen, void (*hash)(void *, const void *, size_t), size_t hashLen,
-              const void *pw, size_t pwLen, const void *salt, size_t saltLen, unsigned rounds)
+void PBKDF2(void *dk, size_t dkLen, void (*hash)(void *, const void *, size_t), size_t hashLen,
+            const void *pw, size_t pwLen, const void *salt, size_t saltLen, unsigned rounds)
 {
     uint8_t s[saltLen + sizeof(uint32_t)];
     uint32_t i, j, U[hashLen/sizeof(uint32_t)], T[hashLen/sizeof(uint32_t)];
@@ -967,11 +967,11 @@ void BRPBKDF2(void *dk, size_t dkLen, void (*hash)(void *, const void *, size_t)
     for (i = 0; i < (dkLen + hashLen - 1)/hashLen; i++) {
         j = be32(i + 1);
         memcpy(s + saltLen, &j, sizeof(j));
-        BRHMAC(U, hash, hashLen, pw, pwLen, s, sizeof(s)); // U1 = hmac_hash(pw, salt || be32(i))
+        HMAC(U, hash, hashLen, pw, pwLen, s, sizeof(s)); // U1 = hmac_hash(pw, salt || be32(i))
         memcpy(T, U, sizeof(U));
         
         for (unsigned r = 1; r < rounds; r++) {
-            BRHMAC(U, hash, hashLen, pw, pwLen, U, sizeof(U)); // Urounds = hmac_hash(pw, Urounds-1)
+            HMAC(U, hash, hashLen, pw, pwLen, U, sizeof(U)); // Urounds = hmac_hash(pw, Urounds-1)
             for (j = 0; j < hashLen/sizeof(uint32_t); j++) T[j] ^= U[j]; // Ti = U1 ^ U2 ^ ... ^ Urounds
         }
         
@@ -1023,8 +1023,8 @@ static void _blockmix_salsa8(uint64_t *dest, const uint64_t *src, uint64_t *b, u
 }
 
 // scrypt key derivation: http://www.tarsnap.com/scrypt.html
-void BRScrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *salt, size_t saltLen,
-              unsigned n, unsigned r, unsigned p)
+void Scrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *salt, size_t saltLen,
+            unsigned n, unsigned r, unsigned p)
 {
     uint64_t x[16*r], y[16*r], z[8], *v = malloc(128*r*n), m;
     uint32_t b[32*r*p];
@@ -1036,8 +1036,8 @@ void BRScrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *
     assert(n > 0);
     assert(r > 0);
     assert(p > 0);
-    
-    BRPBKDF2(b, sizeof(b), BRSHA256, 256/8, pw, pwLen, salt, saltLen, 1);
+
+    PBKDF2(b, sizeof(b), SHA256, 256 / 8, pw, pwLen, salt, saltLen, 1);
     
     for (int i = 0; i < p; i++) {
         for (unsigned j = 0; j < 32*r; j++) ((uint32_t *)x)[j] = le32(b[i*32*r + j]);
@@ -1060,8 +1060,8 @@ void BRScrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *
         
         for (unsigned j = 0; j < 32*r; j++) b[i*32*r + j] = le32(((uint32_t *)x)[j]);
     }
-    
-    BRPBKDF2(dk, dkLen, BRSHA256, 256/8, pw, pwLen, b, sizeof(b), 1);
+
+    PBKDF2(dk, dkLen, SHA256, 256 / 8, pw, pwLen, b, sizeof(b), 1);
     mem_clean(b, sizeof(b));
     mem_clean(x, sizeof(x));
     mem_clean(y, sizeof(y));

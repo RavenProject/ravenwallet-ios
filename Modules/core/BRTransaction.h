@@ -1,5 +1,5 @@
 //
-//  BRTransaction.h
+//  Transaction.h
 //
 //  Created by Aaron Voisine on 8/31/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRTransaction_h
-#define BRTransaction_h
+#ifndef Transaction_h
+#define Transaction_h
 
 #include "BRKey.h"
 #include "BRInt.h"
@@ -46,8 +46,8 @@ extern "C" {
 
 #define TXIN_SEQUENCE        UINT32_MAX  // sequence number for a finalized tx input
 
-#define SATOSHIS             100000000LL
-#define MAX_MONEY            (21000000LL*SATOSHIS)
+#define CORBIES              1000000LL
+#define MAX_MONEY            (21000000*1000LL*CORBIES)
 
 #define BR_RAND_MAX          ((RAND_MAX > 0x7fffffff) ? 0x7fffffff : RAND_MAX)
 
@@ -58,7 +58,7 @@ typedef struct {
     UInt256 txHash;
     uint32_t index;
     char address[36];
-    uint64_t amount;
+    int64_t amount;
     uint8_t *script;
     size_t scriptLen;
     uint8_t *signature;
@@ -77,11 +77,45 @@ typedef struct {
     size_t scriptLen;
 } BRTxOutput;
 
-#define BR_TX_OUTPUT_NONE ((BRTxOutput) { "", 0, NULL, 0 })
+#define TX_OUTPUT_NONE ((BRTxOutput) { "", 0, NULL, 0 })
+#define TX_ASSET_NONE ((BRAsset) {ROOT, NULL, 0, 0, 0, 0, 0, ""})
 
-// when creating a BRTxOutput struct outside of a BRTransaction, set address or script to NULL when done to free memory
+// when creating a TxOutput struct outside of a Transaction, set address or script to NULL when done to free memory
 void BRTxOutputSetAddress(BRTxOutput *output, const char *address);
 void BRTxOutputSetScript(BRTxOutput *output, const uint8_t *script, size_t scriptLen);
+
+// RVN ASSETS
+typedef uint64_t Amount;
+
+typedef enum {
+    NEW_ASSET,
+    TRANSFER,
+    REISSUE,
+    ROOT,
+    OWNER,
+
+    SUB,
+    UNIQUE,
+    CHANNEL,
+    VOTE,
+    INVALID
+} BRAssetType;
+
+const char *GetAssetTypeName(BRAssetType code);
+
+typedef struct {
+    BRAssetType type; // enum
+    char *name;
+//    char name[31]; // MAX 31 Bytes
+    size_t nameLen;
+    uint64_t amount;     // 8 Bytes
+    int64_t unit;        // 1 Byte
+    int64_t reissuable;  // 1 Byte
+    int64_t hasIPFS;     // 1 Byte
+    char IPFSHash[47]; // MAX 40 Bytes
+//    char destination[36];
+} BRAsset;
+// RVN ASSETS END
 
 typedef struct {
     UInt256 txHash;
@@ -93,13 +127,17 @@ typedef struct {
     uint32_t lockTime;
     uint32_t blockHeight;
     uint32_t timestamp; // time interval since unix epoch
+    BRAsset *asset;
 } BRTransaction;
 
-// returns a newly allocated empty transaction that must be freed by calling BRTransactionFree()
+// returns a newly allocated empty transaction that must be freed by calling TransactionFree()
 BRTransaction *BRTransactionNew(void);
 
+// returns a deep copy of tx and that must be freed by calling TransactionFree()
+BRTransaction *BRTransactionCopy(const BRTransaction *tx);
+
 // buf must contain a serialized tx
-// retruns a transaction that must be freed by calling BRTransactionFree()
+// retuns a transaction that must be freed by calling TransactionFree()
 BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen);
 
 // returns number of bytes written to buf, or total bufLen needed if buf is NULL
@@ -129,7 +167,7 @@ int BRTransactionIsSigned(const BRTransaction *tx);
 // adds signatures to any inputs with NULL signatures that can be signed with any keys
 // forkId is 0 for bitcoin, 0x40 for b-cash
 // returns true if tx is signed
-int BRTransactionSign(BRTransaction *tx, int forkId, BRKey keys[], size_t keysCount);
+int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCount);
 
 // true if tx meets IsStandard() rules: https://bitcoin.org/en/developer-guide#standard-transactions
 int BRTransactionIsStandard(const BRTransaction *tx);

@@ -32,4 +32,18 @@ extension NumberFormatter {
         }
         return output
     }
+    
+    static func formattedString(value: Double, currencySymbol: String? = nil, minimumFractionDigits: Int?, maxDigits: Int) -> String {
+        var formatter: NumberFormatter
+        var output = ""
+        formatter = NumberFormatter()
+        if let minimumFractionDigits = minimumFractionDigits {
+            formatter.minimumFractionDigits = minimumFractionDigits
+        }
+        if currencySymbol != nil {
+            formatter.currencySymbol = currencySymbol
+        }
+        output = formatter.string(from: value as NSNumber) ?? "error"
+        return output
+    }
 }
