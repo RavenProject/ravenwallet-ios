@@ -657,9 +657,9 @@ enum S {
     }
     
     enum WipeWallet {
-        static let title = NSLocalizedString("WipeWallet.title", value: "Start or Recover Another Wallet", comment: "Wipe wallet navigation item title.")
-        static let alertTitle = NSLocalizedString("WipeWallet.alertTitle", value: "Wipe Wallet?", comment: "Wipe wallet alert title")
-        static let alertMessage = NSLocalizedString("WipeWallet.alertMessage", value: "Are you sure you want to delete this wallet?", comment: "Wipe wallet alert message")
+        static let title = NSLocalizedString("WipeWallet.title", value: "Start or Recover Another Wallet", comment: "Initial wallet navigation item title.")
+        static let alertTitle = NSLocalizedString("WipeWallet.alertTitle", value: "Erase Wallet?", comment: "Erase wallet alert title")
+        static let alertMessage = NSLocalizedString("WipeWallet.alertMessage", value: "Are you sure you want to delete this wallet? You will not be able to recover your funds without your 12 word passphrase", comment: "Erase wallet alert message")
         static let wipe = NSLocalizedString("WipeWallet.wipe", value: "Wipe", comment: "Wipe wallet button title")
         static let wiping = NSLocalizedString("WipeWallet.wiping", value: "Wiping...", comment: "Wiping activity message")
         static let failedTitle = NSLocalizedString("WipeWallet.failedTitle", value: "Failed", comment: "Failed wipe wallet alert title")
