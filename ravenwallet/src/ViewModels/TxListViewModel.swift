@@ -39,7 +39,9 @@ struct TxListViewModel: TxViewModel {
                                  selectedRate: nil,
                                  minimumFractionDigits: nil,
                                  currency: tx.currency,
-                                 negative: (tx.direction == .sent)).description
+                                 negative: (tx.direction == .sent),
+                                 locale: Locale(identifier: "fr_FR"),
+                                 asset: tx.asset).description
         let color: UIColor = (tx.direction == .received) ? .receivedGreen : .sentRed
         
         return NSMutableAttributedString(string: text,

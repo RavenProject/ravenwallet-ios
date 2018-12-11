@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRArray_h
-#define BRArray_h
+#ifndef Array_h
+#define Array_h
 
 #include <stdlib.h>
 #include <string.h>

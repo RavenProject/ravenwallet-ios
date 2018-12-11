@@ -1,4 +1,4 @@
-module BRCore [system] [extern_c] {
+module Core [system] [extern_c] {
     textual header "secp256k1/src/basic-config.h"
     textual header "secp256k1/src/secp256k1.c"
     header "BRInt.h"
@@ -12,11 +12,13 @@ module BRCore [system] [extern_c] {
     header "BRKey.h"
     header "BRBIP38Key.h"
     header "BRBIP39Mnemonic.h"
-    header "BRBIP32Sequence.h"
+    header "BRBIP44Sequence.h"
     header "BRTransaction.h"
     header "BRPaymentProtocol.h"
     header "BRAddress.h"
     header "BRWallet.h"
     header "BRPeerManager.h"
+    header "BRScript.h"
+    header "BRAssets.h"
     export *
 }

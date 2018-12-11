@@ -17,7 +17,6 @@ class ConfirmPaperPhraseViewController : UIViewController {
         super.init(nibName: nil, bundle: nil)
         if !E.isIPhone4 {
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-            
         }
     }
 
@@ -121,7 +120,7 @@ class ConfirmPaperPhraseViewController : UIViewController {
 
     private func addSubmitButtonConstraints(keyboardHeight: CGFloat) {
         submit.constrain([
-            NSLayoutConstraint(item: submit, attribute: .bottom, relatedBy: .equal, toItem: bottomLayoutGuide, attribute: .top, multiplier: 1.0, constant: -C.padding[1] - keyboardHeight),
+            submit.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[1] - keyboardHeight),
             submit.constraint(.leading, toView: view, constant: C.padding[2]),
             submit.constraint(.trailing, toView: view, constant: -C.padding[2]),
             submit.constraint(.height, constant: C.Sizes.buttonHeight) ])

@@ -8,7 +8,7 @@
 
 import Foundation
 import UIKit
-import BRCore
+import Core
 
 enum SendResult {
     case success
@@ -96,7 +96,7 @@ class Sender {
                 }
                 group.leave()
             }
-            let result = group.wait(timeout: .now() + 4.0)
+            let result = group.wait(timeout: .now() + 4.0)//BMEX TODO : Change back timeout to 4.0
             if result == .timedOut {
                 fatalError("send-tx-timeout")
             }

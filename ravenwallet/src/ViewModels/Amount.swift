@@ -102,13 +102,17 @@ struct DisplayAmount {
     let minimumFractionDigits: Int?
     let currency: CurrencyDef
     let negative: Bool
+    let asset:BRAssetRef?
+    let locale:Locale?
     
-    init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef, negative: Bool) {
+    init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef, negative: Bool, locale:Locale? = nil, asset:BRAssetRef? = nil) {
         self.amount = amount
         self.selectedRate = selectedRate
         self.minimumFractionDigits = minimumFractionDigits
         self.currency = currency
         self.negative = negative
+        self.asset = asset
+        self.locale = locale
     }
     
     init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef) {
@@ -116,6 +120,9 @@ struct DisplayAmount {
     }
     
     var description: String {
+        if asset != nil {
+            return assetDescription
+        }
         return selectedRate != nil ? fiatDescription : bitcoinDescription
     }
 
@@ -127,6 +134,17 @@ struct DisplayAmount {
         guard let rate = selectedRate ?? currency.state.currentRate else { return "" }
         let tokenAmount = Double(amount.rawValue) * (negative ? -1.0 : 1.0)
         guard let string = localFormat.string(from: tokenAmount/100000000.0*rate.rate as NSNumber) else { return "" }
+        return string
+    }
+    
+    private var assetDescription: String {
+        let amountSatoshi: Satoshis = Satoshis.init(UInt64(asset!.pointee.amount))
+        var decimal = Decimal(amountSatoshi.rawValue)
+        var amount: Decimal = 0.0
+        NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
+        let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
+        guard var string = assetFormat.string(from: number) else { return "" }
+        string = string + " " + asset!.pointee.nameString
         return string
     }
 
@@ -158,6 +176,9 @@ struct DisplayAmount {
 
     var rvnFormat: NumberFormatter {
         let format = NumberFormatter()
+        if locale != nil {
+            format.locale = locale
+        }
         format.isLenient = true
         format.numberStyle = .currency
         format.generatesDecimalNumbers = true
@@ -165,16 +186,16 @@ struct DisplayAmount {
         format.currencyCode = currency.code
         switch currency.state.maxDigits {
         case 2:
-            format.currencySymbol = "\(S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
+            format.currencySymbol = "\((locale != nil) ? S.Symbols.ulRvn : S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*100000 as NSNumber
         case 5:
-            format.currencySymbol = "m\(S.Symbols.rvn)\(S.Symbols.narrowSpace)"
+            format.currencySymbol = "m\((locale != nil) ? S.Symbols.lRvn : S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*1000 as NSNumber
         case 8:
-            format.currencySymbol = "\(S.Symbols.rvn)\(S.Symbols.narrowSpace)"
+            format.currencySymbol = "\((locale != nil) ? S.Symbols.lRvn : S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = C.maxMoney/C.satoshis as NSNumber
         default:
-            format.currencySymbol = "\(S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
+            format.currencySymbol = "\((locale != nil) ? S.Symbols.ulRvn : S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
         }
 
         format.maximumFractionDigits = currency.state.maxDigits
@@ -183,6 +204,16 @@ struct DisplayAmount {
         if let minimumFractionDigits = minimumFractionDigits {
             format.minimumFractionDigits = minimumFractionDigits
         }
+
+        return format
+    }
+    
+    var assetFormat: NumberFormatter {
+        let format = NumberFormatter()
+        format.isLenient = true
+        format.generatesDecimalNumbers = true
+        format.negativeFormat = "-\(format.positiveFormat!)"
+        format.minimumFractionDigits = Int(asset!.pointee.unit)
 
         return format
     }

@@ -33,14 +33,14 @@ class RootNavigationController : UINavigationController {
     private let loginTransitionDelegate = LoginTransitionDelegate()
 
     override func viewDidLoad() {
-        self.addChildViewController(tempLoginView, layout: {
+        self.addChild(tempLoginView, layout: {
             tempLoginView.view.constrain(toSuperviewEdges: nil)
         })
         guardProtected(queue: DispatchQueue.main) {
             if WalletManager.staticNoWallet {
                 self.tempLoginView.remove()
-                let tempStartView = StartViewController(didTapCreate: {}, didTapRecover: {})
-                self.addChildViewController(tempStartView, layout: {
+                let tempStartView = StartViewController(didTapCreate: {}, didTapRecover: {}, didTapTutorial: {})
+                self.addChild(tempStartView, layout: {
                     tempStartView.view.constrain(toSuperviewEdges: nil)
                     tempStartView.view.isUserInteractionEnabled = false
                 })

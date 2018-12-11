@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import BRCore
+import Core
 
 extension String {
     var isValidAddress: Bool {

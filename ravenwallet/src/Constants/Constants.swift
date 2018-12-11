@@ -33,15 +33,16 @@ struct C {
     static let animationDuration: TimeInterval = 0.3
     static let secondsInDay: TimeInterval = 86400
     static let maxMoney: UInt64 = 21000000000*100000000
+    static let maxAsset: UInt64 = 21000000000*100000000
     static let satoshis: UInt64 = 100000000
     // TODO Ravenize
     static let walletQueue = "com.breadwallet.walletqueue"
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
-    static let feedbackEmail = "support@ravenwallet.org"
-    static let iosEmail = "support@ravenwallet.org"
-    static let reviewLink = "https://itunes.apple.com/us/app/rvn-wallet/id1371751946?action=write-review"
+    static let feedbackEmail = "feedback@breadapp.com"
+    static let iosEmail = "ios@breadapp.com"
+    static let reviewLink = "https://itunes.apple.com/app/breadwallet-bitcoin-wallet/id885251393?action=write-review"
     static var standardPort: Int {
         return E.isTestnet ? 18767 : 8767
     }
@@ -53,4 +54,9 @@ struct C {
         let cachesDirectory = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
         return URL(fileURLWithPath: cachesDirectory).appendingPathComponent("log.txt")
     }
+    
+    //Asset Fee
+    static let creatAssetFee = UInt64(Int(500) * 100000000)
+    static let manageAssetFee = UInt64(Int(100) * 100000000)
+
 }

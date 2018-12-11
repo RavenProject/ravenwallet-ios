@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import BRCore
+import Core
 
 /// Wrapper for BTC transaction model + metadata
 struct RvnTransaction: Transaction {
@@ -23,6 +23,7 @@ struct RvnTransaction: Transaction {
     let blockHeight: UInt64
     let confirmations: UInt64
     let isValid: Bool
+    let asset: BRAssetRef?
     
     var hasKvStore: Bool {
         return kvStore != nil
@@ -137,6 +138,9 @@ struct RvnTransaction: Transaction {
         } else {
             metaDataContainer = nil
         }
+        
+        //Asset
+        asset = tx.pointee.asset
     }
     
     // MARK: -

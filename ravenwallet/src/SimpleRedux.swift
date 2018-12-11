@@ -50,6 +50,7 @@ enum TriggerName {
     case unblockModalDismissal
     case openFile(Data)
     case recommendRescan(CurrencyDef)
+    case recommendRescanAsset
     case receivedPaymentRequest(PaymentRequest?)
     case scanQr
     case copyWalletAddresses(String?, String?)
@@ -65,8 +66,11 @@ enum TriggerName {
     case promptShareData
     case didEnableShareData
     case didWritePaperKey
+    case didRescanBlockChain
     case wipeWalletNoPrompt
     case didUpdateFeatureFlags
+    case showTermsOfUse()
+    case selectAddressBook( AddressBookType?, ((String)->Void)?)
 } //NB : remember to add to triggers to == fuction below
 
 extension TriggerName : Equatable {}
@@ -99,6 +103,8 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return true
     case (.recommendRescan(let lhsCurrency), .recommendRescan(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code
+    case (.recommendRescanAsset, .recommendRescanAsset):
+        return true
     case (.receivedPaymentRequest(_), .receivedPaymentRequest(_)):
         return true
     case (.scanQr, .scanQr):
@@ -129,9 +135,15 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return true
     case (.didWritePaperKey, .didWritePaperKey):
         return true
+    case (.didRescanBlockChain, .didRescanBlockChain):
+        return true
     case (.wipeWalletNoPrompt, .wipeWalletNoPrompt):
         return true
     case (.didUpdateFeatureFlags, .didUpdateFeatureFlags):
+        return true
+    case (.showTermsOfUse(_), .showTermsOfUse(_)):
+        return true
+    case (.selectAddressBook(_, _), .selectAddressBook(_, _)):
         return true
     default:
         return false

@@ -67,7 +67,7 @@ class RequestAmountViewController : UIViewController {
     }
 
     private func addConstraints() {
-        addChildViewController(amountView, layout: {
+        addChild(amountView, layout: {
             amountView.view.constrain([
                 amountView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 amountView.view.topAnchor.constraint(equalTo: view.topAnchor),

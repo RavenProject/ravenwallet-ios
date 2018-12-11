@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import BRCore
+import Core
 
 extension String {
     var isValidPrivateKey: Bool {

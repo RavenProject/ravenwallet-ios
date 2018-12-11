@@ -97,7 +97,7 @@ extension UIColor {
     }
 
     static var darkPurple: UIColor {
-        return UIColor(red: 127.0/255.0, green: 83.0/255.0, blue: 230.0/255.0, alpha: 1.0)
+        return UIColor(red: 54.0/255.0, green: 44.0/255.0, blue: 70.0/255.0, alpha: 1.0)
     }
 
     static var pink: UIColor {
@@ -138,6 +138,22 @@ extension UIColor {
 
     static var blueGradientEnd: UIColor {
         return UIColor(red: 56.0/255.0, green: 141.0/255.0, blue: 252.0/255.0, alpha: 1.0)
+    }
+    
+    static func assetGradientStart(isOwnerShip:Bool) -> UIColor {
+        return isOwnerShip ? .darkBlueGradientStart : .orangeGradientStart
+    }
+    
+    static func assetGradientEnd(isOwnerShip:Bool) -> UIColor {
+        return isOwnerShip ? .darkBlueGradientEnd : .orangeGradientEnd
+    }
+    
+    static var darkBlueGradientStart: UIColor {
+        return UIColor(red: 71.0/255.0, green: 100.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+    }
+    
+    static var darkBlueGradientEnd: UIColor {
+        return UIColor(red: 67.0/255.0, green: 95.0/255.0, blue: 170.0/255.0, alpha: 1.0)
     }
 
     static var orangeGradientStart: UIColor {

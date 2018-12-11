@@ -108,7 +108,9 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
             }
         })
         
-        Store.subscribe(self, selector: { $0[self.currency].transactions != $1[self.currency].transactions },
+        Store.subscribe(self, selector: {
+            $0[self.currency].transactions != $1[self.currency].transactions
+        },
                         callback: { state in
                             self.allTransactions = state[self.currency].transactions
                             self.reload()

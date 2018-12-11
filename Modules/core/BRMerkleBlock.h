@@ -1,5 +1,5 @@
 //
-//  BRMerkleBlock.h
+//  MerkleBlock.h
 //
 //  Created by Aaron Voisine on 8/6/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRMerkleBlock_h
-#define BRMerkleBlock_h
+#ifndef MerkleBlock_h
+#define MerkleBlock_h
 
 #include "BRInt.h"
 #include <stddef.h>
@@ -38,17 +38,17 @@ extern "C" {
 #define DGW_BLOCK_DIFFICULTY_INTERVAL       1       // number of blocks between difficulty target adjustments after DGW3
 #define BLOCK_UNKNOWN_HEIGHT                INT32_MAX
 #define BLOCK_MAX_TIME_DRIFT                (2*60*60) // the furthest in the future a block is allowed to be timestamped
-    
+
 #define DGW_PAST_BLOCKS                     180
-    
+
 #ifdef TESTNET
-#define DGW_START_BLOCK         1440
+#define DGW_START_BLOCK         6048
 #elif REGTEST
 #define DGW_START_BLOCK         0
 #else
 #define DGW_START_BLOCK         338778
 #endif
-    
+
 typedef struct {
     UInt256 blockHash;
     uint32_t version;
@@ -68,11 +68,14 @@ typedef struct {
 #define BR_MERKLE_BLOCK_NONE\
     ((BRMerkleBlock) { UINT256_ZERO, 0, UINT256_ZERO, UINT256_ZERO, 0, 0, 0, 0, NULL, 0, NULL, 0, 0 })
 
-// returns a newly allocated merkle block struct that must be freed by calling BRMerkleBlockFree()
+// returns a newly allocated merkle block struct that must be freed by calling MerkleBlockFree()
 BRMerkleBlock *BRMerkleBlockNew(void);
 
+// returns a deep copy of block and that must be freed by calling MerkleBlockFree()
+BRMerkleBlock *BRMerkleBlockCopy(const BRMerkleBlock *block);
+
 // buf must contain either a serialized merkleblock or header
-// returns a merkle block struct that must be freed by calling BRMerkleBlockFree()
+// returns a merkle block struct that must be freed by calling MerkleBlockFree()
 BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen);
 
 // returns number of bytes written to buf, or total bufLen needed if buf is NULL (block->height is not serialized)
@@ -82,24 +85,24 @@ size_t BRMerkleBlockSerialize(const BRMerkleBlock *block, uint8_t *buf, size_t b
 // returns number of tx hashes written, or the total hashesCount needed if txHashes is NULL
 size_t BRMerkleBlockTxHashes(const BRMerkleBlock *block, UInt256 *txHashes, size_t hashesCount);
 
-// sets the hashes and flags fields for a block created with BRMerkleBlockNew()
-void BRMerkleBlockSetTxHashes(BRMerkleBlock *block, const UInt256 hashes[], size_t hashesCount,
+// sets the hashes and flags fields for a block created with MerkleBlockNew()
+void BRMerkleBlockSetTxHashes(BRMerkleBlock *block, const UInt256 *hashes, size_t hashesCount,
                               const uint8_t *flags, size_t flagsLen);
 
 // true if merkle tree and timestamp are valid, and proof-of-work matches the stated difficulty target
 // NOTE: this only checks if the block difficulty matches the difficulty target in the header, it does not check if the
-// target is correct for the block's height in the chain - use BRMerkleBlockVerifyDifficulty() for that
+// target is correct for the block's height in the chain - use MerkleBlockVerifyDifficulty() for that
 int BRMerkleBlockIsValid(const BRMerkleBlock *block, uint32_t currentTime);
 
 // true if the given tx hash is known to be included in the block
-int BRMerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash);
+int MerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash);
 
 // verifies the block difficulty target is correct for the block's position in the chain
 // transitionTime is the timestamp of the block at the previous difficulty transition
 // transitionTime may be 0 if block->height is not a multiple of BLOCK_DIFFICULTY_INTERVAL
 int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBlock *previous, const BRSet *blocks);
 
-int DarkGravityWaveTargetV3(const BRMerkleBlock *previous, const BRSet *blockSet);
+int DarkGravityWaveTarget(const BRMerkleBlock *previous, const BRSet *blockSet);
 
 // returns a hash value for block suitable for use in a hashtable
 inline static size_t BRMerkleBlockHash(const void *block)
@@ -121,4 +124,4 @@ void BRMerkleBlockFree(BRMerkleBlock *block);
 }
 #endif
 
-#endif // BRMerkleBlock_h
+#endif // MerkleBlock_h

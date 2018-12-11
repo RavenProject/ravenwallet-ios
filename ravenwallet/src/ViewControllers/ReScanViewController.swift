@@ -16,10 +16,10 @@ class ReScanViewController : UIViewController, Subscriber {
         super.init(nibName: nil, bundle: nil)
     }
 
-    private let currency: CurrencyDef
-    private let header = UILabel(font: .customBold(size: 26.0), color: .darkText)
+    let currency: CurrencyDef
+    let header = UILabel(font: .customBold(size: 26.0), color: .darkText)
     private let body = UILabel.wrapping(font: .systemFont(ofSize: 15.0))
-    private let button = ShadowButton(title: S.ReScan.buttonTitle, type: .primary)
+    let button = ShadowButton(title: S.ReScan.buttonTitle, type: .primary)
     private let footer = UILabel.wrapping(font: .customBody(size: 16.0), color: .secondaryGrayText)
     private let faq: UIButton
 
@@ -44,7 +44,7 @@ class ReScanViewController : UIViewController, Subscriber {
     private func addConstraints() {
         header.constrain([
             header.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
-            header.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: C.padding[2]) ])
+            header.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: C.padding[2]) ])
         faq.constrain([
             faq.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
             faq.centerYAnchor.constraint(equalTo: header.centerYAnchor),
@@ -57,7 +57,7 @@ class ReScanViewController : UIViewController, Subscriber {
         footer.constrain([
             footer.leadingAnchor.constraint(equalTo: header.leadingAnchor),
             footer.trailingAnchor.constraint(equalTo: faq.trailingAnchor),
-            footer.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -C.padding[3]) ])
+            footer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -C.padding[3]) ])
         button.constrain([
             button.leadingAnchor.constraint(equalTo: footer.leadingAnchor),
             button.trailingAnchor.constraint(equalTo: footer.trailingAnchor),
@@ -65,7 +65,7 @@ class ReScanViewController : UIViewController, Subscriber {
             button.heightAnchor.constraint(equalToConstant: C.Sizes.buttonHeight) ])
     }
 
-    private func setInitialData() {
+    func setInitialData() {
         view.backgroundColor = .whiteTint
         header.text = S.ReScan.header
         body.attributedText = bodyText
@@ -75,7 +75,7 @@ class ReScanViewController : UIViewController, Subscriber {
         }
     }
 
-    private func presentRescanAlert() {
+    func presentRescanAlert() {
         let alert = UIAlertController(title: S.ReScan.alertTitle, message: S.ReScan.alertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: nil))
         alert.addAction(UIAlertAction(title: S.ReScan.alertAction, style: .default, handler: { _ in
@@ -85,7 +85,7 @@ class ReScanViewController : UIViewController, Subscriber {
         present(alert, animated: true, completion: nil)
     }
 
-    private var bodyText: NSAttributedString {
+     var bodyText: NSAttributedString {
         let body = NSMutableAttributedString()
         let headerAttributes = [ NSAttributedString.Key.font: UIFont.customBold(size: 16.0),
                                  NSAttributedString.Key.foregroundColor: UIColor.darkText ]

@@ -12,6 +12,7 @@ enum SettingsSections: String {
     case wallet
     case preferences
     case currencies
+    case assets
     case other
     case currency
     case network
@@ -24,6 +25,8 @@ enum SettingsSections: String {
             return S.Settings.preferences
         case .currencies:
             return S.Settings.currencySettings
+        case .assets:
+            return S.Settings.assets
         case .other:
             return S.Settings.other
         default:

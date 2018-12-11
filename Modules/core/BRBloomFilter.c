@@ -1,5 +1,5 @@
 //
-//  BRBloomFilter.c
+//  BloomFilter.c
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
@@ -33,13 +33,13 @@
 
 #define BLOOM_MAX_HASH_FUNCS 50
 
-inline static uint32_t _BRBloomFilterHash(const BRBloomFilter *filter, const uint8_t *data, size_t dataLen,
-                                          uint32_t hashNum)
+inline static uint32_t _BloomFilterHash(const BRBloomFilter *filter, const uint8_t *data, size_t dataLen,
+                                        uint32_t hashNum)
 {
-    return BRMurmur3_32(data, dataLen, hashNum*0xfba4c795 + filter->tweak) % (filter->length*8);
+    return Murmur3_32(data, dataLen, hashNum * 0xfba4c795 + filter->tweak) % (filter->length*8);
 }
 
-// returns a newly allocated bloom filter struct that must be freed by calling BRBloomFilterFree()
+// returns a newly allocated bloom filter struct that must be freed by calling BloomFilterFree()
 BRBloomFilter *BRBloomFilterNew(double falsePositiveRate, size_t elemCount, uint32_t tweak, uint8_t flags)
 {
     BRBloomFilter *filter = calloc(1, sizeof(*filter));
@@ -65,7 +65,7 @@ BRBloomFilter *BRBloomFilterNew(double falsePositiveRate, size_t elemCount, uint
 }
 
 // buf must contain a serialized filter
-// returns a bloom filter struct that must be freed by calling BRBloomFilterFree()
+// returns a bloom filter struct that must be freed by calling BloomFilterFree()
 BRBloomFilter *BRBloomFilterParse(const uint8_t *buf, size_t bufLen)
 {
     BRBloomFilter *filter = calloc(1, sizeof(*filter));
@@ -75,7 +75,7 @@ BRBloomFilter *BRBloomFilterParse(const uint8_t *buf, size_t bufLen)
     assert(buf != NULL || bufLen == 0);
     
     if (buf) {
-        filter->length = (size_t)BRVarInt(&buf[off], (off <= bufLen ? bufLen - off : 0), &len);
+        filter->length = (size_t) BRVarInt(&buf[off], (off <= bufLen ? bufLen - off : 0), &len);
         off += len;
         filter->filter = (filter->length <= BLOOM_MAX_FILTER_LENGTH && off + filter->length <= bufLen) ?
                          malloc(filter->length) : NULL;
@@ -130,7 +130,7 @@ int BRBloomFilterContainsData(const BRBloomFilter *filter, const uint8_t *data, 
     assert(data != NULL || dataLen == 0);
     
     for (i = 0; data && i < filter->hashFuncs; i++) {
-        idx = _BRBloomFilterHash(filter, data, dataLen, i);
+        idx = _BloomFilterHash(filter, data, dataLen, i);
         if (! (filter->filter[idx >> 3] & (1 << (7 & idx)))) return 0;
     }
     
@@ -146,7 +146,7 @@ void BRBloomFilterInsertData(BRBloomFilter *filter, const uint8_t *data, size_t 
     assert(data != NULL || dataLen == 0);
     
     for (i = 0; data && i < filter->hashFuncs; i++) {
-        idx = _BRBloomFilterHash(filter, data, dataLen, i);
+        idx = _BloomFilterHash(filter, data, dataLen, i);
         filter->filter[idx >> 3] |= (1 << (7 & idx));
     }
     

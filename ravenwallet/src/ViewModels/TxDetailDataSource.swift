@@ -54,7 +54,6 @@ class TxDetailDataSource: NSObject {
     init(viewModel: TxDetailViewModel) {
         self.viewModel = viewModel
         
-        // define visible rows and order
         fields = [
             .amount,
             .status,
@@ -67,6 +66,20 @@ class TxDetailDataSource: NSObject {
             .blockHeight,
             .transactionId
         ]
+        
+        if let tx = viewModel.tx as? RvnTransaction {
+            if AssetValidator.shared.checkInvalidAsset(asset: tx.asset) {
+                fields = [
+                    .amount,
+                    .status,
+                    .timestamp,
+                    .address,
+                    .memo,
+                    .blockHeight,
+                    .transactionId
+                ]
+            }
+        }
         
         if viewModel.status == .complete, let index = fields.index(of: .status) {
             fields.remove(at: index)

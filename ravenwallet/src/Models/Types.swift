@@ -30,6 +30,10 @@ extension Satoshis {
     init(value: Double, rate: Rate) {
         rawValue = UInt64((value / rate.rate * Double(C.satoshis)).rounded(.toNearestOrEven))
     }
+    
+    init(value: Double) {
+        rawValue = UInt64((value * Double(C.satoshis)).rounded(.toNearestOrEven))
+    }
 
     init?(btcString: String) {
         var decimal: Decimal = 0.0
@@ -37,6 +41,28 @@ extension Satoshis {
         guard Scanner(string: btcString).scanDecimal(&decimal) else { return nil }
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, 8, .up)
         rawValue = NSDecimalNumber(decimal: amount).uint64Value
+    }
+    
+    func description(minimumFractionDigits:Int) -> String {
+        var decimal = Decimal(rawValue)
+        var amount: Decimal = 0.0
+        NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
+        let number = NSDecimalNumber(decimal: amount)
+        guard let string = satoshiFormat(minimumFractionDigits: minimumFractionDigits).string(from: number) else { return "" }
+        return string
+    }
+    
+    func satoshiFormat(minimumFractionDigits:Int) -> NumberFormatter {
+        let format = NumberFormatter()
+        format.isLenient = true
+        format.generatesDecimalNumbers = true
+        format.negativeFormat = "-\(format.positiveFormat!)"
+        format.minimumFractionDigits = minimumFractionDigits
+        return format
+    }
+    
+    var doubleValue: Double {
+        return (Double(rawValue) / Double(C.satoshis))
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  BRBloomFilter.h
+//  BloomFilter.h
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
@@ -55,11 +55,11 @@ typedef struct {
 // block, allowing a full node to operate while using about half the network traffic
 #define BR_BLOOM_FILTER_FULL ((BRBloomFilter) { &((struct { uint8_t u; }) { 0xff }).u, 1, 0, 0, 0, BLOOM_UPDATE_NONE })
 
-// returns a newly allocated bloom filter struct that must be freed by calling BRBloomFilterFree()
+// returns a newly allocated bloom filter struct that must be freed by calling BloomFilterFree()
 BRBloomFilter *BRBloomFilterNew(double falsePositiveRate, size_t elemCount, uint32_t tweak, uint8_t flags);
 
 // buf must contain a serialized filter
-// returns a bloom filter struct that must be freed by calling BRBloomFilterFree()
+// returns a bloom filter struct that must be freed by calling BloomFilterFree()
 BRBloomFilter *BRBloomFilterParse(const uint8_t *buf, size_t bufLen);
 
 // returns number of bytes written to buf, or total bufLen needed if buf is NULL
@@ -78,4 +78,4 @@ void BRBloomFilterFree(BRBloomFilter *filter);
 }
 #endif
 
-#endif // BRBloomFilter_h
+#endif // BloomFilter_h

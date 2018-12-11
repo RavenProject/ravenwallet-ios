@@ -8,7 +8,7 @@
 
 import UIKit
 import LocalAuthentication
-import BRCore
+import Core
 
 class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
 

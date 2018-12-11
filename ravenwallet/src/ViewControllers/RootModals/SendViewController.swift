@@ -8,10 +8,9 @@
 
 import UIKit
 import LocalAuthentication
-import BRCore
+import Core
 
 typealias PresentScan = ((@escaping ScanCompletion) -> Void)
-
 private let verticalButtonPadding: CGFloat = 32.0
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
@@ -50,6 +49,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     private let amountView: AmountViewController
     private let addressCell: AddressCell
     private let memoCell = DescriptionSendCell(placeholder: S.Send.descriptionLabel)
+    private let checkBoxNameCell = CheckBoxCell(labelCheckBox: S.Send.saveInAddresBook, placeholder: S.AddressBook.nameAddressLabel)
     private let sendButton = ShadowButton(title: S.Send.sendLabel, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
     private var currencySwitcherHeightConstraint: NSLayoutConstraint?
@@ -67,11 +67,15 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
         view.backgroundColor = .white
         view.addSubview(addressCell)
         view.addSubview(memoCell)
+        view.addSubview(checkBoxNameCell)
         view.addSubview(sendButton)
 
+        if (self.initialAddress != nil) {
+            addressCell.removePastAndScan()
+        }
         addressCell.constrainTopCorners(height: SendCell.defaultHeight)
 
-        addChildViewController(amountView, layout: {
+        addChild(amountView, layout: {
             amountView.view.constrain([
                 amountView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 amountView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
@@ -86,11 +90,20 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
 
         memoCell.accessoryView.constrain([
                 memoCell.accessoryView.constraint(.width, constant: 0.0) ])
-
+        
+        checkBoxNameCell.constrain([
+            checkBoxNameCell.widthAnchor.constraint(equalTo: memoCell.widthAnchor),
+            checkBoxNameCell.topAnchor.constraint(equalTo: memoCell.bottomAnchor),
+            checkBoxNameCell.leadingAnchor.constraint(equalTo: memoCell.leadingAnchor),
+            checkBoxNameCell.heightAnchor.constraint(equalTo: memoCell.heightAnchor, constant: -C.padding[2]) ])
+        
+        checkBoxNameCell.accessoryView.constrain([
+            checkBoxNameCell.accessoryView.constraint(.width, constant: 0.0) ])
+ 
         sendButton.constrain([
             sendButton.constraint(.leading, toView: view, constant: C.padding[2]),
             sendButton.constraint(.trailing, toView: view, constant: -C.padding[2]),
-            sendButton.constraint(toBottom: memoCell, constant: verticalButtonPadding),
+            sendButton.constraint(toBottom: checkBoxNameCell, constant: verticalButtonPadding),
             sendButton.constraint(.height, constant: C.Sizes.buttonHeight),
             sendButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[5] : -C.padding[2]) ])
         addButtonActions()
@@ -121,7 +134,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
         super.viewDidAppear(animated)
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
-            amountView.expandPinPad()
+            //BMEX amountView.expandPinPad()
         } else if let initialRequest = initialRequest {
             handleRequest(initialRequest)
         }
@@ -130,6 +143,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     private func addButtonActions() {
         addressCell.paste.addTarget(self, action: #selector(SendViewController.pasteTapped), for: .touchUpInside)
         addressCell.scan.addTarget(self, action: #selector(SendViewController.scanTapped), for: .touchUpInside)
+        addressCell.addressBook.addTarget(self, action: #selector(SendViewController.addressBookTapped), for: .touchUpInside)
         sendButton.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
         memoCell.didReturn = { textView in
             textView.resignFirstResponder()
@@ -225,6 +239,31 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             self?.handleRequest(request)
         }
     }
+    
+    @objc private func addressBookTapped() {
+        memoCell.textView.resignFirstResponder()
+        addressCell.textField.resignFirstResponder()
+        Store.trigger(name: .selectAddressBook(.select, ({ address in
+            self.addressCell.setContent(address)
+        })))
+    }
+    
+    func saveNewAddressBook() {
+        if checkBoxNameCell.btnCheckBox.isSelected {
+            guard !(checkBoxNameCell.textField.text?.isEmpty)! else {
+                return showAlert(title: S.Alert.error, message: S.AddressBook.noNameAddress, buttonLabel: S.Button.ok)
+            }
+            let newAddress = AddressBook(name: checkBoxNameCell.textField.text!, address: addressCell.address!)
+            let addressBookManager = AddressBookManager()
+            addressBookManager.addAddressBook(newAddress: newAddress, successCallBack: {
+                Store.perform(action: Alert.Show(.addressAdded(callback: { [weak self] in
+                })))
+            }, faillerCallBack: {
+                //if already existe dont show error
+            })
+            
+        }
+    }
 
     @objc private func sendTapped() {
         if addressCell.textField.isFirstResponder {
@@ -259,10 +298,14 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             guard amount.rawValue <= (walletManager.wallet?.maxOutputAmount ?? 0) else {
                 return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
             }
+            //BMEX save AddressBook
+            saveNewAddressBook()
+            //sender
             guard sender.createTransaction(amount: amount.rawValue, to: address) else {
                 return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
             }
         }
+        
 
         guard let amount = amount else { return }
         let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: amountView.selectedRate, minimumFractionDigits: amountView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics)

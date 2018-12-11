@@ -10,20 +10,33 @@ import UIKit
 
 enum AlertType {
     case pinSet(callback: () -> Void)
+    case addressAdded(callback: () -> Void)
+    case addressUpdated
+    case addressDeleted
     case paperKeySet(callback: () -> Void)
     case sendSuccess
+    case createSuccess(txHash:String)
     case addressesCopied
     case sweepSuccess(callback: () -> Void)
     case none
+    
 
     var header: String {
         switch self {
         case .pinSet:
             return S.Alerts.pinSet
+        case .addressAdded:
+            return S.Alerts.addressAdded
+        case .addressUpdated:
+            return S.Alerts.addressUpdated
+        case .addressDeleted:
+            return S.Alerts.addressDeleted
         case .paperKeySet:
             return S.Alerts.paperKeySet
         case .sendSuccess:
             return S.Alerts.sendSuccess
+        case .createSuccess:
+            return S.Alerts.createSuccess
         case .addressesCopied:
             return S.Alerts.copiedAddressesHeader
         case .sweepSuccess:
@@ -33,14 +46,22 @@ enum AlertType {
         }
     }
 
-    var subheader: String {
+    var subheader: String {//BMEX
         switch self {
         case .pinSet:
+            return ""
+        case .addressAdded:
+            return ""
+        case .addressUpdated:
+            return ""
+        case .addressDeleted:
             return ""
         case .paperKeySet:
             return S.Alerts.paperKeySetSubheader
         case .sendSuccess:
             return S.Alerts.sendSuccessSubheader
+        case .createSuccess(let txHash):
+            return S.Alerts.createSuccessSubheader + txHash
         case .addressesCopied:
             return S.Alerts.copiedAddressesSubheader
         case .sweepSuccess:
@@ -61,9 +82,17 @@ func ==(lhs: AlertType, rhs: AlertType) -> Bool {
     switch (lhs, rhs) {
     case (.pinSet(_), .pinSet(_)):
         return true
+    case (.addressAdded(_), .addressAdded(_)):
+        return true
+    case (.addressUpdated, .addressUpdated):
+        return true
+    case (.addressDeleted, .addressDeleted):
+        return true
     case (.paperKeySet(_), .paperKeySet(_)):
         return true
     case (.sendSuccess, .sendSuccess):
+        return true
+    case (.createSuccess, .createSuccess):
         return true
     case (.addressesCopied, .addressesCopied):
         return true

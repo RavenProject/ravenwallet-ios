@@ -24,10 +24,11 @@
 //  THE SOFTWARE.
 
 import Foundation
-import BRCore
+import Core
 
 typealias BRTxRef = UnsafeMutablePointer<BRTransaction>
 typealias BRBlockRef = UnsafeMutablePointer<BRMerkleBlock>
+typealias BRAssetRef = UnsafeMutablePointer<BRAsset>
 
 private func secureAllocate(allocSize: CFIndex, hint: CFOptionFlags, info: UnsafeMutableRawPointer?)
     -> UnsafeMutableRawPointer? {
@@ -66,6 +67,86 @@ public let secureAllocator: CFAllocator = {
     context.deallocate = secureDeallocate;
     return CFAllocatorCreate(kCFAllocatorDefault, &context).takeRetainedValue()
 }()
+
+extension BRAsset {
+    public var nameString: String {
+        //let nameBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 31)
+        //nameBytes.initialize(from: UnsafeRawPointer([self.name]).assumingMemoryBound(to: CChar.self), count: 31)
+        return self.name != nil ? String(cString: self.name) : "NULL"
+    }
+    
+    
+    var amountString: String {
+        let amountSatoshi: Satoshis = Satoshis.init(UInt64(self.amount))
+        return amountSatoshi.description(minimumFractionDigits: Int(self.unit))
+    }
+    
+    public var ipfsHashString: String {
+        let ipfsHashBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 47)
+        ipfsHashBytes.initialize(from: UnsafeRawPointer([self.IPFSHash]).assumingMemoryBound(to: CChar.self), count: 47)
+        return String(cString: ipfsHashBytes)
+    }
+    
+    public var ownerShip:Int {
+        let name = nameString
+        switch self.type {
+        case NEW_ASSET:
+            return 1
+        case TRANSFER:
+            if (AssetValidator.shared.IsAssetNameAnOwner(name: name)) {
+                return 1
+            }
+            return 0
+        case REISSUE:
+            return 0
+        case ROOT:
+            return 0
+        case OWNER:
+            return 1
+        case SUB:
+            return 0
+        case UNIQUE:
+            return 0
+        case CHANNEL:
+            return 0
+        case VOTE:
+            return 0
+        case INVALID:
+            return 0
+        default:
+            return 0
+        }
+    }
+    
+    //BMEX Todo: each type has units, should fixed from core
+    public var unitsValue: Int {
+        switch self.type {
+        case OWNER, NEW_ASSET:
+            return 1
+        default:
+            return 0
+        }
+    }
+    
+    static func createAssetRef(asset: Asset, type: BRAssetType, amount: Satoshis) -> BRAssetRef {
+        let newAsset: BRAssetRef = UnsafeMutablePointer.init(NewAsset())
+        newAsset.pointee.name = UnsafeMutablePointer<Int8>(mutating: (asset.name as NSString).utf8String)
+        let nameLen = asset.name.count
+        newAsset.pointee.nameLen = nameLen
+        newAsset.pointee.unit = Int64(asset.units)
+        newAsset.pointee.amount = amount.rawValue
+        newAsset.pointee.hasIPFS = Int64(asset.hasIpfs)
+        newAsset.pointee.reissuable = Int64(asset.reissubale)
+        let cStrIpfsHash = [CChar](asset.ipfsHash.utf8CString)
+        if (cStrIpfsHash.count <= MemoryLayout<BRAddress>.size)
+        {
+            UnsafeMutableRawPointer(mutating: &newAsset.pointee.IPFSHash).assumingMemoryBound(to: CChar.self).assign(from: cStrIpfsHash, count: cStrIpfsHash.count)
+        }
+        newAsset.pointee.type = type
+        return newAsset
+    }
+    
+}
 
 extension BRAddress: CustomStringConvertible, Hashable {
     init?(string: String) {
@@ -171,7 +252,8 @@ extension BRKey {
             let count = BRKeyBIP38Key(&self, nil, 0, nfcPhrase as String)
             var data = CFDataCreateMutable(secureAllocator, count) as Data
             data.count = count
-            guard data.withUnsafeMutableBytes({ BRKeyPrivKey(&self, $0, count) }) != 0 else { return nil }
+            guard data.withUnsafeMutableBytes({ BRKeyBIP38Key(&self, $0, count, nfcPhrase as String) }) != 0
+                else { return nil }
             return CFStringCreateFromExternalRepresentation(secureAllocator, data as CFData,
                                                             CFStringBuiltInEncodings.UTF8.rawValue) as String
         }
@@ -261,6 +343,12 @@ extension BRTxOutput {
     var swiftScript: [UInt8] {
         get { return [UInt8](UnsafeBufferPointer(start: self.script, count: self.scriptLen)) }
         set { BRTxOutputSetScript(&self, newValue, newValue.count) }
+    }
+}
+
+extension UnsafeMutablePointer where Pointee == BRAsset {
+    init?() {
+        self.init(NewAsset())
     }
 }
 
@@ -453,6 +541,11 @@ class BRWallet {
         return BRWalletCreateTransaction(cPtr, forAmount, toAddress)
     }
     
+    func createAssetTransaction(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        //return BRWalletCreateTransaction(cPtr, forAmount, toAddress);
+        return BRWalletCreateTransactionWithAsset(cPtr, forAmount, toAddress, asset); //TODO sobhane allah
+    }
+    
     // returns an unsigned transaction that satisifes the given transaction outputs
     func createTxForOutputs(_ outputs: [BRTxOutput]) -> BRTxRef? {
         return BRWalletCreateTxForOutputs(cPtr, outputs, outputs.count)
@@ -462,7 +555,7 @@ class BRWallet {
     // forkId is 0 for , 0x40 for b-cash
     // seed is the master private key (wallet seed) corresponding to the master public key given when wallet was created
     // returns true if all inputs were signed, or false if there was an error or not all inputs were able to be signed
-    func signTransaction(_ tx: BRTxRef, forkId: Int, seed: inout UInt512) -> Bool {
+    func signTransaction(_ tx: BRTxRef, forkId: Int, seed: inout UInt512, type: Int32) -> Bool { // todo remove type
         return BRWalletSignTransaction(cPtr, tx, Int32(forkId), &seed, MemoryLayout<UInt512>.stride) != 0
     }
     
