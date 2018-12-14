@@ -109,7 +109,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             transferButton.constraint(.trailing, toView: view, constant: -C.padding[2]),
             transferButton.constraint(toBottom: feeView.view, constant: verticalButtonPadding),
             transferButton.constraint(.height, constant: C.Sizes.buttonHeight),
-            transferButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[5] : -C.padding[2]) ])
+            transferButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
     }
 
     private func addButtonActions() {

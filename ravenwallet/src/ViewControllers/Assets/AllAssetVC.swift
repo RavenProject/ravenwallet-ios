@@ -10,7 +10,7 @@ import UIKit
 import Core
 import MachO
 
-let allAssetHeaderHeight: CGFloat = E.isIPhoneX ? 90 : 67.0
+let allAssetHeaderHeight: CGFloat = E.isIPhoneXOrLater ? 90 : 67.0
 
 class AllAssetVC : UIViewController, Subscriber {
 

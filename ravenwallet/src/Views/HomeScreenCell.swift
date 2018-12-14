@@ -81,7 +81,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
     private func chartModel() {
         let chartModel = ChartModel(parentVC: self.parentViewController()!, callback: { elements in
             let prices = elements.map { ($0 as! NSDictionary).object(forKey: "C") }
-            
+            let dates = elements.map { (($0 as! NSDictionary).object(forKey: "T") as! String).replacingOccurrences(of: "T00:00:00", with: "") }
             self.aaChartModel = AAChartModel()
                 .chartType(.areaSpline)//Can be any of the chart types listed under `AAChartType`.
                 .animationType(.easeInSine)
@@ -93,6 +93,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
                 .axisColor("white")
                 .colorsTheme(["#ffffff"])
                 .markerRadius(0)
+                .categories(dates)
                 .series([
                     AASeriesElement()
                         .name("RVN")

@@ -75,7 +75,7 @@ struct RvnTransaction: Transaction {
         
         // direction
         var direction: TransactionDirection
-        if amountSent > 0 && (amountReceived + fee) == amountSent {
+        if (tx.pointee.asset == nil) && amountSent > 0 && (amountReceived + fee) == amountSent {
             direction = .moved
         } else if amountSent > 0 {
             direction = .sent

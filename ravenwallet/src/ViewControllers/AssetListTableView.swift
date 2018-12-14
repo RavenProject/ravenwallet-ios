@@ -144,7 +144,7 @@ class AssetListTableView: UITableViewController, Subscriber {
 
         switch section {
         case .wallet:
-            return 220.0
+            return E.isIPhoneXOrLater ? 260.0 : 220.0
         case .asset:
             return 60.0
         case .menu:

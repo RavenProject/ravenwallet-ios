@@ -181,7 +181,7 @@ public class AAChartView: UIView {
                     ☠️☠️💀☠️☠️WARNING!!!!!!!!!!!!!!!!!!!! FBI WARNING !!!!!!!!!!!!!!!!!!!! WARNING☠️☠️💀☠️☠️
                     
                     """
-                    debugPrint(errorInfo)
+                    //debugPrint(errorInfo)
                 }
             })
         } else {

@@ -422,7 +422,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
     
     private func selectAssetView(asset: Asset) -> UIViewController? {
-        let receiveVC = AssetPopUpVC(asset: asset)
+        let receiveVC = AssetPopUpVC(walletManager: primaryWalletManager, asset: asset)
         let root = ModalViewController(childViewController: receiveVC)
         return root
     }

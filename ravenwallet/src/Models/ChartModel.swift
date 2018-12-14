@@ -19,6 +19,9 @@ class ChartModel {
     let callback: (NSArray) -> Void
 
     func getChartData() {
+        if !UserDefaults.shouldReloadChart && UserDefaults.isChartDrawed {
+            return
+        }
         let url = URL(string: "https://international.bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=BTC-RVN&tickInterval=day")
         let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 20)
 
@@ -31,8 +34,10 @@ class ChartModel {
                 if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     let result:Bool = convertedJsonIntoDict.object(forKey: "success") as! Bool
                     if(result) {
+                        UserDefaults.shouldReloadChart = false
+                        UserDefaults.isChartDrawed = true
                         let elements:NSArray = convertedJsonIntoDict.object(forKey: "result") as! NSArray
-                        self.callback(Array(elements.reversed().prefix(through: 100)) as NSArray)
+                        self.callback(Array(elements) as NSArray)
                     }
                     else {
                         let message: String = convertedJsonIntoDict.object(forKey: "message") as! String

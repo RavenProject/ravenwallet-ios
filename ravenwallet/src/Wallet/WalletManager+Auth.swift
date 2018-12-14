@@ -567,10 +567,12 @@ extension WalletManager : WalletAuthenticator {
                 guard let wallet = wallet else { return false }
                 guard let phrase: String = try keychainItem(key: KeychainKey.mnemonic) else { return false }
                 BRBIP39DeriveKey(&seed, phrase, nil)
-                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-                return wallet.signTransaction(tx, forkId: forkId, seed: &seed, type: Int32(type))
+//                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+                return wallet.signTransaction(tx, forkId: forkId, seed: &seed)
             }
-            catch { return false }
+            catch {
+                return false
+            }
         }
     }
 }

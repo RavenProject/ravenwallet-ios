@@ -40,7 +40,7 @@ static const char *dns_seeds[] = {
        "127.0.0.1", NULL
 //       "91.207.175.228", NULL // Jeremy node
 //        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
-//        "52.208.109.141", "34.244.166.40", "68.0.240.167"
+//        "35.163.33.254", "35.210.244.221", "18.202.96.180"
 };
 
 #else // main net
@@ -839,8 +839,6 @@ static void _peerConnected(void *info) {
             _PeerManagerLoadMempools(manager);
         }
     }
-
-    BRPeerSendGetAsset(peer, (const uint8_t) "ROSHII");
 
     pthread_mutex_unlock(&manager->lock);
 }
@@ -1975,7 +1973,7 @@ static void _publishTxInvDone(void *info, int success) {
     pthread_mutex_unlock(&manager->lock);
 }
 
-// publishes tx to bitcoin network (do not call TransactionFree() on tx afterward)
+// publishes tx to ravencoin network (do not call TransactionFree() on tx afterward)
 void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *info,
                             void (*callback)(void *info, int error)) {
     assert(manager != NULL);
@@ -1986,7 +1984,8 @@ void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *inf
         pthread_mutex_unlock(&manager->lock);
         BRTransactionFree(tx);
         tx = NULL;
-        if (callback) callback(info, EINVAL); // transaction not signed
+        if (callback)
+            callback(info, EINVAL); // transaction not signed
     } else if (tx && !manager->isConnected) {
         int connectFailureCount = manager->connectFailureCount;
 
@@ -1996,7 +1995,7 @@ void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *inf
             (manager->networkIsReachable && !manager->networkIsReachable(manager->info))) {
             BRTransactionFree(tx);
             tx = NULL;
-            if (callback) callback(info, ENOTCONN); // not connected to bitcoin network
+            if (callback) callback(info, ENOTCONN); // not connected to the network
         } else pthread_mutex_lock(&manager->lock);
     }
 

@@ -151,7 +151,7 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         currencyName.constrain([
             currencyName.constraint(.leading, toView: self, constant: C.padding[2]),
             currencyName.constraint(.trailing, toView: self, constant: -C.padding[2]),
-            currencyName.constraint(.top, toView: self, constant: E.isIPhoneX ? C.padding[5] : C.padding[3])
+            currencyName.constraint(.top, toView: self, constant: E.isIPhoneXOrLater ? C.padding[5] : C.padding[3])
             ])
         
         exchangeRateLabel.pinTo(viewAbove: currencyName)

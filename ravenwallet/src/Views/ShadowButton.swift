@@ -15,6 +15,7 @@ enum ButtonType {
     case blackTransparent
     case search
     case checkBox
+    case burn
 }
 
 private let minTargetSize: CGFloat = 48.0
@@ -252,6 +253,14 @@ class ShadowButton: UIControl {
             label.font = UIFont.customBody(size: 13.0)
             container.backgroundColor = .secondaryButton
             label.textColor = .white
+            container.layer.borderColor = nil
+            container.layer.borderWidth = 0.0
+            shadowView.layer.shadowColor = UIColor.black.cgColor
+            shadowView.layer.shadowOpacity = 0.15
+            imageView?.tintColor = .white
+        case .burn:
+            container.backgroundColor = .redButton
+            label.textColor = .primaryText
             container.layer.borderColor = nil
             container.layer.borderWidth = 0.0
             shadowView.layer.shadowColor = UIColor.black.cgColor

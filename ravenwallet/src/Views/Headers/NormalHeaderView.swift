@@ -52,7 +52,7 @@ class NormalHeaderView : UIView, GradientDrawable, Subscriber {
         titleLabel.constrain([
             titleLabel.constraint(.leading, toView: self, constant: C.padding[2]),
             titleLabel.constraint(.trailing, toView: self, constant: -C.padding[2]),
-            titleLabel.constraint(.top, toView: self, constant: E.isIPhoneX ? C.padding[5] : C.padding[3])
+            titleLabel.constraint(.top, toView: self, constant: E.isIPhoneXOrLater ? C.padding[5] : C.padding[3])
             ])
     }
 

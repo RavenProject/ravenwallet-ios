@@ -84,7 +84,7 @@ class AddAddressBookVC : UIViewController, Subscriber, ModalPresentable, Trackab
             addButton?.constraint(.trailing, toView: view, constant: -C.padding[2]),
             addButton?.constraint(toBottom: nameCell, constant: verticalButtonPadding),
             addButton?.constraint(.height, constant: C.Sizes.buttonHeight),
-            addButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[5] : -C.padding[2]) ])
+            addButton?.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
         addButtonActions()
     }
     
