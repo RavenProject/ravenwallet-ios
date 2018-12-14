@@ -31,6 +31,7 @@ private let selectedCurrencyCodeKey = "selectedCurrencyCodeKey"
 private let mostRecentSelectedCurrencyCodeKey = "mostRecentSelectedCurrencyCodeKey"
 private let hasSetSelectedCurrencyKey = "hasSetSelectedCurrencyKey"
 private let hasBchConnectedKey = "hasBchConnectedKey"
+private let shouldReloadChartKey = "shouldReloadChartKey"
 
 extension UserDefaults {
 
@@ -250,5 +251,35 @@ extension UserDefaults {
     static var hasBchConnected: Bool {
         get { return defaults.bool(forKey: hasBchConnectedKey) }
         set { defaults.set(newValue, forKey: hasBchConnectedKey) }
+    }
+}
+
+//MARK: - Chart Data
+extension UserDefaults {
+    
+    static var isChartDrawed:Bool = false
+    
+    static var shouldReloadChart: Bool {
+        get {
+            let lastTimeIntervale = defaults.integer(forKey: shouldReloadChartKey)
+            let lastDate:Date = Date(timeIntervalSince1970: TimeInterval(lastTimeIntervale))
+            let difference = abs(lastDate.timeIntervalSince(Date()))
+            let hoursDiff = Int(difference) / 3600
+            if(hoursDiff > 1)
+            {
+                return true
+            }
+            return false
+        }
+        set { defaults.set(Date().timeIntervalSince1970, forKey: shouldReloadChartKey) }
+    }
+    
+    static func initChartDate()
+    {
+        //BMEX reinit dataChart
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let date = dateFormatter.date(from: "1970-01-01")
+        defaults.set(date, forKey: shouldReloadChartKey)
     }
 }

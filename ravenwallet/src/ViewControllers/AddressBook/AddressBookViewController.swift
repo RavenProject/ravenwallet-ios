@@ -10,7 +10,7 @@ import UIKit
 import Core
 import MachO
 
-let addressBookHeaderHeight: CGFloat = E.isIPhoneX ? 90 : 67.0
+let addressBookHeaderHeight: CGFloat = E.isIPhoneXOrLater ? 90 : 67.0
 let addressBookFooterHeight: CGFloat = 67.0
 
 enum AddressBookType: Int {

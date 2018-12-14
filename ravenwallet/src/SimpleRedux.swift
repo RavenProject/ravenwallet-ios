@@ -41,6 +41,7 @@ enum TriggerName {
     case registerForPushNotificationToken
     case retrySync(CurrencyDef)
     case rescan(CurrencyDef)
+    case burn(Asset)
     case lock
     case promptBiometrics
     case promptPaperKey
@@ -85,6 +86,8 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return lhsCurrency.code == rhsCurrency.code
     case (.rescan(let lhsCurrency), .rescan(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code
+    case (.burn(let lhsAsset), .burn(let rhsAsset)):
+        return lhsAsset.idAsset == rhsAsset.idAsset
     case (.lock, .lock):
         return true
     case (.promptBiometrics, .promptBiometrics):

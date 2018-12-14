@@ -1492,19 +1492,6 @@ void BRPeerSendGetdata(BRPeer *peer, const UInt256 *txHashes, size_t txCount, co
 }
 
 void BRPeerSendGetAsset(BRPeer *peer, const uint8_t assetName) {
-
-    size_t i, off = 0;
-    size_t msgLen = sizeof(uint32_t) + sizeof("ROSHII");
-    //+ BRVarIntSize(locatorsCount) + sizeof(*locators) * locatorsCount + sizeof(hashStop);
-    uint8_t msg[msgLen];
-
-    uint8_t *name = malloc(sizeof("JEREMY"));
-    strncpy(name, "JEREMY", sizeof("JEREMY"));
-
-    peer_log(peer, "calling GetAssetData for Asset: [%u]", *name);
-
-    BRPeerSendMessage(peer, name, /*sizeof("ARAB")*/6, MSG_GETASSETDATA);
-//    BRPeerSendMessage(peer, name, 1, MSG_GETASSETDATA);
 }
 
 void BRPeerSendGetaddr(BRPeer *peer) {

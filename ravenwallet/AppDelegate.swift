@@ -53,6 +53,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         applicationController.didEnterBackground()
     }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        applicationController.WillTerminate()
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         applicationController.willResignActive()

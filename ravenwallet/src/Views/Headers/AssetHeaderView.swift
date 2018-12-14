@@ -73,7 +73,7 @@ class AssetHeaderView : UIView, GradientDrawable, Subscriber {
         assetName.constrain([
             assetName.constraint(.leading, toView: self, constant: C.padding[2]),
             assetName.constraint(.trailing, toView: self, constant: -C.padding[2]),
-            assetName.constraint(.top, toView: self, constant: E.isIPhoneX ? C.padding[5] : C.padding[3])
+            assetName.constraint(.top, toView: self, constant: E.isIPhoneXOrLater ? C.padding[5] : C.padding[3])
             ])
         
         amountLabel.constrain([

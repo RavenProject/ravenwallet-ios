@@ -125,7 +125,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             createButton.constraint(.trailing, toView: view, constant: -C.padding[2]),
             createButton.constraint(toBottom: feeView.view, constant: verticalButtonPadding),
             createButton.constraint(.height, constant: C.Sizes.buttonHeight),
-            createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[5] : -C.padding[2]) ])
+            createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
     }
     
     private func setInitialData() {

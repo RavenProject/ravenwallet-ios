@@ -132,13 +132,16 @@ void BRWalletSetFeePerKb(BRWallet *wallet, uint64_t feePerKb);
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTransaction(BRWallet *wallet, uint64_t amount, const char *addr);
 
-    BRTransaction *BRWalletCreateTransactionWithAsset(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
+BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
 
-BRTransaction *BRWalletCreateTxWithAsset(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
+BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset);
 
+    
 // returns an unsigned transaction that satisifes the given transaction outputs
 // result must be freed using TransactionFree()
-BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
+//BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
+BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount, BRAsset *asset);
+
 
 // signs any inputs in tx that can be signed using private keys from the wallet
 // forkId is 0 for bitcoin, 0x40 for b-cash

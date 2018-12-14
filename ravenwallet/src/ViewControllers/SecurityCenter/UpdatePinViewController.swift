@@ -109,7 +109,7 @@ class UpdatePinViewController : UIViewController, Subscriber {
             pinView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pinView.widthAnchor.constraint(equalToConstant: pinView.width),
             pinView.heightAnchor.constraint(equalToConstant: pinView.itemSize) ])
-        if E.isIPhoneX {
+        if E.isIPhoneXOrLater {
             addChild(pinPad, layout: {
                 pinPad.view.constrainBottomCorners(sidePadding: 0.0, bottomPadding: 0.0)
                 pinPad.view.constrain([pinPad.view.heightAnchor.constraint(equalToConstant: pinPad.height),

@@ -86,32 +86,8 @@
 		41797A2121957ED700E7F3D4 /* BRBIP44Sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = 41797A1B21957ED600E7F3D4 /* BRBIP44Sequence.c */; };
 		41797A2221957ED700E7F3D4 /* BRScript.c in Sources */ = {isa = PBXBuildFile; fileRef = 41797A1F21957ED700E7F3D4 /* BRScript.c */; };
 		417C680F216B51E10090710E /* AddressListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C680E216B51E00090710E /* AddressListCell.swift */; };
-		417C68AF216E0BC10090710E /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 417C68AD216E0BC10090710E /* SwipeCellKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		417C68B2216E0BC10090710E /* SwipeCellKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 417C68AB216E0BC10090710E /* SwipeCellKit.framework */; };
 		417C68B3216E0BC10090710E /* SwipeCellKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 417C68AB216E0BC10090710E /* SwipeCellKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		417C68E9216E0DF00090710E /* SwipeExpanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D1216E0DEC0090710E /* SwipeExpanding.swift */; };
-		417C68EA216E0DF00090710E /* SwipeActionTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */; };
-		417C68EB216E0DF00090710E /* SwipeAccessibilityCustomAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */; };
-		417C68EC216E0DF00090710E /* SwipeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D4216E0DED0090710E /* SwipeController.swift */; };
-		417C68ED216E0DF00090710E /* SwipeFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D5216E0DED0090710E /* SwipeFeedback.swift */; };
-		417C68EE216E0DF00090710E /* SwipeTableViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */; };
-		417C68EF216E0DF00090710E /* SwipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */; };
-		417C68F0216E0DF00090710E /* SwipeCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */; };
-		417C68F2216E0DF00090710E /* SwipeActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DA216E0DEE0090710E /* SwipeActionsView.swift */; };
-		417C68F3216E0DF00090710E /* SwipeCollectionViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */; };
-		417C68F4216E0DF00090710E /* SwipeExpansionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */; };
-		417C68F5216E0DF00090710E /* SwipeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DD216E0DEE0090710E /* SwipeAction.swift */; };
-		417C68F6216E0DF00090710E /* SwipeOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DE216E0DEF0090710E /* SwipeOptions.swift */; };
-		417C68F7216E0DF00090710E /* SwipeActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DF216E0DEF0090710E /* SwipeActionButton.swift */; };
-		417C68F8216E0DF00090710E /* SwipeTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */; };
-		417C68F9216E0DF00090710E /* SwipeTransitionLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */; };
-		417C68FA216E0DF00090710E /* ExtensionsSwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */; };
-		417C68FB216E0DF00090710E /* SwipeCollectionViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */; };
-		417C68FC216E0DF00090710E /* SwipeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */; };
-		417C68FD216E0DF00090710E /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 417C68E5216E0DF00090710E /* SwipeCellKit.h */; };
-		417C68FE216E0DF00090710E /* SwipeTableViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */; };
-		417C68FF216E0DF00090710E /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E7216E0DF00090710E /* SwipeAnimator.swift */; };
-		417C6900216E0DF00090710E /* Swipeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E8216E0DF00090710E /* Swipeable.swift */; };
 		4187C2EA2173AFAB00092067 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4187C2E92173AFAB00092067 /* Asset.swift */; };
 		419BD11621B6DDE60070B2C8 /* AAOptionsConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419BD11021B6DDE60070B2C8 /* AAOptionsConstructor.swift */; };
 		419BD11721B6DDE60070B2C8 /* AAChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419BD11121B6DDE60070B2C8 /* AAChartView.swift */; };
@@ -353,6 +329,30 @@
 		8B137EB820F90F76006DEB3A /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9320F90D11006DEB3A /* aes.cpp */; };
 		8B137EB920F90F79006DEB3A /* sph_shabal.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9520F90D11006DEB3A /* sph_shabal.c */; };
 		8B137EBB20F90F83006DEB3A /* echo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9D20F90D11006DEB3A /* echo.c */; };
+		8B5C1EC421C442470066E629 /* SwipeTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAC21C442460066E629 /* SwipeTableViewCellDelegate.swift */; };
+		8B5C1EC521C442470066E629 /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAD21C442460066E629 /* SwipeAnimator.swift */; };
+		8B5C1EC621C442470066E629 /* SwipeCollectionViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAE21C442460066E629 /* SwipeCollectionViewCell+Display.swift */; };
+		8B5C1EC721C442470066E629 /* Swipeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAF21C442460066E629 /* Swipeable.swift */; };
+		8B5C1EC821C442470066E629 /* SwipeAccessibilityCustomAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB021C442460066E629 /* SwipeAccessibilityCustomAction.swift */; };
+		8B5C1EC921C442470066E629 /* SwipeActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB121C442460066E629 /* SwipeActionButton.swift */; };
+		8B5C1ECA21C442470066E629 /* SwipeTransitionLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB221C442460066E629 /* SwipeTransitionLayout.swift */; };
+		8B5C1ECB21C442470066E629 /* SwipeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB321C442460066E629 /* SwipeAction.swift */; };
+		8B5C1ECC21C442470066E629 /* SwipeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB421C442460066E629 /* SwipeController.swift */; };
+		8B5C1ECD21C442470066E629 /* SwipeFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB521C442460066E629 /* SwipeFeedback.swift */; };
+		8B5C1ECE21C442470066E629 /* SwipeActionTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB621C442460066E629 /* SwipeActionTransitioning.swift */; };
+		8B5C1ECF21C442470066E629 /* SwipeCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB721C442460066E629 /* SwipeCollectionViewCellDelegate.swift */; };
+		8B5C1ED021C442470066E629 /* SwipeTableViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB821C442460066E629 /* SwipeTableViewCell+Display.swift */; };
+		8B5C1ED121C442470066E629 /* SwipeOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EB921C442460066E629 /* SwipeOptions.swift */; };
+		8B5C1ED221C442470066E629 /* SwipeCollectionViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBA21C442460066E629 /* SwipeCollectionViewCell+Accessibility.swift */; };
+		8B5C1ED321C442470066E629 /* ExtensionsSwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBB21C442460066E629 /* ExtensionsSwipeCell.swift */; };
+		8B5C1ED421C442470066E629 /* SwipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBC21C442460066E629 /* SwipeCollectionViewCell.swift */; };
+		8B5C1ED521C442470066E629 /* SwipeTableViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBD21C442460066E629 /* SwipeTableViewCell+Accessibility.swift */; };
+		8B5C1ED621C442470066E629 /* SwipeExpansionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBE21C442460066E629 /* SwipeExpansionStyle.swift */; };
+		8B5C1ED721C442470066E629 /* SwipeExpanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EBF21C442460066E629 /* SwipeExpanding.swift */; };
+		8B5C1ED921C442470066E629 /* SwipeActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EC121C442460066E629 /* SwipeActionsView.swift */; };
+		8B5C1EDA21C442470066E629 /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B5C1EC221C442460066E629 /* SwipeCellKit.h */; };
+		8B5C1EDB21C442470066E629 /* SwipeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EC321C442460066E629 /* SwipeTableViewCell.swift */; };
+		8B5C1F0B21C442590066E629 /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B5C1EF321C442580066E629 /* SwipeCellKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B69BB6B210A395A00F1FE2D /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB6A210A395A00F1FE2D /* Version.swift */; };
 		8B69BB6F211113B500F1FE2D /* StartOneTimeWipeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */; };
 		8B69BB712114BD2E00F1FE2D /* SupportWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B69BB702114BD2E00F1FE2D /* SupportWebViewController.swift */; };
@@ -828,32 +828,6 @@
 		417C680E216B51E00090710E /* AddressListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressListCell.swift; path = src/Views/AddressListCell.swift; sourceTree = "<group>"; };
 		417C686E216CE7810090710E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		417C68AB216E0BC10090710E /* SwipeCellKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwipeCellKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		417C68AD216E0BC10090710E /* SwipeCellKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
-		417C68AE216E0BC10090710E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		417C68D1216E0DEC0090710E /* SwipeExpanding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpanding.swift; sourceTree = "<group>"; };
-		417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionTransitioning.swift; sourceTree = "<group>"; };
-		417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAccessibilityCustomAction.swift; sourceTree = "<group>"; };
-		417C68D4216E0DED0090710E /* SwipeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeController.swift; sourceTree = "<group>"; };
-		417C68D5216E0DED0090710E /* SwipeFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeFeedback.swift; sourceTree = "<group>"; };
-		417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Accessibility.swift"; sourceTree = "<group>"; };
-		417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCell.swift; sourceTree = "<group>"; };
-		417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCellDelegate.swift; sourceTree = "<group>"; };
-		417C68D9216E0DEE0090710E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		417C68DA216E0DEE0090710E /* SwipeActionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionsView.swift; sourceTree = "<group>"; };
-		417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Display.swift"; sourceTree = "<group>"; };
-		417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpansionStyle.swift; sourceTree = "<group>"; };
-		417C68DD216E0DEE0090710E /* SwipeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAction.swift; sourceTree = "<group>"; };
-		417C68DE216E0DEF0090710E /* SwipeOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeOptions.swift; sourceTree = "<group>"; };
-		417C68DF216E0DEF0090710E /* SwipeActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionButton.swift; sourceTree = "<group>"; };
-		417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCellDelegate.swift; sourceTree = "<group>"; };
-		417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTransitionLayout.swift; sourceTree = "<group>"; };
-		417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionsSwipeCell.swift; sourceTree = "<group>"; };
-		417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Accessibility.swift"; sourceTree = "<group>"; };
-		417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCell.swift; sourceTree = "<group>"; };
-		417C68E5216E0DF00090710E /* SwipeCellKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
-		417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Display.swift"; sourceTree = "<group>"; };
-		417C68E7216E0DF00090710E /* SwipeAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAnimator.swift; sourceTree = "<group>"; };
-		417C68E8216E0DF00090710E /* Swipeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Swipeable.swift; sourceTree = "<group>"; };
 		4187C2E92173AFAB00092067 /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		419BD11021B6DDE60070B2C8 /* AAOptionsConstructor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AAOptionsConstructor.swift; sourceTree = "<group>"; };
 		419BD11121B6DDE60070B2C8 /* AAChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AAChartView.swift; sourceTree = "<group>"; };
@@ -1688,6 +1662,32 @@
 		8B137E9420F90D11006DEB3A /* sph_fugue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sph_fugue.h; sourceTree = "<group>"; };
 		8B137E9520F90D11006DEB3A /* sph_shabal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sph_shabal.c; sourceTree = "<group>"; };
 		8B137E9D20F90D11006DEB3A /* echo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = echo.c; sourceTree = "<group>"; };
+		8B5C1EAC21C442460066E629 /* SwipeTableViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCellDelegate.swift; sourceTree = "<group>"; };
+		8B5C1EAD21C442460066E629 /* SwipeAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAnimator.swift; sourceTree = "<group>"; };
+		8B5C1EAE21C442460066E629 /* SwipeCollectionViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Display.swift"; sourceTree = "<group>"; };
+		8B5C1EAF21C442460066E629 /* Swipeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Swipeable.swift; sourceTree = "<group>"; };
+		8B5C1EB021C442460066E629 /* SwipeAccessibilityCustomAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAccessibilityCustomAction.swift; sourceTree = "<group>"; };
+		8B5C1EB121C442460066E629 /* SwipeActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionButton.swift; sourceTree = "<group>"; };
+		8B5C1EB221C442460066E629 /* SwipeTransitionLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTransitionLayout.swift; sourceTree = "<group>"; };
+		8B5C1EB321C442460066E629 /* SwipeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAction.swift; sourceTree = "<group>"; };
+		8B5C1EB421C442460066E629 /* SwipeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeController.swift; sourceTree = "<group>"; };
+		8B5C1EB521C442460066E629 /* SwipeFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeFeedback.swift; sourceTree = "<group>"; };
+		8B5C1EB621C442460066E629 /* SwipeActionTransitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionTransitioning.swift; sourceTree = "<group>"; };
+		8B5C1EB721C442460066E629 /* SwipeCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCellDelegate.swift; sourceTree = "<group>"; };
+		8B5C1EB821C442460066E629 /* SwipeTableViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Display.swift"; sourceTree = "<group>"; };
+		8B5C1EB921C442460066E629 /* SwipeOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeOptions.swift; sourceTree = "<group>"; };
+		8B5C1EBA21C442460066E629 /* SwipeCollectionViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Accessibility.swift"; sourceTree = "<group>"; };
+		8B5C1EBB21C442460066E629 /* ExtensionsSwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionsSwipeCell.swift; sourceTree = "<group>"; };
+		8B5C1EBC21C442460066E629 /* SwipeCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCell.swift; sourceTree = "<group>"; };
+		8B5C1EBD21C442460066E629 /* SwipeTableViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Accessibility.swift"; sourceTree = "<group>"; };
+		8B5C1EBE21C442460066E629 /* SwipeExpansionStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpansionStyle.swift; sourceTree = "<group>"; };
+		8B5C1EBF21C442460066E629 /* SwipeExpanding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpanding.swift; sourceTree = "<group>"; };
+		8B5C1EC021C442460066E629 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B5C1EC121C442460066E629 /* SwipeActionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionsView.swift; sourceTree = "<group>"; };
+		8B5C1EC221C442460066E629 /* SwipeCellKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
+		8B5C1EC321C442460066E629 /* SwipeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCell.swift; sourceTree = "<group>"; };
+		8B5C1EF121C442580066E629 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B5C1EF321C442580066E629 /* SwipeCellKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
 		8B69BB6A210A395A00F1FE2D /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartOneTimeWipeViewController.swift; sourceTree = "<group>"; };
 		8B69BB702114BD2E00F1FE2D /* SupportWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportWebViewController.swift; sourceTree = "<group>"; };
@@ -2181,51 +2181,11 @@
 		417C6810216CDE4F0090710E /* External */ = {
 			isa = PBXGroup;
 			children = (
+				8B5C1EAB21C442460066E629 /* SwipeCellKit */,
 				419BD10E21B6DDE60070B2C8 /* AAInfographics */,
 				411DF574216F59D60003A8BA /* Checkbox */,
-				417C6840216CE7610090710E /* SwipeCellKit */,
 			);
 			path = External;
-			sourceTree = "<group>";
-		};
-		417C6840216CE7610090710E /* SwipeCellKit */ = {
-			isa = PBXGroup;
-			children = (
-				417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */,
-				417C68D9216E0DEE0090710E /* Info.plist */,
-				417C68E8216E0DF00090710E /* Swipeable.swift */,
-				417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */,
-				417C68DD216E0DEE0090710E /* SwipeAction.swift */,
-				417C68DF216E0DEF0090710E /* SwipeActionButton.swift */,
-				417C68DA216E0DEE0090710E /* SwipeActionsView.swift */,
-				417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */,
-				417C68E7216E0DF00090710E /* SwipeAnimator.swift */,
-				417C68E5216E0DF00090710E /* SwipeCellKit.h */,
-				417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */,
-				417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */,
-				417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */,
-				417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */,
-				417C68D4216E0DED0090710E /* SwipeController.swift */,
-				417C68D1216E0DEC0090710E /* SwipeExpanding.swift */,
-				417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */,
-				417C68D5216E0DED0090710E /* SwipeFeedback.swift */,
-				417C68DE216E0DEF0090710E /* SwipeOptions.swift */,
-				417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */,
-				417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */,
-				417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */,
-				417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */,
-				417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */,
-			);
-			path = SwipeCellKit;
-			sourceTree = "<group>";
-		};
-		417C68AC216E0BC10090710E /* SwipeCellKit */ = {
-			isa = PBXGroup;
-			children = (
-				417C68AD216E0BC10090710E /* SwipeCellKit.h */,
-				417C68AE216E0BC10090710E /* Info.plist */,
-			);
-			path = SwipeCellKit;
 			sourceTree = "<group>";
 		};
 		419BD10E21B6DDE60070B2C8 /* AAInfographics */ = {
@@ -3039,7 +2999,7 @@
 				75B6F52F1DA71DCC0031A93F /* Modules */,
 				CEA7E67C1F09A9D2001F8C27 /* Screenshots */,
 				417C6810216CDE4F0090710E /* External */,
-				417C68AC216E0BC10090710E /* SwipeCellKit */,
+				8B5C1EDC21C442580066E629 /* SwipeCellKit */,
 				75A2A7F11DA5935F00A983D8 /* Frameworks */,
 				75A2A7911DA5934300A983D8 /* Products */,
 			);
@@ -3365,6 +3325,46 @@
 				8B137E9D20F90D11006DEB3A /* echo.c */,
 			);
 			path = crypto;
+			sourceTree = "<group>";
+		};
+		8B5C1EAB21C442460066E629 /* SwipeCellKit */ = {
+			isa = PBXGroup;
+			children = (
+				8B5C1EAC21C442460066E629 /* SwipeTableViewCellDelegate.swift */,
+				8B5C1EAD21C442460066E629 /* SwipeAnimator.swift */,
+				8B5C1EAE21C442460066E629 /* SwipeCollectionViewCell+Display.swift */,
+				8B5C1EAF21C442460066E629 /* Swipeable.swift */,
+				8B5C1EB021C442460066E629 /* SwipeAccessibilityCustomAction.swift */,
+				8B5C1EB121C442460066E629 /* SwipeActionButton.swift */,
+				8B5C1EB221C442460066E629 /* SwipeTransitionLayout.swift */,
+				8B5C1EB321C442460066E629 /* SwipeAction.swift */,
+				8B5C1EB421C442460066E629 /* SwipeController.swift */,
+				8B5C1EB521C442460066E629 /* SwipeFeedback.swift */,
+				8B5C1EB621C442460066E629 /* SwipeActionTransitioning.swift */,
+				8B5C1EB721C442460066E629 /* SwipeCollectionViewCellDelegate.swift */,
+				8B5C1EB821C442460066E629 /* SwipeTableViewCell+Display.swift */,
+				8B5C1EB921C442460066E629 /* SwipeOptions.swift */,
+				8B5C1EBA21C442460066E629 /* SwipeCollectionViewCell+Accessibility.swift */,
+				8B5C1EBB21C442460066E629 /* ExtensionsSwipeCell.swift */,
+				8B5C1EBC21C442460066E629 /* SwipeCollectionViewCell.swift */,
+				8B5C1EBD21C442460066E629 /* SwipeTableViewCell+Accessibility.swift */,
+				8B5C1EBE21C442460066E629 /* SwipeExpansionStyle.swift */,
+				8B5C1EBF21C442460066E629 /* SwipeExpanding.swift */,
+				8B5C1EC021C442460066E629 /* Info.plist */,
+				8B5C1EC121C442460066E629 /* SwipeActionsView.swift */,
+				8B5C1EC221C442460066E629 /* SwipeCellKit.h */,
+				8B5C1EC321C442460066E629 /* SwipeTableViewCell.swift */,
+			);
+			path = SwipeCellKit;
+			sourceTree = "<group>";
+		};
+		8B5C1EDC21C442580066E629 /* SwipeCellKit */ = {
+			isa = PBXGroup;
+			children = (
+				8B5C1EF121C442580066E629 /* Info.plist */,
+				8B5C1EF321C442580066E629 /* SwipeCellKit.h */,
+			);
+			path = SwipeCellKit;
 			sourceTree = "<group>";
 		};
 		CE1E5F241EF081F300BD0F72 /* Import */ = {
@@ -3786,8 +3786,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				417C68FD216E0DF00090710E /* SwipeCellKit.h in Headers */,
-				417C68AF216E0BC10090710E /* SwipeCellKit.h in Headers */,
+				8B5C1F0B21C442590066E629 /* SwipeCellKit.h in Headers */,
+				8B5C1EDA21C442470066E629 /* SwipeCellKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4369,28 +4369,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				417C68F2216E0DF00090710E /* SwipeActionsView.swift in Sources */,
-				417C68EF216E0DF00090710E /* SwipeCollectionViewCell.swift in Sources */,
-				417C68F5216E0DF00090710E /* SwipeAction.swift in Sources */,
-				417C68FA216E0DF00090710E /* ExtensionsSwipeCell.swift in Sources */,
-				417C68F4216E0DF00090710E /* SwipeExpansionStyle.swift in Sources */,
-				417C68F7216E0DF00090710E /* SwipeActionButton.swift in Sources */,
-				417C68EC216E0DF00090710E /* SwipeController.swift in Sources */,
-				417C68F0216E0DF00090710E /* SwipeCollectionViewCellDelegate.swift in Sources */,
-				417C68F9216E0DF00090710E /* SwipeTransitionLayout.swift in Sources */,
-				417C68F8216E0DF00090710E /* SwipeTableViewCellDelegate.swift in Sources */,
-				417C68FB216E0DF00090710E /* SwipeCollectionViewCell+Accessibility.swift in Sources */,
-				417C68F3216E0DF00090710E /* SwipeCollectionViewCell+Display.swift in Sources */,
-				417C68EA216E0DF00090710E /* SwipeActionTransitioning.swift in Sources */,
-				417C68FC216E0DF00090710E /* SwipeTableViewCell.swift in Sources */,
-				417C68E9216E0DF00090710E /* SwipeExpanding.swift in Sources */,
-				417C68FF216E0DF00090710E /* SwipeAnimator.swift in Sources */,
-				417C68EB216E0DF00090710E /* SwipeAccessibilityCustomAction.swift in Sources */,
-				417C68F6216E0DF00090710E /* SwipeOptions.swift in Sources */,
-				417C6900216E0DF00090710E /* Swipeable.swift in Sources */,
-				417C68ED216E0DF00090710E /* SwipeFeedback.swift in Sources */,
-				417C68FE216E0DF00090710E /* SwipeTableViewCell+Display.swift in Sources */,
-				417C68EE216E0DF00090710E /* SwipeTableViewCell+Accessibility.swift in Sources */,
+				8B5C1EC621C442470066E629 /* SwipeCollectionViewCell+Display.swift in Sources */,
+				8B5C1EC821C442470066E629 /* SwipeAccessibilityCustomAction.swift in Sources */,
+				8B5C1ECF21C442470066E629 /* SwipeCollectionViewCellDelegate.swift in Sources */,
+				8B5C1ECB21C442470066E629 /* SwipeAction.swift in Sources */,
+				8B5C1EC921C442470066E629 /* SwipeActionButton.swift in Sources */,
+				8B5C1ED521C442470066E629 /* SwipeTableViewCell+Accessibility.swift in Sources */,
+				8B5C1EC421C442470066E629 /* SwipeTableViewCellDelegate.swift in Sources */,
+				8B5C1ED621C442470066E629 /* SwipeExpansionStyle.swift in Sources */,
+				8B5C1ECE21C442470066E629 /* SwipeActionTransitioning.swift in Sources */,
+				8B5C1ED921C442470066E629 /* SwipeActionsView.swift in Sources */,
+				8B5C1ED421C442470066E629 /* SwipeCollectionViewCell.swift in Sources */,
+				8B5C1ED121C442470066E629 /* SwipeOptions.swift in Sources */,
+				8B5C1EDB21C442470066E629 /* SwipeTableViewCell.swift in Sources */,
+				8B5C1ECC21C442470066E629 /* SwipeController.swift in Sources */,
+				8B5C1ECA21C442470066E629 /* SwipeTransitionLayout.swift in Sources */,
+				8B5C1EC721C442470066E629 /* Swipeable.swift in Sources */,
+				8B5C1EC521C442470066E629 /* SwipeAnimator.swift in Sources */,
+				8B5C1ED321C442470066E629 /* ExtensionsSwipeCell.swift in Sources */,
+				8B5C1ECD21C442470066E629 /* SwipeFeedback.swift in Sources */,
+				8B5C1ED721C442470066E629 /* SwipeExpanding.swift in Sources */,
+				8B5C1ED221C442470066E629 /* SwipeCollectionViewCell+Accessibility.swift in Sources */,
+				8B5C1ED021C442470066E629 /* SwipeTableViewCell+Display.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5209,7 +5209,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5246,7 +5246,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5279,7 +5279,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5312,7 +5312,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5344,7 +5344,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5612,7 +5612,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "ravenwallet WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -5630,7 +5630,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "ravenwallet WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -5649,7 +5649,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
@@ -5667,7 +5667,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
@@ -5689,7 +5689,7 @@
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
@@ -5716,7 +5716,7 @@
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
@@ -5738,7 +5738,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -5754,7 +5754,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -5769,7 +5769,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.RavencoinUITests;
@@ -5783,7 +5783,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.RavencoinUITests;
@@ -5797,7 +5797,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = MessagesExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -5811,7 +5811,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = MessagesExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -5854,7 +5854,7 @@
 		75A2A8251DA5938500A983D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -5868,7 +5868,7 @@
 		75A2A8261DA5938500A983D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6021,7 +6021,7 @@
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
@@ -6044,7 +6044,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -6059,7 +6059,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.RavencoinUITests;
@@ -6074,7 +6074,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
@@ -6091,7 +6091,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "ravenwallet WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6109,7 +6109,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = MessagesExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6137,7 +6137,7 @@
 		CEA7E6901F09AC6A001F8C27 /* Screenshots */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6336,7 +6336,7 @@
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
@@ -6359,7 +6359,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -6374,7 +6374,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.RavencoinUITests;
@@ -6389,7 +6389,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
@@ -6406,7 +6406,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "ravenwallet WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6424,7 +6424,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = MessagesExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6452,7 +6452,7 @@
 		CEA7E6A31F0AAA84001F8C27 /* Testnet */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6648,7 +6648,7 @@
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
@@ -6670,7 +6670,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -6685,7 +6685,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = ravenwalletUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.RavencoinUITests;
@@ -6700,7 +6700,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
@@ -6717,7 +6717,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "ravenwallet WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6735,7 +6735,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = MessagesExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -6763,7 +6763,7 @@
 		CEE0EF5C1EBF8D7F0018DB36 /* Testflight */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HZM82QQ2RF;
+				DEVELOPMENT_TEAM = J245WAM2JG;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";

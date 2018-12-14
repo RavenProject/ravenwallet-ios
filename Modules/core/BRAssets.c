@@ -453,37 +453,37 @@ size_t EncodeIPFS(char *str, size_t strLen, const uint8_t *data, size_t dataLen)
 
 }
 
-size_t ConstructNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *newAsset) {
+size_t ConstructNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset) {
 
-    size_t off = 0;
-
+    size_t off = 25;
+    
     assert(script != NULL || scriptLen == 0);
     if (!script || scriptLen == 0 || scriptLen > MAX_SCRIPT_LENGTH) return 0;
-
-    if (script && 25 < scriptLen) {
-        script[25] = OP_RVN_ASSET;
-        script[26] = RVN_R;
-        script[27] = RVN_V;
-        script[28] = RVN_N;
-        script[30] = RVN_Q;
-
-        off += 5;
-
-        off += BRVarIntSet((script ? &script[off] : NULL), (off <= scriptLen ? scriptLen - off : 0), scriptLen);
-
-        script[31] = sizeof(newAsset->name);
-        off++;
-        strncpy(&script[32], &newAsset->name, sizeof(newAsset->name));
-        off += sizeof(newAsset->name);
-//        script[off] = newAsset->amount;
-//        off += BRVarIntSet(&script[off], (off <= dataLen ? dataLen - off : 0), input->sigLen);
-
-        if (script && off + sizeof(uint64_t) <= scriptLen) UInt64SetLE(&script[off], newAsset->amount);
-        off += sizeof(uint64_t);
-
-        script[off] = OP_DROP;
-    }
-
+    
+    script[25] = OP_RVN_ASSET;
+    
+    script[27] = RVN_R;
+    script[28] = RVN_V;
+    script[29] = RVN_N;
+    script[30] = RVN_Q;
+    
+    off += 6;
+    
+    off += BRVarIntSet((script ? &script[off] : NULL), off, asset->nameLen);
+    
+    // Todo change asset name from char to uint8_t, if it works
+    strncpy(script + off, asset->name, asset->nameLen);
+    off += asset->nameLen;
+    
+    //    if (script && off + sizeof(uint64_t) <= scriptLen) UInt64SetLE(&script[off], asset->amount);
+    UInt64SetLE(&script[off], asset->amount);
+    off += sizeof(uint64_t);
+    
+    script[26] = off - 25 - 2;
+    
+    script[off] = OP_DROP;
+    off++;
+    
     return off;
 }
 

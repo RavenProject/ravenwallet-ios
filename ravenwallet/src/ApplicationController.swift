@@ -177,6 +177,9 @@ class ApplicationController : NSObject, Subscriber, Trackable {
             UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: timeSinceLastExitKey)
         }
     }
+    
+    func WillTerminate() {
+    }
 
     func performFetch(_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         fetchCompletionHandler = completionHandler

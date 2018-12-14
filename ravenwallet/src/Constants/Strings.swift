@@ -235,6 +235,7 @@ enum S {
         static let ipfs = NSLocalizedString("Asset.ipfs", value:"IPFS Browse", comment: "Ipfs button label")
         static let transfer = NSLocalizedString("Asset.transfer", value:"Transfer Asset", comment: "Transfer asset button label")
         static let manageAsset = NSLocalizedString("Asset.manageAsset", value:"Manage Asset", comment: "Manage asset button title")
+        static let burnAsset = NSLocalizedString("Asset.burnAsset", value:"Burn Asset", comment: "burn asset button title")
         static let create = NSLocalizedString("Asset.create", value:"Create", comment: "Create asset button label")
         static let transferTitle = NSLocalizedString("Asset.transferTitle", value:"Transfer", comment: "Transfer asset title label")
         static let manageTitle = NSLocalizedString("Asset.manageTitle", value:"Manage", comment: "Manage owned asset title label")
@@ -489,8 +490,10 @@ enum S {
         static let addressAdded = NSLocalizedString("Alerts.addressAdded", value:"Addresses Added", comment: "'the addresses were added'' Alert title")
         static let addressDeleted = NSLocalizedString("Alerts.addressDeleted", value:"Addresses Deleted", comment: "'the addresses were deleted'' Alert title")
         static let addressUpdated = NSLocalizedString("Alerts.addressUpdated", value:"Addresses Updated", comment: "'the addresses were updated'' Alert title")
-
-
+        enum BurnAsset {
+            static let title = NSLocalizedString("Alerts.BurnAsset.title", value: "Confirm Asset  Burn", comment: "Burn Asset title")
+            static let body = NSLocalizedString("Alerts.BurnAsset.body", value: "Are you sure you want to burn the asset? Once burned there is no way you can get it back.", comment: "Burn Asset body")
+        }
     }
     
     enum MenuButton {

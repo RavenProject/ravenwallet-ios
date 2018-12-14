@@ -105,7 +105,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             sendButton.constraint(.trailing, toView: view, constant: -C.padding[2]),
             sendButton.constraint(toBottom: checkBoxNameCell, constant: verticalButtonPadding),
             sendButton.constraint(.height, constant: C.Sizes.buttonHeight),
-            sendButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[5] : -C.padding[2]) ])
+            sendButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
         addButtonActions()
         Store.subscribe(self, selector: { $0[self.currency].balance != $1[self.currency].balance },
                         callback: { [unowned self] in

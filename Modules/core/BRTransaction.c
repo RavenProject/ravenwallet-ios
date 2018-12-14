@@ -546,7 +546,8 @@ int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCou
         size_t sigLen, scriptLen;
         UInt256 md = UINT256_ZERO;
 
-        if (elemsCount >= 2 && *elems[elemsCount - 2] == OP_EQUALVERIFY) { // pay-to-pubkey-hash
+        // OP_EQUALVERIFY condition doesn't trigger for assets input
+        if (elemsCount >= 2 /*&& *elems[elemsCount - 2] == OP_EQUALVERIFY*/) { // pay-to-pubkey-hash
             uint8_t data[_TransactionData(tx, NULL, 0, i, forkId | SIGHASH_ALL)];
             size_t dataLen = _TransactionData(tx, data, sizeof(data), i, forkId | SIGHASH_ALL);
 
@@ -574,7 +575,8 @@ int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCou
 
         SHA256_2(&tx->txHash, data, len);
         return 1;
-    } else return 0;
+    } else
+        return 0;
 }
 
 // true if tx meets IsStandard() rules: https://bitcoin.org/en/developer-guide#standard-transactions

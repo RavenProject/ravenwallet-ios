@@ -69,7 +69,7 @@ class ScanViewController : UIViewController, Trackable {
         view.addSubview(guide)
 
         toolbar.constrainBottomCorners(sidePadding: 0, bottomPadding: 0)
-        if E.isIPhoneX {
+        if E.isIPhoneXOrLater {
             toolbar.constrain([ toolbar.constraint(.height, constant: 60.0) ])
             
             close.constrain([

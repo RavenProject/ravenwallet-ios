@@ -543,19 +543,24 @@ class BRWallet {
     
     func createAssetTransaction(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
         //return BRWalletCreateTransaction(cPtr, forAmount, toAddress);
-        return BRWalletCreateTransactionWithAsset(cPtr, forAmount, toAddress, asset); //TODO sobhane allah
+        return BRWalletCreateTxForRootAssetTransfer(cPtr, forAmount, toAddress, asset);
     }
+    
+    func burnAssetTransaction(asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletBurnRootAsset(cPtr, asset);
+    }
+
     
     // returns an unsigned transaction that satisifes the given transaction outputs
     func createTxForOutputs(_ outputs: [BRTxOutput]) -> BRTxRef? {
-        return BRWalletCreateTxForOutputs(cPtr, outputs, outputs.count)
+        return BRWalletCreateTxForOutputs(cPtr, outputs, outputs.count, nil)
     }
     
     // signs any inputs in tx that can be signed using private keys from the wallet
     // forkId is 0 for , 0x40 for b-cash
     // seed is the master private key (wallet seed) corresponding to the master public key given when wallet was created
     // returns true if all inputs were signed, or false if there was an error or not all inputs were able to be signed
-    func signTransaction(_ tx: BRTxRef, forkId: Int, seed: inout UInt512, type: Int32) -> Bool { // todo remove type
+    func signTransaction(_ tx: BRTxRef, forkId: Int, seed: inout UInt512) -> Bool { 
         return BRWalletSignTransaction(cPtr, tx, Int32(forkId), &seed, MemoryLayout<UInt512>.stride) != 0
     }
     

@@ -39,13 +39,13 @@ class InAppAlert : UIView {
         addSubview(image)
         addSubview(message)
         close.constrain([
-            close.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[2]),
+            close.topAnchor.constraint(equalTo: topAnchor, constant: E.isIPhoneXOrLater ? C.padding[3] : C.padding[2]),
             close.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]),
             close.widthAnchor.constraint(equalToConstant: 44.0),
             close.heightAnchor.constraint(equalToConstant: 44.0) ])
         image.constrain([
             image.centerXAnchor.constraint(equalTo: centerXAnchor),
-            image.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[4]) ])
+            image.topAnchor.constraint(equalTo: topAnchor, constant: E.isIPhoneXOrLater ? C.padding[5] : C.padding[4]) ])
         message.constrain([
             message.leadingAnchor.constraint(equalTo: leadingAnchor, constant: C.padding[2]),
             message.topAnchor.constraint(equalTo: image.bottomAnchor, constant: C.padding[1]),
@@ -55,9 +55,13 @@ class InAppAlert : UIView {
         }
         close.tintColor = .whiteTint
         message.textAlignment = .center
+        let gr = UITapGestureRecognizer(target: self, action: #selector(dismiss))
+        self.addGestureRecognizer(gr)
+        self.isUserInteractionEnabled = true
+
     }
 
-    func dismiss() {
+    @objc func dismiss() {
         UIView.animate(withDuration: C.animationDuration, animations: {
             self.bottomConstraint?.constant = 0.0
             self.superview?.layoutIfNeeded()
