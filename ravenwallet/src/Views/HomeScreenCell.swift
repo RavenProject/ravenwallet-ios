@@ -138,9 +138,6 @@ class HomeScreenCell : UITableViewCell, Subscriber {
         container.addSubview(aaChartView)
         container.addSubview(separator)
         container.addSubview(chartTitle)
-
-        aaChartView.isClearBackgroundColor = true
-        syncIndicator.isHidden = true
     }
 
     private func addConstraints() {
@@ -196,6 +193,9 @@ class HomeScreenCell : UITableViewCell, Subscriber {
         selectionStyle = .none
         backgroundColor = .clear
         chartTitle.text = S.Chart.title
+        aaChartView.isClearBackgroundColor = true
+        aaChartView.scrollEnabled = false
+        syncIndicator.isHidden = true
     }
     
     override func prepareForReuse() {

@@ -51,7 +51,13 @@ class NumberCell : UIViewController, Trackable {
     let pinPad: PinPadViewController
     let border = UIView(color: .secondaryShadow)
     let bottomBorder = UIView(color: .secondaryShadow)
-    var isEnabled : Bool = true
+    var isEnabled : Bool = true {
+        didSet {
+            tapView.isUserInteractionEnabled = isEnabled
+            amount = nil
+            closePinPad()
+        }
+    }
     private let tapView = UIView()
     private let numberDigit:NumberDigit
     
@@ -190,7 +196,12 @@ class NumberCell : UIViewController, Trackable {
     }
     
     func updateAmountLabel() {
-        guard let amount = amount else { amountLabel.text = ""; return }
+        guard let amount = amount else {
+            amountLabel.text = "";
+            pinPad.clear()
+            placeholder.isHidden = false
+            return
+        }
         var output = amount.description(minimumFractionDigits: minimumFractionDigits)
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)

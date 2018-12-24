@@ -324,7 +324,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
             
             let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset!, type: NEW_ASSET, amount: amount)
-            guard sender.createAssetTransaction(amount: 0, to: address, asset: assetToSend) else {
+            guard sender.createAssetTransaction(amount: C.creatAssetFee, to: address, asset: assetToSend) else {
                 return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
             }
         }

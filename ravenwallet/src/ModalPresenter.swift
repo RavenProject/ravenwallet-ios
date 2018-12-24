@@ -36,7 +36,7 @@ class ModalPresenter : Subscriber, Trackable {
     private let modalTransitionDelegate: ModalTransitionDelegate
     private let messagePresenter = MessageUIPresenter()
     private let securityCenterNavigationDelegate = SecurityCenterNavigationDelegate()
-    private let verifyPinTransitionDelegate = PinTransitioningDelegate()
+    let verifyPinTransitionDelegate = PinTransitioningDelegate()
     private let noAuthApiClient: BRAPIClient
     private var currentRequest: PaymentRequest?
     private var reachability = ReachabilityMonitor()
@@ -170,7 +170,7 @@ class ModalPresenter : Subscriber, Trackable {
         })
     }
 
-    private func presentAlert(_ type: AlertType, completion: @escaping ()->Void) {
+    func presentAlert(_ type: AlertType, completion: @escaping ()->Void) {
         let alertView = AlertView(type: type)
         let window = UIApplication.shared.keyWindow!
         let size = window.bounds.size
@@ -235,6 +235,8 @@ class ModalPresenter : Subscriber, Trackable {
             return makeCreateAssetView(initialAddress: initialAddress)
         case .manageOwnedAsset(let asset, let initialAddress)://BMEX
             return makeManageOwnedAssetView(asset: asset, initialAddress: initialAddress)
+        case .burnAsset(let asset)://BMEX
+            return makeBurnAssetView(asset: asset)
         case .receive(let currency):
             return receiveView(currency: currency, isRequestAmountVisible: true)
         case .selectAsset(let asset):
@@ -367,7 +369,7 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         createAssetVC.onPublishSuccess = { txHash in
-            self.presentAlert(.createSuccess(txHash: txHash), completion: {})
+            self.topViewController?.showAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, buttonLabel: S.Button.ok)
         }
         return root
     }
@@ -404,6 +406,50 @@ class ModalPresenter : Subscriber, Trackable {
         }
         return root
     }
+    
+    private func makeBurnAssetView(asset: Asset) -> UIViewController? {
+        guard !Currencies.rvn.state.isRescanning else {
+            let alert = UIAlertController(title: S.Alert.error, message: S.Send.isRescanning, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
+            topViewController?.present(alert, animated: true, completion: nil)
+            return nil
+        }
+        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
+        let burnAssetVC = BurnAssetVC(asset: asset, walletManager: walletManager)
+        currentRequest = nil
+        
+        if Store.state.isLoginRequired {
+            burnAssetVC.isPresentedFromLock = true
+        }
+        
+        let root = ModalViewController(childViewController: burnAssetVC)
+        burnAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
+            guard let myself = self else { return }
+            let walletManager = myself.primaryWalletManager
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            vc.didCancel = {
+                DispatchQueue.main.async {
+                    burnAssetVC.dismiss(animated: true, completion: nil)
+                }
+            }
+            vc.transitioningDelegate = self?.verifyPinTransitionDelegate
+            vc.modalPresentationStyle = .overFullScreen
+            vc.modalPresentationCapturesStatusBarAppearance = true
+            root?.view.isFrameChangeBlocked = true
+            root?.present(vc, animated: true, completion: nil)
+        }
+        burnAssetVC.onPublishSuccess = { [weak self] in
+            self?.presentAlert(.sendSuccess, completion: {
+                if let allAssetVC = self!.topViewController as? AllAssetVC {
+                    self?.pushAccountView(currency: Currencies.rvn, animated: true, nc: allAssetVC.navigationController!)
+                }
+                else {
+                    self?.showAccountView(currency: Currencies.rvn, animated: true)
+                }
+            })
+        }
+        return root
+    }
 
     private func receiveView(currency: CurrencyDef, isRequestAmountVisible: Bool) -> UIViewController? {
         let receiveVC = ReceiveViewController(currency: currency, isRequestAmountVisible: isRequestAmountVisible)
@@ -422,8 +468,10 @@ class ModalPresenter : Subscriber, Trackable {
     }
     
     private func selectAssetView(asset: Asset) -> UIViewController? {
-        let receiveVC = AssetPopUpVC(walletManager: primaryWalletManager, asset: asset)
-        let root = ModalViewController(childViewController: receiveVC)
+        let assetPopUpVC = AssetPopUpVC(walletManager: primaryWalletManager, asset: asset)
+        let root = ModalViewController(childViewController: assetPopUpVC)
+        assetPopUpVC.parentVC = root
+        assetPopUpVC.modalPresenter = self
         return root
     }
     
@@ -887,7 +935,7 @@ class ModalPresenter : Subscriber, Trackable {
         }
     }
     
-    private func showAccountView(currency: CurrencyDef, animated: Bool) {
+    func showAccountView(currency: CurrencyDef, animated: Bool) {
         guard let nc = topViewController?.navigationController as? RootNavigationController,
             nc.viewControllers.count == 1 else { return }
         guard let walletManager = self.walletManagers[currency.code] else { return }
@@ -895,7 +943,7 @@ class ModalPresenter : Subscriber, Trackable {
         nc.pushViewController(accountViewController, animated: animated)
     }
     
-    private func pushAccountView(currency: CurrencyDef, animated: Bool, nc:UINavigationController) {
+    func pushAccountView(currency: CurrencyDef, animated: Bool, nc:UINavigationController) {
         guard let walletManager = self.walletManagers[currency.code] else { return }
         let accountViewController = AccountViewController(walletManager: walletManager)
         nc.pushViewController(accountViewController, animated: animated)
@@ -970,7 +1018,7 @@ class ModalPresenter : Subscriber, Trackable {
         UIPasteboard.general.string = addresses.joined(separator: "\n")
     }
 
-    private var topViewController: UIViewController? {
+    var topViewController: UIViewController? {
         var viewController = window.rootViewController
         if let nc = viewController as? UINavigationController {
             viewController = nc.topViewController

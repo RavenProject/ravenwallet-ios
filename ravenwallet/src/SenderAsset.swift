@@ -36,7 +36,23 @@ class SenderAsset {
     private let operationType: OperationType
 
     func createAssetTransaction(amount: UInt64, to: String, asset: BRAssetRef) -> Bool {
-        transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount, toAddress: to, asset: asset)
+        switch operationType {
+        case .transferAsset:
+            transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount, toAddress: to, asset: asset)
+            break
+        case .burnAsset:
+            transaction = walletManager.wallet?.burnAssetTransaction(asset: asset)
+            break
+        case .createAsset:
+            transaction = walletManager.wallet?.createTxForRootAssetCreation(forAmount: amount, toAddress: to, asset: asset)
+            break
+        case .manageAsset:
+            transaction = nil
+            break
+        case .transferRvn: //never called in this class
+            transaction = nil
+            break
+        }
         return transaction != nil
     }
 
@@ -92,12 +108,12 @@ class SenderAsset {
             let group = DispatchGroup()
             group.enter()
             DispatchQueue.walletQueue.async {
-                if self.walletManager.signTransaction(tx, forkId: 0, pin: pin) {
+                if self.walletManager.signTransaction(tx, forkId: (self.currency as! Raven).forkId, pin: pin) {
                     self.publish(completion: completion)
                 }
                 group.leave()
             }
-            let result = group.wait(timeout: .now() + 1114.0) // TODO: change back to 4.0
+            let result = group.wait(timeout: .now() + 4.0)
             if result == .timedOut {
                 fatalError("send-tx-timeout")
             }

@@ -155,7 +155,7 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
 
     private func setInitialData() {
         view.backgroundColor = .clear
-        payLabel.text = S.Confirmation.send
+        payLabel.text = operationType == .createAsset ? S.Asset.create : (operationType == .manageAsset ? S.Asset.manageTitle : S.Confirmation.send)
 
         let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         let displayFee = DisplayAmount(amount: feeAmount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
@@ -179,7 +179,8 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
             processingTime.text = String(format: S.Confirmation.processingTime, S.FeeSelector.economyTime)
         }
 
-        sendLabel.text = S.Confirmation.amountLabel
+        sendLabel.text = operationType == .createAsset ? S.Confirmation.amountCreateLabel : (operationType == .manageAsset ? S.Confirmation.amountManageLabel : S.Confirmation.amountSendLabel)
+
         sendLabel.adjustsFontSizeToFitWidth = true
         send.text = asset == nil ? displayAmount.description : amount.description(minimumFractionDigits: minimumFractionDigits!) + " " + asset!.name
         feeLabel.text = S.Confirmation.feeLabel

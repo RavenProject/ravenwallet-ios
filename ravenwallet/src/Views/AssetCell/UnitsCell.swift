@@ -45,7 +45,7 @@ class UnitsCell : NumberCell {
     override func setInitialData() {
         super.setInitialData()
         unitsLabel.text = placeHolderString
-        amount = Satoshis(8 * 100000000)
+        amount = Satoshis(0)
     }
     
     

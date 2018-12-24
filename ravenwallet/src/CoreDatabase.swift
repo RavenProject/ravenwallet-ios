@@ -38,7 +38,7 @@ class CoreDatabase {
         queue.async {
             try? self.openDatabase()
         }
-        print("Test dbPath ", self.dbPath)//BMEX Todo : should delet this comment
+        print("Test dbPath ", self.dbPath)//BMEX Todo : should delete this comment
     }
     
     deinit {
@@ -294,6 +294,25 @@ class CoreDatabase {
                 req = String(format: "insert or rollback into ZBRAsset " +
                     "(Z_NAME, Z_AMOUNT, Z_UNITS, Z_REISSUBALE, Z_HAS_IPFS, Z_IPFS_HASH, Z_OWNERSHIP, Z_SORT) values ('%@', '%@', '%@', '%@', '%@', '%@', '%d', '%d')", assetName, amount, assetRef.pointee.unit.description, assetRef.pointee.reissuable.description, assetRef.pointee.hasIPFS.description, assetRef.pointee.ipfsHashString, assetRef.pointee.ownerShip, self.assetsCount)
             }
+            var sql: OpaquePointer? = nil
+            sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
+            defer { sqlite3_finalize(sql) }
+            guard sqlite3_step(sql) == SQLITE_DONE else {
+                print(String(cString: sqlite3_errmsg(self.db)))
+                return
+            }
+            //commit querys
+            sqlite3_exec(self.db, "commit", nil, nil, nil)
+            self.setDBFileAttributes()
+        }
+    }
+    
+    func updateAssetData(_ assetRef: BRAssetRef) {
+        queue.async {
+            //add asset
+            var req = ""
+            var assetName = assetRef.pointee.nameString
+            req = String(format: "update ZBRAsset set Z_UNITS = '%@', Z_REISSUBALE = '%@', Z_HAS_IPFS = '%@', Z_IPFS_HASH = '%@' where Z_NAME = '%@'", assetRef.pointee.unit.description, assetRef.pointee.reissuable.description, assetRef.pointee.hasIPFS.description, assetRef.pointee.ipfsHashString, assetName)
             var sql: OpaquePointer? = nil
             sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
             defer { sqlite3_finalize(sql) }

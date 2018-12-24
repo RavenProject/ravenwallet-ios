@@ -106,6 +106,7 @@ enum RootModal {
     case transferAsset(asset: Asset, initialAddress: String?)
     case createAsset(initialAddress: String?)
     case manageOwnedAsset(asset: Asset, initialAddress: String?)
+    case burnAsset(asset: Asset)
 
 }
 
@@ -238,6 +239,8 @@ func ==(lhs: RootModal, rhs: RootModal) -> Bool {
     case (.createAsset(_), .createAsset(_)):
         return true
     case (.manageOwnedAsset(let lhsAsset, _), .manageOwnedAsset(let rhsAsset, _)):
+        return lhsAsset.name == rhsAsset.name
+    case (.burnAsset(let lhsAsset), .burnAsset(let rhsAsset)):
         return lhsAsset.name == rhsAsset.name
     case (.receive(let lhsCurrency), .receive(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code

@@ -40,6 +40,7 @@ class CheckBoxCell : SendCell {
     var didBeginEditing: (() -> Void)?
     var didReturn: ((UITextField) -> Void)?
     var didChange: ((String) -> Void)?
+    var didSelected: ((Bool) -> Void)?
     var content: String? {
         didSet {
             textField.text = content
@@ -96,6 +97,7 @@ class CheckBoxCell : SendCell {
                     self.textField.resignFirstResponder()
                 }
             }
+            self.didSelected?(isSelected)
         }
         btnCheckBox.isSelected = false
     }

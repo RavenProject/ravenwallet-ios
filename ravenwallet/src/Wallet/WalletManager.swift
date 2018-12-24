@@ -278,10 +278,25 @@ extension WalletManager : BRWalletListener {
 
     func txAdded(_ tx: BRTxRef) {
         db?.txAdded(tx)
-        //BMEX test if asset not nil
+        //add asset if not nil
         if AssetValidator.shared.checkInvalidAsset(asset: tx.pointee.asset) {
-            db?.assetAdded(tx, walletManager: self)
+            for brTx in decomposeTransaction(brTxRef: tx) {
+                if AssetValidator.shared.checkInvalidAsset(asset: brTx!.pointee.asset) {
+                    db?.assetAdded(brTx!, walletManager: self)
+                }
+            }
         }
+        //send get asset data
+        //void BRPeerSendGetAsset(BRPeer *peer, char *assetName, size_t nameLen, void (*receiveAssetData) (void *info, BRAsset *asset)) {
+//        self.db?.loadPeers { peers in
+//            for peer in peers {
+//                BRPeerSendGetAsset(peer, tx.pointee.asset.pointee.nameString, tx.pointee.asset.pointee.nameLen, {
+//                    (info, asset) in
+//                    guard let info = info, let asset = asset else { return }
+//                    Unmanaged<BRWallet>.fromOpaque(info).takeUnretainedValue().listener.balanceChanged(balance)
+//                })
+//            }
+//        }
     }
 
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {
@@ -350,7 +365,8 @@ extension WalletManager : BRWalletListener {
     }
 
     func makeTransactionViewModels(transactions: [BRTxRef?], rate: Rate?) -> [Transaction] {
-        return transactions.compactMap{ $0 }.sorted {
+        let decomposedList = decomposeTransactionsList(transactions: transactions)
+        return decomposedList.compactMap{ $0 }.sorted {
             if $0.pointee.timestamp == 0 {
                 return true
             } else if $1.pointee.timestamp == 0 {
@@ -361,6 +377,47 @@ extension WalletManager : BRWalletListener {
             }.compactMap {
                 return RvnTransaction($0, walletManager: self, kvStore: kvStore, rate: rate)
         }
+    }
+    
+//    var outputs: [BRTxOutput] {
+//        return [BRTxOutput](UnsafeBufferPointer(start: self.pointee.outputs, count: self.pointee.outCount))
+//    }
+    
+    func decomposeTransaction(brTxRef:BRTxRef?) -> [BRTxRef?] {
+        var decomposedTransactions: [BRTxRef?] = [BRTxRef?]()
+        if(brTxRef?.pointee.asset != nil){
+            var txsCount = 0
+            if brTxRef?.pointee.asset.pointee.type == NEW_ASSET {
+                txsCount = 3
+            }
+            else if brTxRef?.pointee.asset.pointee.type == REISSUE {
+                txsCount = 2
+            }
+            else{
+                decomposedTransactions.append(brTxRef)
+                return decomposedTransactions
+            }
+            let txListPointer:UnsafeMutablePointer<BRTransaction>! = BRTransactionDecomposeForCreation(brTxRef, txsCount);
+            let txList = [BRTransaction](UnsafeBufferPointer<BRTransaction>(start: txListPointer, count: txsCount))
+            for tx in txList {
+                let txPointer = UnsafeMutablePointer<BRTransaction>.allocate(capacity: 1)
+                txPointer.initialize(to: tx)
+                decomposedTransactions.append(txPointer)
+            }
+            return decomposedTransactions
+        }
+        else{
+            decomposedTransactions.append(brTxRef)
+            return decomposedTransactions
+        }
+    }
+    
+    func decomposeTransactionsList(transactions:[BRTxRef?]) -> [BRTxRef?] {
+        var decomposedTransactionsList: [BRTxRef?] = [BRTxRef?]()
+        for brTxRef in transactions {
+            decomposedTransactionsList.append(contentsOf:decomposeTransaction(brTxRef: brTxRef))
+        }
+        return decomposedTransactionsList
     }
 
     private func ping() {

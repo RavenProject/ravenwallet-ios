@@ -133,19 +133,19 @@ extension BRAsset {
         newAsset.pointee.name = UnsafeMutablePointer<Int8>(mutating: (asset.name as NSString).utf8String)
         let nameLen = asset.name.count
         newAsset.pointee.nameLen = nameLen
-        newAsset.pointee.unit = Int64(asset.units)
         newAsset.pointee.amount = amount.rawValue
-        newAsset.pointee.hasIPFS = Int64(asset.hasIpfs)
-        newAsset.pointee.reissuable = Int64(asset.reissubale)
-        let cStrIpfsHash = [CChar](asset.ipfsHash.utf8CString)
-        if (cStrIpfsHash.count <= MemoryLayout<BRAddress>.size)
-        {
-            UnsafeMutableRawPointer(mutating: &newAsset.pointee.IPFSHash).assumingMemoryBound(to: CChar.self).assign(from: cStrIpfsHash, count: cStrIpfsHash.count)
-        }
         newAsset.pointee.type = type
+        newAsset.pointee.unit = Int32(asset.units)
+        newAsset.pointee.reissuable = Int32(asset.reissubale)
+        newAsset.pointee.hasIPFS = Int32(asset.hasIpfs)
+        copyAssetPropertyValue(value: asset.ipfsHash, pointer: &newAsset.pointee.IPFSHash)
         return newAsset
     }
     
+    static func copyAssetPropertyValue(value:String, pointer:UnsafeRawPointer){
+        let cStr = [CChar](value.utf8CString)
+        UnsafeMutableRawPointer(mutating: pointer).assumingMemoryBound(to: CChar.self).assign(from: cStr, count: cStr.count)
+    }
 }
 
 extension BRAddress: CustomStringConvertible, Hashable {
@@ -542,8 +542,11 @@ class BRWallet {
     }
     
     func createAssetTransaction(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
-        //return BRWalletCreateTransaction(cPtr, forAmount, toAddress);
         return BRWalletCreateTxForRootAssetTransfer(cPtr, forAmount, toAddress, asset);
+    }
+    
+    func createTxForRootAssetCreation(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForRootAssetCreation(cPtr, forAmount, toAddress, asset)
     }
     
     func burnAssetTransaction(asset:BRAssetRef) -> BRTxRef? {

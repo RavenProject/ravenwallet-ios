@@ -70,7 +70,9 @@ class TutorialVC : UIViewController {
         startBtn.constrain([
             startBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             startBtn.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[2]),
-            startBtn.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -C.padding[4]) ])
+            startBtn.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -C.padding[4]),
+            startBtn.heightAnchor.constraint(equalToConstant: C.Sizes.buttonHeight)
+            ])
         // pageControl
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.constrain([

@@ -22,7 +22,8 @@ class AssetPopUpVC : UIViewController, Subscriber {
     //MARK - Private
     private let walletManager: WalletManager
     private let asset: Asset
-    
+    var parentVC: UIViewController?
+    var modalPresenter:ModalPresenter? //ModalPresentable
     private let ipfs = ShadowButton(title: S.Asset.ipfs, type: .secondary)
     private let transfer = ShadowButton(title: S.Asset.transfer, type: .secondary)
     private let manage = ShadowButton(title: S.Asset.manageAsset, type: .secondary)
@@ -73,11 +74,6 @@ class AssetPopUpVC : UIViewController, Subscriber {
     }
     
     private func addSubscriptions() {
-        Store.subscribe(self, name: .burn(asset), callback: { _ in
-            //BMEX TODO: burn asset
-            let assetToBurn: BRAssetRef = BRAsset.createAssetRef(asset: self.asset, type: TRANSFER, amount: Satoshis.init(0))
-            self.walletManager.wallet?.burnAssetTransaction(asset: assetToBurn)
-        })
     }
 
     private func setStyle() {
@@ -109,13 +105,11 @@ class AssetPopUpVC : UIViewController, Subscriber {
         }
         
         burn.tap = { [weak self] in
-            let alert = UIAlertController(title: S.Alerts.BurnAsset.title, message: S.Alerts.BurnAsset.body, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: nil))
-            alert.addAction(UIAlertAction(title: S.Button.ok, style: .destructive, handler: { _ in
-                Store.trigger(name: .burn(self!.asset))
-                self!.dismiss(animated: true, completion: nil)
-            }))
-            self!.present(alert, animated: true, completion: nil)
+            guard let `self` = self, let modalTransitionDelegate = self.parent?.transitioningDelegate as? ModalTransitionDelegate else { return }
+            modalTransitionDelegate.reset()
+            self.dismiss(animated: false, completion: {
+                Store.perform(action: RootModalActions.Present(modal: .burnAsset(asset: self.asset)))
+            })
         }
     }
     

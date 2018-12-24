@@ -2,7 +2,7 @@
 //  AddressBookViewController.swift
 //  ravenwallet
 //
-//  Created by Bendnaiba on 2018-10-30.
+//  Created by Ben on 2018-10-30.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
