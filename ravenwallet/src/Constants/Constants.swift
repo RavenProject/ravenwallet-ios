@@ -58,5 +58,6 @@ struct C {
     //Asset Fee
     static let creatAssetFee = UInt64(Int(500) * 100000000)
     static let manageAssetFee = UInt64(Int(100) * 100000000)
+    static let ownerShipAsset = UInt64(Int(1) * 100000000)
 
 }

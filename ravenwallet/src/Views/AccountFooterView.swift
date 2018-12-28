@@ -82,6 +82,19 @@ class AccountFooterView: UIView, Subscriber, Trackable {
         [sendButton, receiveButton].forEach {
             $0.customView?.frame = CGRect(x: 0, y: 0, width: buttonWidth, height: buttonHeight)
         }
+        
+        //disable send button if isSyncing
+        Store.subscribe(self, selector: { $0[self.currency].syncState != $1[self.currency].syncState },
+                        callback: { state in
+                            switch state[self.currency].syncState {
+                            case .connecting, .syncing:
+                                send.isEnabled = false
+                                send.backgroundColor = UIColor.disabled
+                            case .success:
+                                send.isEnabled = true
+                                send.backgroundColor = self.currency.colors.0
+                            }
+        })
     }
 
     @objc private func send() { sendCallback?() }

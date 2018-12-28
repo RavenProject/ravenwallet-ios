@@ -49,14 +49,14 @@ class AddressCell : UIView {
     let paste = ShadowButton(title: S.Send.pasteLabel, type: .secondary)
     let scan = ShadowButton(title: S.Send.scanLabel, type: .secondary)
     let addressBook = ShadowButton(type: .secondary, image: #imageLiteral(resourceName: "AddressBookWhite"))
-    fileprivate let contentLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
-    private let label = UILabel(font: .customBody(size: 16.0))
+    let contentLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
+    let label = UILabel(font: .customBody(size: 16.0))
     fileprivate let gr = UITapGestureRecognizer()
-    fileprivate let tapView = UIView()
-    private let border = UIView(color: .secondaryShadow)
+    let tapView = UIView()
+    let border = UIView(color: .secondaryShadow)
     var addressCellType: AddressCellType
     fileprivate let currency: CurrencyDef
-    private var isAddressBookBtnHidden: Bool = false
+    var isAddressBookBtnHidden: Bool = false
 
     private func setupViews() {
         addSubviews()
@@ -64,7 +64,7 @@ class AddressCell : UIView {
         setInitialData()
     }
 
-    private func addSubviews() {
+    func addSubviews() {
         addSubview(label)
         addSubview(contentLabel)
         addSubview(textField)
@@ -75,7 +75,7 @@ class AddressCell : UIView {
         addSubview(scan)
     }
 
-    private func addConstraints() {
+    func addConstraints() {
         label.constrain([
             label.constraint(.centerY, toView: self),
             label.constraint(.leading, toView: self, constant: C.padding[2]) ])

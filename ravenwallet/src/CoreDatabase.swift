@@ -256,7 +256,12 @@ class CoreDatabase {
             let (isExiste, asset) = self.isAssetExiste(assetName: assetName)
             if isExiste {
                 if (AssetValidator.shared.IsAssetNameAnOwner(name: assetRef.pointee.nameString)) {
-                    req = String(format: "update ZBRAsset set Z_OWNERSHIP = 1 where Z_NAME = '%@'", assetName)
+                    if(rvnTx?.direction == .received){
+                        req = String(format: "update ZBRAsset set Z_OWNERSHIP = 1 where Z_NAME = '%@'", assetName)
+                    }
+                    else{
+                        req = String(format: "update ZBRAsset set Z_OWNERSHIP = 0 where Z_NAME = '%@'", assetName)
+                    }
                 }else {
                     switch assetRef.pointee.type {
                     case TRANSFER:
@@ -275,6 +280,10 @@ class CoreDatabase {
                         break
                     case OWNER:
                         req = String(format: "update ZBRAsset set Z_OWNERSHIP = 1 where Z_NAME = '%@'", assetName)
+                        break
+                    case NEW_ASSET:
+                        req = String(format: "insert or rollback into ZBRAsset " +
+                            "(Z_NAME, Z_AMOUNT, Z_UNITS, Z_REISSUBALE, Z_HAS_IPFS, Z_IPFS_HASH, Z_OWNERSHIP, Z_SORT) values ('%@', '%@', '%@', '%@', '%@', '%@', '%d', '%d')", assetName, assetRef.pointee.amount.description, assetRef.pointee.unit.description, assetRef.pointee.reissuable.description, assetRef.pointee.hasIPFS.description, assetRef.pointee.ipfsHashString, assetRef.pointee.ownerShip, self.assetsCount)
                         break
                     default:
                         break

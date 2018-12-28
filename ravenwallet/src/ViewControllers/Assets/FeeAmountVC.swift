@@ -13,6 +13,7 @@ enum OperationType {
     case createAsset
     case manageAsset
     case transferAsset
+    case transferOwnerShipAsset
     case burnAsset
 }
 

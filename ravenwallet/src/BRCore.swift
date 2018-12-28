@@ -82,8 +82,8 @@ extension BRAsset {
     }
     
     public var ipfsHashString: String {
-        let ipfsHashBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 47)
-        ipfsHashBytes.initialize(from: UnsafeRawPointer([self.IPFSHash]).assumingMemoryBound(to: CChar.self), count: 47)
+        let ipfsHashBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 46)
+        ipfsHashBytes.initialize(from: UnsafeRawPointer([self.IPFSHash]).assumingMemoryBound(to: CChar.self), count: 46)
         return String(cString: ipfsHashBytes)
     }
     
@@ -543,6 +543,10 @@ class BRWallet {
     
     func createAssetTransaction(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
         return BRWalletCreateTxForRootAssetTransfer(cPtr, forAmount, toAddress, asset);
+    }
+    
+    func createAssetTransactionOwnerShip(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForRootAssetTransferOwnership(cPtr, forAmount, toAddress, asset);
     }
     
     func createTxForRootAssetCreation(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {

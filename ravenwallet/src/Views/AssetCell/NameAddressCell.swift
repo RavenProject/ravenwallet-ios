@@ -25,6 +25,11 @@ class NameAddressCell : SendCell {
     var didBeginEditing: (() -> Void)?
     var didReturn: ((UITextField) -> Void)?
     var didChange: ((String) -> Void)?
+    var isVerifyShowing: Bool = false {
+        didSet {
+            verify.isHidden = !isVerifyShowing
+        }
+    }
     var content: String? {
         didSet {
             textField.text = content
@@ -34,22 +39,31 @@ class NameAddressCell : SendCell {
 
     let textField = UITextField()
     fileprivate let placeholder = UILabel(font: .customBody(size: 16.0), color: .grayTextTint)
+    let verify = ShadowButton(title: S.Asset.verifyLabel, type: .secondary)
+
     private func setupViews() {
         addSubview(textField)
+        textField.addSubview(placeholder)
+        addSubview(verify)
+
         textField.constrain([
             textField.constraint(.leading, toView: self, constant: 11.0),
             textField.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[2]),
             textField.heightAnchor.constraint(greaterThanOrEqualToConstant: 30.0),
-            textField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]) ])
+            textField.trailingAnchor.constraint(equalTo: verify.leadingAnchor, constant: -C.padding[2]) ])
 
-        textField.addSubview(placeholder)
         placeholder.constrain([
             placeholder.centerYAnchor.constraint(equalTo: textField.centerYAnchor),
             placeholder.leadingAnchor.constraint(equalTo: textField.leadingAnchor, constant: 5.0) ])
+        
+        verify.constrain([
+            verify.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]),
+            verify.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[2])])
     }
     
     private func setInitialData() {
         textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        verify.isHidden = !isVerifyShowing
     }
 
     required init?(coder aDecoder: NSCoder) {

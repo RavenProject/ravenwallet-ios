@@ -121,7 +121,7 @@ class ShadowButton: UIControl {
                 setColors()
             }
             else {
-                container.backgroundColor = UIColor.mediumGray
+                container.backgroundColor = UIColor.disabled
             }
         }
     }

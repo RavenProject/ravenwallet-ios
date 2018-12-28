@@ -33,12 +33,15 @@ class SenderAsset {
     var rate: Rate?
     var comment: String?
     var feePerKb: UInt64?
-    private let operationType: OperationType
+    var operationType: OperationType
 
     func createAssetTransaction(amount: UInt64, to: String, asset: BRAssetRef) -> Bool {
         switch operationType {
         case .transferAsset:
             transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount, toAddress: to, asset: asset)
+            break
+        case .transferOwnerShipAsset:
+            transaction = walletManager.wallet?.createAssetTransactionOwnerShip(forAmount: amount, toAddress: to, asset: asset)
             break
         case .burnAsset:
             transaction = walletManager.wallet?.burnAssetTransaction(asset: asset)

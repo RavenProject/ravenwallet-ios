@@ -43,7 +43,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         NotificationCenter.default.removeObserver(self)
     }
 
-    private let asset: Asset
+    private var asset: Asset
     private let sender: SenderAsset
     private let walletManager: WalletManager
     private let quantityView: QuantityCell
@@ -237,6 +237,14 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                 guard amount.rawValue <= asset.amount.rawValue else {
                     return showAlert(title: S.Alert.error, message: S.Asset.insufficientAssetFunds, buttonLabel: S.Button.ok)
                 }
+                sender.operationType = .transferAsset
+            }
+            else {
+                amount = Satoshis.init(C.ownerShipAsset)//one asset
+                asset.ownerShip = 1
+                asset.name = asset.name + "!"
+                asset.amount = amount
+                sender.operationType = .transferOwnerShipAsset
             }
             
             //BMEX Todo : manage maxOutputAmount and minOutputAmount

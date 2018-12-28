@@ -56,6 +56,7 @@ enum S {
         static let sendLabel = NSLocalizedString("Send.sendLabel", value:"Send", comment: "Send button label")
         static let pasteLabel = NSLocalizedString("Send.pasteLabel", value:"Paste", comment: "Paste button label")
         static let scanLabel = NSLocalizedString("Send.scanLabel", value:"Scan", comment: "Scan button label")
+        static let generateLabel = NSLocalizedString("Send.generateLabel", value:"Generate Address", comment: "Generate button label")
         static let invalidAddressTitle = NSLocalizedString("Send.invalidAddressTitle", value:"Invalid Address", comment: "Invalid address alert title")
         static let invalidAddressMessage = NSLocalizedString("Send.invalidAddressMessage", value:"The destination address is not a valid %1$@ address.", comment: "Invalid <currency> address alert message")
         static let invalidAddressOnPasteboard = NSLocalizedString("Send.invalidAddressOnPasteboard", value: "Pasteboard does not contain a valid %1$@ address.", comment: "Invalid <currency> address on pasteboard message")
@@ -260,6 +261,7 @@ enum S {
         static let noIpfsHash = NSLocalizedString("Asset.noIpfsHash", value: "Please enter the ipfs hash", comment: "Empty ipfs hash alert message")
         static let insufficientAssetFunds = NSLocalizedString("Asset.insufficientAssetFunds", value: "Insufficient Asset Funds", comment: "Insufficient asset funds error")
 
+        static let verifyLabel = NSLocalizedString("Asset.verifyLabel", value:"Check Availabilty", comment: "Verify button label")
 
     }
     

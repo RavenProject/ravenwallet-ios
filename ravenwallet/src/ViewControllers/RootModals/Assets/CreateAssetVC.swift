@@ -11,6 +11,8 @@ import LocalAuthentication
 import Core
 
 private let verticalButtonPadding: CGFloat = 32.0
+private let createAddressHeight: CGFloat = 110.0
+
 
 class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
 
@@ -27,7 +29,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         self.initialRequest = initialRequest
         self.walletManager = walletManager
         self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: .createAsset)
-        self.addressCell = AddressCell(currency: self.currency, type: .create)
+        self.addressCell = AddressCreateAssetCell(currency: self.currency, type: .create)
         self.feeView = FeeAmountVC(walletManager: self.walletManager, sender: self.sender, operationType: .createAsset)
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -44,7 +46,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     private let sender: SenderAsset
     private let walletManager: WalletManager
     private let nameCell = NameAddressCell(placeholder: S.AddressBook.nameAddressLabel)
-    private let addressCell: AddressCell
+    private let addressCell: AddressCreateAssetCell
     private let quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
     private let feeView: FeeAmountVC
     private let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel)
@@ -91,7 +93,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             addressCell.widthAnchor.constraint(equalTo: nameCell.widthAnchor),
             addressCell.topAnchor.constraint(equalTo: nameCell.bottomAnchor),
             addressCell.leadingAnchor.constraint(equalTo: nameCell.leadingAnchor),
-            addressCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight) ])
+            addressCell.heightAnchor.constraint(equalToConstant: createAddressHeight) ])
         
         addChild(quantityView, layout: {
             quantityView.view.constrain([
@@ -111,13 +113,13 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             reissubaleCell.widthAnchor.constraint(equalTo: unitsCell.view.widthAnchor),
             reissubaleCell.topAnchor.constraint(equalTo: unitsCell.view.bottomAnchor),
             reissubaleCell.leadingAnchor.constraint(equalTo: unitsCell.view.leadingAnchor),
-            reissubaleCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2]) ])
+            reissubaleCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
         
         ipfsCell.constrain([
             ipfsCell.widthAnchor.constraint(equalTo: reissubaleCell.widthAnchor),
             ipfsCell.topAnchor.constraint(equalTo: reissubaleCell.bottomAnchor),
             ipfsCell.leadingAnchor.constraint(equalTo: reissubaleCell.leadingAnchor),
-            ipfsCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: 0) ])
+            ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
         
         addChild(feeView, layout: {
             feeView.view.constrain([
@@ -136,6 +138,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     
     private func setInitialData() {
         nameCell.textField.autocapitalizationType = .allCharacters
+        nameCell.isVerifyShowing = true
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
         }
@@ -169,6 +172,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         addressCell.paste.addTarget(self, action: #selector(CreateAssetVC.pasteTapped), for: .touchUpInside)
         addressCell.scan.addTarget(self, action: #selector(CreateAssetVC.scanTapped), for: .touchUpInside)
         addressCell.addressBook.addTarget(self, action: #selector(CreateAssetVC.addressBookTapped), for: .touchUpInside)
+        addressCell.generate.addTarget(self, action: #selector(CreateAssetVC.generateTapped), for: .touchUpInside)
 
         ipfsCell.paste.addTarget(self, action: #selector(CreateAssetVC.pasteTapped), for: .touchUpInside)
         ipfsCell.scan.addTarget(self, action: #selector(CreateAssetVC.scanTapped), for: .touchUpInside)
@@ -264,6 +268,11 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                 self?.ipfsCell.textField.text = paymentRequest?.displayAddress
             }
         }
+    }
+    
+    @objc private func generateTapped(sender:UIButton) {
+        guard let addressText = currency.state.receiveAddress else { return }
+        addressCell.setContent(addressText)        
     }
     
     @objc private func addressBookTapped() {
