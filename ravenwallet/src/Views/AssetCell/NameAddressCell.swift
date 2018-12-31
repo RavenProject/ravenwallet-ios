@@ -25,6 +25,7 @@ class NameAddressCell : SendCell {
     var didBeginEditing: (() -> Void)?
     var didReturn: ((UITextField) -> Void)?
     var didChange: ((String) -> Void)?
+    var didVerifyTapped: ((String?) -> Void)?
     var isVerifyShowing: Bool = false {
         didSet {
             verify.isHidden = !isVerifyShowing
@@ -39,12 +40,14 @@ class NameAddressCell : SendCell {
 
     let textField = UITextField()
     fileprivate let placeholder = UILabel(font: .customBody(size: 16.0), color: .grayTextTint)
-    let verify = ShadowButton(title: S.Asset.verifyLabel, type: .secondary)
+    private let verify = ShadowButton(title: S.Asset.verifyLabel, type: .secondary)
+    let activityView = UIActivityIndicatorView(style: .white)
 
     private func setupViews() {
         addSubview(textField)
         textField.addSubview(placeholder)
         addSubview(verify)
+        verify.addSubview(activityView)
 
         textField.constrain([
             textField.constraint(.leading, toView: self, constant: 11.0),
@@ -59,11 +62,33 @@ class NameAddressCell : SendCell {
         verify.constrain([
             verify.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]),
             verify.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[2])])
+        
+        activityView.constrain([
+            activityView.centerXAnchor.constraint(equalTo: verify.centerXAnchor),
+            activityView.centerYAnchor.constraint(equalTo: verify.centerYAnchor)])
+
     }
     
     private func setInitialData() {
         textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        verify.addTarget(self, action: #selector(NameAddressCell.verifyTapped), for: .touchUpInside)
         verify.isHidden = !isVerifyShowing
+        activityView.hidesWhenStopped = true
+        activityView.stopAnimating()
+    }
+    
+    @objc func verifyTapped() {
+        activityView.startAnimating()
+        verify.label.isHidden = true
+        self.didVerifyTapped!(self.textField.text)
+    }
+    
+    func checkAvailabilityResult(isFound:Bool) {
+        self.textField.textColor = .darkText
+        verify.label.isHidden = false
+        if isFound {
+            self.textField.textColor = .red
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -78,6 +103,7 @@ extension NameAddressCell : UITextFieldDelegate {
     
     @objc func textFieldDidChange(_ textField: UITextField) {
         placeholder.isHidden = (textField.text?.utf8.count)! > 0
+        textField.textColor = .darkText
         if let text = textField.text {
             didChange?(text)
         }

@@ -65,7 +65,7 @@ class ShadowButton: UIControl {
     private let type: ButtonType
     let container = UIView()
     let shadowView = UIView()
-    private let label = UILabel()
+    let label = UILabel()
     private let shadowYOffset: CGFloat = 4.0
     private let cornerRadius: CGFloat = 5.0
     private var imageView: UIImageView?

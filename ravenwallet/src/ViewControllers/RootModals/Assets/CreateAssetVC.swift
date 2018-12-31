@@ -31,6 +31,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: .createAsset)
         self.addressCell = AddressCreateAssetCell(currency: self.currency, type: .create)
         self.feeView = FeeAmountVC(walletManager: self.walletManager, sender: self.sender, operationType: .createAsset)
+        self.cPtr = (walletManager.peerManager?.cPtr)!
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -42,6 +43,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         NotificationCenter.default.removeObserver(self)
     }
 
+    let cPtr: OpaquePointer
     private var asset: Asset?
     private let sender: SenderAsset
     private let walletManager: WalletManager
@@ -141,6 +143,15 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         nameCell.isVerifyShowing = true
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
+        }
+        
+        nameCell.didVerifyTapped = { assetName in
+            let asssetNamePointer = UnsafeMutablePointer<Int8>(mutating: (assetName! as NSString).utf8String)
+            PeerManagerGetAssetData(self.walletManager.peerManager?.cPtr, Unmanaged.passUnretained(self).toOpaque(), asssetNamePointer, (assetName?.count)!, {(info, assetRef) in
+                guard let info = info else { return }
+                Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue().nameCell.activityView.stopAnimating()
+                Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue().nameCell.checkAvailabilityResult(isFound: assetRef != nil)
+            })
         }
     }
     

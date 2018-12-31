@@ -286,17 +286,18 @@ extension WalletManager : BRWalletListener {
                 }
             }
         }
-        //send get asset data
-        //void BRPeerSendGetAsset(BRPeer *peer, char *assetName, size_t nameLen, void (*receiveAssetData) (void *info, BRAsset *asset)) {
-//        self.db?.loadPeers { peers in
-//            for peer in peers {
-//                BRPeerSendGetAsset(peer, tx.pointee.asset.pointee.nameString, tx.pointee.asset.pointee.nameLen, {
-//                    (info, asset) in
-//                    guard let info = info, let asset = asset else { return }
-//                    Unmanaged<BRWallet>.fromOpaque(info).takeUnretainedValue().listener.balanceChanged(balance)
-//                })
-//            }
-//        }
+        //send get asset data for each asset
+        getAssetData(tx)
+        
+    }
+    
+    func getAssetData(_ tx: BRTxRef) {
+        if AssetValidator.shared.checkInvalidAsset(asset: tx.pointee.asset) {
+            PeerManagerGetAssetData(self.peerManager!.cPtr, Unmanaged.passUnretained(self).toOpaque(), tx.pointee.asset.pointee.name, tx.pointee.asset.pointee.nameLen, {(info, asset) in
+                guard let info = info, let asset = asset else { return }
+                Unmanaged<WalletManager>.fromOpaque(info).takeUnretainedValue().db?.updateAssetData(asset)
+            })
+        }
     }
 
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {
