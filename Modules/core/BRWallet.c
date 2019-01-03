@@ -542,45 +542,134 @@ BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t a
     assert(amount >= 0);
     assert(addr != NULL && BRAddressIsValid(addr));
     o.amount = amount;
+//    BRTxOutputSetAddress(&o, addr);
+    
+    strncpy(o.address, addr, sizeof(o.address) - 1);
+//    o.scriptLen = BRAddressScriptPubKey(NULL, 0, addr);
+    o.scriptLen = BRTxOutputSetTransferAssetScript(NULL, 0, asset);
+    array_new(o.script, o.scriptLen);
+    array_set_count(o.script, o.scriptLen);
+    BRAddressScriptPubKey(o.script, o.scriptLen, addr);
+    
+    /*o.scriptLen = */BRTxOutputSetTransferAssetScript(o.script, o.scriptLen, asset);
+    
+    return BRWalletCreateTxForOutputs(wallet, &o, 1, asset);
+}
+
+BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset) {
+    BRTxOutput o = TX_OUTPUT_NONE;
+    
+    assert(wallet != NULL);
+    assert(amount >= 0);
+    assert(addr != NULL && BRAddressIsValid(addr));
+    o.amount = amount;
     BRTxOutputSetAddress(&o, addr);
-    o.scriptLen = ConstructTransferAssetScript(o.script, o.scriptLen, asset);
+    o.scriptLen = BRTxOutputSetOwnerAssetScript(o.script, o.scriptLen, asset);
     
     return BRWalletCreateTxForOutputs(wallet, &o, 1, asset);
 }
 
 BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset) {
-    BRTxOutput o = TX_OUTPUT_NONE;
+    
+    size_t newAsset_outcount = 3;
+    BRTxOutput outputs[newAsset_outcount];
+    
+    for (size_t i = 0; i < newAsset_outcount; i++) {
+        outputs[i] = TX_OUTPUT_NONE;
+    }
     
     assert(wallet != NULL);
-    assert(amount != IssueAssetBurnAmount);
+    //    assert(amount != IssueAssetBurnAmount); // TODO:
     assert(addr != NULL && BRAddressIsValid(addr));
-    o.amount = amount;
-    BRTxOutputSetAddress(&o, addr);
-    o.scriptLen = ConstructNewAssetScript(o.script, o.scriptLen, asset);
     
-    return BRWalletCreateTxForOutputs(wallet, &o, 1, asset);
+    // Add burn output
+    outputs[0].amount = amount;
+#if TESTNET
+    //strIssueAssetBurnAddressTestNet
+#elif REGTEST
+    //strIssueAssetBurnAddressRegTest
+#else
+    //strIssueAssetBurnAddressMainNet
+#endif
+    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressTestNet);
+
+    // Add new asset output
+    outputs[1].amount = 0;
+//    BRTxOutputSetAddress(&outputs[1], addr);
+    
+    strncpy(outputs[1].address, addr, sizeof(outputs[1].address) - 1);
+    outputs[1].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
+    array_new(outputs[1].script, outputs[1].scriptLen);
+    array_set_count(outputs[1].script, outputs[1].scriptLen);
+    BRAddressScriptPubKey(outputs[1].script, outputs[1].scriptLen, addr);
+    
+    /*outputs[1].scriptLen =*/ BRTxOutputSetNewAssetScript(outputs[1].script, outputs[1].scriptLen, asset);
+    
+    // Add new asset ownership output
+    outputs[2].amount = 0;
+//    BRTxOutputSetAddress(&outputs[2], addr);
+    
+    strncpy(outputs[2].address, addr, sizeof(outputs[2].address) - 1);
+    outputs[2].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
+    array_new(outputs[2].script, outputs[2].scriptLen);
+    array_set_count(outputs[2].script, outputs[2].scriptLen);
+    BRAddressScriptPubKey(outputs[2].script, outputs[2].scriptLen, addr);
+
+    /*outputs[2].scriptLen =*/ BRTxOutputSetOwnerAssetScript(outputs[2].script, outputs[2].scriptLen, asset);
+
+    return BRWalletCreateTxForOutputs(wallet, outputs, newAsset_outcount, asset);
 }
 
 BRTransaction *BRWalletCreateTxForRootAssetManage(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset) {
-    BRTxOutput o = TX_OUTPUT_NONE;
-    
+    BRTxOutput outputs[2];
+
     assert(wallet != NULL);
     assert(amount == ReissueAssetBurnAmount);
     assert(addr != NULL && BRAddressIsValid(addr));
-    o.amount = amount;
-    BRTxOutputSetAddress(&o, addr);
-    o.scriptLen = ConstructReissueAssetScript(o.script, o.scriptLen, asset);
     
-    return BRWalletCreateTxForOutputs(wallet, &o, 1, asset);
+    // Add burn output
+    outputs[0].amount = amount;
+#if TESTNET
+    //strReissueAssetBurnAddressTestNet
+#elif REGTEST
+    //strReissueAssetBurnAddressRegTest
+#else
+    //strReissueAssetBurnAddressMainNet
+#endif
+    BRTxOutputSetAddress(&outputs[0], strReissueAssetBurnAddressTestNet);
+
+    outputs[1].amount = amount;
+    BRTxOutputSetAddress(&outputs[1], addr);
+    outputs[1].scriptLen = BRTxOutputSetReissueAssetScript(outputs[1].script, outputs[1].scriptLen, asset);
+    
+    return BRWalletCreateTxForOutputs(wallet, outputs, 2, asset);
 }
 
 BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset) {
     BRTxOutput o = TX_OUTPUT_NONE;
-    
     assert(wallet != NULL);
     o.amount = 0;
-    BRTxOutputSetAddress(&o, strGlobalBurnAddressMainNet);
-    o.scriptLen = ConstructTransferAssetScript(o.script, o.scriptLen, asset);
+    // BMEX TODO: work on this
+#if TESTNET
+    //strGlobalBurnAddressTestNet
+    const char *addr = strGlobalBurnAddressTestNet;
+#elif REGTEST
+    //strGlobalBurnAddressRegTest
+    const char *addr = strGlobalBurnAddressRegTest;
+#else
+    //strGlobalBurnAddressMainNet
+    const char *addr = strGlobalBurnAddressMainNet;
+#endif
+    
+//    BRTxOutputSetAddress(&o, strGlobalBurnAddressTestNet);
+    
+    strncpy(o.address, addr, sizeof(o.address) - 1);
+    o.scriptLen = BRTxOutputSetTransferAssetScript(NULL, 0, asset);
+    array_new(o.script, o.scriptLen);
+    array_set_count(o.script, o.scriptLen);
+    BRAddressScriptPubKey(o.script, o.scriptLen, addr);
+
+    /*o.scriptLen =*/ BRTxOutputSetTransferAssetScript(o.script, o.scriptLen, asset);
     
     return BRWalletCreateTxForOutputs(wallet, &o, 1, asset);
 }
@@ -620,6 +709,21 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
         transaction->asset->nameLen = asset->nameLen;
         transaction->asset->amount = asset->amount;
         transaction->asset->type = asset->type;
+        transaction->asset->reissuable = asset->reissuable;
+        transaction->asset->unit = asset->unit;
+        transaction->asset->hasIPFS = asset->hasIPFS;
+        if(transaction->asset->hasIPFS == 1)
+            strcpy(asset->IPFSHash, transaction->asset->IPFSHash);
+    }
+    
+    if(asset && NEW_ASSET != asset->type) {
+        
+//        transaction->asset = NewAsset();
+//        transaction->asset->name = malloc(asset->nameLen);
+//        strcpy(transaction->asset->name, asset->name);
+//        transaction->asset->nameLen = asset->nameLen;
+//        transaction->asset->amount = asset->amount;
+//        transaction->asset->type = asset->type;
         
         for (i = 0; i < array_count(wallet->utxos); i++) {
             o = &wallet->utxos[i];
@@ -645,7 +749,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
                     BRTxOutputSetAddress(&output_change, addr.s);
                     BRAsset asst_change = *asset;
                     asst_change.amount = asst_balance - transaction->asset->amount;
-                    output_change.scriptLen = ConstructTransferAssetScript(output_change.script, output_change.scriptLen, &asst_change);
+                    output_change.scriptLen = BRTxOutputSetTransferAssetScript(output_change.script, output_change.scriptLen, &asst_change);
                     
                     BRTransactionAddOutput(transaction, output_change.amount, output_change.script, output_change.scriptLen);
 //                    BRTransactionShuffleOutputs(transaction);
@@ -660,7 +764,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
     for (i = 0; i < array_count(wallet->utxos); i++) {
         o = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, o);
-        if (!tx || /*tx->asset*/tx->outputs[o->n].amount == 0 || o->n >= tx->outCount) continue;
+        if (!tx || /*tx->asset ||*/ tx->outputs[o->n].amount == 0 || o->n >= tx->outCount) continue;
     
         BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
                               tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);

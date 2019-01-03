@@ -21,8 +21,6 @@
 #define ASSET_ACTIVATION        435456
 #endif
 
-//typedef int64_t Amount;
-
 #define OWNER_TAG "!"
 #define OWNER_LENGTH 1
 #define OWNER_UNITS 0
@@ -69,20 +67,22 @@ bool GetAssetData(const uint8_t *script, size_t scriptLen, BRAsset *data);
 size_t DecodeIPFS(uint8_t *data, size_t dataLen, const char *str);
 size_t EncodeIPFS(char *str, size_t strLen, const uint8_t *data, size_t dataLen);
 
-size_t ConstructNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructTransferAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructOwnerAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetTransferAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetOwnerAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
 
 bool CreateAssetTransaction(BRWallet* wallet, const BRAsset* asset, const char *address, char *rvnChangeAddress,
-        BRKey* key, Amount* nFeeRequired);
+                            BRKey* key, Amount* nFeeRequired);
 bool CreateReissueAssetTransaction(BRWallet *pwallet, const BRAsset *asset, const char *address,
-        const char *changeAddress, BRKey* key, Amount* nFeeRequired);
+                                   const char *changeAddress, BRKey* key, Amount* nFeeRequired);
 bool CreateTransferAssetTransaction(BRWallet* pwallet, const char *changeAddress, BRKey* key, Amount* nFeeRequired);
 bool SendAssetTransaction(BRWallet* pwallet, BRKey* key);
 
 // returns a newly allocated empty asset that must be freed by calling AssetFree()
 BRAsset *NewAsset(void);
+
+void showAsset(BRAsset* asset);//BMEX
 
 // frees memory allocated for tx
 void AssetFree(BRAsset *asset);

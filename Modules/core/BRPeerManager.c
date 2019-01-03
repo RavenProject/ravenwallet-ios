@@ -38,6 +38,8 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 
 static const char *dns_seeds[] = {
        "127.0.0.1", NULL
+//         "192.168.1.2", NULL
+
 //       "91.207.175.228", NULL // Jeremy node
 //        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
 //        "35.163.33.254", "35.210.244.221", "18.202.96.180"
@@ -839,6 +841,8 @@ static void _peerConnected(void *info) {
             _PeerManagerLoadMempools(manager);
         }
     }
+
+    //BRPeerSendGetAsset(peer, (const uint8_t) "ROSHII");
 
     pthread_mutex_unlock(&manager->lock);
 }
@@ -2052,6 +2056,23 @@ size_t BRPeerManagerRelayCount(BRPeerManager *manager, UInt256 txHash) {
 
 const ChainParams *BRPeerManagerChainParams(BRPeerManager *manager) {
     return manager->params;
+}
+
+void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *assetName, size_t nameLen,
+                             void (*receivedAssetData)(void *info, BRAsset *asset)) {
+    
+    for (size_t i = array_count(manager->connectedPeers); i > 0; i--) {
+        BRPeer *peer = manager->connectedPeers[i - 1];
+        
+        if (BRPeerConnectStatus(peer) != BRPeerStatusConnected) continue;
+        
+        peer->assetCallbackInfo = infoManager;
+        
+        //if (BRPeerVersion(peer) >= 70018 /*&& !(peer->services & SERVICES_NODE_BLOOM)*/) {
+            BRPeerSendGetAsset(peer, assetName, nameLen, receivedAssetData);
+        //} else
+        //    peer_log(peer, "node doesn't support Assets MSG Protocol");
+    }
 }
 
 // frees memory allocated for manager

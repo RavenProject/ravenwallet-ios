@@ -29,13 +29,13 @@
 #include "BRSet.h"
 #include <assert.h>
 
-static const int64_t COIN = 100000000; // todo look into the amount! 100M not 1M corbies
+static const int64_t COIN = 100000000; // BMEX TODO: look into the amount! 100M not 1M corbies
 
 // Burn Amounts
-static const int64_t IssueAssetBurnAmount = 500 * COIN;
-static const int64_t ReissueAssetBurnAmount = 100 * COIN;
-static const int64_t IssueSubAssetBurnAmount = 100 * COIN;
-static const int64_t IssueUniqueAssetBurnAmount = 5 * COIN;
+static const uint64_t IssueAssetBurnAmount = 500 * COIN;
+static const uint64_t ReissueAssetBurnAmount = 100 * COIN;
+static const uint64_t IssueSubAssetBurnAmount = 100 * COIN;
+static const uint64_t IssueUniqueAssetBurnAmount = 5 * COIN;
 
 
 typedef struct {

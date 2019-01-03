@@ -109,9 +109,9 @@ typedef struct {
 //    char name[31]; // MAX 31 Bytes
     size_t nameLen;
     uint64_t amount;     // 8 Bytes
-    int64_t unit;        // 1 Byte
-    int64_t reissuable;  // 1 Byte
-    int64_t hasIPFS;     // 1 Byte
+    int unit;        // 1 Byte
+    int reissuable;  // 1 Byte
+    int hasIPFS;     // 1 Byte
     char IPFSHash[47]; // MAX 40 Bytes
 //    char destination[36];
 } BRAsset;
@@ -183,7 +183,11 @@ inline static int BRTransactionEq(const void *tx, const void *otherTx)
 {
     return (tx == otherTx || UInt256Eq(((const BRTransaction *)tx)->txHash, ((const BRTransaction *)otherTx)->txHash));
 }
+    
+BRTransaction *BRTransactionDecomposeForCreation(const BRTransaction *tx, size_t txsCount);
 
+BRTransaction *BRTransactionDecomposeForManagement(const BRTransaction *tx, size_t txsCount);
+    
 // frees memory allocated for tx
 void BRTransactionFree(BRTransaction *tx);
 
