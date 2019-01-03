@@ -2068,10 +2068,10 @@ void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *as
         
         peer->assetCallbackInfo = infoManager;
         
-        //if (BRPeerVersion(peer) >= 70018 /*&& !(peer->services & SERVICES_NODE_BLOOM)*/) {
+        if (BRPeerVersion(peer) >= 70018) {
             BRPeerSendGetAsset(peer, assetName, nameLen, receivedAssetData);
-        //} else
-        //    peer_log(peer, "node doesn't support Assets MSG Protocol");
+        } else
+            peer_log(peer, "node doesn't support Assets MSG Protocol");
     }
 }
 

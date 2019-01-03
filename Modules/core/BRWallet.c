@@ -586,12 +586,14 @@ BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t a
     outputs[0].amount = amount;
 #if TESTNET
     //strIssueAssetBurnAddressTestNet
+    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressTestNet);
 #elif REGTEST
     //strIssueAssetBurnAddressRegTest
+    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressRegTest);
 #else
     //strIssueAssetBurnAddressMainNet
+    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressMainNet);
 #endif
-    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressTestNet);
 
     // Add new asset output
     outputs[1].amount = 0;
@@ -631,12 +633,14 @@ BRTransaction *BRWalletCreateTxForRootAssetManage(BRWallet *wallet, uint64_t amo
     outputs[0].amount = amount;
 #if TESTNET
     //strReissueAssetBurnAddressTestNet
+    BRTxOutputSetAddress(&outputs[0], strReissueAssetBurnAddressTestNet);
 #elif REGTEST
     //strReissueAssetBurnAddressRegTest
+    BRTxOutputSetAddress(&outputs[0], strReissueAssetBurnAddressRegTest);
 #else
     //strReissueAssetBurnAddressMainNet
+    BRTxOutputSetAddress(&outputs[0], strReissueAssetBurnAddressMainNet);
 #endif
-    BRTxOutputSetAddress(&outputs[0], strReissueAssetBurnAddressTestNet);
 
     outputs[1].amount = amount;
     BRTxOutputSetAddress(&outputs[1], addr);
@@ -649,7 +653,6 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset) {
     BRTxOutput o = TX_OUTPUT_NONE;
     assert(wallet != NULL);
     o.amount = 0;
-    // BMEX TODO: work on this
 #if TESTNET
     //strGlobalBurnAddressTestNet
     const char *addr = strGlobalBurnAddressTestNet;
@@ -660,8 +663,6 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset) {
     //strGlobalBurnAddressMainNet
     const char *addr = strGlobalBurnAddressMainNet;
 #endif
-    
-//    BRTxOutputSetAddress(&o, strGlobalBurnAddressTestNet);
     
     strncpy(o.address, addr, sizeof(o.address) - 1);
     o.scriptLen = BRTxOutputSetTransferAssetScript(NULL, 0, asset);
@@ -703,6 +704,10 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
 
     if(asset) {
         
+        // asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx
+        // instead of pointing to it.
+        
+        // TODO: move to CopyAsset(args) in BRAsset.c
         transaction->asset = NewAsset();
         transaction->asset->name = malloc(asset->nameLen);
         strcpy(transaction->asset->name, asset->name);
@@ -717,13 +722,6 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
     }
     
     if(asset && NEW_ASSET != asset->type) {
-        
-//        transaction->asset = NewAsset();
-//        transaction->asset->name = malloc(asset->nameLen);
-//        strcpy(transaction->asset->name, asset->name);
-//        transaction->asset->nameLen = asset->nameLen;
-//        transaction->asset->amount = asset->amount;
-//        transaction->asset->type = asset->type;
         
         for (i = 0; i < array_count(wallet->utxos); i++) {
             o = &wallet->utxos[i];

@@ -665,7 +665,6 @@ void showAsset(BRAsset* asset){//BMEX
     printf("BMEX name %s, amount %llu, hasIpfs %d, reiss %d \n", asset->name, asset->amount, asset->unit, asset->hasIPFS, asset->reissuable);
 }
 
-
 // frees memory allocated for asset
 void AssetFree(BRAsset *asset) {
     assert(asset != NULL);
