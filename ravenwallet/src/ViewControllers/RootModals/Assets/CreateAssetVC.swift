@@ -13,6 +13,12 @@ import Core
 private let verticalButtonPadding: CGFloat = 32.0
 private let createAddressHeight: CGFloat = 110.0
 
+enum NameStatus {
+    case notVerified
+    case availabe
+    case notAvailable
+}
+
 
 class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
 
@@ -23,6 +29,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     var parentView: UIView? //ModalPresentable
     var initialAddress: String?
     var isPresentedFromLock = false
+    var group: DispatchGroup?
+    var callbackNameAvailability: ((Bool) -> Void)?
 
     init(walletManager: WalletManager, initialAddress: String? = nil, initialRequest: PaymentRequest? = nil) {
         self.initialAddress = initialAddress
@@ -47,7 +55,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     private var asset: Asset?
     private let sender: SenderAsset
     private let walletManager: WalletManager
-    private let nameCell = NameAddressCell(placeholder: S.AddressBook.nameAddressLabel)
+    private let nameCell = NameAssetCell(placeholder: S.AddressBook.nameAddressLabel)
     private let addressCell: AddressCreateAssetCell
     private let quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
     private let feeView: FeeAmountVC
@@ -67,6 +75,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     private let confirmTransitioningDelegate = PinTransitioningDelegate()
     private var feeType: Fee?
     private let currency: CurrencyDef = Currencies.rvn //BMEX
+    private var nameStatus: NameStatus = .notVerified
+    private let activityView = UIActivityIndicatorView(style: .white)
 
     override func viewDidLoad() {
         addSubviews()
@@ -87,6 +97,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         view.addSubview(reissubaleCell)
         view.addSubview(ipfsCell)
         view.addSubview(createButton)
+        createButton.addSubview(activityView)
     }
     
     private func addConstraints() {
@@ -136,23 +147,19 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             createButton.constraint(toBottom: feeView.view, constant: verticalButtonPadding),
             createButton.constraint(.height, constant: C.Sizes.buttonHeight),
             createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
+        
+        activityView.constrain([
+            activityView.constraint(.trailing, toView: createButton, constant: -C.padding[2]),
+            activityView.centerYAnchor.constraint(equalTo: createButton.centerYAnchor) ])
     }
     
     private func setInitialData() {
         nameCell.textField.autocapitalizationType = .allCharacters
-        nameCell.isVerifyShowing = true
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
         }
-        
-        nameCell.didVerifyTapped = { assetName in
-            let asssetNamePointer = UnsafeMutablePointer<Int8>(mutating: (assetName! as NSString).utf8String)
-            PeerManagerGetAssetData(self.walletManager.peerManager?.cPtr, Unmanaged.passUnretained(self).toOpaque(), asssetNamePointer, (assetName?.count)!, {(info, assetRef) in
-                guard let info = info else { return }
-                Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue().nameCell.activityView.stopAnimating()
-                Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue().nameCell.checkAvailabilityResult(isFound: assetRef != nil)
-            })
-        }
+        activityView.hidesWhenStopped = true
+        activityView.stopAnimating()
     }
     
     private func addSubscriptions() {
@@ -195,18 +202,26 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             guard AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!).0 else {
                 return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
             }
-            
-            //Check if name asset disponible
-            AssetManager.shared.isAssetNameExiste(name: self.nameCell.textField.text!, callback: { (assetName, isExiste) in
-                if isExiste {
-                    self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetMessage, buttonLabel: S.Button.ok)
-                }
-            })
+        }
+        
+        nameCell.didChange = { text in
+            self.nameStatus = .notVerified
         }
         
         nameCell.didBeginEditing = { [weak self] in
             self?.quantityView.closePinPad()
             self?.unitsCell.closePinPad()
+        }
+        
+        nameCell.didVerifyTapped = { assetName in
+            guard AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!).0 else {
+                self.nameCell.activityView.stopAnimating()
+                self.nameCell.verify.label.isHidden = false
+                return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
+            }
+            self.getAssetData(assetName: assetName!, callback: { isFound in
+                self.nameCell.checkAvailabilityResult(isFound: isFound)
+            })
         }
         
         ipfsCell.didBeginEditing = { [weak self] in
@@ -245,6 +260,30 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         }
         //initiate feeview balance
         feeView.balance = self.balance
+    }
+    
+    func getAssetData(assetName:String, callback: @escaping (Bool) -> Void) {
+        self.callbackNameAvailability = callback
+        self.group = DispatchGroup()
+        self.group!.enter()
+        DispatchQueue.walletQueue.async {
+            let asssetNamePointer = UnsafeMutablePointer<Int8>(mutating: (assetName as NSString).utf8String)
+            PeerManagerGetAssetData(self.walletManager.peerManager?.cPtr, Unmanaged.passUnretained(self).toOpaque(), asssetNamePointer, assetName.count, {(info, assetRef) in
+                guard let info = info else { return }
+                let mySelf = Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue()
+                mySelf.nameStatus = assetRef != nil ? .notAvailable : .availabe
+                mySelf.callbackNameAvailability!(assetRef != nil)
+                if(mySelf.group != nil){
+                    mySelf.group?.leave()
+                }
+            })
+            let result = self.group!.wait(timeout: .now() + 2.0)
+            if result == .timedOut {
+                self.group = nil
+                callback(false)
+                self.nameStatus = .availabe
+            }
+        }
     }
 
     @objc private func pasteTapped(sender:UIButton) {
@@ -302,55 +341,89 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             addressCell.textField.resignFirstResponder()
         }
 
-        if sender.transaction == nil {
-            guard self.nameCell.textField.text != nil else {
-                return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
+        guard self.nameCell.textField.text != nil else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
+        }
+        
+        guard self.nameCell.textField.text?.isEmpty == false else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
+        }
+        
+        if self.nameStatus != .availabe {
+            if self.nameStatus == .notAvailable {
+                return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
             }
+        }
+
             
-            guard let address = addressCell.address else {
-                return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
+        guard let address = addressCell.address else {
+            return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
+        }
+        
+        guard currency.state.fees != nil else {
+            return showAlert(title: S.Alert.error, message: S.Send.noFeesError, buttonLabel: S.Button.ok)
+        }
+        guard address.isValidAddress else {
+            let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
+            return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+        }
+        guard quantity != nil else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanity, buttonLabel: S.Button.ok)
+        }
+        
+        guard let amount = quantity else {
+            return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+        }
+        
+        //BMEX Todo : manage maxOutputAmount and minOutputAmount
+        guard feeAmount <= balance else {
+            return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
+        }
+        
+        if ipfsCell.hasIpfs {
+            guard let ipfsHash = ipfsCell.ipfsHash else {
+                return showAlert(title: S.Alert.error, message: S.Asset.noIpfsHash, buttonLabel: S.Button.ok)
             }
-            
-            guard currency.state.fees != nil else {
-                return showAlert(title: S.Alert.error, message: S.Send.noFeesError, buttonLabel: S.Button.ok)
-            }
-            guard address.isValidAddress else {
-                let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
+            guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: ipfsHash) else {
+                let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
                 return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
             }
-            guard quantity != nil else {
-                return showAlert(title: S.Alert.error, message: S.Asset.noQuanity, buttonLabel: S.Button.ok)
-            }
-            
-            guard let amount = quantity else {
-                return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
-            }
-            
-            //BMEX Todo : manage maxOutputAmount and minOutputAmount
-            guard feeAmount <= balance else {
-                return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
-            }
-            
-            if ipfsCell.hasIpfs {
-                guard let ipfsHash = ipfsCell.ipfsHash else {
-                    return showAlert(title: S.Alert.error, message: S.Asset.noIpfsHash, buttonLabel: S.Button.ok)
-                }
-                guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: ipfsHash) else {
-                    let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
-                    return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+        }
+        //if all ok check name availability if not checked
+        if nameStatus == .notVerified {
+            createButton.label.text = S.Asset.availability
+            activityView.startAnimating()
+            getAssetData(assetName: self.nameCell.textField.text!) {isFound in
+                DispatchQueue.main.async {
+                    self.activityView.stopAnimating()
+                    self.createButton.label.text = S.Asset.create
+                    self.nameCell.checkAvailabilityResult(isFound: isFound)
+                    if(isFound){
+                        return self.showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
+                    }
+                    else {
+                        self.showConfirmationView(amount: amount, address: address)
+                    }
                 }
             }
-            //sender
-            asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
-            
-            let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset!, type: NEW_ASSET, amount: amount)
-            guard sender.createAssetTransaction(amount: C.creatAssetFee, to: address, asset: assetToSend) else {
-                return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
-            }
+        }
+        else
+        {
+            showConfirmationView(amount: amount, address: address)
+        }
+        return
+    }
+    
+    func showConfirmationView(amount:Satoshis, address:String) {
+        //sender
+        asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
+        
+        let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset!, type: NEW_ASSET, amount: amount)
+        guard sender.createAssetTransaction(amount: C.creatAssetFee, to: address, asset: assetToSend) else {
+            return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
         }
         
         
-        guard let amount = quantity else { return }
         let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: nil, minimumFractionDigits: quantityView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics, operationType: .createAsset, assetToSend: asset)
         confirm.successCallback = {
             confirm.dismiss(animated: true, completion: {
@@ -367,7 +440,6 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         confirm.modalPresentationStyle = .overFullScreen
         confirm.modalPresentationCapturesStatusBarAppearance = true
         present(confirm, animated: true, completion: nil)
-        return
     }
 
     private func send() {
@@ -448,3 +520,4 @@ extension CreateAssetVC : ModalDisplayable {
         return "\(S.Asset.createTitle)"
     }
 }
+

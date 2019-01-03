@@ -282,8 +282,7 @@ class CoreDatabase {
                         req = String(format: "update ZBRAsset set Z_OWNERSHIP = 1 where Z_NAME = '%@'", assetName)
                         break
                     case NEW_ASSET:
-                        req = String(format: "insert or rollback into ZBRAsset " +
-                            "(Z_NAME, Z_AMOUNT, Z_UNITS, Z_REISSUBALE, Z_HAS_IPFS, Z_IPFS_HASH, Z_OWNERSHIP, Z_SORT) values ('%@', '%@', '%@', '%@', '%@', '%@', '%d', '%d')", assetName, assetRef.pointee.amount.description, assetRef.pointee.unit.description, assetRef.pointee.reissuable.description, assetRef.pointee.hasIPFS.description, assetRef.pointee.ipfsHashString, assetRef.pointee.ownerShip, self.assetsCount)
+                        req = String(format: "update ZBRAsset set Z_AMOUNT = '%@', Z_UNITS = '%@', Z_REISSUBALE = '%@', Z_HAS_IPFS = '%@', Z_IPFS_HASH = '%@' where Z_NAME = '%@'", assetRef.pointee.amount.description, assetRef.pointee.unit.description, assetRef.pointee.reissuable.description, assetRef.pointee.hasIPFS.description, assetRef.pointee.ipfsHashString, assetName)
                         break
                     default:
                         break
