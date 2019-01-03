@@ -712,7 +712,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
         transaction->asset->reissuable = asset->reissuable;
         transaction->asset->unit = asset->unit;
         transaction->asset->hasIPFS = asset->hasIPFS;
-        if(transaction->asset->hasIPFS == 1)
+        if(asset->hasIPFS == 1)
             strcpy(asset->IPFSHash, transaction->asset->IPFSHash);
     }
     
