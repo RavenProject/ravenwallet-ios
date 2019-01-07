@@ -591,33 +591,32 @@ BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t a
     //strIssueAssetBurnAddressRegTest
     BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressRegTest);
 #else
-    //strIssueAssetBurnAddressMainNet
+    //strIssueAssetBurnAddressMainNetf
     BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressMainNet);
 #endif
-
-    // Add new asset output
+    
+    // The order is important here: Ownership script before NewAsset script
+    //Add new asset ownership output
     outputs[1].amount = 0;
-//    BRTxOutputSetAddress(&outputs[1], addr);
     
     strncpy(outputs[1].address, addr, sizeof(outputs[1].address) - 1);
-    outputs[1].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
+    outputs[1].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
     array_new(outputs[1].script, outputs[1].scriptLen);
     array_set_count(outputs[1].script, outputs[1].scriptLen);
     BRAddressScriptPubKey(outputs[1].script, outputs[1].scriptLen, addr);
     
-    /*outputs[1].scriptLen =*/ BRTxOutputSetNewAssetScript(outputs[1].script, outputs[1].scriptLen, asset);
-    
-    // Add new asset ownership output
+    BRTxOutputSetOwnerAssetScript(outputs[1].script, outputs[1].scriptLen, asset);
+
+    // Add new asset output
     outputs[2].amount = 0;
-//    BRTxOutputSetAddress(&outputs[2], addr);
     
     strncpy(outputs[2].address, addr, sizeof(outputs[2].address) - 1);
-    outputs[2].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
+    outputs[2].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
     array_new(outputs[2].script, outputs[2].scriptLen);
     array_set_count(outputs[2].script, outputs[2].scriptLen);
     BRAddressScriptPubKey(outputs[2].script, outputs[2].scriptLen, addr);
-
-    /*outputs[2].scriptLen =*/ BRTxOutputSetOwnerAssetScript(outputs[2].script, outputs[2].scriptLen, asset);
+    
+    BRTxOutputSetNewAssetScript(outputs[2].script, outputs[2].scriptLen, asset);
 
     return BRWalletCreateTxForOutputs(wallet, outputs, newAsset_outcount, asset);
 }
@@ -750,7 +749,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *ou
                     output_change.scriptLen = BRTxOutputSetTransferAssetScript(output_change.script, output_change.scriptLen, &asst_change);
                     
                     BRTransactionAddOutput(transaction, output_change.amount, output_change.script, output_change.scriptLen);
-//                    BRTransactionShuffleOutputs(transaction);
+                    BRTransactionShuffleOutputs(transaction);
                     AssetFree(&asst_change);
                     break;
                 } else if(transaction->asset->amount > asst_balance) continue;

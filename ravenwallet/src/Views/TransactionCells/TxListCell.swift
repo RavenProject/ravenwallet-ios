@@ -35,7 +35,7 @@ class TxListCell: UITableViewCell {
         self.viewModel = viewModel
         
         timestamp.text = viewModel.shortTimestamp
-        descriptionLabel.text = viewModel.shortDescription
+        descriptionLabel.attributedText = viewModel.shortAttributeDescription
         amount.attributedText = viewModel.amount(rate: rate)
         
         statusIndicator.status = viewModel.status

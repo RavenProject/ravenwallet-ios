@@ -28,21 +28,13 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 //        {      0, "000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a", 1537466400, 0x1e00ffff },
 //        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
 //        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
-////        {   6594, "00000027eb51702a9436a57790f38ecb419720ee898c0a27ec05365d862d317c", 1537915659, 0x1e009f48 },
-////        {   6595, "0000002f6822bbfb298ebb20071fb74e7df6698769d1543c02f90d87af67dcc8", 1537915696, 0x1e009d3f },
-////        {   6596, "0000005a78617404f6bf03e6a4337feb5b2b70985247e1d864a66b908cfe4878", 1537915736, 0x1e009cc5 },
-////        {   7000, "000000cb2a8326cd11d557c47ee1935f29f0c0fc3612e65b8b793237582382e9", 1537915736, 0x1e009cc5 },
 //        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
         {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
     }; // New testnet, port:18770 useragent:"/Ravencoin2.1.1/"
 
 static const char *dns_seeds[] = {
        "127.0.0.1", NULL
-//         "192.168.1.2", NULL
-
-//       "91.207.175.228", NULL // Jeremy node
 //        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
-//        "35.163.33.254", "35.210.244.221", "18.202.96.180"
 };
 
 #else // main net
@@ -50,31 +42,35 @@ static const char *dns_seeds[] = {
 // blockchain checkpoints - these are also used as starting points for partial chain downloads, so they need to be at
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
-        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
-        {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
-        {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
-        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
-        {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
-        {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
-        {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
-        { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
-        { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
-        { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
-        { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
-        { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
-        { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
-        { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
-        { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
-        { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
-        { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
-        { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
-        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
-        { 334656, "0000000000017b8112fb5e67c807d2962c98cef80ef3ed9c2d9503dfef219b3e", 1535026940, 0x1b069a70 },
-        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
-        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+//        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
+////        {      1, "00000058bcc33dea08b53691edb9e49a9eb8bac36a0db17eb5a7588860b1f590", 1515015723, 0x1e00ffff },
+//        {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
+//        {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
+//        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
+//        {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
+//        {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
+//        {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
+//        { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
+//        { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
+//        { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
+//        { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
+//        { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
+//        { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
+//        { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
+//        { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
+//        { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
+//        { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
+//        { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
+//        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
+//        { 334656, "0000000000017b8112fb5e67c807d2962c98cef80ef3ed9c2d9503dfef219b3e", 1535026940, 0x1b069a70 },
+//        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
+//        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+        { 479587, "000000000000a96ff81c3958712f24895a6084e39c33da258a84b82d550e233b", 1544094174, 0x1b00f00d }
+
 };
 
 static const char *dns_seeds[] = {
+//    "127.0.0.1", NULL
         "seed-raven.ravencoin.com", "seed-raven.ravencoin.org.", "seed-raven.bitactivate.com.", NULL
 };
 
@@ -1153,11 +1149,11 @@ static int _PeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *block,
     int r = 1;
 
     // check if we hit a difficulty transition, and find previous transition time
-    if ((block->height % BLOCK_DIFFICULTY_INTERVAL) == 0) {
+    if ((block->height % (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL)) == 0) {
         BRMerkleBlock *b = block;
         UInt256 prevBlock;
 
-        for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
+        for (uint32_t i = 0; b && i < (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL); i++) {
             b = BRSetGet(manager->blocks, &b->prevBlock);
         }
 
@@ -1174,7 +1170,7 @@ static int _PeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *block,
             b = BRSetGet(manager->blocks, &prevBlock);
             if (b) prevBlock = b->prevBlock;
 
-            if (b && (b->height % BLOCK_DIFFICULTY_INTERVAL) != 0) {
+            if (b && (b->height % (block->height < DGW_START_BLOCK ? BLOCK_DIFFICULTY_INTERVAL : DGW_BLOCK_DIFFICULTY_INTERVAL)) != 0) {
                 BRSetRemove(manager->blocks, b);
                 BRMerkleBlockFree(b);
             }
@@ -1340,8 +1336,7 @@ static void _peerRelayedBlock(void *info, BRMerkleBlock *block) {
         while (b && b->height > block->height)
             b = BRSetGet(manager->blocks, &b->prevBlock); // is block in main chain?
 
-        if (BRMerkleBlockEq(b,
-                            block)) { // if it's not on a fork, set block heights for its transactions
+        if (BRMerkleBlockEq(b, block)) { // if it's not on a fork, set block heights for its transactions
             if (txCount > 0)
                 _PeerManagerUpdateTx(manager, txHashes, txCount, block->height, txTime);
             if (block->height == manager->lastBlock->height) manager->lastBlock = block;

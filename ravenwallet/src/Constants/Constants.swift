@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Core
 
 let π: CGFloat = .pi
 
@@ -40,13 +41,15 @@ struct C {
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
-    static let feedbackEmail = "feedback@breadapp.com"
-    static let iosEmail = "ios@breadapp.com"
+    static let feedbackEmail = "feedback@ravenwallet.org"
+    static let iosEmail = "ios@ravenwallet.org"
     static let reviewLink = "https://itunes.apple.com/app/breadwallet-bitcoin-wallet/id885251393?action=write-review"
     static var standardPort: Int {
-        return E.isTestnet ? 18767 : 8767
+        return E.isTestnet ? 18770 : 8767
     }
     static let feeCacheTimeout: TimeInterval = C.secondsInDay*3
+    
+    // TODO: Remove bCash
     static let bCashForkBlockHeight: UInt32 = E.isTestnet ? 1155876 : 478559
     static let bCashForkTimeStamp: TimeInterval = E.isTestnet ? (1501597117 - NSTimeIntervalSince1970) : (1501568580 - NSTimeIntervalSince1970)
     static let txUnconfirmedHeight = Int32.max
@@ -59,5 +62,27 @@ struct C {
     static let creatAssetFee = UInt64(Int(500) * 100000000)
     static let manageAssetFee = UInt64(Int(100) * 100000000)
     static let ownerShipAsset = UInt64(Int(1) * 100000000)
-
+    
+    //Burn Addresses
+    static var strIssueAssetBurnAddress: String {
+        return E.isTestnet ? "n1issueAssetXXXXXXXXXXXXXXXXWdnemQ" : "RXissueAssetXXXXXXXXXXXXXXXXXhhZGt"
+    }
+    static var strReissueAssetBurnAddress: String {
+        return E.isTestnet ? "n1ReissueAssetXXXXXXXXXXXXXXWG9NLd" : "RXReissueAssetXXXXXXXXXXXXXXVEFAWu"
+    }
+    static var strIssueSubAssetBurnAddress: String {
+        return E.isTestnet ? "n1issueSubAssetXXXXXXXXXXXXXbNiH6v" : "RXissueSubAssetXXXXXXXXXXXXXWcwhwL"
+    }
+    static var strIssueUniqueAssetBurnAddress: String {
+        return E.isTestnet ? "n1issueUniqueAssetXXXXXXXXXXS4695i" : "RXissueUniqueAssetXXXXXXXXXXWEAe58"
+    }
+    static var strGlobalBurnAddress: String {
+        return E.isTestnet ? "n1BurnXXXXXXXXXXXXXXXXXXXXXXU1qejP" : "RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV"
+    }
+    
+    static var setBurnAddresses: Set = Set.init(arrayLiteral: strIssueAssetBurnAddress, strReissueAssetBurnAddress, strIssueSubAssetBurnAddress, strIssueUniqueAssetBurnAddress, strGlobalBurnAddress)
+    
+    
+    
+    
 }

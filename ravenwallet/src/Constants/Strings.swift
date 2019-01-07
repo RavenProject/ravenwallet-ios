@@ -162,6 +162,13 @@ enum S {
         static let receivedVia = NSLocalizedString("TransactionDetails.receivedVia", value:"received via %1$@", comment: "received via <address>")
         static let sendingTo = NSLocalizedString("Transaction.sendingTo", value:"sending to %1$@", comment: "sending to <address>")
         static let receivingVia = NSLocalizedString("TransactionDetails.receivingVia", value:"receiving via %1$@", comment: "receiving via <address>")
+        static let burning = NSLocalizedString("Transaction.burning", value:"Burning", comment: "Burning")
+        static let burn = NSLocalizedString("Transaction.burn", value:"Burn", comment: "Burn")
+        static let burningForCreation = NSLocalizedString("Transaction.burningForCreation", value:"Burning For Creation", comment: "Burning For Creation")
+        static let burnForCreation = NSLocalizedString("Transaction.burnForCreation", value:"Burn For Creation", comment: "Burn For Creation")
+        static let burningForReissue = NSLocalizedString("Transaction.burningForReissue", value:"Burning For Reissue", comment: "Burning For Reissue")
+        static let burnForReissue = NSLocalizedString("Transaction.burnForReissue", value:"Burn For Reissue", comment: "Burn For Reissue")
+
     }
     
     enum TransactionDetails {

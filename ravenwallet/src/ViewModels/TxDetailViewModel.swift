@@ -30,7 +30,12 @@ struct TxDetailViewModel: TxViewModel {
         case .received:
             return status == .complete ? S.TransactionDetails.titleReceived : S.TransactionDetails.titleReceiving
         case .sent:
-            return status == .complete ? S.TransactionDetails.titleSent : S.TransactionDetails.titleSending
+            if(C.setBurnAddresses.contains(tx.toAddress)){
+                return status == .complete ? S.Transaction.burn : S.Transaction.burning
+            }
+            else{
+                return status == .complete ? S.TransactionDetails.titleSent : S.TransactionDetails.titleSending
+            }
         }
     }
     

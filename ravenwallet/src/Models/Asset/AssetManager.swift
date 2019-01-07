@@ -2,7 +2,7 @@
 //  AssetManager.swift
 //  ravenwallet
 //
-//  Created by Ben on 15/10/18.
+//  Created by Bendnaiba on 15/10/18.
 //  Copyright (c) 2018 Ravenwallet Team
 
 

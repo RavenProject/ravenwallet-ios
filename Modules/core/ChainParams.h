@@ -72,7 +72,7 @@ static const char *RegTestDNSSeeds[] = {
 // blockchain checkpoints - these are also used as starting points for partial chain downloads, so they must be at
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const CheckPoint MainNetCheckpoints[] = {
-        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
+    {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
         {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
         {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
         {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
@@ -92,7 +92,7 @@ static const CheckPoint MainNetCheckpoints[] = {
         { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
         { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
         { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
-        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 }
 };
 
 static const CheckPoint TestNetCheckpoints[] = {
