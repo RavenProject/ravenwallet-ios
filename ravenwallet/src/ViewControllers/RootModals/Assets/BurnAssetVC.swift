@@ -30,12 +30,23 @@ class BurnAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
     private let walletManager: WalletManager
     private let confirmTransitioningDelegate = PinTransitioningDelegate()
     private let currency: CurrencyDef = Currencies.rvn //BMEX
+    private var balance: UInt64 = 0
 
     override func viewDidLoad() {
         self.parent?.view.isHidden = true
+        addSubscriptions()
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        let feeAmount = self.sender.feeForTx(amount: UInt64(100000000))
+        if feeAmount == nil {
+            showError()
+            return
+        }
+        if feeAmount! < balance {
+            showError()
+            return
+        }
         let alert = UIAlertController(title: S.Alerts.BurnAsset.title, message: S.Alerts.BurnAsset.body, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: { _ in
             self.dismiss(animated: true, completion: nil)
@@ -46,6 +57,20 @@ class BurnAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
             }
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func addSubscriptions() {
+        Store.subscribe(self, selector: { $0[self.currency].balance != $1[self.currency].balance },
+                        callback: { [unowned self] in
+                            if let balance = $0[self.currency].balance {
+                                self.balance = balance
+                            }
+        })
+    }
+    
+    func showError() {
+        self.dismiss(animated: true, completion: nil)
+        showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
     }
 
     func sendTapped() {
