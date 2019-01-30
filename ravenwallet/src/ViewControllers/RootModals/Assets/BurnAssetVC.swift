@@ -43,7 +43,7 @@ class BurnAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
             showError()
             return
         }
-        if feeAmount! < balance {
+        if feeAmount! > balance {
             showError()
             return
         }

@@ -56,7 +56,7 @@ typedef struct {
     uint8_t pubKey[33];
 } BRMasterPubKey;
 
-#define MASTER_PUBKEY_NONE ((BRMasterPubKey) { 0, UINT256_ZERO, \
+#define MASTER_PUBKEY_NONE ((const BRMasterPubKey) { 0, UINT256_ZERO, \
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } })
 
 //static void _CKDpriv(UInt256 *k, UInt256 *c, uint32_t i);

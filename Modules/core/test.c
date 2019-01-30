@@ -31,8 +31,8 @@
 
 #ifdef __ANDROID__
 #include <android/log.h>
-#define fprintf(...) __android_log_print(ANDROID_LOG_ERROR, "bread", _va_rest(__VA_ARGS__, NULL))
-#define printf(...) __android_log_print(ANDROID_LOG_INFO, "bread", __VA_ARGS__)
+#define fprintf(...) __android_log_print(ANDROID_LOG_ERROR, "rvn", _va_rest(__VA_ARGS__, NULL))
+#define printf(...) __android_log_print(ANDROID_LOG_INFO, "rvn", __VA_ARGS__)
 #define _va_first(first, ...) first
 #define _va_rest(first, ...) __VA_ARGS__
 #endif

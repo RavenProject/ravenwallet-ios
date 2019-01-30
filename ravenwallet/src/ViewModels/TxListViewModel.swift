@@ -46,9 +46,10 @@ struct TxListViewModel: TxViewModel {
             switch tx.direction {
             case .sent, .moved:
                 format = isComplete ? S.Transaction.sentTo : S.Transaction.sendingTo
-                if(C.setBurnAddresses.contains(tx.toAddress)){
+                let rvnTx = self.tx as? RvnTransaction
+                if(C.setBurnAddresses.contains(tx.toAddress) && (rvnTx?.amount == C.creatAssetFee || rvnTx?.amount == C.manageAssetFee || rvnTx?.amount == C.uniqueAssetFee || rvnTx?.amount == C.subAssetFee)){
                     color = UIColor.sentRed
-                    format = getShortSentDescription(isComplete: isComplete)
+                    format = getShortSentBurnDescription(isComplete: isComplete)
                     return NSAttributedString(string: format, attributes: [.foregroundColor: color])
                 }
                 return NSAttributedString(string: String(format: format, address), attributes: [.foregroundColor: color])
@@ -59,7 +60,7 @@ struct TxListViewModel: TxViewModel {
         }
     }
 
-    func amount(rate: Rate) -> NSAttributedString {
+    func amount(rate: Rate, isBtcSwapped: Bool) -> NSAttributedString {
         guard let tx = tx as? RvnTransaction else { return NSAttributedString(string: "") }
         let text = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
                                  selectedRate: nil,
@@ -67,20 +68,26 @@ struct TxListViewModel: TxViewModel {
                                  currency: tx.currency,
                                  negative: (tx.direction == .sent),
                                  locale: Locale(identifier: "fr_FR"),
-                                 asset: tx.asset).description
+                                 asset: tx.asset).description(isBtcSwapped: isBtcSwapped)
         let color: UIColor = (tx.direction == .received) ? .receivedGreen : .sentRed
         
         return NSMutableAttributedString(string: text,
                                          attributes: [.foregroundColor: color])
     }
     
-    func getShortSentDescription(isComplete:Bool) -> String {
+    func getShortSentBurnDescription(isComplete:Bool) -> String {
         var shortSentDescription: String = isComplete ? S.Transaction.burn : S.Transaction.burning
         if tx.toAddress ==  C.strIssueAssetBurnAddress {
             shortSentDescription = isComplete ? S.Transaction.burnForCreation : S.Transaction.burningForCreation
         }
         else if tx.toAddress ==  C.strReissueAssetBurnAddress {
             shortSentDescription = isComplete ? S.Transaction.burnForReissue : S.Transaction.burningForReissue
+        }
+        else if tx.toAddress ==  C.strIssueSubAssetBurnAddress {
+            shortSentDescription = isComplete ? S.Transaction.burnForSub : S.Transaction.burningForSub
+        }
+        else if tx.toAddress ==  C.strIssueUniqueAssetBurnAddress {
+            shortSentDescription = isComplete ? S.Transaction.burnForUnique : S.Transaction.burningForUnique
         }
         return shortSentDescription
     }

@@ -43,6 +43,7 @@ struct C {
     static let maxMemoLength = 250
     static let feedbackEmail = "feedback@ravenwallet.org"
     static let iosEmail = "ios@ravenwallet.org"
+    //TODO: change reviewLink
     static let reviewLink = "https://itunes.apple.com/app/breadwallet-bitcoin-wallet/id885251393?action=write-review"
     static var standardPort: Int {
         return E.isTestnet ? 18770 : 8767
@@ -58,11 +59,18 @@ struct C {
         return URL(fileURLWithPath: cachesDirectory).appendingPathComponent("log.txt")
     }
     
+    //Asset
+    static let OWNER_TAG = "!"
+    
     //Asset Fee
     static let creatAssetFee = UInt64(Int(500) * 100000000)
     static let manageAssetFee = UInt64(Int(100) * 100000000)
     static let ownerShipAsset = UInt64(Int(1) * 100000000)
-    
+    static let uniqueAsset = UInt64(Int(1) * 100000000)
+    static let subAssetFee = UInt64(Int(100) * 100000000)
+    static let uniqueAssetFee = UInt64(Int(5) * 100000000)
+    static let oneAsset = UInt64(Int(1) * 100000000)
+
     //Burn Addresses
     static var strIssueAssetBurnAddress: String {
         return E.isTestnet ? "n1issueAssetXXXXXXXXXXXXXXXXWdnemQ" : "RXissueAssetXXXXXXXXXXXXXXXXXhhZGt"
@@ -82,7 +90,16 @@ struct C {
     
     static var setBurnAddresses: Set = Set.init(arrayLiteral: strIssueAssetBurnAddress, strReissueAssetBurnAddress, strIssueSubAssetBurnAddress, strIssueUniqueAssetBurnAddress, strGlobalBurnAddress)
     
+    //TX confirmation numbers
+    struct Blocks {
+        static let unconfirmed: UInt64 = 0
+        static let pendingStart: UInt64 = 1
+        static let pendingEnd: UInt64 = 6
+    }
     
+    static let diffBlocks:Int = 100
     
+    //ipfs URL
+    static let ipfsHost = "http://ipfs.io/ipfs/"
     
 }

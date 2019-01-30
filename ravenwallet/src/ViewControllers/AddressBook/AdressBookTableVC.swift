@@ -1,8 +1,8 @@
 //
-//  AdressTableViewController.swift
+//  AdressBookTableVC.swift
 //  ravenwallet
 //
-//  Created by Ben on 2016-11-16.
+//  Created by Bendnaiba on 2016-11-16.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
@@ -10,9 +10,7 @@ import UIKit
 import SafariServices
 import SwipeCellKit
 
-private let promptDelay: TimeInterval = 0.6
-
-class AdressTableViewController : UITableViewController, Subscriber, Trackable, SwipeTableViewCellDelegate {
+class AdressBookTableVC : UITableViewController, Subscriber, Trackable, SwipeTableViewCellDelegate {
     
     //MARK: - Public
     init(addressBookType: AddressBookType? = .normal, didSelectAddress: @escaping ([AddressBook], Int) -> Void, didEditAddress: @escaping (AddressBook) -> Void) {
@@ -37,7 +35,7 @@ class AdressTableViewController : UITableViewController, Subscriber, Trackable, 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.register(AddressListCell.self, forCellReuseIdentifier: addressListCellIdentifier)
+        tableView.register(AddressBookListCell.self, forCellReuseIdentifier: addressListCellIdentifier)
         
         tableView.separatorStyle = .none
         tableView.estimatedRowHeight = 60.0
@@ -114,12 +112,12 @@ class AdressTableViewController : UITableViewController, Subscriber, Trackable, 
 }
 
 //MARK: - Cell Builders
-extension AdressTableViewController {
+extension AdressBookTableVC {
     
     private func addressListCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: addressListCellIdentifier, for: indexPath)
-        if let addressListCell = cell as? AddressListCell {
-            (cell as! AddressListCell).delegate = self
+        if let addressListCell = cell as? AddressBookListCell {
+            (cell as! AddressBookListCell).delegate = self
             let addressBook = allAddress[indexPath.row]
             addressListCell.setAddress(addressBook)
         }

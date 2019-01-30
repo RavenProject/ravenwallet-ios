@@ -185,4 +185,11 @@ bool IsScriptTransferAsset(const uint8_t *script, size_t scriptLen);
 
 bool IsScriptAsset(const uint8_t *script, size_t scriptLen);
 
+bool IsAssetNameRootAsset(const BRAsset *asst);
+
+bool IsAssetNameSubAsset(const BRAsset *asst);
+
+bool IsAssetNameUniqueAsset(const BRAsset *asst);
+
+
 #endif // SCRIPT_H

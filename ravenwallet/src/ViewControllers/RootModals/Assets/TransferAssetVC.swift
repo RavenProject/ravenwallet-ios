@@ -10,7 +10,6 @@ import UIKit
 import LocalAuthentication
 import Core
 
-private let verticalButtonPadding: CGFloat = 32.0
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
 class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
@@ -136,6 +135,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         }
         
         transferOwnerShip.didSelected = { isSelected in
+            self.quantityView.amount = nil
             self.quantityView.isEnabled = !isSelected
         }
         //initiate feeview balance
@@ -172,7 +172,12 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         }
         if asset.isOwnerShip {
             transferOwnerShipHeight?.constant = SendCell.defaultHeight - C.padding[2]
-            self.view.layoutIfNeeded()
+            view.layoutIfNeeded()
+        }
+        //disable quantity for unique asset
+        if asset.name.contains("#") {
+            quantityView.amount = Satoshis(C.oneAsset)
+            quantityView.isEnabled = false
         }
     }
     
@@ -242,7 +247,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             else {
                 amount = Satoshis.init(C.ownerShipAsset)//one asset
                 asset.ownerShip = 1
-                asset.name = asset.name + "!"
+                asset.name = asset.name + C.OWNER_TAG
                 asset.amount = amount
                 sender.operationType = .transferOwnerShipAsset
             }

@@ -9,8 +9,6 @@
 import UIKit
 import SafariServices
 
-private let promptDelay: TimeInterval = 0.6
-
 class TransactionsTableViewController : UITableViewController, Subscriber, Trackable {
 
     //MARK: - Public
@@ -48,7 +46,8 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         didSet { reload() }
     }
     private let emptyMessage = UILabel.wrapping(font: .customBody(size: 16.0), color: .grayTextTint)
-    
+    private let emptyImage = UIImageView(image: #imageLiteral(resourceName: "EmptyTxs"))
+
     private var currentPrompt: Prompt? {
         didSet {
             if currentPrompt != nil && oldValue == nil {
@@ -79,6 +78,8 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         
         emptyMessage.textAlignment = .center
         emptyMessage.text = S.TransactionDetails.emptyMessage
+        
+        emptyImage.contentMode = .scaleAspectFit
         
         setContentInset()
 
@@ -185,8 +186,17 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
                     emptyMessage.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -accountHeaderHeight),
                     emptyMessage.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -C.padding[2]) ])
             }
+            emptyMessage.isHidden = true
+            if emptyImage.superview == nil {
+                tableView.addSubview(emptyImage)
+                emptyImage.constrain([
+                    emptyImage.centerXAnchor.constraint(equalTo: tableView.centerXAnchor),
+                    emptyImage.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -(accountHeaderHeight/2)),
+                    emptyImage.widthAnchor.constraint(equalTo: view.widthAnchor) ])
+            }
         } else {
             emptyMessage.removeFromSuperview()
+            emptyImage.removeFromSuperview()
         }
     }
 

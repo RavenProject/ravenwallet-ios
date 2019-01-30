@@ -27,6 +27,7 @@ class NumberCell : UIViewController, Trackable {
     }
 
     var didChangeFirstResponder: ((Bool) -> Void)?
+    var didUpdateAmount: ((Satoshis?) -> Void)?
 
     /*var currentOutput: String {
         return amountLabel.text ?? ""
@@ -54,7 +55,7 @@ class NumberCell : UIViewController, Trackable {
     var isEnabled : Bool = true {
         didSet {
             tapView.isUserInteractionEnabled = isEnabled
-            amount = nil
+            //amount = nil
             closePinPad()
         }
     }
@@ -202,6 +203,7 @@ class NumberCell : UIViewController, Trackable {
             placeholder.isHidden = false
             return
         }
+        placeholder.isHidden = true
         var output = amount.description(minimumFractionDigits: minimumFractionDigits)
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)

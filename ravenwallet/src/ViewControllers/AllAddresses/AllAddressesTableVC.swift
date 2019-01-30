@@ -1,32 +1,34 @@
 //
-//  AllAssetTableVC.swift
+//  AllAddressesTableVC.swift
 //  ravenwallet
 //
-//  Created by Ben on 2016-11-16.
+//  Created by Bendnaiba on 2016-11-16.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit
-import SafariServices
 
-class AllAssetTableVC : UITableViewController, Subscriber, Trackable {
+class AllAddressesTableVC : UITableViewController, Subscriber, Trackable {
     
     //MARK: - Public
-    init(didSelectAsset: @escaping (Asset) -> Void) {
-        self.didSelectAsset = didSelectAsset
+    init(walletManager: WalletManager, didSelectAddress: @escaping ([String], Int) -> Void) {
+        self.walletManager = walletManager
+        self.didSelectAddress = didSelectAddress
         super.init(nibName: nil, bundle: nil)
     }
     
-    let didSelectAsset: (Asset) -> Void
+    let didSelectAddress: ([String], Int) -> Void
     
     //MARK: - Private
-    
+    private let walletManager: WalletManager
+    private let allAddressesListCellIdentifier = "AllAddressesListCellIdentifier"
+    private var allAddress: [String] = []
     private let emptyMessage = UILabel.wrapping(font: .customBody(size: 16.0), color: .grayTextTint)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.register(AssetHomeCell.self, forCellReuseIdentifier: AssetHomeCell.cellIdentifier)
+        tableView.register(AllAddressesListCell.self, forCellReuseIdentifier: allAddressesListCellIdentifier)
         
         tableView.separatorStyle = .none
         tableView.estimatedRowHeight = 60.0
@@ -34,22 +36,17 @@ class AllAssetTableVC : UITableViewController, Subscriber, Trackable {
         tableView.backgroundColor = .whiteTint
         
         emptyMessage.textAlignment = .center
-        emptyMessage.text = S.Asset.allAssetEmptyMessage
+        emptyMessage.text = S.AllAddresses.emptyMessage
         
         setContentInset()
-        
-        //BMEX detect transactions changes
-        Store.subscribe(self, selector: {
-            $0[Store.state.currencies[0]].transactions != $1[Store.state.currencies[0]].transactions
-        },
-                        callback: { state in
-                            AssetManager.shared.loadAsset { assets in
-                                self.reload()
-                            }
-        })
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        setupData()
+    }
+    
+    public func setupData() {
+        self.allAddress = (self.walletManager.wallet?.usedAddresses)!
         self.reload()
     }
     
@@ -65,32 +62,28 @@ class AllAssetTableVC : UITableViewController, Subscriber, Trackable {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return AssetManager.shared.showedAssetList.count
+        return allAddress.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return assetCell(tableView: tableView, indexPath: indexPath)
+        return addressListCell(tableView: tableView, indexPath: indexPath)
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return C.padding[2];
+        return 0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return nil
     }
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60.0
-    }
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        didSelectAsset(AssetManager.shared.showedAssetList[indexPath.row])
+        didSelectAddress(allAddress, indexPath.row)
     }
     
     private func reload() {
         tableView.reloadData()
-        if AssetManager.shared.showedAssetList.count == 0 {
+        if allAddress.count == 0 {
             if emptyMessage.superview == nil {
                 tableView.addSubview(emptyMessage)
                 emptyMessage.constrain([
@@ -109,15 +102,15 @@ class AllAssetTableVC : UITableViewController, Subscriber, Trackable {
 }
 
 //MARK: - Cell Builders
-extension AllAssetTableVC {
+extension AllAddressesTableVC {
     
-    private func assetCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: AssetHomeCell.cellIdentifier, for: indexPath)
-        if let assetHomeCell = cell as? AssetHomeCell {
-            let asset = AssetManager.shared.showedAssetList[indexPath.row]
-            let viewModel = AssetListViewModel(asset: asset)
-            assetHomeCell.set(viewModel: viewModel)
+    private func addressListCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: allAddressesListCellIdentifier, for: indexPath)
+        if let allAddressesListCell = cell as? AllAddressesListCell {
+            let address = allAddress[indexPath.row]
+            allAddressesListCell.setAddress(address)
         }
         return cell
     }
+    
 }

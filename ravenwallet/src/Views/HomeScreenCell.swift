@@ -40,6 +40,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
     private let aaChartView: AAChartView = AAChartView()
     private var aaChartModel: AAChartModel = AAChartModel()
     private let separator = UIView(color: .transparentWhiteText)
+    private let arrow = UIImageView(image: #imageLiteral(resourceName: "RightArrow").withRenderingMode(.alwaysTemplate))
 
     private var isSyncIndicatorVisible: Bool = false {
         didSet {
@@ -138,6 +139,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
         container.addSubview(aaChartView)
         container.addSubview(separator)
         container.addSubview(chartTitle)
+        container.addSubview(arrow)
     }
 
     private func addConstraints() {
@@ -154,7 +156,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
             price.topAnchor.constraint(equalTo: currencyName.bottomAnchor)
             ])
         fiatBalance.constrain([
-            fiatBalance.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -C.padding[2]),
+            fiatBalance.trailingAnchor.constraint(equalTo: arrow.leadingAnchor, constant: -C.padding[1]),
             fiatBalance.topAnchor.constraint(equalTo: container.topAnchor, constant: C.padding[2]),
             fiatBalance.leadingAnchor.constraint(greaterThanOrEqualTo: currencyName.trailingAnchor, constant: C.padding[1])
             ])
@@ -170,9 +172,16 @@ class HomeScreenCell : UITableViewCell, Subscriber {
             syncIndicator.leadingAnchor.constraint(greaterThanOrEqualTo: price.trailingAnchor, constant: C.padding[1])
             ])
         
+        arrow.constrain([
+            arrow.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -C.padding[1]),
+            arrow.widthAnchor.constraint(equalToConstant: 7.0),
+            arrow.heightAnchor.constraint(equalToConstant: 12.0),
+            arrow.centerYAnchor.constraint(equalTo: fiatBalance.bottomAnchor)
+            ])
+        
         chartTitle.constrain([
             chartTitle.topAnchor.constraint(equalTo: tokenBalance.bottomAnchor, constant: C.padding[2]),
-            chartTitle.trailingAnchor.constraint(equalTo: fiatBalance.trailingAnchor)
+            chartTitle.trailingAnchor.constraint(equalTo: arrow.trailingAnchor)
             ])
         
         separator.constrain([
@@ -196,6 +205,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
         aaChartView.isClearBackgroundColor = true
         aaChartView.scrollEnabled = false
         syncIndicator.isHidden = true
+        arrow.tintColor = .white
     }
     
     override func prepareForReuse() {

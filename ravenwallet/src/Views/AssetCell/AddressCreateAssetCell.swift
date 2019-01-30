@@ -46,6 +46,8 @@ class AddressCreateAssetCell : AddressCell {
             addressBook.widthAnchor.constraint(equalTo: scan.widthAnchor, multiplier: isAddressBookBtnHidden ? 0 : 1),
             addressBook.heightAnchor.constraint(equalTo: scan.heightAnchor)])
         generate.constrain([
+            generate.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: C.padding[1]),
+            generate.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor, multiplier: 0.41),
             generate.trailingAnchor.constraint(equalTo: addressBook.leadingAnchor, constant: -C.padding[1]),
             generate.topAnchor.constraint(equalTo: scan.topAnchor),
             generate.heightAnchor.constraint(equalTo: addressBook.heightAnchor)])

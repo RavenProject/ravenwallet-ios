@@ -36,7 +36,7 @@ class TxListCell: UITableViewCell {
         
         timestamp.text = viewModel.shortTimestamp
         descriptionLabel.attributedText = viewModel.shortAttributeDescription
-        amount.attributedText = viewModel.amount(rate: rate)
+        amount.attributedText = viewModel.amount(rate: rate, isBtcSwapped: isBtcSwapped)
         
         statusIndicator.status = viewModel.status
         if viewModel.status == .complete {

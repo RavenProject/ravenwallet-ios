@@ -291,8 +291,6 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         peer_log(peer, "dropping assets message, %zu is too many assets, max is 512", count);
     } else {
         peer_log(peer, "got asset with %zu data", count);
-        //        nameLen = UInt64GetLE(&msg[off]);
-        //        off += sizeof(uint64_t);
         
         BRAsset *asset = NewAsset();
 
@@ -304,9 +302,18 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         *(asset->name + count) = '\0';
         assert(*(asset->name + count) == '\0');
         
+        //TODO: test
+        if(strcmp(asset->name, "_NF") == 0) {
+            r = 0;
+            peer_log(peer, "Asset not found");
+            ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, NULL);
+            return r;
+        }
+        
         asset->amount = (off + sizeof(uint64_t) <= msgLen) ? UInt64GetLE(&msg[off]) : 0;
         off += sizeof(uint64_t);
         
+        // TODO: change VarInt reading to UINT8
         asset->unit = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
         off += sLen;
         
@@ -322,19 +329,20 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         
         // Check the end of the script
         if (asset->hasIPFS != 0 || IPFS_length != 0) {
-        
-        uint8_t IPFS_hash[IPFS_length];
-        
-        if (off <= msgLen + IPFS_length) {
-            memcpy(&IPFS_hash, msg + off, IPFS_length);
-            off += IPFS_length;
-            printf("\nIPFS hash: %s", IPFS_hash);
             
-            EncodeIPFS(asset->IPFSHash, 47, IPFS_hash, IPFS_length);
-        }
+            uint8_t IPFS_hash[IPFS_length];
+            
+            if (off <= msgLen + IPFS_length) {
+                memcpy(&IPFS_hash, msg + off, IPFS_length);
+                off += IPFS_length;
+                printf("\nIPFS hash: %s", IPFS_hash);
+                
+                EncodeIPFS(asset->IPFSHash, 47, IPFS_hash, IPFS_length);
+            }
         }
         
-        ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
+        //        if( ((BRPeerContext *) peer)->receiveAssetData ) // TODO: Test and deploy
+            ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
     }
     
     return r;
@@ -544,7 +552,7 @@ static int _PeerAcceptTxMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen)
         }
 
         if(tx->asset) {
-            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetType(tx->asset->type), tx->asset->amount / COIN,
+            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetScriptType(tx->asset->type), tx->asset->amount / COIN,
                     tx->asset->nameLen, tx->asset->name);
         }
     }
@@ -924,12 +932,10 @@ static int _PeerAcceptMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, c
     else if (strncmp(MSG_PING, type, 12) == 0) r = _PeerAcceptPingMessage(peer, msg, msgLen);
     else if (strncmp(MSG_PONG, type, 12) == 0) r = _PeerAcceptPongMessage(peer, msg, msgLen);
     else if (strncmp(MSG_MERKLEBLOCK, type, 12) == 0) r = _PeerAcceptMerkleblockMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_REJECT, type, 12) == 0) r = _PeerAcceptRejectMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_ASSETDATA, type, 12) == 0)
-        r = _PeerAcceptAssetMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0)
-        r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_REJECT, type, 12) == 0)r = _PeerAcceptRejectMessage(peer, msg, msgLen);
+    else  if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_ASSETDATA, type, 12) == 0) r = _PeerAcceptAssetMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0) r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
     else
         peer_log(peer, "dropping %s, length %zu, not implemented", type, msgLen);
 

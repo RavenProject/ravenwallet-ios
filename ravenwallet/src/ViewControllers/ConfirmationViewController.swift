@@ -155,16 +155,41 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
 
     private func setInitialData() {
         view.backgroundColor = .clear
-        payLabel.text = operationType == .createAsset ? S.Asset.create : (operationType == .manageAsset ? S.Asset.manageTitle : S.Confirmation.send)
 
-        let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
-        let displayFee = DisplayAmount(amount: feeAmount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
-        let assetFee = Satoshis(operationType == .createAsset ? C.creatAssetFee : (operationType == .manageAsset ? C.manageAssetFee : 0))
+        var assetFee = Satoshis.zero
+        switch operationType {
+        case .createAsset:
+            assetFee = Satoshis(C.creatAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.createFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        case .manageAsset:
+            assetFee = Satoshis(C.manageAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.manageFeeLabel
+            sendLabel.text = S.Confirmation.amountManageLabel
+            payLabel.text = S.Asset.manageTitle
+        case .subAsset:
+            assetFee = Satoshis(C.subAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.subAssetFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        case .uniqueAsset:
+            assetFee = Satoshis(C.uniqueAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.uniqueAssetFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        default:
+            assetFee = Satoshis.zero
+            sendLabel.text = S.Confirmation.amountSendLabel
+            payLabel.text = S.Confirmation.send
+        }
         let displayAssetFee = DisplayAmount(amount: assetFee, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         var totalFee = amount + feeAmount
         if operationType != .transferRvn {
             totalFee = assetFee + feeAmount
         }
+        let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
+        let displayFee = DisplayAmount(amount: feeAmount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         let displayTotal = DisplayAmount(amount: totalFee, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
 
         amountLabel.text = operationType == .transferRvn ? displayAmount.combinedDescription : amount.description(minimumFractionDigits: minimumFractionDigits!) + " " + asset!.name
@@ -179,17 +204,15 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
             processingTime.text = String(format: S.Confirmation.processingTime, S.FeeSelector.economyTime)
         }
 
-        sendLabel.text = operationType == .createAsset ? S.Confirmation.amountCreateLabel : (operationType == .manageAsset ? S.Confirmation.amountManageLabel : S.Confirmation.amountSendLabel)
 
         sendLabel.adjustsFontSizeToFitWidth = true
         send.text = asset == nil ? displayAmount.description : amount.description(minimumFractionDigits: minimumFractionDigits!) + " " + asset!.name
         feeLabel.text = S.Confirmation.feeLabel
         fee.text = displayFee.description
         
-        operationAssetFeeLabel.text = operationType == .createAsset ? S.Confirmation.createFeeLabel : (operationType == .manageAsset ? S.Confirmation.manageFeeLabel : "")
         operationAssetFee.text = displayAssetFee.description
         switch operationType {
-        case .createAsset, .manageAsset :
+        case .createAsset, .manageAsset, .subAsset, .uniqueAsset :
             operationAssetFeeHeight?.constant = 20
             operationAssetFee.isHidden = false //BMEX Todo : should work only with autolayout
         default:
@@ -197,7 +220,6 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
             operationAssetFee.isHidden = true
         }
         self.view.layoutIfNeeded()
-
 
         totalLabel.text = S.Confirmation.totalLabel
         total.text = displayTotal.description

@@ -119,6 +119,7 @@ class AddressCell : UIView {
     }
 
     private func setInitialData() {
+        self.clipsToBounds = true
         addressBook.clipsToBounds = true
         label.text = (addressCellType == .send) ? S.Send.toLabel : S.AddressBook.addressLabel
         textField.font = contentLabel.font

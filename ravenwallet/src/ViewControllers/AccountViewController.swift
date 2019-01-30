@@ -22,13 +22,13 @@ class AccountViewController : UIViewController, Subscriber {
         self.walletManager = walletManager
         self.currency = walletManager.currency
         self.headerView = AccountHeaderView(currency: currency)
-        self.footerView = AccountFooterView(currency: currency)
+        self.footerView = AccountFooterView(walletManager: walletManager)
         super.init(nibName: nil, bundle: nil)
         self.transactionsTableView = TransactionsTableViewController(walletManager: walletManager, didSelectTransaction: didSelectTransaction)
         
         headerView.isWatchOnly = walletManager.isWatchOnly
         footerView.sendCallback     = { Store.perform(action: RootModalActions.Present(modal: .send(currency: walletManager.currency))) }
-        footerView.receiveCallback  = { Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency))) }
+        footerView.receiveCallback  = { Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency, isRequestAmountVisible: true, initialAddress: nil))) }
     }
 
     //MARK: - Private

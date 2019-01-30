@@ -51,7 +51,7 @@ const char *GetOpName(enum OPCODETYPE opcode) {
     case OP_IFDUP                  : return "OP_IFDUP";
     case OP_DEPTH                  : return "OP_DEPTH";
     case OP_DROP                   : return "OP_DROP";
-//    case OP_DUP                    : return "OP_DUP";
+    case OP_DUP                    : return "OP_DUP";
     case OP_NIP                    : return "OP_NIP";
     case OP_OVER                   : return "OP_OVER";
     case OP_PICK                   : return "OP_PICK";
@@ -212,6 +212,36 @@ bool IsScriptAsset(const uint8_t *script, size_t scriptLen) {
     bool helper =  IsScriptTransferAsset(script, scriptLen) || IsScriptReissueAsset(script, scriptLen) ||
             IsScriptOwnerAsset(script, scriptLen) || IsScriptNewAsset(script, scriptLen);
     return helper;
+}
+
+bool IsAssetNameRootAsset(const BRAsset *asst) {
+    
+    assert(asst != NULL);
+    assert(asst->name != NULL);
+    
+    if(strstr(asst->name, "/") || strstr(asst->name, "#"))
+        return false;
+    else return true;
+}
+
+bool IsAssetNameSubAsset(const BRAsset *asst) {
+    
+    assert(asst != NULL);
+    assert(asst->name != NULL);
+    
+    if(strstr(asst->name, "/"))
+        return true;
+    else return false;
+}
+
+bool IsAssetNameUniqueAsset(const BRAsset *asst) {
+    
+    assert(asst != NULL);
+    assert(asst->name != NULL);
+    
+    if(strstr(asst->name, "#"))
+        return true;
+    else return false;
 }
 
 bool IsPayToWitnessScriptHash(const uint8_t *script, size_t scriptLen) {

@@ -115,7 +115,7 @@ typedef struct {
     void *assetCallbackInfo;
 } BRPeer;
 
-#define PEER_NONE ((BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
+#define PEER_NONE ((const BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
 
 // NOTE: Peer functions are not thread-safe
 

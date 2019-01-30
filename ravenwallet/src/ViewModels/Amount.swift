@@ -94,6 +94,12 @@ struct Amount {
         format.currencySymbol = rate.currencySymbol
         return format
     }
+    
+    var homeScreenFormat: NumberFormatter {
+        let format = self.localFormat
+        format.maximumFractionDigits = maxDigits
+        return format
+    }
 }
 
 struct DisplayAmount {
@@ -125,6 +131,13 @@ struct DisplayAmount {
         }
         return selectedRate != nil ? fiatDescription : bitcoinDescription
     }
+    
+    func description(isBtcSwapped: Bool) -> String {
+        if asset != nil {
+            return assetDescription
+        }
+        return isBtcSwapped ? fiatDescription : bitcoinDescription
+    }
 
     var combinedDescription: String {
         return Store.state.isSwapped ? "\(fiatDescription) (\(bitcoinDescription))" : "\(bitcoinDescription) (\(fiatDescription))"
@@ -143,7 +156,8 @@ struct DisplayAmount {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        guard var string = assetFormat.string(from: number) else { return "" }
+        //guard var string = assetFormat.string(from: number) else { return "" }
+        var string = number.stringValue
         string = string + " " + asset!.pointee.nameString
         return string
     }
@@ -212,8 +226,9 @@ struct DisplayAmount {
         let format = NumberFormatter()
         format.isLenient = true
         format.generatesDecimalNumbers = true
+        format.numberStyle = .decimal
         format.negativeFormat = "-\(format.positiveFormat!)"
-        format.minimumFractionDigits = Int(asset!.pointee.unit)
+        //format.minimumFractionDigits = Int(asset!.pointee.unit)
 
         return format
     }

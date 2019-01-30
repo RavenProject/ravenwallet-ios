@@ -13,8 +13,8 @@ struct WalletListViewModel {
     
     var exchangeRate: String {
         guard let rate = currency.state.currentRate else { return "" }
-        let placeholderAmount = Amount(amount: 0, rate: rate, maxDigits: 2, currency: currency)
-        return placeholderAmount.localFormat.string(from: NSNumber(value: rate.rate)) ?? ""
+        let placeholderAmount = Amount(amount: 0, rate: rate, maxDigits: 4, currency: currency)
+        return placeholderAmount.homeScreenFormat.string(from: NSNumber(value: rate.rate)) ?? ""
     }
     
     var fiatBalance: String {

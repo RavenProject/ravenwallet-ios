@@ -2,7 +2,6 @@
 //  ChainParams.h
 //
 //  Created by Aaron Voisine on 1/10/18.
-//  Copyright (c) 2019 breadwallet LLC
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +28,7 @@
 #include "BRSet.h"
 #include <assert.h>
 
-static const int64_t COIN = 100000000; // BMEX TODO: look into the amount! 100M not 1M corbies
+static const int64_t COIN = 100000000;
 
 // Burn Amounts
 static const uint64_t IssueAssetBurnAmount = 500 * COIN;

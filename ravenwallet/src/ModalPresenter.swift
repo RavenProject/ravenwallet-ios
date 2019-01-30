@@ -233,12 +233,16 @@ class ModalPresenter : Subscriber, Trackable {
             return makeTransferAssetView(asset: asset, initialAddress: initialAddress)
         case .createAsset(let initialAddress)://BMEX
             return makeCreateAssetView(initialAddress: initialAddress)
+        case .subAsset(let rootAssetName, let initialAddress)://BMEX
+            return makeSubAssetView(rootAssetName: rootAssetName, initialAddress: initialAddress)
+        case .uniqueAsset(let rootAssetName, let initialAddress)://BMEX
+            return makeUniqueAssetView(rootAssetName: rootAssetName, initialAddress: initialAddress)
         case .manageOwnedAsset(let asset, let initialAddress)://BMEX
             return makeManageOwnedAssetView(asset: asset, initialAddress: initialAddress)
         case .burnAsset(let asset)://BMEX
             return makeBurnAssetView(asset: asset)
-        case .receive(let currency):
-            return receiveView(currency: currency, isRequestAmountVisible: true)
+        case .receive(let currency, let isRequestAmountVisible, let initialAddress):
+            return receiveView(currency: currency, isRequestAmountVisible: isRequestAmountVisible, initialAddress: initialAddress)
         case .selectAsset(let asset):
             return selectAssetView(asset: asset)//BMEX
         case .addressBook(let currency, let initialAddress, let actionAddressType, let callback):
@@ -369,7 +373,77 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         createAssetVC.onPublishSuccess = { txHash in
-            self.topViewController?.showAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, buttonLabel: S.Button.ok)
+            let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
+        }
+        return root
+    }
+    
+    private func makeSubAssetView(rootAssetName:String, initialAddress: String? = nil) -> UIViewController? {
+        guard !Currencies.rvn.state.isRescanning else {
+            let alert = UIAlertController(title: S.Alert.error, message: S.Send.isRescanning, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
+            topViewController?.present(alert, animated: true, completion: nil)
+            return nil
+        }
+        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
+        let createAssetVC = CreateSubAssetVC(walletManager: walletManager, rootAssetName: rootAssetName, initialAddress: initialAddress, initialRequest: currentRequest)
+        currentRequest = nil
+        
+        if Store.state.isLoginRequired {
+            createAssetVC.isPresentedFromLock = true
+        }
+        
+        let root = ModalViewController(childViewController: createAssetVC)
+        createAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
+        createAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
+            guard let myself = self else { return }
+            let walletManager = myself.primaryWalletManager
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            vc.transitioningDelegate = self?.verifyPinTransitionDelegate
+            vc.modalPresentationStyle = .overFullScreen
+            vc.modalPresentationCapturesStatusBarAppearance = true
+            root?.view.isFrameChangeBlocked = true
+            root?.present(vc, animated: true, completion: nil)
+        }
+        createAssetVC.onPublishSuccess = { txHash in
+            let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
+
+        }
+        return root
+    }
+    
+    private func makeUniqueAssetView(rootAssetName:String, initialAddress: String? = nil) -> UIViewController? {
+        guard !Currencies.rvn.state.isRescanning else {
+            let alert = UIAlertController(title: S.Alert.error, message: S.Send.isRescanning, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
+            topViewController?.present(alert, animated: true, completion: nil)
+            return nil
+        }
+        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
+        let createAssetVC = CreateUniqueAssetVC(walletManager: walletManager, rootAssetName: rootAssetName, initialAddress: initialAddress, initialRequest: currentRequest)
+        currentRequest = nil
+        
+        if Store.state.isLoginRequired {
+            createAssetVC.isPresentedFromLock = true
+        }
+        
+        let root = ModalViewController(childViewController: createAssetVC)
+        createAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
+        createAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
+            guard let myself = self else { return }
+            let walletManager = myself.primaryWalletManager
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            vc.transitioningDelegate = self?.verifyPinTransitionDelegate
+            vc.modalPresentationStyle = .overFullScreen
+            vc.modalPresentationCapturesStatusBarAppearance = true
+            root?.view.isFrameChangeBlocked = true
+            root?.present(vc, animated: true, completion: nil)
+        }
+        createAssetVC.onPublishSuccess = { txHash in
+            let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
         }
         return root
     }
@@ -451,8 +525,8 @@ class ModalPresenter : Subscriber, Trackable {
         return root
     }
 
-    private func receiveView(currency: CurrencyDef, isRequestAmountVisible: Bool) -> UIViewController? {
-        let receiveVC = ReceiveViewController(currency: currency, isRequestAmountVisible: isRequestAmountVisible)
+    private func receiveView(currency: CurrencyDef, isRequestAmountVisible: Bool, initialAddress: String? = nil) -> UIViewController? {
+        let receiveVC = ReceiveViewController(currency: currency, isRequestAmountVisible: isRequestAmountVisible, initialAddress: initialAddress)
         let root = ModalViewController(childViewController: receiveVC)
         receiveVC.presentEmail = { [weak self, weak root] address, image in
             guard let root = root, let uri = currency.addressURI(address) else { return }
@@ -572,7 +646,7 @@ class ModalPresenter : Subscriber, Trackable {
                 }),
             ],
             SettingsSections.currencies: currencySettings,
-            SettingsSections.assets: [//BMEX
+            SettingsSections.assets: [
                 Setting(title: S.Asset.settingTitle, callback: { [weak self] in
                     guard let `self` = self else { return }
                     let nc = ModalNavigationController()
@@ -617,8 +691,25 @@ class ModalPresenter : Subscriber, Trackable {
                                 let nodeSelector = NodeSelectorViewController(walletManager: walletManager)
                                 settingsNav.pushViewController(nodeSelector, animated: true)
                             }),
+                            Setting(title: S.Settings.usedAddresses, callback: { [weak self] in
+                                guard let `self` = self else { return }
+                                let nc = ModalNavigationController()
+                                nc.setClearNavbar()
+                                nc.setWhiteStyle()
+                                nc.delegate = self.wipeNavigationDelegate
+                                let start = AllAddressesVC(walletManager: walletManager)
+                                start.addCloseNavigationItem(tintColor: .white)
+                                start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding]
+                                nc.viewControllers = [start]
+                                settingsNav.dismiss(animated: true, completion: { [weak self] in
+                                    self?.topViewController?.present(nc, animated: true, completion: nil)
+                                })
+                            }),
                             Setting(title: S.WipeSetting.title, callback: {
                                 self.wipeWallet()
+                            }),
+                            Setting(title: S.Settings.expertMode, toggle: UISwitch(), toggleDefaultValue: UserDefaults.hasActivatedExpertMode, toggleCallback: { isOn in
+                                UserDefaults.hasActivatedExpertMode = isOn
                             })
                         ],
                     ]
@@ -687,7 +778,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
     
     func presentAddressBook(type: AddressBookType? = .normal, callback: ((String) -> Void)? = nil) {
-        let addressBookVC = AddressBookViewController(walletManager: primaryWalletManager, addressBookType: type, callback: callback)
+        let addressBookVC = AddressBookVC(walletManager: primaryWalletManager, addressBookType: type, callback: callback)
         let nc = ModalNavigationController(rootViewController: addressBookVC)
         nc.setClearNavbar()
         addressBookVC.addCloseNavigationItem(tintColor: .white)
@@ -793,7 +884,7 @@ class ModalPresenter : Subscriber, Trackable {
     public func wipeWallet() {
         let alert = UIAlertController(title: S.WipeWallet.alertTitle, message: S.WipeWallet.alertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: nil))
-        alert.addAction(UIAlertAction(title: S.WipeWallet.wipe, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: S.WipeWallet.wipe, style: .destructive, handler: { _ in
 //            self.topViewController?.dismiss(animated: true, completion: {
                 Store.trigger(name: .wipeWalletNoPrompt)
 //            })

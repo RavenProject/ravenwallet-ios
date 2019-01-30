@@ -35,22 +35,28 @@ class SenderAsset {
     var feePerKb: UInt64?
     var operationType: OperationType
 
-    func createAssetTransaction(amount: UInt64, to: String, asset: BRAssetRef) -> Bool {
+    func createAssetTransaction(amount: UInt64? = nil, to: String, asset: BRAssetRef, rootAsset: BRAssetRef? = nil) -> Bool {
         switch operationType {
         case .transferAsset:
-            transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount, toAddress: to, asset: asset)
+            transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount!, toAddress: to, asset: asset)
             break
         case .transferOwnerShipAsset:
-            transaction = walletManager.wallet?.createAssetTransactionOwnerShip(forAmount: amount, toAddress: to, asset: asset)
+            transaction = walletManager.wallet?.createAssetTransactionOwnerShip(forAmount: amount!, toAddress: to, asset: asset)
             break
         case .burnAsset:
             transaction = walletManager.wallet?.burnAssetTransaction(asset: asset)
             break
         case .createAsset:
-            transaction = walletManager.wallet?.createTxForRootAssetCreation(forAmount: amount, toAddress: to, asset: asset)
+            transaction = walletManager.wallet?.createTxForRootAssetCreation(forAmount: C.creatAssetFee, toAddress: to, asset: asset)
+            break
+        case .subAsset:
+            transaction = walletManager.wallet?.createTxForSubAssetCreation(forAmount: C.subAssetFee, toAddress: to, asset: asset, rootAsset: rootAsset!)
+            break
+        case .uniqueAsset:
+            transaction = walletManager.wallet?.createTxForUniqueAssetCreation(forAmount: C.uniqueAssetFee, toAddress: to, asset: asset, rootAsset: rootAsset!)
             break
         case .manageAsset:
-            transaction = nil
+            transaction = walletManager.wallet?.createTxForRootAssetManage(forAmount: amount!, toAddress: to, asset: asset)
             break
         case .transferRvn: //never called in this class
             transaction = nil

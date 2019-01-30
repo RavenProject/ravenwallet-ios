@@ -1,8 +1,8 @@
 //
-//  AddressBookViewController.swift
+//  AddAddressBookVC.swift
 //  ravenwallet
 //
-//  Created by Bendnaiba on 2018-10-30.
+//  Created by Ben on 2018-10-30.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
@@ -15,7 +15,6 @@ enum ActionAddressType {//BMEX
     case update
 }
 
-private let verticalButtonPadding: CGFloat = 32.0
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
 class AddAddressBookVC : UIViewController, Subscriber, ModalPresentable, Trackable {
@@ -133,9 +132,6 @@ class AddAddressBookVC : UIViewController, Subscriber, ModalPresentable, Trackab
             return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
         }
         
-        guard currency.state.fees != nil else {
-            return showAlert(title: S.Alert.error, message: S.Send.noFeesError, buttonLabel: S.Button.ok)
-        }
         guard address.isValidAddress else {
             let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
             return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)

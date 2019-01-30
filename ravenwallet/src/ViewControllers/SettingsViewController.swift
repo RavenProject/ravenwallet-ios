@@ -89,16 +89,26 @@ class SettingsViewController : UITableViewController, CustomTitleView {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-
+        
         if let setting = rows[sections[indexPath.section]]?[indexPath.row] {
+            cell.selectionStyle = .default
             cell.textLabel?.text = setting.title
             cell.textLabel?.font = .customBody(size: 16.0)
             cell.textLabel?.textColor = .darkGray
+            
+            if(setting.accessoryText != nil){
+                let label = UILabel(font: .customMedium(size: 16.0), color: .darkGray)
+                label.text = setting.accessoryText?()
+                label.sizeToFit()
+                cell.accessoryView = label
+            }
+            else if(setting.toggle != nil){
+                cell.selectionStyle = .none
+                setting.toggle?.boolChanged = setting.toggleCallback
+                setting.toggle?.isOn = setting.toggleDefaultValue
+                cell.accessoryView = setting.toggle
+            }
 
-            let label = UILabel(font: .customMedium(size: 16.0), color: .darkGray)
-            label.text = setting.accessoryText?()
-            label.sizeToFit()
-            cell.accessoryView = label
         }
         return cell
     }
@@ -128,7 +138,8 @@ class SettingsViewController : UITableViewController, CustomTitleView {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let setting = rows[sections[indexPath.section]]?[indexPath.row] {
-            setting.callback()
+            guard setting.toggle == nil else { return }
+            setting.callback!()
         }
     }
 

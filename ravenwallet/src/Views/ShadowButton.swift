@@ -150,7 +150,7 @@ class ShadowButton: UIControl {
         shadowView.isUserInteractionEnabled = false
     }
 
-    private func addContent() {
+    func addContent() {
         addSubview(container)
         container.backgroundColor = .primaryButton
         container.layer.cornerRadius = cornerRadius

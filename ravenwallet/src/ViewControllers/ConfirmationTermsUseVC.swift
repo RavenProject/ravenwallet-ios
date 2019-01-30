@@ -77,8 +77,15 @@ class ConfirmationTermsUseVC : UIViewController, Subscriber {
         container.backgroundColor = .white
         confirmBtn.addTarget(self, action: #selector(ConfirmationTermsUseVC.confirmTaped), for: .touchUpInside)
         confirmBtn.isEnabled = false
+        acceptCell.isEnabled = false
         didSelectCallback = { isSelected in
             self.confirmBtn.isEnabled = false
+            if !self.firstTermCell.isSelected || !self.secondTermCell.isSelected {
+                self.acceptCell.isEnabled = false
+            }
+            else{
+                self.acceptCell.isEnabled = true
+            }
             if self.firstTermCell.isSelected && self.secondTermCell.isSelected && self.acceptCell.isSelected {
                 self.confirmBtn.isEnabled = true
             }

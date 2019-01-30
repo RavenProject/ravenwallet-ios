@@ -10,8 +10,8 @@ import UIKit
 import LocalAuthentication
 import Core
 
-private let verticalButtonPadding: CGFloat = 32.0
-private let createAddressHeight: CGFloat = 110.0
+internal let verticalButtonPadding: CGFloat = 32.0
+internal let createAddressHeight: CGFloat = 110.0
 
 enum NameStatus {
     case notVerified
@@ -36,9 +36,10 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         self.initialAddress = initialAddress
         self.initialRequest = initialRequest
         self.walletManager = walletManager
-        self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: .createAsset)
+        self.operationType = .createAsset
+        self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: self.operationType)
         self.addressCell = AddressCreateAssetCell(currency: self.currency, type: .create)
-        self.feeView = FeeAmountVC(walletManager: self.walletManager, sender: self.sender, operationType: .createAsset)
+        self.feeView = FeeAmountVC(walletManager: self.walletManager, sender: self.sender, operationType: self.operationType)
         self.cPtr = (walletManager.peerManager?.cPtr)!
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -52,31 +53,32 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     }
 
     let cPtr: OpaquePointer
-    private var asset: Asset?
-    private let sender: SenderAsset
-    private let walletManager: WalletManager
-    private let nameCell = NameAssetCell(placeholder: S.AddressBook.nameAddressLabel)
-    private let addressCell: AddressCreateAssetCell
-    private let quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
-    private let feeView: FeeAmountVC
-    private let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel)
-    private let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissubaleLabel)
-    private let ipfsCell = IPFSCell(labelCheckBox: S.Asset.hasIpfsLabel, placeholder: S.Asset.ipfsHashLabel)
-    private let createButton = ShadowButton(title: S.Asset.create, type: .tertiary)
+    internal var operationType: OperationType
+    internal var asset: Asset?
+    internal var sender: SenderAsset
+    internal let walletManager: WalletManager
+    internal let nameCell = NameAssetCell(placeholder: S.AddressBook.nameAddressLabel)
+    internal let addressCell: AddressCreateAssetCell
+    internal let quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
+    internal var feeView: FeeAmountVC
+    internal let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel)
+    internal let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissubaleLabel)
+    internal let ipfsCell = IPFSCell(labelCheckBox: S.Asset.hasIpfsLabel, placeholder: S.Asset.ipfsHashLabel)
+    internal let createButton = ShadowButton(title: S.Asset.create, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
     private var currencySwitcherHeightConstraint: NSLayoutConstraint?
     private var pinPadHeightConstraint: NSLayoutConstraint?
-    private var balance: UInt64 = 0
-    private var feeAmount: UInt64 = 0
-    private var quantity: Satoshis?
+    internal var balance: UInt64 = 0
+    internal var feeAmount: UInt64 = 0
+    internal var quantity: Satoshis?
     private var didIgnoreUsedAddressWarning = false
     private var didIgnoreIdentityNotCertified = false
     private let initialRequest: PaymentRequest?
-    private let confirmTransitioningDelegate = PinTransitioningDelegate()
-    private var feeType: Fee?
-    private let currency: CurrencyDef = Currencies.rvn //BMEX
-    private var nameStatus: NameStatus = .notVerified
-    private let activityView = UIActivityIndicatorView(style: .white)
+    internal let confirmTransitioningDelegate = PinTransitioningDelegate()
+    internal var feeType: Fee?
+    internal let currency: CurrencyDef = Currencies.rvn //BMEX
+    internal var nameStatus: NameStatus = .notVerified
+    internal let activityView = UIActivityIndicatorView(style: .white)
 
     override func viewDidLoad() {
         addSubviews()
@@ -90,7 +92,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         super.viewDidAppear(animated)
     }
     
-    private func addSubviews() {
+    internal func addSubviews() {
         view.backgroundColor = .white
         view.addSubview(nameCell)
         view.addSubview(addressCell)
@@ -100,13 +102,13 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         createButton.addSubview(activityView)
     }
     
-    private func addConstraints() {
+    internal func addConstraints() {
         nameCell.constrainTopCorners(height: SendCell.defaultHeight)
         addressCell.constrain([
             addressCell.widthAnchor.constraint(equalTo: nameCell.widthAnchor),
             addressCell.topAnchor.constraint(equalTo: nameCell.bottomAnchor),
             addressCell.leadingAnchor.constraint(equalTo: nameCell.leadingAnchor),
-            addressCell.heightAnchor.constraint(equalToConstant: createAddressHeight) ])
+            addressCell.heightAnchor.constraint(equalToConstant: !UserDefaults.hasActivatedExpertMode ? 0.0 : createAddressHeight) ])
         
         addChild(quantityView, layout: {
             quantityView.view.constrain([
@@ -153,13 +155,16 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             activityView.centerYAnchor.constraint(equalTo: createButton.centerYAnchor) ])
     }
     
-    private func setInitialData() {
+    internal func setInitialData() {
         nameCell.textField.autocapitalizationType = .allCharacters
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
         }
         activityView.hidesWhenStopped = true
         activityView.stopAnimating()
+        if !UserDefaults.hasActivatedExpertMode {
+            self.generateTapped()
+        }
     }
     
     private func addSubscriptions() {
@@ -186,7 +191,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         })
     }
 
-    private func addButtonActions() {
+    internal func addButtonActions() {
         addressCell.paste.addTarget(self, action: #selector(CreateAssetVC.pasteTapped), for: .touchUpInside)
         addressCell.scan.addTarget(self, action: #selector(CreateAssetVC.scanTapped), for: .touchUpInside)
         addressCell.addressBook.addTarget(self, action: #selector(CreateAssetVC.addressBookTapped), for: .touchUpInside)
@@ -275,6 +280,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                 mySelf.callbackNameAvailability!(assetRef != nil)
                 if(mySelf.group != nil){
                     mySelf.group?.leave()
+                    mySelf.group = nil
                 }
             })
             let result = self.group!.wait(timeout: .now() + 2.0)
@@ -291,14 +297,17 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             return showAlert(title: S.Alert.error, message: S.Send.emptyPasteboard, buttonLabel: S.Button.ok)
         }
         
-        guard PaymentRequest(string: pasteboard, currency: currency) != nil else {
-            let message = String.init(format: S.Send.invalidAddressOnPasteboard, currency.name)
-            return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
-        }
         if sender.superview == addressCell {
+            guard PaymentRequest(string: pasteboard, currency: currency) != nil else {
+                let message = String.init(format: S.Send.invalidAddressOnPasteboard, currency.name)
+                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+            }
             addressCell.setContent(pasteboard)
         }
         else if sender.superview == ipfsCell{
+            guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: pasteboard) else {
+                return showAlert(title: S.Send.invalidAddressTitle, message: S.Asset.invalidIpfsHashMessage, buttonLabel: S.Button.ok)
+            }
             ipfsCell.textField.text = pasteboard
         }
     }
@@ -320,7 +329,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         }
     }
     
-    @objc private func generateTapped(sender:UIButton) {
+    @objc private func generateTapped() {
         guard let addressText = currency.state.receiveAddress else { return }
         addressCell.setContent(addressText)        
     }
@@ -336,7 +345,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         })))
     }
     
-    @objc private func sendTapped() {
+    @objc internal func sendTapped() {
         if addressCell.textField.isFirstResponder {
             addressCell.textField.resignFirstResponder()
         }
@@ -348,13 +357,23 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         guard self.nameCell.textField.text?.isEmpty == false else {
             return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
         }
+        var assetType:AssetType = .ROOT
+        if (AssetValidator.shared.IsAssetNameAnOwner(name: self.nameCell.textField.text!)) {
+            assetType = .OWNER
+        }
+        else{
+            assetType = operationType == .createAsset ? .ROOT : .SUB
+        }
+
+        guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
+            return showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
+        }
         
         if self.nameStatus != .availabe {
             if self.nameStatus == .notAvailable {
                 return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
             }
         }
-
             
         guard let address = addressCell.address else {
             return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
@@ -385,8 +404,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                 return showAlert(title: S.Alert.error, message: S.Asset.noIpfsHash, buttonLabel: S.Button.ok)
             }
             guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: ipfsHash) else {
-                let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
-                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+                return showAlert(title: S.Send.invalidAddressTitle, message: S.Asset.invalidIpfsHashMessage, buttonLabel: S.Button.ok)
             }
         }
         //if all ok check name availability if not checked
@@ -402,29 +420,33 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                         return self.showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
                     }
                     else {
-                        self.showConfirmationView(amount: amount, address: address)
+                        self.showConfirmationView(amount: amount, address: address, units: Int(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
                     }
                 }
             }
         }
         else
         {
-            showConfirmationView(amount: amount, address: address)
+            showConfirmationView(amount: amount, address: address, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale:reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
         }
         return
     }
     
-    func showConfirmationView(amount:Satoshis, address:String) {
+    func createAsset(amount:Satoshis) -> (BRAssetRef, BRAssetRef?) {
+        let assetToSend = BRAsset.createAssetRef(asset: asset!, type: NEW_ASSET, amount: amount)
+        return (assetToSend, nil)
+    }
+    
+    func showConfirmationView(amount:Satoshis, address:String, units:Int, reissubale:Int) {
         //sender
-        asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
+        asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: units, reissubale: reissubale, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
         
-        let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset!, type: NEW_ASSET, amount: amount)
-        guard sender.createAssetTransaction(amount: C.creatAssetFee, to: address, asset: assetToSend) else {
+        let (assetToSend, rootAsset) = createAsset(amount: amount)
+        guard sender.createAssetTransaction(to: address, asset: assetToSend, rootAsset: rootAsset) else {
             return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
         }
         
-        
-        let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: nil, minimumFractionDigits: quantityView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics, operationType: .createAsset, assetToSend: asset)
+        let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: nil, minimumFractionDigits: quantityView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics, operationType: operationType, assetToSend: asset)
         confirm.successCallback = {
             confirm.dismiss(animated: true, completion: {
                 self.send()
@@ -466,14 +488,14 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                         }
                         myself.onPublishSuccess?(myself.sender.transaction!.txHash.description)
                     })
-                    self?.saveEvent("create.success")
+                    self?.saveEvent("\(self!.operationType).success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("create.publishFailed", attributes: ["errorMessage": message])
+                    self?.saveEvent("\(self!.operationType).publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("create.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
+                        self?.saveEvent("\(self!.operationType).publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })
@@ -517,7 +539,16 @@ extension CreateAssetVC : ModalDisplayable {
     }
 
     var modalTitle: String {
-        return "\(S.Asset.createTitle)"
+        switch self.operationType {
+        case .createAsset:
+            return "\(S.Asset.createTitle)"
+        case .subAsset:
+            return "\(S.Asset.subAssetTitle)"
+        case .uniqueAsset:
+            return "\(S.Asset.uniqueAssetTitle)"
+        default:
+            return "\(S.Asset.createTitle)"
+        }
     }
 }
 

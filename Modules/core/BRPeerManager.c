@@ -29,12 +29,14 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 //        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
 //        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
 //        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
-        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
-    }; // New testnet, port:18770 useragent:"/Ravencoin2.1.1/"
+//        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
+//        {  150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
+        {  160000, "000000ce693ba2f21eff6b38270b6eab8bf442adb25252b9e8d4a7ab43709b10", 1547998364, 0x1e01c59a }
+    }; // New testnet, port:18770 useragent:"/Ravencoin2.2.0/"
 
 static const char *dns_seeds[] = {
-       "127.0.0.1", NULL
-//        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
+//       "127.0.0.1", NULL
+        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
 };
 
 #else // main net
@@ -43,7 +45,6 @@ static const char *dns_seeds[] = {
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
 //        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
-////        {      1, "00000058bcc33dea08b53691edb9e49a9eb8bac36a0db17eb5a7588860b1f590", 1515015723, 0x1e00ffff },
 //        {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
 //        {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
 //        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
@@ -65,8 +66,9 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 //        { 334656, "0000000000017b8112fb5e67c807d2962c98cef80ef3ed9c2d9503dfef219b3e", 1535026940, 0x1b069a70 },
 //        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
 //        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
-        { 479587, "000000000000a96ff81c3958712f24895a6084e39c33da258a84b82d550e233b", 1544094174, 0x1b00f00d }
-
+//        { 479587, "000000000000a96ff81c3958712f24895a6084e39c33da258a84b82d550e233b", 1544094174, 0x1b00f00d },
+        { 556081, "000000000000dc88e8b366a5bec1f2365a93d86a254f24a7e610ea291874590a", 1548715428, 0x1b012026 }
+    
 };
 
 static const char *dns_seeds[] = {
@@ -138,7 +140,7 @@ static size_t _TxPeerListAddPeer(TxPeerList **list, UInt256 txHash, const BRPeer
         return array_count((*list)[i - 1].peers);
     }
 
-    array_add(*list, ((TxPeerList) {txHash, NULL}));
+    array_add(*list, ((const TxPeerList) {txHash, NULL}));
     array_new((*list)[array_count(*list) - 1].peers, PEER_MAX_CONNECTIONS);
     array_add((*list)[array_count(*list) - 1].peers, *peer);
     return 1;
@@ -707,7 +709,7 @@ static void *_findPeersThreadRoutine(void *arg) {
 
     for (addr = addrList; addr && !UInt128IsZero(*addr); addr++) {
         age = 24 * 60 * 60 + BRRand(2 * 24 * 60 * 60); // add between 1 and 3 days
-        array_add(manager->peers, ((BRPeer) {*addr, STANDARD_PORT, services, now - age, 0}));
+        array_add(manager->peers, ((const BRPeer) {*addr, STANDARD_PORT, services, now - age, 0}));
     }
 
     manager->dnsThreadCount--;
@@ -747,7 +749,7 @@ static void _PeerManagerFindPeers(BRPeerManager *manager) {
 
         for (addr = addrList = _addressLookup(dns_seeds[0]);
              addr && !UInt128IsZero(*addr); addr++) {
-            array_add(manager->peers, ((BRPeer) {*addr, STANDARD_PORT, services, now, 0}));
+            array_add(manager->peers, ((const BRPeer) {*addr, STANDARD_PORT, services, now, 0}));
         }
 
         if (addrList) free(addrList);
@@ -1704,7 +1706,7 @@ void BRPeerManagerSetFixedPeer(BRPeerManager *manager, UInt128 address, uint16_t
     BRPeerManagerDisconnect(manager);
     pthread_mutex_lock(&manager->lock);
     manager->maxConnectCount = UInt128IsZero(address) ? PEER_MAX_CONNECTIONS : 1;
-    manager->fixedPeer = ((BRPeer) {address, port, 0, 0, 0});
+    manager->fixedPeer = ((const BRPeer) {address, port, 0, 0, 0});
     array_clear(manager->peers);
     pthread_mutex_unlock(&manager->lock);
 }
@@ -1810,7 +1812,7 @@ void BRPeerManagerConnect(BRPeerManager *manager) {
     }
 
     if (array_count(manager->connectedPeers) == 0) {
-        peer_log(&PEER_NONE, "sync failed");
+//        peer_log(&PEER_NONE, "sync failed");
         _PeerManagerSyncStopped(manager);
         pthread_mutex_unlock(&manager->lock);
         if (manager->syncStopped) manager->syncStopped(manager->info, ENETUNREACH);
@@ -2070,25 +2072,33 @@ void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *as
     }
 }
 
+
 // frees memory allocated for manager
 void BRPeerManagerFree(BRPeerManager *manager) {
+    BRTransaction *tx;
+    
     assert(manager != NULL);
     pthread_mutex_lock(&manager->lock);
     array_free(manager->peers);
-    for (size_t i = array_count(manager->connectedPeers); i > 0; i--)
-        BRPeerFree(manager->connectedPeers[i - 1]);
+    for (size_t i = array_count(manager->connectedPeers); i > 0; i--) BRPeerFree(manager->connectedPeers[i - 1]);
     array_free(manager->connectedPeers);
     BRSetApply(manager->blocks, NULL, _setApplyFreeBlock);
     BRSetFree(manager->blocks);
     BRSetApply(manager->orphans, NULL, _setApplyFreeBlock);
     BRSetFree(manager->orphans);
     BRSetFree(manager->checkpoints);
-    for (size_t i = array_count(manager->txRelays); i > 0; i--)
-        free(manager->txRelays[i - 1].peers);
+    for (size_t i = array_count(manager->txRelays); i > 0; i--) array_free(manager->txRelays[i - 1].peers);
     array_free(manager->txRelays);
-    for (size_t i = array_count(manager->txRequests); i > 0; i--)
-        free(manager->txRequests[i - 1].peers);
+    for (size_t i = array_count(manager->txRequests); i > 0; i--) array_free(manager->txRequests[i - 1].peers);
     array_free(manager->txRequests);
+    
+    for (size_t i = array_count(manager->publishedTx); i > 0; i--) {
+        tx = manager->publishedTx[i - 1].tx;
+        if (tx && tx != BRWalletTransactionForHash(manager->wallet, tx->txHash)) BRTransactionFree(tx);
+    }
+    
+    if (manager->bloomFilter) BRBloomFilterFree(manager->bloomFilter);
+    
     array_free(manager->publishedTx);
     array_free(manager->publishedTxHashes);
     pthread_mutex_unlock(&manager->lock);

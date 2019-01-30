@@ -92,6 +92,8 @@ size_t BRWalletUnusedAddrs(BRWallet *wallet, BRAddress *addrs, uint32_t gapLimit
 
 // returns the first unused external address
 BRAddress BRWalletReceiveAddress(BRWallet *wallet);
+    
+size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs, size_t addrsCount);
 
 // writes all addresses previously genereated with WalletUnusedAddrs() to addrs
 // returns the number addresses written, or total number available if addrs is NULL
@@ -131,19 +133,28 @@ void BRWalletSetFeePerKb(BRWallet *wallet, uint64_t feePerKb);
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTransaction(BRWallet *wallet, uint64_t amount, const char *addr);
+
+// TODO:
+BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
+
+BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst);
     
-BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
+BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst);
 
-BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
+BRTransaction *BRWalletCreateTxForRootAssetManage(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
 
-BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset);
+BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
+
+BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
+    
 BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset);
 
     
 // returns an unsigned transaction that satisifes the given transaction outputs
 // result must be freed using TransactionFree()
-//BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
-BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount, BRAsset *asset);
+BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
+// deprecated/
+BRTransaction *BRWalletCreateTxForOutputsV2(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount, BRAsset *asset);
 
 
 // signs any inputs in tx that can be signed using private keys from the wallet

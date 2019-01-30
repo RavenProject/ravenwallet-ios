@@ -90,7 +90,7 @@ typedef struct {
     char s[36];
 } BRAddress;
 
-#define ADDRESS_NONE ((BRAddress) { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" })
+#define ADDRESS_NONE ((const BRAddress) { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" })
 
 // writes the ravencoin address for a scriptPubKey to addr
 // returns the number of bytes written, or addrLen needed if addr is NULL

@@ -306,6 +306,7 @@ class CoreDatabase {
             sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
             defer { sqlite3_finalize(sql) }
             guard sqlite3_step(sql) == SQLITE_DONE else {
+                print("BMEX database assetAdded error")
                 print(String(cString: sqlite3_errmsg(self.db)))
                 return
             }
@@ -594,7 +595,11 @@ class CoreDatabase {
                 transactions.append(tx)
             }
             
-            if sqlite3_errcode(self.db) != SQLITE_DONE { print(String(cString: sqlite3_errmsg(self.db))) }
+            if sqlite3_errcode(self.db) != SQLITE_DONE {
+                print("BMEX database loadTransactions error")
+                print(String(cString: sqlite3_errmsg(self.db)))
+            }
+
             DispatchQueue.main.async {
                 callback(transactions)
             }
@@ -703,6 +708,7 @@ class CoreDatabase {
             }
             
             if sqlite3_errcode(self.db) != SQLITE_DONE {
+                print("BMEX database loadAsset error")
                 print(String(cString: sqlite3_errmsg(self.db)))
             }
             DispatchQueue.main.async {

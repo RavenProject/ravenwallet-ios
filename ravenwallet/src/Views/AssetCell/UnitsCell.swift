@@ -17,6 +17,13 @@ class UnitsCell : NumberCell {
     
     private let unitsLabel = UILabel.init(font: .customBody(size: 14.0), color: .grayTextTint)
     
+    override var amount: Satoshis? {
+        didSet {
+            updateAmountLabel()
+            didUpdateAmount?(amount)
+        }
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
