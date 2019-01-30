@@ -7,18 +7,18 @@
 //
 
 import XCTest
-@testable import breadwallet
+@testable import Ravencoin
 
 class PaymentRequestTests : XCTestCase {
 
     func testEmptyString() {
         XCTAssertNil(PaymentRequest(string: "", currency: Currencies.rvn))
-        XCTAssertNil(PaymentRequest(string: "", currency: Currencies.bch))
+        //XCTAssertNil(PaymentRequest(string: "", currency: Currencies.bch))
     }
 
     func testInvalidAddress() {
         XCTAssertNil(PaymentRequest(string: "notandaddress", currency: Currencies.rvn), "Payment request should be nil for invalid addresses")
-        XCTAssertNil(PaymentRequest(string: "notandaddress", currency: Currencies.bch), "Payment request should be nil for invalid addresses")
+        //XCTAssertNil(PaymentRequest(string: "notandaddress", currency: Currencies.bch), "Payment request should be nil for invalid addresses")
     }
 
     func testBasicExampleBTC() {
@@ -30,11 +30,11 @@ class PaymentRequestTests : XCTestCase {
     }
     
     func testBasicExampleBCH() {
-        let uri = "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u"
+        /*let uri = "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u"
         let request = PaymentRequest(string: uri, currency: Currencies.bch)
         XCTAssertNotNil(request)
         XCTAssertTrue(request?.toAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u".bitcoinAddr)
-        XCTAssertTrue(request?.displayAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u")
+        XCTAssertTrue(request?.displayAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u")*/
     }
 
     func testAmountInUriBTC() {
@@ -48,11 +48,11 @@ class PaymentRequestTests : XCTestCase {
     
     func testAmountInUriBCH() {
         let uri = "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u?amount=1.2"
-        let request = PaymentRequest(string: uri, currency: Currencies.bch)
+        /*let request = PaymentRequest(string: uri, currency: Currencies.bch)
         XCTAssertNotNil(request)
         XCTAssertTrue(request?.toAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u".bitcoinAddr)
         XCTAssertTrue(request?.displayAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u")
-        XCTAssertTrue(request?.amount?.rawValue == 120000000)
+        XCTAssertTrue(request?.amount?.rawValue == 120000000)*/
     }
 
     func testRequestMetaDataBTC() {
@@ -67,12 +67,12 @@ class PaymentRequestTests : XCTestCase {
     
     func testRequestMetaDataBCH() {
         let uri = "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u?amount=1.2&message=Payment&label=Satoshi"
-        let request = PaymentRequest(string: uri, currency: Currencies.bch)
+        /*let request = PaymentRequest(string: uri, currency: Currencies.bch)
         XCTAssertTrue(request?.toAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u".bitcoinAddr)
         XCTAssertTrue(request?.displayAddress == "bitcoincash:qr2g8fyjy0csdujuxcg02syrp5eaqgtn9ytlk3650u")
         XCTAssertTrue(request?.amount?.rawValue == 120000000)
         XCTAssertTrue(request?.message == "Payment")
-        XCTAssertTrue(request?.label == "Satoshi")
+        XCTAssertTrue(request?.label == "Satoshi")*/
     }
 
     func testExtraEqualSign() {

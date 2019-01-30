@@ -2,7 +2,7 @@
 //  ManageAssetTableVC.swift
 //  ravenwallet
 //
-//  Created by Bendnaiba on 2016-11-16.
+//  Created by Ben on 2016-11-16.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 

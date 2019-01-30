@@ -7,8 +7,8 @@
 //
 
 import XCTest
-@testable import breadwallet
-import BRCore
+@testable import Ravencoin
+import Core
 
 class FakeAuthenticator: WalletAuthenticator {
     let secret: UInt256

@@ -2,7 +2,7 @@
 //  TutorialVC.swift
 //  Ravencoin
 //
-//  Created by bendnaiba on 11/29/18.
+//  Created by Ben on 11/29/18.
 //  Copyright © 2018 Medici Ventures. All rights reserved.
 //
 

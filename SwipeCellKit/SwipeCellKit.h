@@ -2,7 +2,7 @@
 //  SwipeCellKit.h
 //  SwipeCellKit
 //
-//  Created by bendnaiba on 10/10/18.
+//  Created by Ben on 10/10/18.
 //  Copyright © 2018 Medici Ventures. All rights reserved.
 //
 
