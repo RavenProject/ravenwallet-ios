@@ -74,7 +74,6 @@
 		41358D1D21761BD800B86443 /* ManageAssetTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41358D1C21761BD800B86443 /* ManageAssetTableVC.swift */; };
 		41358D1F2176288B00B86443 /* AssetManageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41358D1E2176288B00B86443 /* AssetManageCell.swift */; };
 		41358D2221787CBF00B86443 /* AssetPopUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41358D2121787CBF00B86443 /* AssetPopUpVC.swift */; };
-		414B254121B0144200BC57FC /* TutorialVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414B254021B0144200BC57FC /* TutorialVC.swift */; };
 		41650AF621697E540024D36E /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41650AF521697E540024D36E /* AddressBook.swift */; };
 		41743A1C2174A89600624970 /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41743A1B2174A89600624970 /* AssetManager.swift */; };
 		41743A1E2174B4BA00624970 /* AssetHomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41743A1D2174B4BA00624970 /* AssetHomeCell.swift */; };
@@ -329,6 +328,7 @@
 		8B137EB820F90F76006DEB3A /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9320F90D11006DEB3A /* aes.cpp */; };
 		8B137EB920F90F79006DEB3A /* sph_shabal.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9520F90D11006DEB3A /* sph_shabal.c */; };
 		8B137EBB20F90F83006DEB3A /* echo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B137E9D20F90D11006DEB3A /* echo.c */; };
+		8B5877E82201DE390065DD19 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5877E72201DE390065DD19 /* TutorialViewController.swift */; };
 		8B5C1EC421C442470066E629 /* SwipeTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAC21C442460066E629 /* SwipeTableViewCellDelegate.swift */; };
 		8B5C1EC521C442470066E629 /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAD21C442460066E629 /* SwipeAnimator.swift */; };
 		8B5C1EC621C442470066E629 /* SwipeCollectionViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5C1EAE21C442460066E629 /* SwipeCollectionViewCell+Display.swift */; };
@@ -810,7 +810,6 @@
 		41358D1C21761BD800B86443 /* ManageAssetTableVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageAssetTableVC.swift; sourceTree = "<group>"; };
 		41358D1E2176288B00B86443 /* AssetManageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AssetManageCell.swift; path = src/Views/AssetManageCell.swift; sourceTree = "<group>"; };
 		41358D2121787CBF00B86443 /* AssetPopUpVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetPopUpVC.swift; sourceTree = "<group>"; };
-		414B254021B0144200BC57FC /* TutorialVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TutorialVC.swift; path = src/ViewControllers/TutorialVC.swift; sourceTree = "<group>"; };
 		41650AF521697E540024D36E /* AddressBook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBook.swift; path = src/Models/AddressBook.swift; sourceTree = "<group>"; };
 		41743A1B2174A89600624970 /* AssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetManager.swift; sourceTree = "<group>"; };
 		41743A1D2174B4BA00624970 /* AssetHomeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AssetHomeCell.swift; path = src/Views/AssetHomeCell.swift; sourceTree = "<group>"; };
@@ -1662,6 +1661,7 @@
 		8B137E9420F90D11006DEB3A /* sph_fugue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sph_fugue.h; sourceTree = "<group>"; };
 		8B137E9520F90D11006DEB3A /* sph_shabal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sph_shabal.c; sourceTree = "<group>"; };
 		8B137E9D20F90D11006DEB3A /* echo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = echo.c; sourceTree = "<group>"; };
+		8B5877E72201DE390065DD19 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TutorialViewController.swift; path = src/ViewControllers/TutorialViewController.swift; sourceTree = "<group>"; };
 		8B5C1EAC21C442460066E629 /* SwipeTableViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCellDelegate.swift; sourceTree = "<group>"; };
 		8B5C1EAD21C442460066E629 /* SwipeAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAnimator.swift; sourceTree = "<group>"; };
 		8B5C1EAE21C442460066E629 /* SwipeCollectionViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Display.swift"; sourceTree = "<group>"; };
@@ -3378,7 +3378,7 @@
 		CE20C8EF1DBAF6D300C8397A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				414B254021B0144200BC57FC /* TutorialVC.swift */,
+				8B5877E72201DE390065DD19 /* TutorialViewController.swift */,
 				410C3EC02192E7BB002B5208 /* ConfirmationTermsUseVC.swift */,
 				CEEC708B1E95461A00EF788E /* AboutViewController.swift */,
 				CEBF32EF1DDCD30600348FC6 /* AccountViewController.swift */,
@@ -4566,6 +4566,7 @@
 				CEA05CC31F21B53C00D850F0 /* FeeSelector.swift in Sources */,
 				417C680F216B51E10090710E /* AddressListCell.swift in Sources */,
 				CE20C8F21DBAF71500C8397A /* ApplicationController.swift in Sources */,
+				8B5877E82201DE390065DD19 /* TutorialViewController.swift in Sources */,
 				CEC4CF071F0C48DD00E5C82E /* StartWipeWalletViewController.swift in Sources */,
 				7528D2981ECF655500925DBC /* PaymentProtocol.swift in Sources */,
 				41743A202174BCE400624970 /* WalletListViewModel.swift in Sources */,
@@ -4696,7 +4697,6 @@
 				CE8CD8DD1E2D9EF200785E02 /* Sender.swift in Sources */,
 				4175A420217B3395009A76FD /* UITextField+Additions.swift in Sources */,
 				CE4DFB2C1E9BE5880014009E /* ReScanViewController.swift in Sources */,
-				414B254121B0144200BC57FC /* TutorialVC.swift in Sources */,
 				7C9724661FF07B9A004248C4 /* StatusPip.swift in Sources */,
 				7C35E712200AC2080064808F /* TxViewModel.swift in Sources */,
 				8B137EB720F90F72006DEB3A /* skein.c in Sources */,

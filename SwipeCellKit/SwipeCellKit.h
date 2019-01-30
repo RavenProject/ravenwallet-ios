@@ -2,8 +2,8 @@
 //  SwipeCellKit.h
 //  SwipeCellKit
 //
-//  Created by Jeremy Koch on 2/3/17.
-//
+//  Created by bendnaiba on 10/10/18.
+//  Copyright © 2018 Medici Ventures. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
