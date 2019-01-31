@@ -404,26 +404,25 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
         off += sLen;
         
         /*RVN PROCESS START*/
-            if (!tx->asset) {
-                if(tx->blockHeight >= ASSET_ACTIVATION) {// if assets are deployed
-                    
-                    if (!output->script || output->scriptLen == 0) return tx;
-                    
-                    if (IsScriptAsset(output->script, output->scriptLen) && !IsScriptOwnerAsset(output->script, output->scriptLen)) {
-                        tx->asset = NewAsset();
-                        GetAssetData(output->script, output->scriptLen, tx->asset);
-                    }
-                }
-            }
-            else if(tx->asset->type == TRANSFER) {
-                if (IsScriptAsset(output->script, output->scriptLen) &&
-                    !IsScriptOwnerAsset(output->script, output->scriptLen) &&
-                    !IsScriptTransferAsset(output->script, output->scriptLen)) {
+        if (!tx->asset) {
+            if(tx->blockHeight >= ASSET_ACTIVATION) {// if assets are deployed
+                
+                //                    if (output->scriptLen > 25)
+                if (IsScriptAsset(output->script, output->scriptLen) && !IsScriptOwnerAsset(output->script, output->scriptLen)) {
+                    tx->asset = NewAsset();
                     GetAssetData(output->script, output->scriptLen, tx->asset);
-                } else if(IsScriptTransferAsset(output->script, output->scriptLen)) {
-                    
                 }
             }
+        }
+        // SubAsset or Unique Asset creation
+        // Reissue or Transfer
+        else if(tx->asset->type == TRANSFER) {
+            if (IsScriptAsset(output->script, output->scriptLen) &&
+                !IsScriptOwnerAsset(output->script, output->scriptLen) &&
+                !IsScriptTransferAsset(output->script, output->scriptLen)) {
+                GetAssetData(output->script, output->scriptLen, tx->asset);
+            } /*else if(IsScriptTransferAsset(output->script, output->scriptLen)) break;*/
+        }
         /*RVN PROCESS END*/
     }
     
@@ -434,7 +433,8 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
         BRTransactionFree(tx);
         tx = NULL;
     } else if (isSigned) SHA256_2(&tx->txHash, buf, off);
-    
+//    if(tx->asset)
+//        printf("/nBMEX TransactionParse 436: Name %s, %llu\n", tx->asset->name, tx->asset->amount / COIN);
     return tx;
 }
 
@@ -564,9 +564,9 @@ int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCou
         size_t sigLen, scriptLen;
         UInt256 md = UINT256_ZERO;
         
-        #warning TODO: OP_EQUALVERIFY condition doesn't trigger for assets input
+#warning TODO: OP_EQUALVERIFY condition doesn't trigger for assets input
         if (elemsCount >= 2 && (*elems[elemsCount - 2] == OP_EQUALVERIFY || *elems[elemsCount - 5] == OP_EQUALVERIFY)) { // pay-to-pubkey-hash
-//        if (elemsCount >= 2 /*&& *elems[elemsCount - 2] == OP_EQUALVERIFY*/) { // pay-to-pubkey-hash
+            //        if (elemsCount >= 2 /*&& *elems[elemsCount - 2] == OP_EQUALVERIFY*/) { // pay-to-pubkey-hash
             uint8_t data[_TransactionData(tx, NULL, 0, i, forkId | SIGHASH_ALL)];
             size_t dataLen = _TransactionData(tx, data, sizeof(data), i, forkId | SIGHASH_ALL);
             
@@ -576,7 +576,7 @@ int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCou
             scriptLen = BRScriptPushData(script, sizeof(script), sig, sigLen);
             scriptLen += BRScriptPushData(&script[scriptLen], sizeof(script) - scriptLen, pubKey, pkLen);
             BRTxInputSetSignature(input, script, scriptLen);
-
+            
         } else { // pay-to-pubkey
             uint8_t data[_TransactionData(tx, NULL, 0, i, forkId | SIGHASH_ALL)];
             size_t dataLen = _TransactionData(tx, data, sizeof(data), i, forkId | SIGHASH_ALL);
@@ -641,9 +641,9 @@ BRTransaction *BRTransactionDecomposeForCreation(const BRTransaction *tx, size_t
         // if statement ignores Owner Token transfer for proving ownership
         if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
                           tx->outputs[tx->inputs[j].index].scriptLen))// TODO: not tested yet!
-        BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
-                              tx->inputs[j].script, tx->inputs[j].scriptLen,
-                              tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
+            BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
+                                  tx->inputs[j].script, tx->inputs[j].scriptLen,
+                                  tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
     }
     for (size_t j = 0; j < tx->outCount; j++) {
         if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))
@@ -675,8 +675,8 @@ BRTransaction *BRTransactionDecomposeForCreation(const BRTransaction *tx, size_t
         }
     }
     
-//    if(off == txsCount || IsAssetNameUniqueAsset(tx->asset))
-//        return cpy;
+    //    if(off == txsCount || IsAssetNameUniqueAsset(tx->asset))
+    //        return cpy;
     
     // Tx for Ownership asset reception
     cpy[2].version = TX_VERSION;
@@ -737,9 +737,9 @@ BRTransaction *BRTransactionDecomposeForManagement(const BRTransaction *tx, size
         // if statement ignores Owner Token transfer for proving ownership
         if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
                           tx->outputs[tx->inputs[j].index].scriptLen))// TODO: not tested yet!
-        BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
-                              tx->inputs[j].script, tx->inputs[j].scriptLen,
-                              tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
+            BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
+                                  tx->inputs[j].script, tx->inputs[j].scriptLen,
+                                  tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
     }
     for (size_t j = 0; j < tx->outCount; j++) {
         if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))

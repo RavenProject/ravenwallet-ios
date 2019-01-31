@@ -494,9 +494,8 @@ class BRWallet {
     
     // all used addresses
     var usedAddresses: [String] {
-        
-        var addrs = [BRAddress](repeating: BRAddress(), count: BRWalletUsedAddresses(cPtr, nil, 0))
-        guard BRWalletUsedAddresses(cPtr, &addrs, addrs.count) == addrs.count else { return [] }
+        var addrs = [BRAddress](repeating: BRAddress(), count: BRWalletUsedAddresses(cPtr, nil))
+        guard BRWalletUsedAddresses(cPtr, &addrs) == addrs.count else { return [] }
         return addrs.map({ $0.description })
     }
     

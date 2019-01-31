@@ -265,6 +265,8 @@ TransferAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script,
     asset->amount = amount;
     off += sizeof(uint64_t);
     
+//    printf("/nBMEX TransferAssetFromScriptPubKey 267 asset name %s, %llu\n", asset->name, asset->amount / COIN);
+
     // Check the end of the script
     if (assetScript[off] != OP_DROP) {
         free(assetScript);
@@ -305,7 +307,6 @@ OwnerAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, si
         *(asset->name + name_size) = '\0';
         assert(*(asset->name + name_size) == '\0');
     }
-    
     if((off + sizeof(uint64_t)) < assetScriptLen) {
         amount = (off + sizeof(uint64_t) <= assetScriptLen) ? UInt64GetLE(&assetScript[off]) : 0;
         asset->amount = amount;
@@ -402,7 +403,7 @@ bool GetAssetData(const uint8_t *script, size_t scriptLen, BRAsset *data) {
     
     BRAddress addr;
     
-    // Get the Asset or Transfer Asset from the scriptPubKey
+    // Gets the Asset from the scriptPubKey
     if (IsScriptNewAsset(script, scriptLen)) {
         data->type = NEW_ASSET;
         if (NewAssetFromScriptPubKey(addr.s, sizeof(addr), script, scriptLen, data)) {

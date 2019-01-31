@@ -93,7 +93,7 @@ size_t BRWalletUnusedAddrs(BRWallet *wallet, BRAddress *addrs, uint32_t gapLimit
 // returns the first unused external address
 BRAddress BRWalletReceiveAddress(BRWallet *wallet);
     
-size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs, size_t addrsCount);
+size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs);
 
 // writes all addresses previously genereated with WalletUnusedAddrs() to addrs
 // returns the number addresses written, or total number available if addrs is NULL

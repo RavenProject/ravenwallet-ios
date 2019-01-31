@@ -574,31 +574,7 @@ class ModalPresenter : Subscriber, Trackable {
         let settingsNav = UINavigationController()
         settingsNav.setGrayStyle()
         let sections: [SettingsSections] = [.wallet, .preferences, .currencies, .assets, .other]
-        
-        let currencySettings: [Setting]  = Store.state.currencies.compactMap { (currency) -> Setting? in
-            guard let walletManager = walletManagers[currency.code] else { return nil }
-            return Setting(title: currency.name, callback: { [weak self] in
-                guard let `self` = self else { return }
-                let sections = [SettingsSections.currency]
-                let currencySettings = [
-                    SettingsSections.currency: [
-                        Setting(title: S.Settings.importTile, callback: {
-                                settingsNav.dismiss(animated: true, completion: { [weak self] in
-                                    self?.presentKeyImport(walletManager: walletManager)
-                            })
-                        }),
-                        Setting(title: S.Settings.sync, callback: {
-                            settingsNav.pushViewController(ReScanViewController(currency: currency), animated: true)
-                        }),
-                    ]
-                ]
                 
-                let pageTitle = String(format: S.Settings.currencyPageTitle, currency.name)
-                let currencySettingsVC = SettingsViewController(sections: sections, rows: currencySettings, optionalTitle: pageTitle)
-                settingsNav.pushViewController(currencySettingsVC, animated: true)
-            })
-        }
-        
         let rows = [
             SettingsSections.wallet: [
                 Setting(title: S.Settings.wipe, callback: { [weak self] in
@@ -645,7 +621,16 @@ class ModalPresenter : Subscriber, Trackable {
                     settingsNav.pushViewController(DefaultCurrencyViewController(walletManager: walletManager), animated: true)
                 }),
             ],
-            SettingsSections.currencies: currencySettings,
+            SettingsSections.currencies: [
+                Setting(title: S.Settings.importTile, callback: {
+                    settingsNav.dismiss(animated: true, completion: { [weak self] in
+                        self?.presentKeyImport(walletManager: walletManager)
+                    })
+                }),
+                Setting(title: S.Settings.sync, callback: {
+                    settingsNav.pushViewController(ReScanViewController(currency: Currencies.rvn), animated: true)
+                }),
+            ],
             SettingsSections.assets: [
                 Setting(title: S.Asset.settingTitle, callback: { [weak self] in
                     guard let `self` = self else { return }
