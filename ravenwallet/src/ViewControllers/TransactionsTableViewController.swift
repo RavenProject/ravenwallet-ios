@@ -81,7 +81,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         
         emptyImage.contentMode = .scaleAspectFit
         
-        setContentInset()
+        //setContentInset()
 
         setupSubscriptions()
     }

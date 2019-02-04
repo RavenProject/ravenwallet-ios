@@ -35,7 +35,7 @@ enum SettingsSections: String {
     }
 }
 
-class SettingsViewController : UITableViewController, CustomTitleView {
+class SettingsViewController : UITableViewController, CustomTitleView, Subscriber {
     
     init(sections: [SettingsSections], rows: [SettingsSections: [Setting]], optionalTitle: String? = nil) {
         self.sections = sections
@@ -53,7 +53,7 @@ class SettingsViewController : UITableViewController, CustomTitleView {
     }
 
     private let sections: [SettingsSections]
-    private let rows: [SettingsSections: [Setting]]
+    private var rows: [SettingsSections: [Setting]]
     private let cellIdentifier = "CellIdentifier"
     let titleLabel = UILabel(font: .customBold(size: 28.0), color: .darkGray)
     let customTitle: String
@@ -72,11 +72,33 @@ class SettingsViewController : UITableViewController, CustomTitleView {
         tableView.separatorStyle = .none
         tableView.backgroundColor = .whiteBackground
         addCustomTitle()
+        addSubscriptions()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+    }
+    
+    private func addSubscriptions() {
+        Store.subscribe(self, name: .reloadSettings, callback: { _ in
+            let advancedSetting = self.rows[.network]
+            guard advancedSetting != nil else { return }
+            var newAdvancedSettings:[Setting]? = []
+            for var setting:Setting in advancedSetting! {
+                if(setting.title == S.Settings.expertMode){
+                    setting.toggleDefaultValue = UserDefaults.hasActivatedExpertMode
+                }
+                else if(setting.title == S.WipeSetting.title){
+                    setting.isHidden = !UserDefaults.hasActivatedExpertMode
+                }
+                newAdvancedSettings?.append(setting)
+            }
+            self.rows[.network] = newAdvancedSettings
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                self.tableView.reloadData()
+            })
+        })
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -148,6 +170,10 @@ class SettingsViewController : UITableViewController, CustomTitleView {
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let setting = rows[sections[indexPath.section]]?[indexPath.row]
+        if setting!.isHidden {
+            return 0.0
+        }
         return 48.0
     }
 

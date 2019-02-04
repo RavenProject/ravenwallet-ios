@@ -1114,7 +1114,7 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
 
 BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput outputs[], size_t outCount)
 {
-    BRTransaction *tx, *transaction = BRTransactionNew();
+    BRTransaction *tx, *transaction = BRTransactionNew(1);
     uint64_t feeAmount, amount = 0, balance = 0, minAmount;
     size_t i, j, cpfpSize = 0;
     UTXO *o;
@@ -1350,9 +1350,9 @@ void BRWalletRemoveTransaction(BRWallet *wallet, UInt256 txHash) {
                 }
             }
 
-            BRTransactionFree(tx);
             if (wallet->balanceChanged) wallet->balanceChanged(wallet->callbackInfo, wallet->balance);
             if (wallet->txDeleted) wallet->txDeleted(wallet->callbackInfo, txHash, notifyUser, recommendRescan);
+            BRTransactionFree(tx);
         }
 
         array_free(hashes);
@@ -1535,7 +1535,35 @@ uint64_t BRWalletAmountReceivedFromTx(BRWallet *wallet, const BRTransaction *tx)
     return amount;
 }
 
-// returns the amount sent from the wallet by the trasaction (total wallet outputs consumed, change and fee included)
+// writes the assets contained in the transaction and return the asset object count.
+// used in Creation and Reissue assets transaction // Transfer and Ownership Transfers aren't counted.
+size_t BRWalletAssetsReceivedFromTx(BRWallet *wallet, const BRTransaction *tx, BRAsset *asset, size_t asstCount) {
+    size_t count = 0;
+    
+    assert(wallet != NULL);
+    assert(tx != NULL);
+    pthread_mutex_lock(&wallet->lock);
+    
+    if(!asset && asstCount == 0) {
+        for (size_t i = 0; tx && i < tx->outCount; i++)
+            if (tx->outputs[i].amount == 0 &&
+                !IsScriptTransferAsset(tx->outputs[i].script, tx->outputs[i].scriptLen) &&
+                BRSetContains(wallet->allAddrs, tx->outputs[i].address)) count++;
+    } else {
+        for (size_t i = 0; tx && i < asstCount; i++)
+            if (tx->outputs[i].amount == 0 &&
+                !IsScriptTransferAsset(tx->outputs[i].script, tx->outputs[i].scriptLen) &&
+                BRSetContains(wallet->allAddrs, tx->outputs[i].address)) {
+                GetAssetData(tx->outputs[i].script, tx->outputs[i].scriptLen, &asset[i]);
+                count++;
+            }
+    }
+    
+    pthread_mutex_unlock(&wallet->lock);
+    return count;
+}
+
+// returns the amount sent from the wallet by the transaction (total wallet outputs consumed, change and fee included)
 uint64_t BRWalletAmountSentByTx(BRWallet *wallet, const BRTransaction *tx) {
     uint64_t amount = 0;
 
@@ -1734,6 +1762,75 @@ int64_t RavencoinAmount(int64_t localAmount, double price) {
     return (localAmount < 0) ? -amount : amount;
 }
 
-bool AreAssetsDeployed() {
-    return true;
+// decompose a Creation asset or Reissue asset Transaction to burn + assets txs
+// returns the txscCount a transaction can be decomposed to when txDecomposed is NULL and txsCount is 0
+size_t BRTransactionDecompose(BRWallet *wallet, const BRTransaction *tx, BRTransaction *txDecomposed, size_t txsCount) {
+    
+    assert(tx != NULL);
+    
+    size_t count = 0;
+    bool burn = false;
+    
+    if (BRWalletAmountSentByTx(wallet, tx) > 0 && BRWalletTransactionIsValid(wallet, tx))
+        burn = true;
+    
+    size_t asstCount = BRWalletAssetsReceivedFromTx(wallet, tx, NULL, 0);
+    
+    if(!txDecomposed && txsCount == 0)
+        return (burn ? asstCount + 1 : asstCount);
+    
+    // allocation done in SWIFT
+//    txDecomposed = BRTransactionNew(burn ? asstCount + 1 : asstCount);
+
+    BRTxInput *inputs = txDecomposed[count].inputs;
+    BRTxOutput *outputs = txDecomposed[count].outputs;
+
+    if(burn) {
+        
+        txDecomposed[count] = *tx;
+        txDecomposed[count].inputs = inputs;
+        txDecomposed[count].outputs = outputs;
+        txDecomposed[count].inCount = txDecomposed[count].outCount = 0;
+
+        txDecomposed[count].asset = NULL;
+        
+        for (size_t j = 0; j < tx->inCount; j++) {
+            if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
+                              tx->outputs[tx->inputs[j].index].scriptLen))
+                BRTransactionAddInput(&txDecomposed[count], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
+                                      tx->inputs[j].script, tx->inputs[j].scriptLen,
+                                      tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
+        }
+        for (size_t j = 0; j < tx->outCount; j++) {
+            if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))
+                BRTransactionAddOutput(&txDecomposed[count], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
+        }
+        
+        count++;
+    }
+    
+    for (size_t j = 0; j < tx->outCount; j++) {
+        if(IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen) &&
+           !IsScriptTransferAsset(tx->outputs[j].script, tx->outputs[j].scriptLen) &&
+           BRSetContains(wallet->allAddrs, tx->outputs[j].address)) {
+            
+            inputs = txDecomposed[count].inputs;
+            outputs = txDecomposed[count].outputs;
+            
+            txDecomposed[count] = *tx;
+            txDecomposed[count].inputs = inputs;
+            txDecomposed[count].outputs = outputs;
+            txDecomposed[count].inCount = txDecomposed[count].outCount = 0;
+
+            txDecomposed[count].asset = NewAsset();
+            
+            BRTransactionAddOutput(&txDecomposed[count], tx->outputs[j].amount, tx->outputs[j].script,
+                                       tx->outputs[j].scriptLen);
+            GetAssetData(tx->outputs[j].script, tx->outputs[j].scriptLen, txDecomposed[count].asset);
+            
+            count++;
+        }
+    }
+    
+    return count;
 }

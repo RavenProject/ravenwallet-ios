@@ -188,8 +188,8 @@ class AssetPopUpVC : UIViewController, Subscriber {
                     if(assetRef != nil){
                         mySelf.walletManager.db!.updateAssetData(assetRef!)
                         DispatchQueue.main.async {
-                            //var message = String(format: S.Alerts.getDataAssetError, mySelf.asset.name)
-                            let message = "\nName: " + mySelf.asset.name +  "\namount: " + assetRef!.pointee.amount.description + "\nunits: "
+                            let amount = Double(assetRef!.pointee.amount / C.oneAsset)
+                            let message = "\nName: " + mySelf.asset.name +  "\namount: " + String(amount) + "\nunits: "
                                 + assetRef!.pointee.unit.description + "\nreissubale: " + assetRef!.pointee.reissuable.description + "\nhasIpfs: "
                                 + assetRef!.pointee.hasIPFS.description + "\nipfsHash: "
                                 + assetRef!.pointee.ipfsHashString + ""
@@ -236,7 +236,7 @@ class AssetPopUpVC : UIViewController, Subscriber {
         if !asset.isHasIpfs {
             ipfs.isEnabled = false
         }
-        if !asset.isOwnerShip || !asset.isReissubale {//enable manage asset only if is owner and is resissubale
+        if !asset.isOwnerShip || !asset.isReissuable {//enable manage asset only if is owner and is resissubale
             manage.isEnabled = false
         }
         if !asset.isOwnerShip {//enable subAsset/uniqueAsset only if is owner
@@ -268,7 +268,7 @@ class AssetPopUpVC : UIViewController, Subscriber {
             manage.isEnabled = true
             subAsset.isEnabled = true
             uniqueAsset.isEnabled = true
-            if !asset.isOwnerShip || !asset.isReissubale {//enable manage asset only if is owner and is resissubale
+            if !asset.isOwnerShip || !asset.isReissuable {//enable manage asset only if is owner and is resissubale
                 manage.isEnabled = false
             }
             if !asset.isOwnerShip {//enable subAsset/uniqueAsset only if is owner

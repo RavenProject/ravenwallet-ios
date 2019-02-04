@@ -29,7 +29,7 @@ class ChartModel {
 
         URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
             guard error == nil else { print("get chart Data error: \(error!)"); return }
-            guard let response = response, let data = data else { print("no response or data"); return }
+            guard let _ = response, let data = data else { print("no response or data"); return }
             do {
                 if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     let result:Bool = convertedJsonIntoDict.object(forKey: "success") as! Bool

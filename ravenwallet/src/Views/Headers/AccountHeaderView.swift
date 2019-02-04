@@ -22,7 +22,8 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     private let secondaryBalance: UpdatingLabel
     private let conversionSymbol = UIImageView(image: #imageLiteral(resourceName: "conversion"))
     private let currencyTapView = UIView()
-    private let syncIndicator = SyncingIndicator(style: .account)
+    private let syncView: SyncingHeaderView
+    private var syncViewHeight: NSLayoutConstraint?
     private let modeLabel = UILabel(font: .customBody(size: 12.0), color: .transparentWhiteText) // debug info
     
     private var regularConstraints: [NSLayoutConstraint] = []
@@ -35,7 +36,11 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     
     private var isSyncIndicatorVisible: Bool = false {
         didSet {
-            UIView.crossfade(balanceLabel, syncIndicator, toRight: isSyncIndicatorVisible, duration: 0.3)
+            if isSyncIndicatorVisible {
+                showSyncView()
+            } else {
+                hideSyncView()
+            }
         }
     }
 
@@ -85,6 +90,7 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     init(currency: CurrencyDef) {
         
         self.currency = currency
+        self.syncView =  SyncingHeaderView(currency: currency)
         self.isBtcSwapped = Store.state.isSwapped
         if let rate = currency.state.currentRate {
             let maxDigits = currency.state.maxDigits
@@ -129,7 +135,6 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         swapLabels()
 
         modeLabel.isHidden = true
-        syncIndicator.isHidden = true
         
         let gr = UITapGestureRecognizer(target: self, action: #selector(currencySwitchTapped))
         currencyTapView.addGestureRecognizer(gr)
@@ -143,8 +148,22 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         addSubview(secondaryBalance)
         addSubview(conversionSymbol)
         addSubview(modeLabel)
-        addSubview(syncIndicator)
         addSubview(currencyTapView)
+        addSubview(syncView)
+    }
+    
+    private func showSyncView() {
+        syncViewHeight?.constant = SyncingHeaderView.height
+        UIView.spring(C.animationDuration, animations: {
+            self.superview?.superview?.layoutIfNeeded()
+        }, completion: {_ in})
+    }
+    
+    private func hideSyncView() {
+        syncViewHeight?.constant = 0.0
+        UIView.spring(C.animationDuration, animations: {
+            self.superview?.superview?.layoutIfNeeded()
+        }, completion: {_ in})
     }
 
     private func addConstraints() {
@@ -157,16 +176,16 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         exchangeRateLabel.pinTo(viewAbove: currencyName)
         
         balanceLabel.constrain([
-            balanceLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]),
-            balanceLabel.bottomAnchor.constraint(equalTo: primaryBalance.topAnchor, constant: 0.0)
+            balanceLabel.topAnchor.constraint(equalTo: exchangeRateLabel.bottomAnchor, constant: C.padding[4]),
+            balanceLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2])
             ])
         
         primaryBalance.constrain([
-            primaryBalance.firstBaselineAnchor.constraint(equalTo: bottomAnchor, constant: -C.padding[2])
+            primaryBalance.firstBaselineAnchor.constraint(equalTo: balanceLabel.bottomAnchor, constant: 30.0)
             ])
         
         secondaryBalance.constrain([
-            secondaryBalance.firstBaselineAnchor.constraint(equalTo: bottomAnchor, constant: -C.padding[2]),
+            secondaryBalance.firstBaselineAnchor.constraint(equalTo: balanceLabel.bottomAnchor, constant: 30.0)
             ])
         
         conversionSymbol.constrain([
@@ -201,11 +220,14 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
             modeLabel.centerYAnchor.constraint(equalTo: balanceLabel.centerYAnchor)
             ])
         
-        syncIndicator.constrain([
-            syncIndicator.trailingAnchor.constraint(equalTo: balanceLabel.trailingAnchor),
-            syncIndicator.topAnchor.constraint(equalTo: balanceLabel.topAnchor),
-            syncIndicator.bottomAnchor.constraint(equalTo: balanceLabel.bottomAnchor)
-            ])
+        syncViewHeight = syncView.heightAnchor.constraint(equalToConstant: 40.0)
+        syncView.constrain([
+            syncView.topAnchor.constraint(equalTo: primaryBalance.firstBaselineAnchor, constant: C.padding[2]),
+            syncView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            syncView.widthAnchor.constraint(equalTo: widthAnchor),
+            syncView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            syncViewHeight])
+
     }
 
     private func addShadow() {
@@ -258,10 +280,8 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
                             switch state[self.currency].syncState {
                             case .connecting:
                                 self.isSyncIndicatorVisible = true
-                                self.syncIndicator.text = S.SyncingView.connecting
                             case .syncing:
                                 self.isSyncIndicatorVisible = true
-                                self.syncIndicator.text = S.SyncingView.syncing
                             case .success:
                                 self.isSyncIndicatorVisible = false
                             }
@@ -270,14 +290,17 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         Store.subscribe(self, selector: {
             return $0[self.currency].lastBlockTimestamp != $1[self.currency].lastBlockTimestamp },
                         callback: { state in
-                            self.syncIndicator.progress = CGFloat(state[self.currency].syncProgress)
+                            let progress = state[self.currency].syncProgress
+                            self.syncView.syncIndicator.progress = CGFloat(progress)
         })
     }
 
     func setBalances() {
         guard let rate = exchangeRate else { return }
-        
-        exchangeRateLabel.text = "\(rate.localString)\(S.AccountHeader.exchangeRateSeparator)\(currency.code)"
+        let exchangeRateAmount = Amount(amount: 0, rate: rate, maxDigits: 4, currency: currency)
+        let exchangeRateString = exchangeRateAmount.homeScreenFormat.string(from: NSNumber(value: rate.rate)) ?? ""
+
+        exchangeRateLabel.text = "\(exchangeRateString)\(S.AccountHeader.exchangeRateSeparator)\(currency.code)"
         
         let maxDigits = currency.state.maxDigits
         let amount = Amount(amount: balance, rate: rate, maxDigits: maxDigits, currency: currency)

@@ -242,6 +242,9 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                 guard amount.rawValue <= asset.amount.rawValue else {
                     return showAlert(title: S.Alert.error, message: S.Asset.insufficientAssetFunds, buttonLabel: S.Button.ok)
                 }
+                guard amount != Satoshis.zero else {
+                    return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+                }
                 sender.operationType = .transferAsset
             }
             else {

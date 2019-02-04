@@ -23,6 +23,8 @@
 #define RVN_T 116
 #define RVN_O 111
 
+#define OWNERSHIP_TRANSFER_TAG 0x21
+
 /** Script opcodes */
 enum OPCODETYPE
 {

@@ -37,7 +37,7 @@ import Core
     }
     
     override func addConstraints() {
-        nameCell.constrainTopCorners(height: SendCell.defaultHeight)
+        nameCell.constrainTopCorners(height: createNameAssetHeight)
         addressCell.constrain([
             addressCell.widthAnchor.constraint(equalTo: nameCell.widthAnchor),
             addressCell.topAnchor.constraint(equalTo: nameCell.bottomAnchor),
@@ -77,26 +77,6 @@ import Core
                 self.nameCell.textField.text = self.rootAssetName + "#"
             }
         }
-        
-        nameCell.didReturn = { textField in
-            textField.resignFirstResponder()
-            let validatorResult = AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!)
-            guard validatorResult.0 && validatorResult.1 == .UNIQUE  else {
-                return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
-            }
-        }
-        
-        nameCell.didVerifyTapped = { assetName in
-            let validatorResult = AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!)
-            guard validatorResult.0 && validatorResult.1 == .UNIQUE else {
-                self.nameCell.activityView.stopAnimating()
-                self.nameCell.verify.label.isHidden = false
-                return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
-            }
-            self.getAssetData(assetName: assetName!, callback: { isFound in
-                self.nameCell.checkAvailabilityResult(isFound: isFound)
-            })
-        }
     }
     
     override func sendTapped() {
@@ -116,10 +96,8 @@ import Core
             return showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
         }
         
-        if self.nameStatus != .availabe {
-            if self.nameStatus == .notAvailable {
-                return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
-            }
+        if self.nameStatus == .notAvailable {
+            return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
         }
         
         guard let address = addressCell.address else {
@@ -153,16 +131,19 @@ import Core
         if nameStatus == .notVerified {
             createButton.label.text = S.Asset.availability
             activityView.startAnimating()
-            getAssetData(assetName: self.nameCell.textField.text!) {isFound in
+            getAssetData(assetName: self.nameCell.textField.text!) { nameStatus in
                 DispatchQueue.main.async {
                     self.activityView.stopAnimating()
                     self.createButton.label.text = S.Asset.create
-                    self.nameCell.checkAvailabilityResult(isFound: isFound)
-                    if(isFound){
+                    self.nameCell.checkAvailabilityResult(nameStatus: nameStatus)
+                    if(nameStatus == .notAvailable){
                         return self.showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
                     }
+                    else if(nameStatus == .notVerified){
+                        return self.showAlert(title: S.Alert.error, message: S.Asset.notVerifiedName, buttonLabel: S.Button.ok)
+                    }
                     else {
-                        self.showConfirmationView(amount: amount, address: address, units: 0, reissubale: 0)
+                        self.showConfirmationView(amount: amount, address: address, units: Int(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
                     }
                 }
             }

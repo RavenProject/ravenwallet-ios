@@ -49,7 +49,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     private let quantityView: QuantityCell
     private let feeView: FeeAmountVC
     private let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel, isEnabled: true)
-    private let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissubaleLabel)
+    private let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissuableLabel)
     private let ipfsCell = IPFSCell(labelCheckBox: S.Asset.hasIpfsLabel, placeholder: S.Asset.ipfsHashLabel)
     private let createButton = ShadowButton(title: S.Asset.create, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
@@ -87,7 +87,12 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     }
     
     private func addConstraints() {
-        addressCell.constrainTopCorners(height: manageAddressHeight)
+        addressCell.constrain([
+            addressCell.widthAnchor.constraint(equalTo: view.widthAnchor),
+            addressCell.topAnchor.constraint(equalTo: view.topAnchor),
+            addressCell.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            addressCell.heightAnchor.constraint(equalToConstant: !UserDefaults.hasActivatedExpertMode ? 0.0 : manageAddressHeight) ])
+
         
         addChild(quantityView, layout: {
             quantityView.view.constrain([
@@ -107,14 +112,14 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             reissubaleCell.widthAnchor.constraint(equalTo: unitsCell.view.widthAnchor),
             reissubaleCell.topAnchor.constraint(equalTo: unitsCell.view.bottomAnchor),
             reissubaleCell.leadingAnchor.constraint(equalTo: unitsCell.view.leadingAnchor),
-            reissubaleCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight) ])
-        
+            reissubaleCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
+
         ipfsCell.constrain([
             ipfsCell.widthAnchor.constraint(equalTo: reissubaleCell.widthAnchor),
             ipfsCell.topAnchor.constraint(equalTo: reissubaleCell.bottomAnchor),
             ipfsCell.leadingAnchor.constraint(equalTo: reissubaleCell.leadingAnchor),
-            ipfsCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[5]) ])
-        
+            ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
+
         addChild(feeView, layout: {
             feeView.view.constrain([
                 feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -134,7 +139,12 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
         }
+        if !UserDefaults.hasActivatedExpertMode {
+            self.generateTapped()
+        }
         self.unitsCell.amount = Satoshis(UInt64(self.asset.units) * C.satoshis)
+        //reissuable is true by default
+        reissubaleCell.btnCheckBox.isSelected = true
     }
     
     private func addSubscriptions() {
@@ -177,14 +187,10 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             self?.unitsCell.closePinPad()
         }
         
-        /*unitsCell.didReturn = { textField in
-            guard (textField.text?.isEmpty)! else {
-                guard Int(textField.text!)! < 8 else {
-                    return self.showAlert(title: S.Alert.error, message: S.Asset.errorUnitsMessage, buttonLabel: S.Button.ok)
-                }
-                return
-            }
-        }*/
+        ipfsCell.didReturn = { textField in
+            textField.resignFirstResponder()
+        }
+        
         addressCell.didBeginEditing = strongify(self) { myself in
             myself.quantityView.closePinPad()
         }
@@ -272,7 +278,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         })))
     }
     
-    @objc private func generateTapped(sender:UIButton) {
+    @objc private func generateTapped() {
         guard let addressText = currency.state.receiveAddress else { return }
         addressCell.setContent(addressText)
     }
@@ -294,11 +300,15 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
         }
         guard quantity != nil else {
-            return showAlert(title: S.Alert.error, message: S.Asset.noQuanity, buttonLabel: S.Button.ok)
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
         }
         
         guard let amount = quantity else {
             return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+        }
+        
+        guard amount != Satoshis.zero else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
         }
         
         //BMEX Todo : manage maxOutputAmount and minOutputAmount

@@ -60,7 +60,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
     }
     
     func refreshAnimations() {
-        syncIndicator.pulse()
+        //syncIndicator.pulse()
     }
 
     private func setupViews() {
@@ -113,10 +113,8 @@ class HomeScreenCell : UITableViewCell, Subscriber {
                             switch state[self.container.currency!].syncState {
                             case .connecting:
                                 self.isSyncIndicatorVisible = true
-                                self.syncIndicator.text = S.SyncingView.connecting
                             case .syncing:
                                 self.isSyncIndicatorVisible = true
-                                self.syncIndicator.text = S.SyncingView.syncing
                             case .success:
                                 self.isSyncIndicatorVisible = false
                             }

@@ -80,7 +80,13 @@ extension NameAddressCell : UITextFieldDelegate {
         return true
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        didReturn?(textField)
+    //func textFieldDidEndEditing(_ textField: UITextField) {
+    //    didReturn?(textField)
+    //}
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let count = text.count + string.count - range.length
+        return count <= C.MAX_ADDRESSBOOK_NAME_LENGTH
     }
 }

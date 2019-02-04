@@ -286,8 +286,23 @@ void BRBIP32vPrivKeyPath(BRKey *key, const void *seed, size_t seedLen, int depth
 
 // writes the base58check encoded serialized master private key (xprv) to str
 // returns number of bytes written including NULL terminator, or strLen needed if str is NULL
-size_t BRBIP32SerializeMasterPrivKey(char *str, size_t strLen, const void *seed, size_t seedLen)
-{
+size_t BRBIP32SerializeMasterPrivKey(char *str, size_t strLen, const void *seed, size_t seedLen) {
+    UInt512 I;
+    UInt256 secret, chain;
+    BRKey key;
+
+    assert(seed != NULL || seedLen == 0);
+    
+
+    if (seed || seedLen == 0) {
+        HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
+        
+        secret = *(UInt256 *)&I;
+        chain = *(UInt256 *)&I.u8[sizeof(UInt256)]; //We don't need the chain code.
+        var_clean(&I);
+        size_t keyCount = BRKeySetSecret(&key, &secret, 1);
+    }
+    
     // TODO: XXX implement
     return 0;
 }

@@ -102,4 +102,7 @@ struct C {
     //ipfs URL
     static let ipfsHost = "http://ipfs.io/ipfs/"
     
+    //AddressBook
+    static let MAX_ADDRESSBOOK_NAME_LENGTH = 30;
+    
 }

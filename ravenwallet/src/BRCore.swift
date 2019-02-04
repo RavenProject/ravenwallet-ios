@@ -346,7 +346,7 @@ extension UnsafeMutablePointer where Pointee == BRAsset {
 
 extension UnsafeMutablePointer where Pointee == BRTransaction {
     init?() {
-        self.init(BRTransactionNew())
+        self.init(BRTransactionNew(1))
     }
     
     // bytes must contain a serialized tx

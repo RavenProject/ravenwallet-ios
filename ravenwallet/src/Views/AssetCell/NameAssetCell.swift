@@ -15,6 +15,7 @@ class NameAssetCell : NameAddressCell {
     let verify = ShadowButton(title: S.Asset.verifyLabel, type: .secondary)
     let activityView = UIActivityIndicatorView(style: .white)
     let verifyResult = UILabel(font: UIFont.customBody(size: 14.0))
+    let msgLabel = UILabel.init(font: .customBody(size: 12.0), color: .cameraGuideNegative)
 
     override func setupViews() {
         addSubviews()
@@ -28,6 +29,7 @@ class NameAssetCell : NameAddressCell {
         addSubview(verifyResult)
         addSubview(verify)
         verify.addSubview(activityView)
+        addSubview(msgLabel)
     }
     
     private func addConstraints() {
@@ -52,6 +54,12 @@ class NameAssetCell : NameAddressCell {
         verifyResult.constrain([
             verifyResult.trailingAnchor.constraint(equalTo: verify.leadingAnchor, constant: -C.padding[2]),
             verifyResult.centerYAnchor.constraint(equalTo: verify.centerYAnchor)])
+        
+        msgLabel.constrain([
+            msgLabel.topAnchor.constraint(equalTo: verify.bottomAnchor, constant: C.padding[1]/2),
+            msgLabel.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
+            msgLabel.trailingAnchor.constraint(equalTo: verify.trailingAnchor)
+            ])
     }
     
     private func addButtonActions() {
@@ -66,12 +74,15 @@ class NameAssetCell : NameAddressCell {
         verifyResult.isHidden = true
         activityView.hidesWhenStopped = true
         activityView.stopAnimating()
+        msgLabel.text = S.Asset.notVerifiedName
+        msgLabel.isHidden = true
     }
     
     @objc func removeText(sender:UITapGestureRecognizer){
         self.textField.text = ""
         textField.textColor = .darkText
         verifyResult.isHidden = true
+        didChange?("")
     }
 
     @objc func verifyTapped() {
@@ -79,37 +90,52 @@ class NameAssetCell : NameAddressCell {
         verify.label.isHidden = true
         verifyResult.isHidden = false
         verifyResult.attributedText = NSAttributedString(string: "")
+        verify.isEnabled = false
+        msgLabel.isHidden = true
         self.didVerifyTapped!(self.textField.text)
     }
     
-    func checkAvailabilityResult(isFound:Bool) {
+    func checkAvailabilityResult(nameStatus:NameStatus) {
         DispatchQueue.main.async {
             self.activityView.stopAnimating()
             self.verify.label.isHidden = false
-            self.verifyResult.attributedText = self.getVerifyResultString(isFound: isFound)
-            self.textField.textColor = isFound ? .red : .receivedGreen
+            self.verifyResult.attributedText = self.getVerifyResultString(nameStatus: nameStatus)
+            switch nameStatus {
+            case .availabe :
+                self.msgLabel.isHidden = true
+                self.textField.textColor = .receivedGreen
+            case .notAvailable :
+                self.msgLabel.isHidden = true
+                self.textField.textColor = .red
+            case .notVerified :
+                self.msgLabel.isHidden = false
+                self.textField.textColor = .darkText
+            }
         }
     }
     
-    func getVerifyResultString(isFound:Bool) -> NSAttributedString {
+    func getVerifyResultString(nameStatus:NameStatus) -> NSAttributedString {
         let attributedString = NSMutableAttributedString(string: "")
         let icon = NSTextAttachment()
         icon.bounds = CGRect(x: 0, y: -2.0, width: 24.0, height: 24.0)
         let iconString = NSMutableAttributedString(string: S.Symbols.narrowSpace) // space required before an attachment to apply template color (UIKit bug)
-        if isFound == false {
+        switch nameStatus {
+        case .availabe :
             icon.image = #imageLiteral(resourceName: "CircleCheckSolid").withRenderingMode(.alwaysTemplate)
             iconString.append(NSAttributedString(attachment: icon))
             attributedString.insert(iconString, at: 0)
             attributedString.addAttributes([.foregroundColor: UIColor.receivedGreen,
                                             .font: UIFont.customBody(size: 0.0)],
                                            range: NSMakeRange(0, iconString.length))
-        } else {
+        case .notAvailable :
             icon.image = #imageLiteral(resourceName: "deletecircle").withRenderingMode(.alwaysTemplate)
             iconString.append(NSAttributedString(attachment: icon))
             attributedString.insert(iconString, at: 0)
             attributedString.addAttributes([.foregroundColor: UIColor.sentRed,
                                             .font: UIFont.customBody(size: 0.0)],
                                            range: NSMakeRange(0, iconString.length))
+        case .notVerified :
+            break
         }
         return attributedString
     }
@@ -121,6 +147,10 @@ extension NameAssetCell {
         super.textFieldDidChange(textField)
         textField.textColor = .darkText
         verifyResult.isHidden = true
+        msgLabel.isHidden = true
     }
     
+    override func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        return true
+    }
 }

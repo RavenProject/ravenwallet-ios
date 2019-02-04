@@ -205,6 +205,19 @@ bool IsScriptTransferAsset(const uint8_t *script, size_t scriptLen) {
     return helper;
 }
 
+//bool IsScriptOwnershipTransferAsset(const uint8_t *script, size_t scriptLen) {
+//    
+//    bool helper = (scriptLen > 30 &&
+//                   script[25] == OP_RVN_ASSET &&
+//                   script[27] == RVN_R &&
+//                   script[28] == RVN_V &&
+//                   script[29] == RVN_N &&
+//                   script[30] == RVN_T);// &&
+//    // script[scriptLen - 2] == OP_DROP);
+//
+//    return helper;
+//}
+
 bool IsScriptAsset(const uint8_t *script, size_t scriptLen) {
 
     assert(script != NULL || scriptLen == 0);

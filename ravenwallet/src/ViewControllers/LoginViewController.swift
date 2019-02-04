@@ -132,7 +132,7 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         guard UIApplication.shared.applicationState != .background else { return }
-        if shouldUseBiometrics && !hasAttemptedToShowBiometrics && !isPresentedForLock && UserDefaults.hasShownWelcome {
+        if shouldUseBiometrics && !hasAttemptedToShowBiometrics && !isPresentedForLock {
             hasAttemptedToShowBiometrics = true
             biometricsTapped()
         }

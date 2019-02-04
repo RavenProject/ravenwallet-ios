@@ -58,8 +58,8 @@
 #define MAX_MSG_LENGTH     0x02000000
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0ULL  // we don't provide full blocks to remote nodes
-#define PROTOCOL_VERSION   70013
-#define MIN_PROTO_VERSION  70002 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
+#define PROTOCOL_VERSION   70020
+#define MIN_PROTO_VERSION  70020 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
 #define LOCAL_HOST         ((UInt128) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x7f, 0x00, 0x00, 0x01 })
 #define CONNECT_TIMEOUT    3.0
 #define MESSAGE_TIMEOUT    10.0
@@ -304,7 +304,6 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         
         //TODO: test
         if(strcmp(asset->name, "_NF") == 0) {
-            r = 0;
             peer_log(peer, "Asset not found");
             ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, NULL);
             return r;
@@ -335,13 +334,10 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
             if (off <= msgLen + IPFS_length) {
                 memcpy(&IPFS_hash, msg + off, IPFS_length);
                 off += IPFS_length;
-                printf("\nIPFS hash: %s", IPFS_hash);
-                
                 EncodeIPFS(asset->IPFSHash, 47, IPFS_hash, IPFS_length);
             }
         }
         
-        //        if( ((BRPeerContext *) peer)->receiveAssetData ) // TODO: Test and deploy
             ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
     }
     
@@ -933,9 +929,9 @@ static int _PeerAcceptMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, c
     else if (strncmp(MSG_PONG, type, 12) == 0) r = _PeerAcceptPongMessage(peer, msg, msgLen);
     else if (strncmp(MSG_MERKLEBLOCK, type, 12) == 0) r = _PeerAcceptMerkleblockMessage(peer, msg, msgLen);
     else if (strncmp(MSG_REJECT, type, 12) == 0)r = _PeerAcceptRejectMessage(peer, msg, msgLen);
-    else  if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
     else if (strncmp(MSG_ASSETDATA, type, 12) == 0) r = _PeerAcceptAssetMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0) r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
+//    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0) r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
     else
         peer_log(peer, "dropping %s, length %zu, not implemented", type, msgLen);
 
@@ -1610,8 +1606,8 @@ void BRPeerFree(BRPeer *peer) {
     if (ctx->knownBlockHashes) array_free(ctx->knownBlockHashes);
     if (ctx->knownTxHashes) array_free(ctx->knownTxHashes);
     if (ctx->knownTxHashSet) BRSetFree(ctx->knownTxHashSet);
-    if (ctx->pongInfo) array_free(ctx->pongInfo);
     if (ctx->pongCallback) array_free(ctx->pongCallback);
+    if (ctx->pongInfo) array_free(ctx->pongInfo);
     free(ctx);
 }
 
