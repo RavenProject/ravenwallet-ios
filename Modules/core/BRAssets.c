@@ -718,7 +718,7 @@ bool CreateAssetTransaction(BRWallet *wallet, const BRAsset *asset, const char *
     
     int error = 0;
     
-    BRTransaction *tx, *transaction = BRTransactionNew();
+    BRTransaction *tx, *transaction = BRTransactionNew(1);
     UTXO *o;
     size_t i;
     

@@ -75,9 +75,9 @@ class AccountViewController : UIViewController, Subscriber {
         }
 
         setupNavigationBar()
-        addTransactionsView()
         addSubviews()
         addConstraints()
+        addTransactionsView()
         addSubscriptions()
         setInitialData()
     }
@@ -119,10 +119,15 @@ class AccountViewController : UIViewController, Subscriber {
     }
 
     private func addConstraints() {
-        headerContainer.constrainTopCorners(height: accountHeaderHeight)
+        let topConstraint = headerContainer.topAnchor.constraint(equalTo: view.topAnchor)
+        topConstraint.priority = .required
+        headerContainer.constrain([
+            headerContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topConstraint,
+            headerContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
         headerView.constrain(toSuperviewEdges: nil)
         searchHeaderview.constrain(toSuperviewEdges: nil)
-
+        
         if #available(iOS 11.0, *) {
             footerView.constrain([
                 footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -166,13 +171,16 @@ class AccountViewController : UIViewController, Subscriber {
         addChild(transactionsTableView, layout: {
             if #available(iOS 11.0, *) {
                 transactionsTableView.view.constrain([
-                    transactionsTableView.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                transactionsTableView.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                transactionsTableView.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                transactionsTableView.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                ])
+                    transactionsTableView.view.topAnchor.constraint(equalTo: headerContainer.bottomAnchor),
+                    transactionsTableView.view.bottomAnchor.constraint(equalTo: footerView.topAnchor),
+                    transactionsTableView.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                    transactionsTableView.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)])
             } else {
-                transactionsTableView.view.constrain(toSuperviewEdges: nil)
+                transactionsTableView.view.constrain([
+                    transactionsTableView.view.topAnchor.constraint(equalTo: headerContainer.bottomAnchor),
+                    transactionsTableView.view.bottomAnchor.constraint(equalTo: footerView.topAnchor),
+                    transactionsTableView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    transactionsTableView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
             }
         })
     }

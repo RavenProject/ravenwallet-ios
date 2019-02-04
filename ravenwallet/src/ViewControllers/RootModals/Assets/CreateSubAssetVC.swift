@@ -35,24 +35,6 @@ import Core
                 self.nameCell.textField.text = self.rootAssetName + "/"
             }
         }
-        
-        nameCell.didReturn = { textField in
-            textField.resignFirstResponder()
-            guard AssetValidator.shared.IsAssetNameASubasset(name: self.nameCell.textField.text!) else {
-                return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
-            }
-        }
-        
-        nameCell.didVerifyTapped = { assetName in
-            guard AssetValidator.shared.IsAssetNameASubasset(name: self.nameCell.textField.text!) else {
-                self.nameCell.activityView.stopAnimating()
-                self.nameCell.verify.label.isHidden = false
-                return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
-            }
-            self.getAssetData(assetName: assetName!, callback: { isFound in
-                self.nameCell.checkAvailabilityResult(isFound: isFound)
-            })
-        }
     }
     
     override func createAsset(amount:Satoshis) -> (BRAssetRef, BRAssetRef?) {

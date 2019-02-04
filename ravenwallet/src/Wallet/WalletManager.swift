@@ -329,19 +329,20 @@ extension WalletManager : BRWalletListener {
         print("BMEX txUpdated")
         db?.txUpdated(txHashes, blockHeight: blockHeight, timestamp: timestamp)
         //BMEX write new asset confirmed
-        db?.loadTransactions(callback: { transactions in
-            for tx in transactions {
-                if(txHashes.contains((tx?.pointee.txHash)!)){
-                    if AssetValidator.shared.checkInvalidAsset(asset: tx!.pointee.asset) {
-                        if(tx!.pointee.asset!.pointee.type == NEW_ASSET || tx!.pointee.asset!.pointee.type == REISSUE){
-                            DispatchQueue.main.async {
-                                self.assetAdded(tx!)
-                            }
+        //db?.loadTransactions(callback: { transactions in
+        let transactions = self.wallet?.transactions
+        for tx in transactions! {
+            if(txHashes.contains((tx?.pointee.txHash)!)){
+                if AssetValidator.shared.checkInvalidAsset(asset: tx!.pointee.asset) {
+                    if(tx!.pointee.asset!.pointee.type == NEW_ASSET || tx!.pointee.asset!.pointee.type == REISSUE){
+                        DispatchQueue.main.async {
+                            self.assetAdded(tx!)
                         }
                     }
                 }
             }
-        })
+        }
+    //})
     }
 
     func txDeleted(_ txHash: UInt256, notifyUser: Bool, recommendRescan: Bool) {
@@ -430,15 +431,10 @@ extension WalletManager : BRWalletListener {
         if(brTxRef?.pointee.asset != nil){
             var txsCount = 0
             var txListPointer:UnsafeMutablePointer<BRTransaction>!
-            if brTxRef?.pointee.asset.pointee.type == NEW_ASSET {
-                txsCount = 3
-                txListPointer = BRTransactionDecomposeForCreation(brTxRef, txsCount);
-                //TODO : BMEX NEW_ASSET/OWNER receive 2, No burn input And 3 for sent
-            }
-            else if brTxRef?.pointee.asset.pointee.type == REISSUE {
-                txsCount = 2
-                txListPointer = BRTransactionDecomposeForManagement(brTxRef, txsCount);
-                //TODO : BMEX REISSUE receive 1, No burn input And 2 for sent
+            if brTxRef?.pointee.asset.pointee.type == NEW_ASSET ||  brTxRef?.pointee.asset.pointee.type == REISSUE {
+                txsCount = BRTransactionDecompose(wallet?.cPtr, brTxRef, nil, 0);
+                txListPointer = BRTransactionNew(txsCount)
+                BRTransactionDecompose(wallet?.cPtr, brTxRef, txListPointer, txsCount);
             }
             else{
                 decomposedTransactions.append(brTxRef)

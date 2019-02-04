@@ -32,7 +32,7 @@ struct Asset {
         }
     }
     
-    var isReissubale:Bool{
+    var isReissuable:Bool{
         get {
             return reissubale == 1 ? true : false
         }

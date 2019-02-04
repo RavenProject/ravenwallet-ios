@@ -212,4 +212,21 @@ class AssetValidator {
         }
         return false
     }
+    
+    func getAssetType(operationType:OperationType, nameAsset:String) -> AssetType {
+        var assetType:AssetType = .ROOT
+        switch operationType {
+        case .createAsset:
+            if (IsAssetNameAnOwner(name: nameAsset)) {
+                assetType = .OWNER
+            }
+        case .subAsset:
+            assetType = .SUB
+        case .uniqueAsset:
+            assetType = .UNIQUE
+        default:
+            assetType = .ROOT
+        }
+        return assetType
+    }
 }

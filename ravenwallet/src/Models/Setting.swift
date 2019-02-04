@@ -15,6 +15,7 @@ struct Setting {
     let toggle:UISwitch?
     var toggleDefaultValue:Bool = false
     let toggleCallback: ((Bool) -> Void)?
+    var isHidden:Bool = false
 }
 
 extension Setting {
@@ -24,6 +25,15 @@ extension Setting {
         self.toggle = nil
         self.toggleCallback = nil
         self.callback = callback
+    }
+    
+    init(title: String, isHidden:Bool, callback: @escaping () -> Void) {
+        self.title = title
+        self.accessoryText = nil
+        self.toggle = nil
+        self.toggleCallback = nil
+        self.callback = callback
+        self.isHidden = isHidden
     }
     
     init(title: String, accessoryText: (() -> String)?, callback: @escaping () -> Void) {

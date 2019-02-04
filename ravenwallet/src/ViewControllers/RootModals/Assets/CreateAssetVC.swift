@@ -12,6 +12,7 @@ import Core
 
 internal let verticalButtonPadding: CGFloat = 32.0
 internal let createAddressHeight: CGFloat = 110.0
+internal let createNameAssetHeight: CGFloat = 77.0
 
 enum NameStatus {
     case notVerified
@@ -30,7 +31,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     var initialAddress: String?
     var isPresentedFromLock = false
     var group: DispatchGroup?
-    var callbackNameAvailability: ((Bool) -> Void)?
+    var callbackNameAvailability: ((NameStatus) -> Void)?
 
     init(walletManager: WalletManager, initialAddress: String? = nil, initialRequest: PaymentRequest? = nil) {
         self.initialAddress = initialAddress
@@ -62,7 +63,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     internal let quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
     internal var feeView: FeeAmountVC
     internal let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel)
-    internal let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissubaleLabel)
+    internal let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissuableLabel)
     internal let ipfsCell = IPFSCell(labelCheckBox: S.Asset.hasIpfsLabel, placeholder: S.Asset.ipfsHashLabel)
     internal let createButton = ShadowButton(title: S.Asset.create, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
@@ -79,7 +80,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     internal let currency: CurrencyDef = Currencies.rvn //BMEX
     internal var nameStatus: NameStatus = .notVerified
     internal let activityView = UIActivityIndicatorView(style: .white)
-
+    private var origineParentFrame:CGRect?
     override func viewDidLoad() {
         addSubviews()
         addConstraints()
@@ -90,6 +91,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        origineParentFrame = self.parentView?.frame
     }
     
     internal func addSubviews() {
@@ -103,7 +105,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     }
     
     internal func addConstraints() {
-        nameCell.constrainTopCorners(height: SendCell.defaultHeight)
+        nameCell.constrainTopCorners(height: createNameAssetHeight)
         addressCell.constrain([
             addressCell.widthAnchor.constraint(equalTo: nameCell.widthAnchor),
             addressCell.topAnchor.constraint(equalTo: nameCell.bottomAnchor),
@@ -165,6 +167,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         if !UserDefaults.hasActivatedExpertMode {
             self.generateTapped()
         }
+        //reissuable is true by default
+        reissubaleCell.btnCheckBox.isSelected = true
     }
     
     private func addSubscriptions() {
@@ -190,6 +194,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             }
         })
     }
+    
+    
 
     internal func addButtonActions() {
         addressCell.paste.addTarget(self, action: #selector(CreateAssetVC.pasteTapped), for: .touchUpInside)
@@ -204,7 +210,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         
         nameCell.didReturn = { textField in
             textField.resignFirstResponder()
-            guard AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!).0 else {
+            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.textField.text!)
+            guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
                 return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
             }
         }
@@ -219,19 +226,30 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         }
         
         nameCell.didVerifyTapped = { assetName in
-            guard AssetValidator.shared.IsAssetNameValid(name: self.nameCell.textField.text!).0 else {
-                self.nameCell.activityView.stopAnimating()
-                self.nameCell.verify.label.isHidden = false
+            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.textField.text!)
+            guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
+                DispatchQueue.main.async {
+                    self.nameCell.activityView.stopAnimating()
+                    self.nameCell.verify.label.isHidden = false
+                    self.nameCell.verify.isEnabled = true
+                }
                 return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
             }
-            self.getAssetData(assetName: assetName!, callback: { isFound in
-                self.nameCell.checkAvailabilityResult(isFound: isFound)
+            self.getAssetData(assetName: assetName!, callback: { nameStatus in
+                DispatchQueue.main.async {
+                    self.nameCell.verify.isEnabled = true
+                }
+                self.nameCell.checkAvailabilityResult(nameStatus: nameStatus)
             })
         }
         
         ipfsCell.didBeginEditing = { [weak self] in
             self?.quantityView.closePinPad()
             self?.unitsCell.closePinPad()
+        }
+        
+        ipfsCell.didReturn = { textField in
+            textField.resignFirstResponder()
         }
         
         addressCell.didBeginEditing = strongify(self) { myself in
@@ -247,6 +265,14 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             }
         }
         
+        quantityView.didReturn = { [weak self] in
+            self?.parentView?.frame = self!.origineParentFrame!
+        }
+        
+        quantityView.didUpdateAmount = { [weak self] amount in
+            self?.quantity = amount
+        }
+        
         unitsCell.didChangeFirstResponder = { [weak self] isFirstResponder in
             if isFirstResponder {
                 self?.nameCell.textField.resignFirstResponder()
@@ -256,8 +282,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             }
         }
         
-        quantityView.didUpdateAmount = { [weak self] amount in
-            self?.quantity = amount
+        unitsCell.didReturn = { [weak self] in
+            self?.parentView?.frame = self!.origineParentFrame!
         }
         
         feeView.didUpdateAssetFee = { [weak self] feeAmount in
@@ -267,7 +293,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         feeView.balance = self.balance
     }
     
-    func getAssetData(assetName:String, callback: @escaping (Bool) -> Void) {
+    func getAssetData(assetName:String, callback: @escaping (NameStatus) -> Void) {
         self.callbackNameAvailability = callback
         self.group = DispatchGroup()
         self.group!.enter()
@@ -277,7 +303,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                 guard let info = info else { return }
                 let mySelf = Unmanaged<CreateAssetVC>.fromOpaque(info).takeUnretainedValue()
                 mySelf.nameStatus = assetRef != nil ? .notAvailable : .availabe
-                mySelf.callbackNameAvailability!(assetRef != nil)
+                mySelf.callbackNameAvailability!(mySelf.nameStatus)
                 if(mySelf.group != nil){
                     mySelf.group?.leave()
                     mySelf.group = nil
@@ -286,8 +312,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             let result = self.group!.wait(timeout: .now() + 2.0)
             if result == .timedOut {
                 self.group = nil
-                callback(false)
-                self.nameStatus = .availabe
+                callback(.notVerified)
+                self.nameStatus = .notVerified
             }
         }
     }
@@ -369,10 +395,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             return showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
         }
         
-        if self.nameStatus != .availabe {
-            if self.nameStatus == .notAvailable {
-                return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
-            }
+        if self.nameStatus == .notAvailable {
+            return showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
         }
             
         guard let address = addressCell.address else {
@@ -387,11 +411,15 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
         }
         guard quantity != nil else {
-            return showAlert(title: S.Alert.error, message: S.Asset.noQuanity, buttonLabel: S.Button.ok)
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToCreate, buttonLabel: S.Button.ok)
         }
         
         guard let amount = quantity else {
             return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+        }
+        
+        guard amount != Satoshis.zero else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToCreate, buttonLabel: S.Button.ok)
         }
         
         //BMEX Todo : manage maxOutputAmount and minOutputAmount
@@ -411,13 +439,16 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         if nameStatus == .notVerified {
             createButton.label.text = S.Asset.availability
             activityView.startAnimating()
-            getAssetData(assetName: self.nameCell.textField.text!) {isFound in
+            getAssetData(assetName: self.nameCell.textField.text!) {nameStatus in
                 DispatchQueue.main.async {
                     self.activityView.stopAnimating()
                     self.createButton.label.text = S.Asset.create
-                    self.nameCell.checkAvailabilityResult(isFound: isFound)
-                    if(isFound){
+                    self.nameCell.checkAvailabilityResult(nameStatus: nameStatus)
+                    if(nameStatus == .notAvailable){
                         return self.showAlert(title: S.Alert.error, message: S.Asset.noAvailable, buttonLabel: S.Button.ok)
+                    }
+                    else if(nameStatus == .notVerified){
+                        return self.showAlert(title: S.Alert.error, message: S.Asset.notVerifiedName, buttonLabel: S.Button.ok)
                     }
                     else {
                         self.showConfirmationView(amount: amount, address: address, units: Int(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
@@ -516,6 +547,9 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
     }
 
     @objc private func keyboardWillHide(notification: Notification) {
+        if parentView!.frame.origin.y >= (origineParentFrame?.origin.y)!  {
+            return
+        }
         copyKeyboardChangeAnimation(notification: notification)
     }
 
@@ -524,7 +558,11 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         guard let info = KeyboardNotificationInfo(notification.userInfo) else { return }
         UIView.animate(withDuration: info.animationDuration, delay: 0, options: info.animationOptions, animations: {
             guard let parentView = self.parentView else { return }
-            parentView.frame = parentView.frame.offsetBy(dx: 0, dy: info.deltaY)
+            var diff:CGFloat = info.deltaY
+            if(self.nameCell.textField.isFirstResponder){
+                diff = info.deltaY + (notification.name.rawValue == UIResponder.keyboardWillShowNotification.rawValue ? createAddressHeight : -createAddressHeight)
+            }
+            parentView.frame = parentView.frame.offsetBy(dx: 0, dy: diff)
         }, completion: nil)
     }
 

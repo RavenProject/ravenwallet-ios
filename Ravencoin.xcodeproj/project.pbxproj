@@ -142,6 +142,7 @@
 		41F38046217E425400D6634C /* SenderAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F38045217E425400D6634C /* SenderAsset.swift */; };
 		41F38048217F09F000D6634C /* ManageOwnedAssetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F38047217F09F000D6634C /* ManageOwnedAssetVC.swift */; };
 		41F3804A217F12E300D6634C /* IPFSCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F38049217F12E300D6634C /* IPFSCell.swift */; };
+		41F78B972204BC3F007678FF /* SyncingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F78B962204BC3E007678FF /* SyncingHeaderView.swift */; };
 		7503773D1DF57428005EB8AE /* WalletManager+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */; };
 		751734B91DAC941E00193C87 /* sec-sub-1.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD8BE1DAA16820075898E /* sec-sub-1.c */; };
 		752438751DAAC50800844BEC /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD6761DAA0E400075898E /* alloc.c */; };
@@ -836,7 +837,6 @@
 		41797A1A21957ED600E7F3D4 /* BRAssets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BRAssets.c; sourceTree = "<group>"; };
 		41797A1B21957ED600E7F3D4 /* BRBIP44Sequence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BRBIP44Sequence.c; sourceTree = "<group>"; };
 		41797A1C21957ED600E7F3D4 /* BRAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRAssets.h; sourceTree = "<group>"; };
-		41797A1D21957ED700E7F3D4 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
 		41797A1E21957ED700E7F3D4 /* BRBIP44Sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRBIP44Sequence.h; sourceTree = "<group>"; };
 		41797A1F21957ED700E7F3D4 /* BRScript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BRScript.c; sourceTree = "<group>"; };
 		417C680E216B51E00090710E /* AddressBookListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookListCell.swift; path = src/Views/AddressBookListCell.swift; sourceTree = "<group>"; };
@@ -892,6 +892,7 @@
 		41F38045217E425400D6634C /* SenderAsset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SenderAsset.swift; path = src/SenderAsset.swift; sourceTree = "<group>"; };
 		41F38047217F09F000D6634C /* ManageOwnedAssetVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageOwnedAssetVC.swift; sourceTree = "<group>"; };
 		41F38049217F12E300D6634C /* IPFSCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IPFSCell.swift; sourceTree = "<group>"; };
+		41F78B962204BC3E007678FF /* SyncingHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncingHeaderView.swift; path = src/Views/SyncingHeaderView.swift; sourceTree = "<group>"; };
 		7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WalletManager+Auth.swift"; sourceTree = "<group>"; };
 		7528D2971ECF655500925DBC /* PaymentProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaymentProtocol.swift; path = src/PaymentProtocol.swift; sourceTree = "<group>"; };
 		752FB03B1DF8BE4B009086FB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3327,7 +3328,6 @@
 				755CD3181DAA099D0075898E /* module.modulemap */,
 				755CD3191DAA0A110075898E /* secp256k1 */,
 				75DC783C1DAA05B500932D9A /* test.c */,
-				41797A1D21957ED700E7F3D4 /* Version.h */,
 			);
 			name = core;
 			path = Modules/core;
@@ -3585,6 +3585,7 @@
 				7C7F18EC1FED9A3B0030230E /* TxStatusIndicator.swift */,
 				7CBA74E720227D1300FBBFA9 /* MenuCell.swift */,
 				7C230E742037AD52002F0FF1 /* SyncingIndicator.swift */,
+				41F78B962204BC3E007678FF /* SyncingHeaderView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -4585,6 +4586,7 @@
 				CEF3E82B1DE51612007C0A9E /* GradientCircle.swift in Sources */,
 				41EA80E0217B75B100B67A78 /* AllAssetHeaderView.swift in Sources */,
 				41358D0F2175E2FC00B86443 /* AddressBookHeaderView.swift in Sources */,
+				41F78B972204BC3F007678FF /* SyncingHeaderView.swift in Sources */,
 				7CCD9F6C1FEC1FA300175E64 /* TxAmountCell.swift in Sources */,
 				8B137E9E20F90EE2006DEB3A /* keccak.c in Sources */,
 				CE124CFE1E68F57700DFA146 /* Async.swift in Sources */,

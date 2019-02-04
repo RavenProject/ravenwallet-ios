@@ -333,7 +333,7 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         transferAssetVC.onPublishSuccess = { [weak self] in
-            self?.presentAlert(.sendSuccess, completion: {
+            self?.presentAlert(.sendAssetSuccess, completion: {
                 if let allAssetVC = self!.topViewController as? AllAssetVC {
                     self?.pushAccountView(currency: Currencies.rvn, animated: true, nc: allAssetVC.navigationController!)
                 }
@@ -374,7 +374,10 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+                Store.trigger(name: .lightWeightAlert(S.Receive.copied))
+                UIPasteboard.general.string = txHash
+            })
         }
         return root
     }
@@ -408,7 +411,10 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+                Store.trigger(name: .lightWeightAlert(S.Receive.copied))
+                UIPasteboard.general.string = txHash
+            })
 
         }
         return root
@@ -443,7 +449,10 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.ok)
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+                Store.trigger(name: .lightWeightAlert(S.Receive.copied))
+                UIPasteboard.general.string = txHash
+            })
         }
         return root
     }
@@ -513,7 +522,7 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         burnAssetVC.onPublishSuccess = { [weak self] in
-            self?.presentAlert(.sendSuccess, completion: {
+            self?.presentAlert(.burnAssetSuccess, completion: {
                 if let allAssetVC = self!.topViewController as? AllAssetVC {
                     self?.pushAccountView(currency: Currencies.rvn, animated: true, nc: allAssetVC.navigationController!)
                 }
@@ -690,11 +699,12 @@ class ModalPresenter : Subscriber, Trackable {
                                     self?.topViewController?.present(nc, animated: true, completion: nil)
                                 })
                             }),
-                            Setting(title: S.WipeSetting.title, callback: {
+                            Setting(title: S.WipeSetting.title, isHidden: !UserDefaults.hasActivatedExpertMode, callback: {
                                 self.wipeWallet()
                             }),
                             Setting(title: S.Settings.expertMode, toggle: UISwitch(), toggleDefaultValue: UserDefaults.hasActivatedExpertMode, toggleCallback: { isOn in
                                 UserDefaults.hasActivatedExpertMode = isOn
+                                Store.trigger(name: .reloadSettings)
                             })
                         ],
                     ]

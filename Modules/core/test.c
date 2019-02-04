@@ -1512,7 +1512,7 @@ int TransactionTests() {
 
     uint8_t script[BRAddressScriptPubKey(NULL, 0, address.s)];
     size_t scriptLen = BRAddressScriptPubKey(script, sizeof(script), address.s);
-    BRTransaction *tx = BRTransactionNew();
+    BRTransaction *tx = BRTransactionNew(1);
 
     BRTransactionAddInput(tx, inHash, 0, 1, script, scriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddOutput(tx, 100000000, script, scriptLen);
@@ -1551,7 +1551,7 @@ int TransactionTests() {
         r = 0, fprintf(stderr, "***FAILED*** %s: TransactionSerialize() test 1\n", __func__);
     BRTransactionFree(tx);
     
-    tx = BRTransactionNew();
+    tx = BRTransactionNew(1);
     BRTransactionAddInput(tx, inHash, 0, 1, script, scriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddInput(tx, inHash, 0, 1, script, scriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddInput(tx, inHash, 0, 1, script, scriptLen, NULL, 0, TXIN_SEQUENCE);
@@ -1648,7 +1648,7 @@ int WalletTests() {
     uint8_t outScript[BRAddressScriptPubKey(NULL, 0, recvAddr.s)];
     size_t outScriptLen = BRAddressScriptPubKey(outScript, sizeof(outScript), recvAddr.s);
     
-    tx = BRTransactionNew();
+    tx = BRTransactionNew(1);
     BRTransactionAddInput(tx, inHash, 0, 1, inScript, inScriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddOutput(tx, CORBIES, outScript, outScriptLen);
 //    WalletRegisterTransaction(w, tx); // test adding unsigned tx
@@ -1670,7 +1670,7 @@ int WalletTests() {
     if (BRWalletBalance(w) != CORBIES)
         r = 0, fprintf(stderr, "***FAILED*** %s: WalletRegisterTransaction() test 3\n", __func__);
 
-    tx = BRTransactionNew();
+    tx = BRTransactionNew(1);
     BRTransactionAddInput(tx, inHash, 1, 1, inScript, inScriptLen, NULL, 0, TXIN_SEQUENCE - 1);
     BRTransactionAddOutput(tx, CORBIES, outScript, outScriptLen);
     tx->lockTime = 1000;
@@ -1688,7 +1688,7 @@ int WalletTests() {
         r = 0, fprintf(stderr, "***FAILED*** %s: WalletUpdateTransactions() test\n", __func__);
 
     BRWalletFree(w);
-    tx = BRTransactionNew();
+    tx = BRTransactionNew(1);
     BRTransactionAddInput(tx, inHash, 0, 1, inScript, inScriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddOutput(tx, CORBIES, outScript, outScriptLen);
     BRTransactionSign(tx, 0, &k, 1);
@@ -1749,7 +1749,7 @@ int WalletTests() {
 
     int64_t amt;
     
-    tx = BRTransactionNew();
+    tx = BRTransactionNew(1);
     BRTransactionAddInput(tx, inHash, 0, 1, inScript, inScriptLen, NULL, 0, TXIN_SEQUENCE);
     BRTransactionAddOutput(tx, 740000, outScript, outScriptLen);
     BRTransactionSign(tx, 0, &k, 1);

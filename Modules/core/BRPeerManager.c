@@ -25,12 +25,12 @@
 #if TESTNET
 
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
-        {      0, "000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a", 1537466400, 0x1e00ffff },
-        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
-        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
-        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
-        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
-        {  150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
+//        {      0, "000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a", 1537466400, 0x1e00ffff },
+//        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
+//        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
+//        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
+//        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
+//        {  150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
         {  160000, "000000ce693ba2f21eff6b38270b6eab8bf442adb25252b9e8d4a7ab43709b10", 1547998364, 0x1e01c59a }
     }; // New testnet, port:18770 useragent:"/Ravencoin2.2.0/"
 
@@ -548,7 +548,8 @@ static void _requestUnrelayedTxGetdataDone(void *info, int success) {
             } else if (!isPublishing && _TxPeerListCount(manager->txRelays, tx[i]->txHash) <
                                         manager->maxConnectCount) {
                 // set timestamp 0 to mark as unverified
-                _PeerManagerUpdateTx(manager, &tx[i]->txHash, 1, TX_UNCONFIRMED, 0);
+//                _PeerManagerUpdateTx(manager, &tx[i]->txHash, 1, TX_UNCONFIRMED, 0);
+                BRWalletUpdateTransactions(manager->wallet, &tx[i]->txHash, 1, TX_UNCONFIRMED, 0);
             }
         }
     }
@@ -855,8 +856,8 @@ static void _peerDisconnected(void *info, int error) {
     //free(info);
     pthread_mutex_lock(&manager->lock);
 
-    void *txInfo[array_count(manager->publishedTx)];
-    void (*txCallback[array_count(manager->publishedTx)])(void *, int);
+    PublishedTx pubTx[array_count(manager->publishedTx)];
+
 
     if (error == EPROTO) { // if it's protocol error, the peer isn't following standard policy
         _PeerManagerPeerMisbehavin(manager, peer);
@@ -903,12 +904,9 @@ static void _peerDisconnected(void *info, int error) {
         for (size_t i = array_count(manager->publishedTx); i > 0; i--) {
             if (manager->publishedTx[i - 1].callback == NULL) continue;
             peer_log(peer, "transaction canceled: %s", strerror(txError));
-            txInfo[txCount] = manager->publishedTx[i - 1].info;
-            txCallback[txCount] = manager->publishedTx[i - 1].callback;
-            txCount++;
-            BRTransactionFree(manager->publishedTx[i - 1].tx);
-            array_rm(manager->publishedTxHashes, i - 1);
-            array_rm(manager->publishedTx, i - 1);
+            pubTx[txCount++] = manager->publishedTx[i - 1];
+            manager->publishedTx[i - 1].callback = NULL;
+            manager->publishedTx[i - 1].info = NULL;
         }
     }
 
@@ -922,7 +920,7 @@ static void _peerDisconnected(void *info, int error) {
     pthread_mutex_unlock(&manager->lock);
 
     for (size_t i = 0; i < txCount; i++) {
-        txCallback[i](txInfo[i], txError);
+        pubTx[i].callback(pubTx[i].info, txError);
     }
 
 //    if (willSave && manager->savePeers) manager->savePeers(manager->info, 1, NULL, 0);
@@ -1046,7 +1044,7 @@ static void _peerRelayedTx(void *info, BRTransaction *tx) {
     // set timestamp when tx is verified
     if (tx && relayCount >= manager->maxConnectCount && tx->blockHeight == TX_UNCONFIRMED &&
         tx->timestamp == 0) {
-        _PeerManagerUpdateTx(manager, &tx->txHash, 1, TX_UNCONFIRMED, (uint32_t) time(NULL));
+        BRWalletUpdateTransactions(manager->wallet, &tx->txHash, 1, TX_UNCONFIRMED, (uint32_t)time(NULL));
     }
 
     pthread_mutex_unlock(&manager->lock);
@@ -1057,8 +1055,7 @@ static void _peerHasTx(void *info, UInt256 txHash) {
     BRPeer *peer = ((PeerCallbackInfo *) info)->peer;
     BRPeerManager *manager = ((PeerCallbackInfo *) info)->manager;
     BRTransaction *tx;
-    void *txInfo = NULL;
-    void (*txCallback)(void *, int) = NULL;
+    PublishedTx pubTx;
     int isWalletTx = 0, hasPendingCallbacks = 0;
     size_t relayCount = 0;
 
@@ -1070,10 +1067,10 @@ static void _peerHasTx(void *info, UInt256 txHash) {
          i > 0; i--) { // see if tx is in list of published tx
         if (UInt256Eq(manager->publishedTxHashes[i - 1], txHash)) {
             if (!tx) tx = manager->publishedTx[i - 1].tx;
-            txInfo = manager->publishedTx[i - 1].info;
-            txCallback = manager->publishedTx[i - 1].callback;
-            manager->publishedTx[i - 1].info = NULL;
+            pubTx = manager->publishedTx[i - 1];
+            if (! tx) tx = pubTx.tx;
             manager->publishedTx[i - 1].callback = NULL;
+            manager->publishedTx[i - 1].info = NULL;
             relayCount = _TxPeerListAddPeer(&manager->txRelays, txHash, peer);
         } else if (manager->publishedTx[i - 1].callback != NULL) hasPendingCallbacks = 1;
     }
@@ -1107,7 +1104,7 @@ static void _peerHasTx(void *info, UInt256 txHash) {
     }
 
     pthread_mutex_unlock(&manager->lock);
-    if (txCallback) txCallback(txInfo, 0);
+    if (pubTx.callback) pubTx.callback(pubTx.info, 0);
 }
 
 static void _peerRejectedTx(void *info, UInt256 txHash, uint8_t code) {
@@ -1124,7 +1121,7 @@ static void _peerRejectedTx(void *info, UInt256 txHash, uint8_t code) {
         if (_TxPeerListRemovePeer(manager->txRelays, txHash, peer) &&
             tx->blockHeight == TX_UNCONFIRMED) {
             // set timestamp 0 to mark tx as unverified
-            _PeerManagerUpdateTx(manager, &txHash, 1, TX_UNCONFIRMED, 0);
+            BRWalletUpdateTransactions(manager->wallet, &txHash, 1, TX_UNCONFIRMED, 0);
         }
 
         // if we get rejected for any reason other than double-spend, the peer is likely misconfigured
@@ -1311,7 +1308,7 @@ static void _peerRelayedBlock(void *info, BRMerkleBlock *block) {
 
         BRSetAdd(manager->blocks, block);
         manager->lastBlock = block;
-        if (txCount > 0) _PeerManagerUpdateTx(manager, txHashes, txCount, block->height, txTime);
+        if (txCount > 0) BRWalletUpdateTransactions(manager->wallet, txHashes, txCount, block->height, txTime);
         if (manager->downloadPeer)
             BRPeerSetCurrentBlockHeight(manager->downloadPeer, block->height);
 
@@ -1339,8 +1336,7 @@ static void _peerRelayedBlock(void *info, BRMerkleBlock *block) {
             b = BRSetGet(manager->blocks, &b->prevBlock); // is block in main chain?
 
         if (BRMerkleBlockEq(b, block)) { // if it's not on a fork, set block heights for its transactions
-            if (txCount > 0)
-                _PeerManagerUpdateTx(manager, txHashes, txCount, block->height, txTime);
+            if (txCount > 0) BRWalletUpdateTransactions(manager->wallet, txHashes, txCount, block->height, txTime);
             if (block->height == manager->lastBlock->height) manager->lastBlock = block;
         }
 
@@ -1497,52 +1493,21 @@ static void _peerSetFeePerKb(void *info, uint64_t feePerKb) {
     pthread_mutex_unlock(&manager->lock);
 }
 
-//static void _peerRequestedTxPingDone(void *info, int success)
-//{
-//    Peer *peer = ((PeerCallbackInfo *)info)->peer;
-//    PeerManager *manager = ((PeerCallbackInfo *)info)->manager;
-//    UInt256 txHash = ((PeerCallbackInfo *)info)->hash;
-//
-//    free(info);
-//    pthread_mutex_lock(&manager->lock);
-//
-//    if (success && ! _TxPeerListHasPeer(manager->txRequests, txHash, peer)) {
-//        _TxPeerListAddPeer(&manager->txRequests, txHash, peer);
-//        PeerSendGetdata(peer, &txHash, 1, NULL, 0); // check if peer will relay the transaction back
-//    }
-//    
-//    pthread_mutex_unlock(&manager->lock);
-//}
-
 static BRTransaction *_peerRequestedTx(void *info, UInt256 txHash) {
     BRPeer *peer = ((PeerCallbackInfo *) info)->peer;
     BRPeerManager *manager = ((PeerCallbackInfo *) info)->manager;
-//    PeerCallbackInfo *pingInfo;
-    BRTransaction *tx = NULL;
-    void *txInfo = NULL;
-    void (*txCallback)(void *, int) = NULL;
+    PublishedTx pubTx;
     int hasPendingCallbacks = 0, error = 0;
 
     pthread_mutex_lock(&manager->lock);
 
     for (size_t i = array_count(manager->publishedTx); i > 0; i--) {
         if (UInt256Eq(manager->publishedTxHashes[i - 1], txHash)) {
-            tx = manager->publishedTx[i - 1].tx;
-            txInfo = manager->publishedTx[i - 1].info;
-            txCallback = manager->publishedTx[i - 1].callback;
-            manager->publishedTx[i - 1].info = NULL;
+            pubTx = manager->publishedTx[i - 1];
             manager->publishedTx[i - 1].callback = NULL;
 
-            if (tx && !BRWalletTransactionIsValid(manager->wallet, tx)) {
-                error = EINVAL;
-                array_rm(manager->publishedTx, i - 1);
-                array_rm(manager->publishedTxHashes, i - 1);
+            manager->publishedTx[i - 1].info = NULL;
 
-                if (!BRWalletTransactionForHash(manager->wallet, txHash)) {
-                    BRTransactionFree(tx);
-                    tx = NULL;
-                }
-            }
         } else if (manager->publishedTx[i - 1].callback != NULL) hasPendingCallbacks = 1;
     }
 
@@ -1551,20 +1516,13 @@ static BRTransaction *_peerRequestedTx(void *info, UInt256 txHash) {
         BRPeerScheduleDisconnect(peer, -1); // cancel publish tx timeout
     }
 
-    if (tx && !error) {
-        _TxPeerListAddPeer(&manager->txRelays, txHash, peer);
-        BRWalletRegisterTransaction(manager->wallet, tx);
-    }
+    _TxPeerListAddPeer(&manager->txRelays, txHash, peer);
+    if (pubTx.tx) BRWalletRegisterTransaction(manager->wallet, pubTx.tx);
+    if (pubTx.tx && ! BRWalletTransactionIsValid(manager->wallet, pubTx.tx)) error = EINVAL;
 
-//    pingInfo = calloc(1, sizeof(*pingInfo));
-//    assert(pingInfo != NULL);
-//    pingInfo->peer = peer;
-//    pingInfo->manager = manager;
-//    pingInfo->hash = txHash;
-//    PeerSendPing(peer, pingInfo, _peerRequestedTxPingDone);
     pthread_mutex_unlock(&manager->lock);
-    if (txCallback) txCallback(txInfo, error);
-    return tx;
+    if (pubTx.callback) pubTx.callback(pubTx.info, error);
+    return pubTx.tx;
 }
 
 static int _peerNetworkIsReachable(void *info) {
@@ -1928,8 +1886,10 @@ double BRPeerManagerSyncProgress(BRPeerManager *manager, uint32_t startHeight) {
         if (manager->lastBlock->height > startHeight && manager->estimatedHeight > startHeight) {
             progress = 0.1 + 0.9 * (manager->lastBlock->height - startHeight) /
                              (manager->estimatedHeight - startHeight);
-        } else progress = 0.05;
-    } else progress = 1.0;
+        } else
+            progress = 0.05;
+    } else
+        progress = 1.0;
 
     pthread_mutex_unlock(&manager->lock);
     return progress;
@@ -1974,7 +1934,7 @@ static void _publishTxInvDone(void *info, int success) {
     pthread_mutex_unlock(&manager->lock);
 }
 
-// publishes tx to ravencoin network (do not call TransactionFree() on tx afterward)
+// publishes tx to ravencoin network
 void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *info,
                             void (*callback)(void *info, int error)) {
     assert(manager != NULL);
@@ -1983,10 +1943,9 @@ void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *inf
 
     if (tx && !BRTransactionIsSigned(tx)) {
         pthread_mutex_unlock(&manager->lock);
-        BRTransactionFree(tx);
-        tx = NULL;
         if (callback)
             callback(info, EINVAL); // transaction not signed
+        tx = NULL;
     } else if (tx && !manager->isConnected) {
         int connectFailureCount = manager->connectFailureCount;
 
@@ -1994,9 +1953,8 @@ void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *inf
 
         if (connectFailureCount >= MAX_CONNECT_FAILURES ||
             (manager->networkIsReachable && !manager->networkIsReachable(manager->info))) {
-            BRTransactionFree(tx);
-            tx = NULL;
             if (callback) callback(info, ENOTCONN); // not connected to the network
+            tx = NULL;
         } else pthread_mutex_lock(&manager->lock);
     }
 
@@ -2064,9 +2022,10 @@ void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *as
         if (BRPeerConnectStatus(peer) != BRPeerStatusConnected) continue;
         
         peer->assetCallbackInfo = infoManager;
-        
-        if (BRPeerVersion(peer) >= 70018) {
+        // TODO: get it back
+        if (BRPeerVersion(peer) >= /*PROTOCOL_VERSION*/ 70020) {
             BRPeerSendGetAsset(peer, assetName, nameLen, receivedAssetData);
+            break;
         } else
             peer_log(peer, "node doesn't support Assets MSG Protocol");
     }

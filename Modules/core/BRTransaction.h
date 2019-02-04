@@ -135,7 +135,7 @@ extern "C" {
     } BRTransaction;
     
     // returns a newly allocated empty transaction that must be freed by calling TransactionFree()
-    BRTransaction *BRTransactionNew(void);
+    BRTransaction *BRTransactionNew(size_t txCount);
     
     // returns a deep copy of tx and that must be freed by calling TransactionFree()
     BRTransaction *BRTransactionCopy(const BRTransaction *tx);
@@ -187,10 +187,6 @@ extern "C" {
     {
         return (tx == otherTx || UInt256Eq(((const BRTransaction *)tx)->txHash, ((const BRTransaction *)otherTx)->txHash));
     }
-    
-    BRTransaction *BRTransactionDecomposeForCreation(const BRTransaction *tx, size_t txsCount);
-    
-    BRTransaction *BRTransactionDecomposeForManagement(const BRTransaction *tx, size_t txsCount);
     
     // frees memory allocated for tx
     void BRTransactionFree(BRTransaction *tx);

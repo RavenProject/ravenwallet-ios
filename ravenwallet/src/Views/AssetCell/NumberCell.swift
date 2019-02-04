@@ -28,6 +28,7 @@ class NumberCell : UIViewController, Trackable {
 
     var didChangeFirstResponder: ((Bool) -> Void)?
     var didUpdateAmount: ((Satoshis?) -> Void)?
+    var didReturn: (() -> Void)?
 
     /*var currentOutput: String {
         return amountLabel.text ?? ""
@@ -181,7 +182,11 @@ class NumberCell : UIViewController, Trackable {
 
         
         var newAmount: Satoshis?
-        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {
+        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {//BMEX TODO : need optimisation
+            if(Double(outputAmount) > Double(C.maxMoney/C.oneAsset)){
+                pinPad.removeLast()
+                return
+            }
             newAmount = Satoshis(value: outputAmount)
         }
         
@@ -221,6 +226,7 @@ class NumberCell : UIViewController, Trackable {
     func closePinPad() {
         pinPadHeight?.constant = 0.0
         bottomBorder.isHidden = true
+        didReturn?()
     }
 
     func togglePinPad() {

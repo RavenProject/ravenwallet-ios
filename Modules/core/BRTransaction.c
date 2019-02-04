@@ -310,21 +310,24 @@ static size_t _TransactionData(const BRTransaction *tx, uint8_t *data, size_t da
 }
 
 // returns a newly allocated empty transaction that must be freed by calling TransactionFree()
-BRTransaction *BRTransactionNew(void) {
-    BRTransaction *tx = calloc(1, sizeof(*tx));
+BRTransaction *BRTransactionNew(size_t txCount) {
+    BRTransaction *tx = calloc(txCount, sizeof(*tx));
     
     assert(tx != NULL);
-    tx->version = TX_VERSION;
-    array_new(tx->inputs, 1);
-    array_new(tx->outputs, 2);
-    tx->lockTime = TX_LOCKTIME;
-    tx->blockHeight = TX_UNCONFIRMED;
+    for(int i = 0; i < txCount; i++) {
+        tx[i].version = TX_VERSION;
+        array_new(tx[i].inputs, 1);
+        array_new(tx[i].outputs, 2);
+        tx[i].lockTime = TX_LOCKTIME;
+        tx[i].blockHeight = TX_UNCONFIRMED;
+    }
+    
     return tx;
 }
 
 // returns a deep copy of tx and that must be freed by calling TransactionFree()
 BRTransaction *BRTransactionCopy(const BRTransaction *tx) {
-    BRTransaction *cpy = BRTransactionNew();
+    BRTransaction *cpy = BRTransactionNew(1);
     BRTxInput *inputs = cpy->inputs;
     BRTxOutput *outputs = cpy->outputs;
     
@@ -359,7 +362,7 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
     
     int isSigned = 1;
     size_t i, off = 0, sLen = 0, len = 0;
-    BRTransaction *tx = BRTransactionNew();
+    BRTransaction *tx = BRTransactionNew(1);
     BRTxInput *input;
     BRTxOutput *output;
     
@@ -421,7 +424,7 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
                 !IsScriptOwnerAsset(output->script, output->scriptLen) &&
                 !IsScriptTransferAsset(output->script, output->scriptLen)) {
                 GetAssetData(output->script, output->scriptLen, tx->asset);
-            } /*else if(IsScriptTransferAsset(output->script, output->scriptLen)) break;*/
+            } /*else if(IsScriptTransferAsset(output->script, output->scriptLen)) continue;*/
         }
         /*RVN PROCESS END*/
     }
@@ -606,172 +609,6 @@ int BRTransactionIsStandard(const BRTransaction *tx) {
     // TODO: XXX implement
     
     return r;
-}
-
-BRTransaction *BRTransactionDecomposeForCreation(const BRTransaction *tx, size_t txsCount) {
-    assert(tx != NULL);
-    assert(tx->asset->type == NEW_ASSET);
-    
-    size_t off = 0;
-    
-    BRTransaction *cpy = calloc(txsCount, sizeof(*tx));
-    
-    assert(cpy != NULL);
-    
-    // Tx for burn amount 500 RVN
-    cpy[0].version = TX_VERSION;
-    array_new(cpy[0].inputs, 1);
-    array_new(cpy[0].outputs, 2);
-    cpy[0].lockTime = TX_LOCKTIME;
-    cpy[0].blockHeight = TX_UNCONFIRMED;
-    
-    BRTxInput *inputs = cpy[0].inputs;
-    BRTxOutput *outputs = cpy[0].outputs;
-    
-    assert(tx != NULL);
-    cpy[0] = *tx;
-    off++;
-    cpy[0].inputs = inputs;
-    cpy[0].outputs = outputs;
-    cpy[0].inCount = cpy[0].outCount = 0;
-    
-    cpy[0].asset = NULL;
-    // TODO: see how to ignore asset owner input!
-    for (size_t j = 0; j < tx->inCount; j++) {
-        // if statement ignores Owner Token transfer for proving ownership
-        if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
-                          tx->outputs[tx->inputs[j].index].scriptLen))// TODO: not tested yet!
-            BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
-                                  tx->inputs[j].script, tx->inputs[j].scriptLen,
-                                  tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
-    }
-    for (size_t j = 0; j < tx->outCount; j++) {
-        if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))
-            BRTransactionAddOutput(&cpy[0], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
-    }
-    
-    // Tx for New Asset reception
-    cpy[1].version = TX_VERSION;
-    array_new(cpy[1].inputs, 1);
-    array_new(cpy[1].outputs, 2);
-    cpy[1].lockTime = TX_LOCKTIME;
-    cpy[1].blockHeight = TX_UNCONFIRMED;
-    
-    inputs = cpy[1].inputs;
-    outputs = cpy[1].outputs;
-    
-    assert(tx != NULL);
-    cpy[1] = *tx;
-    off++;
-    cpy[1].inputs = inputs;
-    cpy[1].outputs = outputs;
-    cpy[1].inCount = cpy[1].outCount = 0;
-    cpy[1].asset = tx->asset;
-    
-    for (size_t j = 0; j < tx->outCount; j++) {
-        if(IsScriptNewAsset(tx->outputs[j].script, tx->outputs[j].scriptLen)) {
-            BRTransactionAddOutput(&cpy[1], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
-            GetAssetData(tx->outputs[j].script, tx->outputs[j].scriptLen, cpy[1].asset);
-        }
-    }
-    
-    //    if(off == txsCount || IsAssetNameUniqueAsset(tx->asset))
-    //        return cpy;
-    
-    // Tx for Ownership asset reception
-    cpy[2].version = TX_VERSION;
-    array_new(cpy[2].inputs, 1);
-    array_new(cpy[2].outputs, 2);
-    cpy[2].lockTime = TX_LOCKTIME;
-    cpy[2].blockHeight = TX_UNCONFIRMED;
-    
-    inputs = cpy[2].inputs;
-    outputs = cpy[2].outputs;
-    
-    assert(tx != NULL);
-    cpy[2] = *tx;
-    off++;
-    cpy[2].inputs = inputs;
-    cpy[2].outputs = outputs;
-    cpy[2].inCount = cpy[2].outCount = 0;
-    
-    cpy[2].asset = NewAsset();
-    
-    for (size_t j = 0; j < tx->outCount; j++) {
-        if(IsScriptOwnerAsset(tx->outputs[j].script, tx->outputs[j].scriptLen)) {
-            BRTransactionAddOutput(&cpy[2], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
-            GetAssetData(tx->outputs[j].script, tx->outputs[j].scriptLen, cpy[2].asset);
-        }
-    }
-    
-    return cpy;
-}
-
-BRTransaction *BRTransactionDecomposeForManagement(const BRTransaction *tx, size_t txsCount) {
-    assert(tx != NULL);
-    assert(tx->asset->type == REISSUE);
-    
-    BRTransaction *cpy = calloc(txsCount, sizeof(*tx));
-    
-    assert(cpy != NULL);
-    
-    // Tx for burn amount 100 RVN
-    cpy[0].version = TX_VERSION;
-    array_new(cpy[0].inputs, 1);
-    array_new(cpy[0].outputs, 2);
-    cpy[0].lockTime = TX_LOCKTIME;
-    cpy[0].blockHeight = TX_UNCONFIRMED;
-    
-    BRTxInput *inputs = cpy[0].inputs;
-    BRTxOutput *outputs = cpy[0].outputs;
-    
-    assert(tx != NULL);
-    
-    cpy[0] = *tx;
-    cpy[0].inputs = inputs;
-    cpy[0].outputs = outputs;
-    cpy[0].inCount = cpy[0].outCount = 0;
-    cpy[0].asset = NULL;
-    
-    for (size_t j = 0; j < tx->inCount; j++) {
-        // if statement ignores Owner Token transfer for proving ownership
-        if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
-                          tx->outputs[tx->inputs[j].index].scriptLen))// TODO: not tested yet!
-            BRTransactionAddInput(&cpy[0], tx->inputs[j].txHash, tx->inputs[j].index, tx->inputs[j].amount,
-                                  tx->inputs[j].script, tx->inputs[j].scriptLen,
-                                  tx->inputs[j].signature, tx->inputs[j].sigLen, tx->inputs[j].sequence);
-    }
-    for (size_t j = 0; j < tx->outCount; j++) {
-        if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))
-            BRTransactionAddOutput(&cpy[0], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
-    }
-    
-    // Tx for Reissue Asset reception
-    cpy[1].version = TX_VERSION;
-    array_new(cpy[1].inputs, 1);
-    array_new(cpy[1].outputs, 2);
-    cpy[1].lockTime = TX_LOCKTIME;
-    cpy[1].blockHeight = TX_UNCONFIRMED;
-    
-    inputs = cpy[1].inputs;
-    outputs = cpy[1].outputs;
-    
-    assert(tx != NULL);
-    cpy[1] = *tx;
-    cpy[1].inputs = inputs;
-    cpy[1].outputs = outputs;
-    cpy[1].inCount = cpy[1].outCount = 0;
-    
-    cpy[1].asset = tx->asset;
-    
-    for (size_t j = 0; j < tx->outCount; j++) {
-        if(IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen)  &&
-           IsScriptReissueAsset(tx->outputs[j].script, tx->outputs[j].scriptLen)) {
-            BRTransactionAddOutput(&cpy[1], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
-        }
-    }
-    
-    return cpy;
 }
 
 // frees memory allocated for tx
