@@ -27,6 +27,8 @@ class NumberCell : UIViewController, Trackable {
     }
 
     var didChangeFirstResponder: ((Bool) -> Void)?
+    var didUpdateAmount: ((Satoshis?) -> Void)?
+    var didReturn: (() -> Void)?
 
     /*var currentOutput: String {
         return amountLabel.text ?? ""
@@ -51,7 +53,13 @@ class NumberCell : UIViewController, Trackable {
     let pinPad: PinPadViewController
     let border = UIView(color: .secondaryShadow)
     let bottomBorder = UIView(color: .secondaryShadow)
-    var isEnabled : Bool = true
+    var isEnabled : Bool = true {
+        didSet {
+            tapView.isUserInteractionEnabled = isEnabled
+            //amount = nil
+            closePinPad()
+        }
+    }
     private let tapView = UIView()
     private let numberDigit:NumberDigit
     
@@ -174,7 +182,11 @@ class NumberCell : UIViewController, Trackable {
 
         
         var newAmount: Satoshis?
-        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {
+        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {//BMEX TODO : need optimisation
+            if(Double(outputAmount) > Double(C.maxMoney/C.oneAsset)){
+                pinPad.removeLast()
+                return
+            }
             newAmount = Satoshis(value: outputAmount)
         }
         
@@ -190,7 +202,13 @@ class NumberCell : UIViewController, Trackable {
     }
     
     func updateAmountLabel() {
-        guard let amount = amount else { amountLabel.text = ""; return }
+        guard let amount = amount else {
+            amountLabel.text = "";
+            pinPad.clear()
+            placeholder.isHidden = false
+            return
+        }
+        placeholder.isHidden = true
         var output = amount.description(minimumFractionDigits: minimumFractionDigits)
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)
@@ -208,6 +226,7 @@ class NumberCell : UIViewController, Trackable {
     func closePinPad() {
         pinPadHeight?.constant = 0.0
         bottomBorder.isHidden = true
+        didReturn?()
     }
 
     func togglePinPad() {

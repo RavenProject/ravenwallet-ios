@@ -33,10 +33,35 @@ class SenderAsset {
     var rate: Rate?
     var comment: String?
     var feePerKb: UInt64?
-    private let operationType: OperationType
+    var operationType: OperationType
 
-    func createAssetTransaction(amount: UInt64, to: String, asset: BRAssetRef) -> Bool {
-        transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount, toAddress: to, asset: asset)
+    func createAssetTransaction(amount: UInt64? = nil, to: String, asset: BRAssetRef, rootAsset: BRAssetRef? = nil) -> Bool {
+        switch operationType {
+        case .transferAsset:
+            transaction = walletManager.wallet?.createAssetTransaction(forAmount: amount!, toAddress: to, asset: asset)
+            break
+        case .transferOwnerShipAsset:
+            transaction = walletManager.wallet?.createAssetTransactionOwnerShip(forAmount: amount!, toAddress: to, asset: asset)
+            break
+        case .burnAsset:
+            transaction = walletManager.wallet?.burnAssetTransaction(asset: asset)
+            break
+        case .createAsset:
+            transaction = walletManager.wallet?.createTxForRootAssetCreation(forAmount: C.creatAssetFee, toAddress: to, asset: asset)
+            break
+        case .subAsset:
+            transaction = walletManager.wallet?.createTxForSubAssetCreation(forAmount: C.subAssetFee, toAddress: to, asset: asset, rootAsset: rootAsset!)
+            break
+        case .uniqueAsset:
+            transaction = walletManager.wallet?.createTxForUniqueAssetCreation(forAmount: C.uniqueAssetFee, toAddress: to, asset: asset, rootAsset: rootAsset!)
+            break
+        case .manageAsset:
+            transaction = walletManager.wallet?.createTxForRootAssetManage(forAmount: amount!, toAddress: to, asset: asset)
+            break
+        case .transferRvn: //never called in this class
+            transaction = nil
+            break
+        }
         return transaction != nil
     }
 
@@ -92,12 +117,12 @@ class SenderAsset {
             let group = DispatchGroup()
             group.enter()
             DispatchQueue.walletQueue.async {
-                if self.walletManager.signTransaction(tx, forkId: 0, pin: pin) {
+                if self.walletManager.signTransaction(tx, forkId: (self.currency as! Raven).forkId, pin: pin) {
                     self.publish(completion: completion)
                 }
                 group.leave()
             }
-            let result = group.wait(timeout: .now() + 1114.0) // TODO: change back to 4.0
+            let result = group.wait(timeout: .now() + 4.0)
             if result == .timedOut {
                 fatalError("send-tx-timeout")
             }

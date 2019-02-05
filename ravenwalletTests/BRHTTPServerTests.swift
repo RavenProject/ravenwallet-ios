@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import ravenwallet
+@testable import Ravencoin
 
 class BRHTTPServerTests: XCTestCase {
     var server: BRHTTPServer!

@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-#define PEER_MAX_CONNECTIONS 3
+#define PEER_MAX_CONNECTIONS 25// TODO: Change back to 6 or 3
 
 typedef struct PeerManagerStruct BRPeerManager;
 
@@ -114,6 +114,9 @@ size_t BRPeerManagerRelayCount(BRPeerManager *manager, UInt256 txHash);
 // return the ChainParams used to create this peer manager
 const ChainParams *BRPeerManagerChainParams(BRPeerManager *manager);
 
+void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *assetName, size_t nameLen,
+                             void (*receivedAssetData)(void *info, BRAsset *asset));
+    
 // frees memory allocated for manager (call PeerManagerDisconnect() first if connected)
 void BRPeerManagerFree(BRPeerManager *manager);
 

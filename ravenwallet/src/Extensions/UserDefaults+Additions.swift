@@ -12,6 +12,7 @@ private let defaults = UserDefaults.standard
 private let isBiometricsEnabledKey = "istouchidenabled"
 private let defaultCurrencyCodeKey = "defaultcurrency"
 private let hasAquiredShareDataPermissionKey = "has_acquired_permission"
+private let hasActivatedExpertModeKey = "has_activated_expert_mode"
 private let legacyWalletNeedsBackupKey = "WALLET_NEEDS_BACKUP"
 private let writePaperPhraseDateKey = "writepaperphrasedatekey"
 private let hasPromptedBiometricsKey = "haspromptedtouched"
@@ -58,6 +59,11 @@ extension UserDefaults {
     static var hasAquiredShareDataPermission: Bool {
         get { return defaults.bool(forKey: hasAquiredShareDataPermissionKey) }
         set { defaults.set(newValue, forKey: hasAquiredShareDataPermissionKey) }
+    }
+    
+    static var hasActivatedExpertMode: Bool {
+        get { return defaults.bool(forKey: hasActivatedExpertModeKey) }
+        set { defaults.set(newValue, forKey: hasActivatedExpertModeKey) }
     }
 
     static var isBtcSwapped: Bool {

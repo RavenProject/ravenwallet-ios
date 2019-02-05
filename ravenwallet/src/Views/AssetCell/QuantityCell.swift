@@ -18,6 +18,7 @@ class QuantityCell : NumberCell {
     
     override var amount: Satoshis? {
         didSet {
+            updateAmountLabel()
             updateBalanceLabel()
             didUpdateAmount?(amount)
         }
@@ -28,7 +29,6 @@ class QuantityCell : NumberCell {
     }
     
     private let balanceLabel = UILabel.init(font: .customBody(size: 14.0), color: .grayTextTint)
-    var didUpdateAmount: ((Satoshis?) -> Void)?
 
     private var asset:Asset? {
         didSet {

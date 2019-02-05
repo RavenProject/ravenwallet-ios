@@ -40,6 +40,7 @@ class CheckBoxCell : SendCell {
     var didBeginEditing: (() -> Void)?
     var didReturn: ((UITextField) -> Void)?
     var didChange: ((String) -> Void)?
+    var didSelected: ((Bool) -> Void)?
     var content: String? {
         didSet {
             textField.text = content
@@ -96,6 +97,7 @@ class CheckBoxCell : SendCell {
                     self.textField.resignFirstResponder()
                 }
             }
+            self.didSelected?(isSelected)
         }
         btnCheckBox.isSelected = false
     }
@@ -128,5 +130,11 @@ extension CheckBoxCell : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         didReturn?(textField)
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let count = text.count + string.count - range.length
+        return count <= C.MAX_ADDRESSBOOK_NAME_LENGTH
     }
 }

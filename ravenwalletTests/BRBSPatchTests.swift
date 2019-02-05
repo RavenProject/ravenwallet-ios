@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import breadwallet
+@testable import Ravencoin
 
 class BRBSPatchTests: XCTestCase {
     var bundle1Url: URL?

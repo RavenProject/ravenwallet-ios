@@ -183,6 +183,17 @@ class WalletManager {
         let mpkData = Data(masterPubKey: masterPubKey)
         return mpkData.count == 0
     }
+    
+    func isSyncing() -> Bool {
+        if (self.peerManager == nil) {
+            return false
+        }
+        let diffBlocks = Int(self.lastBlockHeight) - Int((self.peerManager?.lastBlockHeight)!)
+        if abs(diffBlocks) > C.diffBlocks {
+            return true
+        }
+        return false
+    }
 }
 
 extension WalletManager : BRPeerManagerListener, Trackable {
@@ -277,18 +288,65 @@ extension WalletManager : BRWalletListener {
     }
 
     func txAdded(_ tx: BRTxRef) {
+        print("BMEX txAdded")
         db?.txAdded(tx)
-        //BMEX test if asset not nil
+        //add asset if not null
         if AssetValidator.shared.checkInvalidAsset(asset: tx.pointee.asset) {
-            db?.assetAdded(tx, walletManager: self)
+            DispatchQueue.main.async {
+                self.assetAdded(tx)
+            }
+        }
+    }
+    
+    func assetAdded(_ tx: BRTxRef) {
+        let rvnTx = RvnTransaction(tx, walletManager: self, kvStore: self.kvStore, rate: self.currency.state.currentRate)
+        if(tx.pointee.asset!.pointee.type == NEW_ASSET || tx.pointee.asset!.pointee.type == REISSUE){//BMEX should dont write asset if not confirmed
+            if(rvnTx?.status == .pending || rvnTx?.status == .invalid){
+                return
+            }
+        }
+        for brTx in decomposeTransaction(brTxRef: tx) {
+            if AssetValidator.shared.checkInvalidAsset(asset: brTx!.pointee.asset) {
+                db?.assetAdded(brTx!, walletManager: self)
+            }
+        }
+        //send get asset data for each asset
+        if(tx.pointee.asset!.pointee.type == TRANSFER){
+            getAssetData(tx)
+        }
+    }
+    
+    func getAssetData(_ tx: BRTxRef) {
+        if AssetValidator.shared.checkNullAsset(asset: tx.pointee.asset) {
+            PeerManagerGetAssetData(self.peerManager!.cPtr, Unmanaged.passUnretained(self).toOpaque(), tx.pointee.asset.pointee.name, tx.pointee.asset.pointee.nameLen, {(info, asset) in
+                guard let info = info, let asset = asset else { return }
+                Unmanaged<WalletManager>.fromOpaque(info).takeUnretainedValue().db?.updateAssetData(asset)
+            })
         }
     }
 
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {
+        print("BMEX txUpdated")
         db?.txUpdated(txHashes, blockHeight: blockHeight, timestamp: timestamp)
+        //BMEX write new asset confirmed
+        //db?.loadTransactions(callback: { transactions in
+        let transactions = self.wallet?.transactions
+        for tx in transactions! {
+            if(txHashes.contains((tx?.pointee.txHash)!)){
+                if AssetValidator.shared.checkInvalidAsset(asset: tx!.pointee.asset) {
+                    if(tx!.pointee.asset!.pointee.type == NEW_ASSET || tx!.pointee.asset!.pointee.type == REISSUE){
+                        DispatchQueue.main.async {
+                            self.assetAdded(tx!)
+                        }
+                    }
+                }
+            }
+        }
+    //})
     }
 
     func txDeleted(_ txHash: UInt256, notifyUser: Bool, recommendRescan: Bool) {
+        print("BMEX txDeleted")
         if notifyUser {
             if recommendRescan {
                 DispatchQueue.main.async { [weak self] in
@@ -350,7 +408,8 @@ extension WalletManager : BRWalletListener {
     }
 
     func makeTransactionViewModels(transactions: [BRTxRef?], rate: Rate?) -> [Transaction] {
-        return transactions.compactMap{ $0 }.sorted {
+        let decomposedList = decomposeTransactionsList(transactions: transactions)
+        return decomposedList.compactMap{ $0 }.sorted {
             if $0.pointee.timestamp == 0 {
                 return true
             } else if $1.pointee.timestamp == 0 {
@@ -361,6 +420,51 @@ extension WalletManager : BRWalletListener {
             }.compactMap {
                 return RvnTransaction($0, walletManager: self, kvStore: kvStore, rate: rate)
         }
+    }
+    
+//    var outputs: [BRTxOutput] {
+//        return [BRTxOutput](UnsafeBufferPointer(start: self.pointee.outputs, count: self.pointee.outCount))
+//    }
+    
+    func decomposeTransaction(brTxRef:BRTxRef?) -> [BRTxRef?] {
+        var decomposedTransactions: [BRTxRef?] = [BRTxRef?]()
+        if(brTxRef?.pointee.asset != nil){
+            var txsCount = 0
+            var txListPointer:UnsafeMutablePointer<BRTransaction>!
+            if brTxRef?.pointee.asset.pointee.type == NEW_ASSET ||  brTxRef?.pointee.asset.pointee.type == REISSUE {
+                txsCount = BRTransactionDecompose(wallet?.cPtr, brTxRef, nil, 0);
+                txListPointer = BRTransactionNew(txsCount)
+                BRTransactionDecompose(wallet?.cPtr, brTxRef, txListPointer, txsCount);
+            }
+            else{
+                decomposedTransactions.append(brTxRef)
+                return decomposedTransactions
+            }
+            let txList = [BRTransaction](UnsafeBufferPointer<BRTransaction>(start: txListPointer, count: txsCount))
+            for tx in txList {
+                let txPointer = UnsafeMutablePointer<BRTransaction>.allocate(capacity: 1)
+                txPointer.initialize(to: tx)
+                if(txPointer.pointee.asset != nil){
+                    if(txPointer.pointee.asset.pointee.name == nil){
+                        continue
+                    }
+                }
+                decomposedTransactions.append(txPointer)
+            }
+            return decomposedTransactions
+        }
+        else{
+            decomposedTransactions.append(brTxRef)
+            return decomposedTransactions
+        }
+    }
+    
+    func decomposeTransactionsList(transactions:[BRTxRef?]) -> [BRTxRef?] {
+        var decomposedTransactionsList: [BRTxRef?] = [BRTxRef?]()
+        for brTxRef in transactions {
+            decomposedTransactionsList.append(contentsOf:decomposeTransaction(brTxRef: brTxRef))
+        }
+        return decomposedTransactionsList
     }
 
     private func ping() {

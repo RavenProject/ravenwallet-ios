@@ -66,7 +66,7 @@ typedef struct {
 } BRMerkleBlock;
 
 #define BR_MERKLE_BLOCK_NONE\
-    ((BRMerkleBlock) { UINT256_ZERO, 0, UINT256_ZERO, UINT256_ZERO, 0, 0, 0, 0, NULL, 0, NULL, 0, 0 })
+    ((const BRMerkleBlock) { UINT256_ZERO, 0, UINT256_ZERO, UINT256_ZERO, 0, 0, 0, 0, NULL, 0, NULL, 0, 0 })
 
 // returns a newly allocated merkle block struct that must be freed by calling MerkleBlockFree()
 BRMerkleBlock *BRMerkleBlockNew(void);

@@ -44,6 +44,7 @@
 #include <arpa/inet.h>
 #include "BRScript.h"
 #include "BRAssets.h"
+#include "BRPeerManager.h"
 
 #if TESTNET
 #define MAGIC_NUMBER 0x544e5652  //RVNT - Reverse from chainparams.cpp
@@ -57,8 +58,8 @@
 #define MAX_MSG_LENGTH     0x02000000
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0ULL  // we don't provide full blocks to remote nodes
-#define PROTOCOL_VERSION   70013
-#define MIN_PROTO_VERSION  70002 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
+#define PROTOCOL_VERSION   70020
+#define MIN_PROTO_VERSION  70020 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
 #define LOCAL_HOST         ((UInt128) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x7f, 0x00, 0x00, 0x01 })
 #define CONNECT_TIMEOUT    3.0
 #define MESSAGE_TIMEOUT    10.0
@@ -149,6 +150,10 @@ typedef struct {
     void *volatile mempoolInfo;
 
     void (*volatile mempoolCallback)(void *info, int success);
+    
+    // RVN Start
+    void (*receiveAssetData) (void *info, BRAsset *asset);
+    // RVN End
 
     pthread_t thread;
 } BRPeerContext;
@@ -275,6 +280,99 @@ static int _PeerAcceptVerackMessage(BRPeer *peer, const uint8_t *msg, size_t msg
     return r;
 }
 
+static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen) {
+    size_t off = 0, count = (size_t) BRVarInt(msg, msgLen, &off), sLen = 0;
+    int r = 1;
+    
+    if (off == 0) {
+        peer_log(peer, "malformed assets message");
+        r = 0;
+    } else if (msgLen > 16898) {
+        peer_log(peer, "dropping assets message, %zu is too many assets, max is 512", count);
+    } else {
+        peer_log(peer, "got asset with %zu data", count);
+        
+        BRAsset *asset = NewAsset();
+
+        asset->nameLen = count;
+        
+        asset->name = malloc(count + 1);
+        memcpy(asset->name, msg + off, count);
+        off += count;
+        *(asset->name + count) = '\0';
+        assert(*(asset->name + count) == '\0');
+        
+        //TODO: test
+        if(strcmp(asset->name, "_NF") == 0) {
+            peer_log(peer, "Asset not found");
+            ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, NULL);
+            return r;
+        }
+        
+        asset->amount = (off + sizeof(uint64_t) <= msgLen) ? UInt64GetLE(&msg[off]) : 0;
+        off += sizeof(uint64_t);
+        
+        // TODO: change VarInt reading to UINT8
+        asset->unit = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
+        off += sLen;
+        
+        asset->reissuable = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
+        off += sLen;
+        
+        asset->hasIPFS = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
+        off += sLen;
+        
+        size_t IPFS_length = (size_t) BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0),
+                                               &sLen);
+        off += sLen;
+        
+        // Check the end of the script
+        if (asset->hasIPFS != 0 || IPFS_length != 0) {
+            
+            uint8_t IPFS_hash[IPFS_length];
+            
+            if (off <= msgLen + IPFS_length) {
+                memcpy(&IPFS_hash, msg + off, IPFS_length);
+                off += IPFS_length;
+                EncodeIPFS(asset->IPFSHash, 47, IPFS_hash, IPFS_length);
+            }
+        }
+        
+            ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
+    }
+    
+    return r;
+}
+
+static int _PeerAssetNotFoundMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen) {
+    
+    size_t off = 0, size = (size_t) BRVarInt(msg, msgLen, &off), nameLen;
+    int r = 1;
+    
+    peer_log(peer, "got asset msg with %zu data", size);
+    
+    if (size == 0) {
+        peer_log(peer, "malformed assets message");
+        r = 0;
+    } else {
+        //TODO : assign name and len to new asset
+
+        nameLen = UInt64GetLE(&msg[off]);
+        off += sizeof(uint64_t);
+        
+        char name[nameLen];
+        memcpy(name, msg + off, nameLen);
+        off += nameLen;
+        *(name + nameLen) = '\0';
+        assert(*(name + nameLen) == '\0');
+        
+        peer_log(peer, "Asset %s not found", name);
+        ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, NewAsset());
+    }
+    
+    return r;
+}
+
 // TODO: relay addresses
 static int _PeerAcceptAddrMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen) {
     BRPeerContext *ctx = (BRPeerContext *) peer;
@@ -315,51 +413,6 @@ static int _PeerAcceptAddrMessage(BRPeer *peer, const uint8_t *msg, size_t msgLe
 
         if (peersCount > 0 && ctx->relayedPeers) ctx->relayedPeers(ctx->info, peers, peersCount);
     }
-
-    return r;
-}
-
-static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen) {
-    BRPeerContext *ctx = (BRPeerContext *) peer;
-    size_t off = 0, count = (size_t) BRVarInt(msg, msgLen, &off);
-    int r = 1;
-
-    peer_log(peer, "got asset with %zu data", count);
-
-//    if (off == 0 || off + count * 30 > msgLen) {
-//        peer_log(peer, "malformed addr message, length is %zu, should be %zu for %zu address(es)", msgLen,
-//                 BRVarIntSize(count) + 30 * count, count);
-//        r = 0;
-//    } else if (count > 1000) {
-//        peer_log(peer, "dropping addr message, %zu is too many addresses, max is 1000", count);
-//    } else {
-//        BRPeer peers[count], p;
-//        size_t peersCount = 0;
-//        time_t now = time(NULL);
-//
-//        peer_log(peer, "got addr with %zu address(es)", count);
-//
-//        for (size_t i = 0; i < count; i++) {
-//            p.timestamp = UInt32GetLE(&msg[off]);
-//            off += sizeof(uint32_t);
-//            p.services = UInt64GetLE(&msg[off]);
-//            off += sizeof(uint64_t);
-//            p.address = UInt128Get(&msg[off]);
-//            off += sizeof(UInt128);
-//            p.port = UInt16GetBE(&msg[off]);
-//            off += sizeof(uint16_t);
-//
-//            if (!(p.services & SERVICES_NODE_NETWORK)) continue; // skip peers that don't carry full blocks
-//            if (!_PeerIsIPv4(&p)) continue; // ignore IPv6 for now
-//
-//            // if address time is more than 10 min in the future or unknown, set to 5 days old
-//            if (p.timestamp > now + 10 * 60 || p.timestamp == 0) p.timestamp = now - 5 * 24 * 60 * 60;
-//            p.timestamp -= 2 * 60 * 60; // subtract two hours
-//            peers[peersCount++] = p; // add it to the list
-//        }
-//
-//        if (peersCount > 0 && ctx->relayedPeers) ctx->relayedPeers(ctx->info, peers, peersCount);
-//    }
 
     return r;
 }
@@ -495,7 +548,7 @@ static int _PeerAcceptTxMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen)
         }
 
         if(tx->asset) {
-            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetType(tx->asset->type), tx->asset->amount / COIN,
+            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetScriptType(tx->asset->type), tx->asset->amount / COIN,
                     tx->asset->nameLen, tx->asset->name);
         }
     }
@@ -875,10 +928,10 @@ static int _PeerAcceptMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, c
     else if (strncmp(MSG_PING, type, 12) == 0) r = _PeerAcceptPingMessage(peer, msg, msgLen);
     else if (strncmp(MSG_PONG, type, 12) == 0) r = _PeerAcceptPongMessage(peer, msg, msgLen);
     else if (strncmp(MSG_MERKLEBLOCK, type, 12) == 0) r = _PeerAcceptMerkleblockMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_REJECT, type, 12) == 0) r = _PeerAcceptRejectMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_REJECT, type, 12) == 0)r = _PeerAcceptRejectMessage(peer, msg, msgLen);
     else if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_ASSETDATA, type, 12) == 0)
-        r = _PeerAcceptAssetMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_ASSETDATA, type, 12) == 0) r = _PeerAcceptAssetMessage(peer, msg, msgLen);
+//    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0) r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
     else
         peer_log(peer, "dropping %s, length %zu, not implemented", type, msgLen);
 
@@ -1491,7 +1544,26 @@ void BRPeerSendGetdata(BRPeer *peer, const UInt256 *txHashes, size_t txCount, co
     }
 }
 
-void BRPeerSendGetAsset(BRPeer *peer, const uint8_t assetName) {
+void BRPeerSendGetAsset(BRPeer *peer, char *assetName, size_t nameLen,
+                        void (*receivedAssetData)(void *info, BRAsset *asset)) {
+    
+    size_t off = 0;
+    
+    size_t msgLen = + BRVarIntSize(1) + BRVarIntSize(nameLen) + nameLen;
+    uint8_t msg[msgLen];
+    
+    off += BRVarIntSet(&msg[off], (off <= msgLen ? msgLen - off : 0), 1);
+    off += BRVarIntSet(&msg[off], (off <= msgLen ? msgLen - off : 0), nameLen);
+    
+    peer_log(peer, "calling GetAssetData for Asset: [%s]", assetName);
+    
+    memcpy(msg + off, assetName, nameLen);
+    off += nameLen;
+    
+    
+    ((BRPeerContext *) peer)->receiveAssetData = receivedAssetData;
+    
+    BRPeerSendMessage(peer, msg, sizeof(msg), MSG_GETASSETDATA);
 }
 
 void BRPeerSendGetaddr(BRPeer *peer) {
@@ -1534,8 +1606,8 @@ void BRPeerFree(BRPeer *peer) {
     if (ctx->knownBlockHashes) array_free(ctx->knownBlockHashes);
     if (ctx->knownTxHashes) array_free(ctx->knownTxHashes);
     if (ctx->knownTxHashSet) BRSetFree(ctx->knownTxHashSet);
-    if (ctx->pongInfo) array_free(ctx->pongInfo);
     if (ctx->pongCallback) array_free(ctx->pongCallback);
+    if (ctx->pongInfo) array_free(ctx->pongInfo);
     free(ctx);
 }
 

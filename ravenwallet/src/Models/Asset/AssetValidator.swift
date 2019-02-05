@@ -23,7 +23,7 @@ let MAX_IPFSHASH_LENGTH = 46;
 
 let ROOT_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]{3,}$", options: [])
 let SUB_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
-let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()[\\]{}<>_.;?\\\\:]+$", options: [])
+let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()\\{}_.?:]+$", options: [])
 let CHANNEL_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
 
 let DOUBLE_PUNCTUATION = try? NSRegularExpression(pattern: "^.*[._]{2,}.*$", options: [])
@@ -172,6 +172,14 @@ class AssetValidator {
         }
     }
     
+    func validateName(name:String, forType:AssetType) -> Bool {
+        let (result, type) = AssetValidator.shared.IsAssetNameValid(name: name)
+        if result && forType == type {
+            return true
+        }
+        return false
+    }
+    
     func IsAssetNameAnOwner(name:String) -> Bool {
         let isOwnerIndicator = OWNER_INDICATOR?.firstMatch(in: name, options: [], range: NSRange(location: 0, length: name.count)) != nil
         return IsAssetNameValid(name: name).0 && isOwnerIndicator
@@ -179,7 +187,7 @@ class AssetValidator {
     
     
     func IsIpfsHashValid(ipfsHash:String) -> Bool {
-        if(ipfsHash.count != MAX_IPFSHASH_LENGTH)
+        if(ipfsHash.count == MAX_IPFSHASH_LENGTH)
         {
             if IPFSHASH_START?.firstMatch(in: ipfsHash, options: [], range: NSRange(location: 0, length: ipfsHash.count)) != nil {
                 return true
@@ -188,7 +196,6 @@ class AssetValidator {
         return false
     }
     
-    //BMEX test if asset not nil
     func checkInvalidAsset(asset: BRAssetRef?)->Bool {
         if asset != nil {
             if (asset!.pointee.type != INVALID)
@@ -197,5 +204,29 @@ class AssetValidator {
             }
         }
         return false
+    }
+    
+    func checkNullAsset(asset: BRAssetRef?)->Bool {
+        if asset != nil {
+            return true
+        }
+        return false
+    }
+    
+    func getAssetType(operationType:OperationType, nameAsset:String) -> AssetType {
+        var assetType:AssetType = .ROOT
+        switch operationType {
+        case .createAsset:
+            if (IsAssetNameAnOwner(name: nameAsset)) {
+                assetType = .OWNER
+            }
+        case .subAsset:
+            assetType = .SUB
+        case .uniqueAsset:
+            assetType = .UNIQUE
+        default:
+            assetType = .ROOT
+        }
+        return assetType
     }
 }

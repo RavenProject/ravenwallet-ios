@@ -43,6 +43,12 @@ extension Satoshis {
         rawValue = NSDecimalNumber(decimal: amount).uint64Value
     }
     
+    static var zero:Satoshis {
+        get {
+            return Satoshis.init(0)
+        }
+    }
+    
     func description(minimumFractionDigits:Int) -> String {
         var decimal = Decimal(rawValue)
         var amount: Decimal = 0.0

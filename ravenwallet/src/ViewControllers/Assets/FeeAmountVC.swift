@@ -11,8 +11,12 @@ import UIKit
 enum OperationType {
     case transferRvn
     case createAsset
+    case subAsset
+    case uniqueAsset
     case manageAsset
     case transferAsset
+    case transferOwnerShipAsset
+    case burnAsset
 }
 
 
@@ -123,7 +127,7 @@ class FeeAmountVC : UIViewController, Trackable, Subscriber {
         feeLabel.numberOfLines = 0
         feeLabel.lineBreakMode = .byWordWrapping
         switch operationType {
-        case .createAsset, .manageAsset :
+        case .createAsset, .manageAsset, .subAsset, .uniqueAsset :
             assetFeeHeight?.constant = 15
         default:
             assetFeeHeight?.constant = 0
@@ -211,6 +215,12 @@ class FeeAmountVC : UIViewController, Trackable, Subscriber {
         case .manageAsset:
             assetFeeText = S.Asset.manageAssetFee
             assetFeeAmount = C.manageAssetFee
+        case .subAsset:
+            assetFeeText = S.Asset.subAssetFee
+            assetFeeAmount = C.subAssetFee
+        case .uniqueAsset:
+            assetFeeText = S.Asset.uniqueAssetFee
+            assetFeeAmount = C.uniqueAssetFee
         default:
             break
         }

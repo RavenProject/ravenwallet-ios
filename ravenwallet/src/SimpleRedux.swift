@@ -41,7 +41,6 @@ enum TriggerName {
     case registerForPushNotificationToken
     case retrySync(CurrencyDef)
     case rescan(CurrencyDef)
-    case burn(Asset)
     case lock
     case promptBiometrics
     case promptPaperKey
@@ -71,6 +70,7 @@ enum TriggerName {
     case wipeWalletNoPrompt
     case didUpdateFeatureFlags
     case showTermsOfUse()
+    case reloadSettings
     case selectAddressBook( AddressBookType?, ((String)->Void)?)
 } //NB : remember to add to triggers to == fuction below
 
@@ -86,8 +86,6 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return lhsCurrency.code == rhsCurrency.code
     case (.rescan(let lhsCurrency), .rescan(let rhsCurrency)):
         return lhsCurrency.code == rhsCurrency.code
-    case (.burn(let lhsAsset), .burn(let rhsAsset)):
-        return lhsAsset.idAsset == rhsAsset.idAsset
     case (.lock, .lock):
         return true
     case (.promptBiometrics, .promptBiometrics):
@@ -145,6 +143,8 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
     case (.didUpdateFeatureFlags, .didUpdateFeatureFlags):
         return true
     case (.showTermsOfUse(_), .showTermsOfUse(_)):
+        return true
+    case (.reloadSettings, .reloadSettings):
         return true
     case (.selectAddressBook(_, _), .selectAddressBook(_, _)):
         return true

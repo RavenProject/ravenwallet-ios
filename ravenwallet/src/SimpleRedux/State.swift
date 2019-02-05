@@ -96,7 +96,7 @@ extension State {
 enum RootModal {
     case none
     case send(currency: CurrencyDef)
-    case receive(currency: CurrencyDef)
+    case receive(currency: CurrencyDef, isRequestAmountVisible: Bool, initialAddress: String?)
     case selectAsset(asset: Asset)
     case loginAddress
     case loginScan
@@ -105,7 +105,10 @@ enum RootModal {
     case sendWithAddress(currency: CurrencyDef, initialAddress: String? )
     case transferAsset(asset: Asset, initialAddress: String?)
     case createAsset(initialAddress: String?)
+    case subAsset(rootAssetName:String, initialAddress: String?)
+    case uniqueAsset(rootAssetName:String, initialAddress: String?)
     case manageOwnedAsset(asset: Asset, initialAddress: String?)
+    case burnAsset(asset: Asset)
 
 }
 
@@ -237,9 +240,15 @@ func ==(lhs: RootModal, rhs: RootModal) -> Bool {
         return lhsAsset.name == rhsAsset.name
     case (.createAsset(_), .createAsset(_)):
         return true
+    case (.subAsset(let lhsRootAssetName, _), .subAsset(let rhsRootAssetName, _)):
+        return lhsRootAssetName == rhsRootAssetName
+    case (.uniqueAsset(let lhsRootAssetName, _), .uniqueAsset(let rhsRootAssetName, _)):
+        return lhsRootAssetName == rhsRootAssetName
     case (.manageOwnedAsset(let lhsAsset, _), .manageOwnedAsset(let rhsAsset, _)):
         return lhsAsset.name == rhsAsset.name
-    case (.receive(let lhsCurrency), .receive(let rhsCurrency)):
+    case (.burnAsset(let lhsAsset), .burnAsset(let rhsAsset)):
+        return lhsAsset.name == rhsAsset.name
+    case (.receive(let lhsCurrency, _, _), .receive(let rhsCurrency, _, _)):
         return lhsCurrency.code == rhsCurrency.code
     case (.selectAsset(let lhsAsset), .selectAsset(let rhsAsset)):
         return lhsAsset.name == rhsAsset.name

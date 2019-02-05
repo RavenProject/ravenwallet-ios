@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import breadwallet
+@testable import Ravencoin
 
 class BRTarTests: XCTestCase {
     var fileUrl: URL?

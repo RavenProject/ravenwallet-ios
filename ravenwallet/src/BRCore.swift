@@ -70,9 +70,8 @@ public let secureAllocator: CFAllocator = {
 
 extension BRAsset {
     public var nameString: String {
-        //let nameBytes = UnsafeMutablePointer<CChar>.allocate(capacity: 31)
-        //nameBytes.initialize(from: UnsafeRawPointer([self.name]).assumingMemoryBound(to: CChar.self), count: 31)
         return self.name != nil ? String(cString: self.name) : "NULL"
+//        return nil != self.name ? String(cString: self.name) : "NULL"
     }
     
     
@@ -91,6 +90,9 @@ extension BRAsset {
         let name = nameString
         switch self.type {
         case NEW_ASSET:
+            if(self.nameString.contains("#")){
+                return 0
+            }
             return 1
         case TRANSFER:
             if (AssetValidator.shared.IsAssetNameAnOwner(name: name)) {
@@ -99,18 +101,18 @@ extension BRAsset {
             return 0
         case REISSUE:
             return 0
-        case ROOT:
-            return 0
+//        case ROOT:
+//            return 0
         case OWNER:
             return 1
-        case SUB:
-            return 0
-        case UNIQUE:
-            return 0
-        case CHANNEL:
-            return 0
-        case VOTE:
-            return 0
+//        case SUB:
+//            return 0
+//        case UNIQUE:
+//            return 0
+//        case CHANNEL:
+//            return 0
+//        case VOTE:
+//            return 0
         case INVALID:
             return 0
         default:
@@ -118,34 +120,24 @@ extension BRAsset {
         }
     }
     
-    //BMEX Todo: each type has units, should fixed from core
-    public var unitsValue: Int {
-        switch self.type {
-        case OWNER, NEW_ASSET:
-            return 1
-        default:
-            return 0
-        }
-    }
-    
-    static func createAssetRef(asset: Asset, type: BRAssetType, amount: Satoshis) -> BRAssetRef {
+    static func createAssetRef(asset: Asset, type: BRAssetScriptType, amount: Satoshis) -> BRAssetRef {
         let newAsset: BRAssetRef = UnsafeMutablePointer.init(NewAsset())
         newAsset.pointee.name = UnsafeMutablePointer<Int8>(mutating: (asset.name as NSString).utf8String)
         let nameLen = asset.name.count
         newAsset.pointee.nameLen = nameLen
-        newAsset.pointee.unit = Int64(asset.units)
         newAsset.pointee.amount = amount.rawValue
-        newAsset.pointee.hasIPFS = Int64(asset.hasIpfs)
-        newAsset.pointee.reissuable = Int64(asset.reissubale)
-        let cStrIpfsHash = [CChar](asset.ipfsHash.utf8CString)
-        if (cStrIpfsHash.count <= MemoryLayout<BRAddress>.size)
-        {
-            UnsafeMutableRawPointer(mutating: &newAsset.pointee.IPFSHash).assumingMemoryBound(to: CChar.self).assign(from: cStrIpfsHash, count: cStrIpfsHash.count)
-        }
         newAsset.pointee.type = type
+        newAsset.pointee.unit = Int32(asset.units)
+        newAsset.pointee.reissuable = Int32(asset.reissubale)
+        newAsset.pointee.hasIPFS = Int32(asset.hasIpfs)
+        copyAssetPropertyValue(value: asset.ipfsHash, pointer: &newAsset.pointee.IPFSHash)
         return newAsset
     }
     
+    static func copyAssetPropertyValue(value:String, pointer:UnsafeRawPointer){
+        let cStr = [CChar](value.utf8CString)
+        UnsafeMutableRawPointer(mutating: pointer).assumingMemoryBound(to: CChar.self).assign(from: cStr, count: cStr.count)
+    }
 }
 
 extension BRAddress: CustomStringConvertible, Hashable {
@@ -354,7 +346,7 @@ extension UnsafeMutablePointer where Pointee == BRAsset {
 
 extension UnsafeMutablePointer where Pointee == BRTransaction {
     init?() {
-        self.init(BRTransactionNew())
+        self.init(BRTransactionNew(1))
     }
     
     // bytes must contain a serialized tx
@@ -500,6 +492,13 @@ class BRWallet {
         return addrs.map({ $0.description })
     }
     
+    // all used addresses
+    var usedAddresses: [String] {
+        var addrs = [BRAddress](repeating: BRAddress(), count: BRWalletUsedAddresses(cPtr, nil))
+        guard BRWalletUsedAddresses(cPtr, &addrs) == addrs.count else { return [] }
+        return addrs.map({ $0.description })
+    }
+    
     // true if the address is a previously generated internal or external address
     func containsAddress(_ address: String) -> Bool {
         return BRWalletContainsAddress(cPtr, address) != 0
@@ -542,8 +541,27 @@ class BRWallet {
     }
     
     func createAssetTransaction(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
-        //return BRWalletCreateTransaction(cPtr, forAmount, toAddress);
         return BRWalletCreateTxForRootAssetTransfer(cPtr, forAmount, toAddress, asset);
+    }
+    
+    func createAssetTransactionOwnerShip(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForRootAssetTransferOwnership(cPtr, forAmount, toAddress, asset);
+    }
+    
+    func createTxForRootAssetCreation(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForRootAssetCreation(cPtr, forAmount, toAddress, asset)
+    }
+    
+    func createTxForSubAssetCreation(forAmount: UInt64, toAddress: String, asset:BRAssetRef, rootAsset: BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForSubAssetCreation(cPtr, forAmount, toAddress, asset, rootAsset)
+    }
+
+    func createTxForUniqueAssetCreation(forAmount: UInt64, toAddress: String, asset:BRAssetRef, rootAsset: BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForUniqueAssetCreation(cPtr, forAmount, toAddress, asset, rootAsset)
+    }
+    
+    func createTxForRootAssetManage(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
+        return BRWalletCreateTxForRootAssetManage(cPtr, forAmount, toAddress, asset)
     }
     
     func burnAssetTransaction(asset:BRAssetRef) -> BRTxRef? {
@@ -553,7 +571,7 @@ class BRWallet {
     
     // returns an unsigned transaction that satisifes the given transaction outputs
     func createTxForOutputs(_ outputs: [BRTxOutput]) -> BRTxRef? {
-        return BRWalletCreateTxForOutputs(cPtr, outputs, outputs.count, nil)
+        return BRWalletCreateTxForOutputs(cPtr, outputs, outputs.count)
     }
     
     // signs any inputs in tx that can be signed using private keys from the wallet

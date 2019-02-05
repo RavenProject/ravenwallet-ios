@@ -10,7 +10,6 @@ import UIKit
 import LocalAuthentication
 import Core
 
-private let verticalButtonPadding: CGFloat = 32.0
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
 class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
@@ -43,7 +42,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         NotificationCenter.default.removeObserver(self)
     }
 
-    private let asset: Asset
+    private var asset: Asset
     private let sender: SenderAsset
     private let walletManager: WalletManager
     private let quantityView: QuantityCell
@@ -134,6 +133,11 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         feeView.didUpdateAssetFee = { [weak self] feeAmount in
             self?.feeAmount = feeAmount
         }
+        
+        transferOwnerShip.didSelected = { isSelected in
+            self.quantityView.amount = nil
+            self.quantityView.isEnabled = !isSelected
+        }
         //initiate feeview balance
         feeView.balance = self.balance
     }
@@ -168,7 +172,12 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         }
         if asset.isOwnerShip {
             transferOwnerShipHeight?.constant = SendCell.defaultHeight - C.padding[2]
-            self.view.layoutIfNeeded()
+            view.layoutIfNeeded()
+        }
+        //disable quantity for unique asset
+        if asset.name.contains("#") {
+            quantityView.amount = Satoshis(C.oneAsset)
+            quantityView.isEnabled = false
         }
     }
     
@@ -208,6 +217,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         if addressCell.textField.isFirstResponder {
             addressCell.textField.resignFirstResponder()
         }
+        var amount = Satoshis.zero //BMEX Todo : check amount value if transferOwnerShip selected
 
         if sender.transaction == nil {
             guard let address = addressCell.address else {
@@ -221,15 +231,30 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                 let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
                 return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
             }
-            guard let amount = quantity else {
-                return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
-            }
-            guard amount.rawValue <= asset.amount.rawValue else {
-                return showAlert(title: S.Alert.error, message: S.Asset.insufficientAssetFunds, buttonLabel: S.Button.ok)
-            }
             guard !(walletManager.wallet?.containsAddress(address) ?? false) else {
                 return showAlert(title: S.Alert.error, message: S.Send.containsAddress, buttonLabel: S.Button.ok)
             }
+            if !transferOwnerShip.btnCheckBox.isSelected {
+                guard quantity != nil else {
+                    return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+                }
+                amount = quantity!
+                guard amount.rawValue <= asset.amount.rawValue else {
+                    return showAlert(title: S.Alert.error, message: S.Asset.insufficientAssetFunds, buttonLabel: S.Button.ok)
+                }
+                guard amount != Satoshis.zero else {
+                    return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+                }
+                sender.operationType = .transferAsset
+            }
+            else {
+                amount = Satoshis.init(C.ownerShipAsset)//one asset
+                asset.ownerShip = 1
+                asset.name = asset.name + C.OWNER_TAG
+                asset.amount = amount
+                sender.operationType = .transferOwnerShipAsset
+            }
+            
             //BMEX Todo : manage maxOutputAmount and minOutputAmount
             guard feeAmount <= balance else {
                 return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
@@ -241,8 +266,6 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             }
         }
         
-
-        guard let amount = quantity else { return }
         let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: nil, minimumFractionDigits: quantityView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics, operationType: .transferAsset, assetToSend: asset)
         confirm.successCallback = {
             confirm.dismiss(animated: true, completion: {

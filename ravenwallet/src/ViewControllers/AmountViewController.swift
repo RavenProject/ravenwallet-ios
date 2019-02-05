@@ -253,7 +253,11 @@ class AmountViewController : UIViewController, Trackable {
         }
 
         var newAmount: Satoshis?
-        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {
+        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {//BMEX TODO : need optimisation
+            if(Double(outputAmount) > Double(C.maxMoney/C.oneAsset)){
+                pinPad.removeLast()
+                return
+            }
             if let rate = selectedRate {
                 newAmount = Satoshis(value: outputAmount, rate: rate)
             } else {
@@ -282,6 +286,9 @@ class AmountViewController : UIViewController, Trackable {
         guard let amount = amount else { amountLabel.text = ""; return }
         let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         var output = displayAmount.description
+        output = output.replacingOccurrences(of: "RVN", with: "")
+        output = output.replacingOccurrences(of: S.Symbols.narrowSpace, with: "")
+        output = String(output.dropLast())
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)
         }

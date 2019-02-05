@@ -118,9 +118,9 @@ struct RvnTransaction: Transaction {
         
         if isValid {
             switch confirmations {
-            case 0:
+            case C.Blocks.unconfirmed:
                 status = .pending
-            case 1..<6:
+            case C.Blocks.pendingStart..<C.Blocks.pendingEnd:
                 status = .confirmed
             default:
                 status = .complete

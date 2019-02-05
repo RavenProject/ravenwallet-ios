@@ -82,7 +82,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
 
     private func addConstraints() {
-        let height: CGFloat = 136.0
+        let height: CGFloat = 60.0//Height with total label = 136.0
         if #available(iOS 11.0, *) {
             subHeaderView.constrain([
                 subHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -107,11 +107,14 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         totalHeader.constrain([
             totalHeader.trailingAnchor.constraint(equalTo: total.trailingAnchor),
             totalHeader.bottomAnchor.constraint(equalTo: total.topAnchor, constant: 0.0),
-            totalHeader.topAnchor.constraint(equalTo: logo.bottomAnchor, constant: C.padding[2])
+            totalHeader.topAnchor.constraint(equalTo: logo.bottomAnchor, constant: C.padding[2]),
+            totalHeader.heightAnchor.constraint(equalToConstant: 0)//BMEX to show totalHeader just remove this line
             ])
         total.constrain([
             total.trailingAnchor.constraint(equalTo: subHeaderView.trailingAnchor, constant: -C.padding[2]),
-            total.topAnchor.constraint(equalTo: totalHeader.bottomAnchor)])
+            total.topAnchor.constraint(equalTo: totalHeader.bottomAnchor),
+            total.heightAnchor.constraint(equalToConstant: 0)//BMEX to show total just remove this line
+            ])
         
         promptHiddenConstraint = prompt.heightAnchor.constraint(equalToConstant: 0.0)
         prompt.constrain([
@@ -134,6 +137,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         view.backgroundColor = .whiteBackground
         subHeaderView.backgroundColor = .whiteBackground
         subHeaderView.clipsToBounds = false
+        logo.contentMode = .scaleToFill
         
         navigationItem.titleView = UIView()
         navigationController?.navigationBar.isTranslucent = true

@@ -32,16 +32,8 @@ class AssetHomeCell : UITableViewCell, Subscriber {
     private let assetName = UILabel(font: .customMedium(size: 18.0), color: .white)
     private let assetAmount = UILabel(font: .customMedium(size: 18.0), color: .transparentWhiteText)
     private let imgAsset = UIImageView(image: #imageLiteral(resourceName: "owned"))
-    private let syncIndicator = SyncingIndicator(style: .home)
     private let container = BackgroundAsset()
     private var imgAssetWidth: NSLayoutConstraint?
-
-    private var isSyncIndicatorVisible: Bool = false {
-        didSet {
-            UIView.crossfade(assetAmount, syncIndicator, toRight: isSyncIndicatorVisible, duration: 0.3)
-            assetAmount.textColor = isSyncIndicatorVisible ? .disabledWhiteText : .white
-        }
-    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -60,10 +52,6 @@ class AssetHomeCell : UITableViewCell, Subscriber {
         }
         container.setNeedsDisplay()
     }
-    
-    func refreshAnimations() {
-        syncIndicator.pulse()
-    }
 
     private func setupViews() {
         addSubviews()
@@ -75,10 +63,7 @@ class AssetHomeCell : UITableViewCell, Subscriber {
         contentView.addSubview(container)
         container.addSubview(assetName)
         container.addSubview(assetAmount)
-        container.addSubview(syncIndicator)
         container.addSubview(imgAsset)
-        
-        syncIndicator.isHidden = true
     }
 
     private func addConstraints() {
@@ -100,13 +85,6 @@ class AssetHomeCell : UITableViewCell, Subscriber {
             assetAmount.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -C.padding[2]),
             assetAmount.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             assetAmount.leadingAnchor.constraint(greaterThanOrEqualTo: assetName.trailingAnchor, constant: C.padding[1])
-            ])
-        
-        syncIndicator.constrain([
-            syncIndicator.trailingAnchor.constraint(equalTo: assetAmount.trailingAnchor),
-            syncIndicator.topAnchor.constraint(equalTo: assetAmount.bottomAnchor),
-            syncIndicator.leadingAnchor.constraint(greaterThanOrEqualTo: container.trailingAnchor, constant: -C.padding[1]),
-            syncIndicator.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -C.padding[2])
             ])
     }
 

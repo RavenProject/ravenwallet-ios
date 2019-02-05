@@ -2,7 +2,7 @@
 //  AssetManager.swift
 //  ravenwallet
 //
-//  Created by Bendnaiba on 15/10/18.
+//  Created by Ben on 15/10/18.
 //  Copyright (c) 2018 Ravenwallet Team
 
 
@@ -28,6 +28,7 @@ class AssetManager {
     }
     
     func loadAsset(callBack: (([Asset]) -> Void)? = nil) {
+        db = CoreDatabase()
         db?.loadAssets(callback: { assets in
             self.assetList = assets
             if callBack != nil {

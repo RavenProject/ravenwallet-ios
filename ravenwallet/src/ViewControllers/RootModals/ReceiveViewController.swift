@@ -18,19 +18,20 @@ typealias PresentShare = (String, UIImage) -> Void
 
 class ReceiveViewController : UIViewController, Subscriber, Trackable {
 
+    init(currency: CurrencyDef, isRequestAmountVisible: Bool, initialAddress: String? = nil) {
+        self.currency = currency
+        self.isRequestAmountVisible = isRequestAmountVisible
+        self.initialAddress = initialAddress
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     //MARK - Public
     var presentEmail: PresentShare?
     var presentText: PresentShare?
-
-    init(currency: CurrencyDef, isRequestAmountVisible: Bool) {
-        self.currency = currency
-        self.isRequestAmountVisible = isRequestAmountVisible
-        super.init(nibName: nil, bundle: nil)
-    }
+    var initialAddress: String?
 
     //MARK - Private
     private let currency: CurrencyDef
-    
     private let qrCode = UIImageView()
     private let address = UILabel(font: .customBody(size: 14.0))
     private let addressPopout = InViewAlert(type: .primary)
@@ -51,9 +52,16 @@ class ReceiveViewController : UIViewController, Subscriber, Trackable {
         addActions()
         setupCopiedMessage()
         setupShareButtons()
-        Store.subscribe(self, selector: { $0[self.currency].receiveAddress != $1[self.currency].receiveAddress }, callback: { _ in
-            self.setReceiveAddress()
-        })
+        if (self.initialAddress == nil) {
+            Store.subscribe(self, selector: { $0[self.currency].receiveAddress != $1[self.currency].receiveAddress }, callback: { _ in
+                self.setReceiveAddress()
+            })
+        }
+        else {
+            address.text = self.initialAddress
+            qrCode.image = UIImage.qrCode(data: "\(address.text!)".data(using: .utf8)!, color: CIColor(color: .black))?
+                .resize(CGSize(width: qrSize, height: qrSize))!
+        }
     }
 
     private func addSubviews() {
@@ -261,10 +269,10 @@ class ReceiveViewController : UIViewController, Subscriber, Trackable {
 
 extension ReceiveViewController : ModalDisplayable {
     var faqArticleId: String? {
-        return ArticleIds.receiveBitcoin
+        return (self.initialAddress != nil) ? nil : ArticleIds.receiveBitcoin
     }
 
     var modalTitle: String {
-        return "\(S.Receive.title) \(currency.code)"
+        return (self.initialAddress != nil) ? S.AllAddresses.selectedAddressTitle : "\(S.Receive.title) \(currency.code)"
     }
 }

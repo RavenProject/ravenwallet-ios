@@ -81,11 +81,10 @@ class StartPaperPhraseViewController : UIViewController {
 //            invisibleView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
 //            ])
         illustration.constrain([
-            illustration.constraint(.width, constant: 127.0),
-            illustration.constraint(.height, constant: 130.0),
-            illustration.constraint(.centerX, toView: /*invisibleView*/view, constant: nil),
-//            illustration.constraint(.centerY, toView: /*invisibleView*/view, constant: nil),
-            illustration.topAnchor.constraint(equalTo: subHeader.bottomAnchor, constant: C.padding[15]) ])
+            illustration.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1/3),
+            illustration.heightAnchor.constraint(equalTo: illustration.widthAnchor),
+            illustration.constraint(.centerX, toView: view, constant: nil),
+            illustration.topAnchor.constraint(equalTo: view.centerYAnchor, constant: C.padding[5]) ])
         important.constrain([
             important.topAnchor.constraint(equalTo: subHeader.topAnchor, constant: C.padding[2]),
             important.constraint(.leading, toView: subHeader, constant: C.padding[2]),

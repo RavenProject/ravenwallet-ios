@@ -11,7 +11,6 @@ import LocalAuthentication
 import Core
 
 typealias PresentScan = ((@escaping ScanCompletion) -> Void)
-private let verticalButtonPadding: CGFloat = 32.0
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
 class SendViewController : UIViewController, Subscriber, ModalPresentable, Trackable {

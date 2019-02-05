@@ -36,6 +36,7 @@ enum S {
         static let buy = NSLocalizedString("Button.buy", value: "Buy", comment: "buy button")
         static let continueAction = NSLocalizedString("Button.continueAction", value: "Continue", comment: "prompt continue button")
         static let dismiss = NSLocalizedString("Button.dismiss", value: "Dismiss", comment: "prompt dismiss button")
+        static let copy = NSLocalizedString("Button.copy", value: "Copy", comment: "prompt copy button")
     }
     
     enum Alert {
@@ -56,6 +57,7 @@ enum S {
         static let sendLabel = NSLocalizedString("Send.sendLabel", value:"Send", comment: "Send button label")
         static let pasteLabel = NSLocalizedString("Send.pasteLabel", value:"Paste", comment: "Paste button label")
         static let scanLabel = NSLocalizedString("Send.scanLabel", value:"Scan", comment: "Scan button label")
+        static let generateLabel = NSLocalizedString("Send.generateLabel", value:"Generate Address", comment: "Generate button label")
         static let invalidAddressTitle = NSLocalizedString("Send.invalidAddressTitle", value:"Invalid Address", comment: "Invalid address alert title")
         static let invalidAddressMessage = NSLocalizedString("Send.invalidAddressMessage", value:"The destination address is not a valid %1$@ address.", comment: "Invalid <currency> address alert message")
         static let invalidAddressOnPasteboard = NSLocalizedString("Send.invalidAddressOnPasteboard", value: "Pasteboard does not contain a valid %1$@ address.", comment: "Invalid <currency> address on pasteboard message")
@@ -114,10 +116,12 @@ enum S {
         static let errorAddressMessage = NSLocalizedString("AddressBook.errorAddressMessage", value: "Address Already exist in your Address Book", comment: "Adress already exist alert message")
         static let errorBaseMessage = NSLocalizedString("AddressBook.errorMessage", value: "unknown problem", comment: "unknown problem")
         static let errorBaseTitle = NSLocalizedString("AddressBook.errorTitle", value: "DataBase Error", comment: "DataBase Error")
-
-
-
-
+    }
+    
+    enum AllAddresses {
+        static let title = NSLocalizedString("AllAddresses.title", value:"Used Addresses", comment: "Used Addresses Title")
+        static let selectedAddressTitle = NSLocalizedString("AllAddresses.selectedAddressTitle", value:"Used Addresse", comment: "Selected Address Title")
+        static let emptyMessage = NSLocalizedString("AllAddresses.emptyMessage", value:"Your Used Addresses will appear here.", comment: "Empty Used Addresses list message.")
     }
     
     enum JailbreakWarnings {
@@ -161,6 +165,16 @@ enum S {
         static let receivedVia = NSLocalizedString("TransactionDetails.receivedVia", value:"received via %1$@", comment: "received via <address>")
         static let sendingTo = NSLocalizedString("Transaction.sendingTo", value:"sending to %1$@", comment: "sending to <address>")
         static let receivingVia = NSLocalizedString("TransactionDetails.receivingVia", value:"receiving via %1$@", comment: "receiving via <address>")
+        static let burning = NSLocalizedString("Transaction.burning", value:"Burning", comment: "Burning")
+        static let burn = NSLocalizedString("Transaction.burn", value:"Burn", comment: "Burn")
+        static let burningForCreation = NSLocalizedString("Transaction.burningForCreation", value:"Asset creation fee (Burning)", comment: "Burning For Creation")
+        static let burnForCreation = NSLocalizedString("Transaction.burnForCreation", value:"Asset creation fee (Burnt)", comment: "Burn For Creation")
+        static let burningForReissue = NSLocalizedString("Transaction.burningForReissue", value:"Asset reissue fee (Burning)", comment: "Burning For Reissue")
+        static let burnForReissue = NSLocalizedString("Transaction.burnForReissue", value:"Asset reissue fee (Burnt)", comment: "Burn For Reissue")
+        static let burnForUnique = NSLocalizedString("Transaction.burnForUnique", value:"Unique Asset creation fee (Burnt)", comment: "Burn For Unique Asset")
+        static let burningForUnique = NSLocalizedString("Transaction.burningForUnique", value:"Unique Asset creation fee (Burning)", comment: "Burning For Unique")
+        static let burnForSub = NSLocalizedString("Transaction.burnForSub", value:"SubAsset creation fee (Burnt)", comment: "Burn For Sub Asset")
+        static let burningForSub = NSLocalizedString("Transaction.burningForSub", value:"SubAsset creation fee (Burning)", comment: "Burning For Sub Asset")
     }
     
     enum TransactionDetails {
@@ -234,32 +248,44 @@ enum S {
         static let quantity = NSLocalizedString("Asset.quantity", value:"Quantity", comment: "Asset quantity label")
         static let ipfs = NSLocalizedString("Asset.ipfs", value:"IPFS Browse", comment: "Ipfs button label")
         static let transfer = NSLocalizedString("Asset.transfer", value:"Transfer Asset", comment: "Transfer asset button label")
-        static let manageAsset = NSLocalizedString("Asset.manageAsset", value:"Manage Asset", comment: "Manage asset button title")
+        static let manageAsset = NSLocalizedString("Asset.manageAsset", value:"Reissue Asset", comment: "Manage asset button title")
         static let burnAsset = NSLocalizedString("Asset.burnAsset", value:"Burn Asset", comment: "burn asset button title")
+        static let getDataAsset = NSLocalizedString("Asset.getDataAsset", value:"Get Data", comment: "get data asset button title")
+        static let subAsset = NSLocalizedString("Asset.subAsset", value:"Issue SubAsset", comment: "sub asset button title")
+        static let uniqueAsset = NSLocalizedString("Asset.uniqueAsset", value:"Issue Unique Asset", comment: "unique asset button title")
         static let create = NSLocalizedString("Asset.create", value:"Create", comment: "Create asset button label")
+        static let availability = NSLocalizedString("Asset.availability", value:"Check Availability ...", comment: "Check Availability asset button label")
         static let transferTitle = NSLocalizedString("Asset.transferTitle", value:"Transfer", comment: "Transfer asset title label")
         static let manageTitle = NSLocalizedString("Asset.manageTitle", value:"Manage", comment: "Manage owned asset title label")
         static let createTitle = NSLocalizedString("Asset.createTitle", value:"Create New Asset", comment: "Create new asset title label")
+        static let subAssetTitle = NSLocalizedString("Asset.subAssetTitle", value:"Issue Sub Asset", comment: "Issue sub asset title label")
+        static let uniqueAssetTitle = NSLocalizedString("Asset.uniqueAssetTitle", value:"Issue Unique Asset", comment: "Issue unique asset title label")
         static let nameAssetLabel = NSLocalizedString("Asset.nameAssetLabel", value:"Name", comment: "Asset name label")
         static let unitsLabel = NSLocalizedString("Asset.unitsLabel", value:"Units", comment: "Asset units label")
-        static let isReissubaleLabel = NSLocalizedString("Asset.isReissubaleLabel", value:"isReissubale", comment: "Asset isReissubale label")
+        static let isReissuableLabel = NSLocalizedString("Asset.isreissuableLabel", value:"is reissuable", comment: "Asset is reissuable label")
         static let hasIpfsLabel = NSLocalizedString("Asset.hasIpfsLabel", value:"Has IPFS", comment: "Asset has Ipfs label")
         static let ipfsHashLabel = NSLocalizedString("Asset.ipfsHashLabel", value:"IPFS Hash", comment: "Asset IPFS Hash label")
         static let errorAssetMessage = NSLocalizedString("Asset.errorAssetMessage", value: "Asset Name Already used", comment: "Asset Name Already used alert message")
         static let errorAssetNameMessage = NSLocalizedString("Asset.errorAssetNameMessage", value: "Asset Name not valid", comment: "Asset Name not valid alert message")
-        static let errorUnitsMessage = NSLocalizedString("Asset.errorUnitsMessage", value: "UNits should be <= 8", comment: "Units value alert message")
+        static let errorUnitsValue = NSLocalizedString("Asset.errorUnitsValue", value: "Units should be >= %d", comment: "Units value alert message")
         static let allAssetTitle = NSLocalizedString("Asset.allAssetTitle", value:"All Asset", comment: "All Assets title")
         static let allAssetEmptyMessage = NSLocalizedString("Asset.allAssetEmptyMessage", value:"Your assets will appear here.", comment: "Empty asset list message.")
-        static let noQuanity = NSLocalizedString("Asset.noQuanity", value: "Please enter a quantity to create.", comment: "Emtpy quantity alert message")
+        static let noQuanityToCreate = NSLocalizedString("Asset.noQuanityToCreate", value: "Please enter a quantity to create.", comment: "Emtpy quantity alert message")
+        static let noQuanityToManage = NSLocalizedString("Asset.noQuanityToManage", value: "Please enter a quantity to manage.", comment: "Emtpy quantity alert message")
         static let noName = NSLocalizedString("Asset.noName", value: "Please enter the asset name.", comment: "Empty name alert message")
+        static let noVerified = NSLocalizedString("Asset.noVerified", value: "Name not verified", comment: "Name not verified alert message")
+        static let noAvailable = NSLocalizedString("Asset.noAvailable", value: "Name not available", comment: "Name not available alert message")
         static let transferOwnerShip = NSLocalizedString("Asset.transferOwnerShip", value: "Transfer OwnerShip", comment: "Transfer OwnerShip")
         static let balance = NSLocalizedString("Asset.balance", value:"Balance: %@ %@", comment: "Asset Balance")
         static let creationAssetFee = NSLocalizedString("Asset.creationAssetFee", value:"Creation Fee: %1$@", comment: "Creation Asset Fee")
+        static let subAssetFee = NSLocalizedString("Asset.subAssetFee", value:"Sub Asset Fee: %1$@", comment: "Sub Asset Fee")
+        static let uniqueAssetFee = NSLocalizedString("Asset.uniqueAssetFee", value:"Unique Asset Fee: %1$@", comment: "Unique Asset Fee")
         static let manageAssetFee = NSLocalizedString("Asset.manageAssetFee", value:"Manage Fee: %1$@", comment: "Manage Asset Fee")
         static let invalidIpfsHashMessage = NSLocalizedString("Asset.invalidIpfsHashMessage", value:"The ipfs hash is not valid", comment: "Invalid ipfs hash alert message")
         static let noIpfsHash = NSLocalizedString("Asset.noIpfsHash", value: "Please enter the ipfs hash", comment: "Empty ipfs hash alert message")
         static let insufficientAssetFunds = NSLocalizedString("Asset.insufficientAssetFunds", value: "Insufficient Asset Funds", comment: "Insufficient asset funds error")
-
+        static let verifyLabel = NSLocalizedString("Asset.verifyLabel", value:"Check Availabilty", comment: "Verify button label")
+        static let notVerifiedName = NSLocalizedString("Asset.notVerifiedName", value:"Operation timeout: not connected to a node that accept getAssetData MSG protocol.", comment: "Not verified asset name error")
 
     }
     
@@ -370,6 +396,8 @@ enum S {
         static let assets = NSLocalizedString("Settings.assets", value: "Assets", comment: "Assets settings section header")
         static let other = NSLocalizedString("Settings.other", value: "Other", comment: "Other settings section header")
         static let advanced = NSLocalizedString("Settings.advanced", value: "Advanced", comment: "Advanced settings header")
+        static let expertMode = NSLocalizedString("Settings.expertMode", value: "Expert Mode", comment: "Expert Mode settings header")
+        static let usedAddresses = NSLocalizedString("Settings.usedAddresses", value: "Used Addresses", comment: "Used Addresses settings header")
         static let currencyPageTitle = NSLocalizedString("Settings.currencyPageTitle", value: "%1$@ Settings", comment: "Ravencoin Settings page title")
         static let importTile = NSLocalizedString("Settings.importTitle", value:"Redeem Private Key", comment: "Import wallet label")
         static let notifications = NSLocalizedString("Settings.notifications", value:"Notifications", comment: "Notifications label")
@@ -381,7 +409,7 @@ enum S {
         static let about = NSLocalizedString("Settings.about", value:"About", comment: "About label")
         static let review = NSLocalizedString("Settings.review", value: "Leave us a Review", comment: "Leave review button label")
         static let enjoying = NSLocalizedString("Settings.enjoying", value: "Are you enjoying RVN Wallet?", comment: "Are you enjoying RVN Wallet alert message body")
-        static let wipe = NSLocalizedString("Settings.wipe", value: "Unlink from this device", comment: "Unlink wallet menu label.")
+        static let wipe = NSLocalizedString("Settings.wipe", value: "Erase Wallet", comment: "Unlink wallet menu label.")
         static let advancedTitle = NSLocalizedString("Settings.advancedTitle", value: "Advanced Settings", comment: "Advanced Settings title")
         static let faceIdLimit = NSLocalizedString("Settings.faceIdLimit", value:"Face ID Spending Limit", comment: "Face ID spending limit label")
         static let sendLogs = NSLocalizedString("Settings.sendLogs", value: "Send Logs", comment: "Send Logs option")
@@ -416,6 +444,8 @@ enum S {
     enum SyncingView {
         static let syncing = NSLocalizedString("SyncingView.syncing", value:"Syncing", comment: "Syncing view syncing state header text")
         static let connecting = NSLocalizedString("SyncingView.connecting", value:"Connecting", comment: "Syncing view connectiong state header text")
+        static let syncedThrough = NSLocalizedString("SyncingView.syncedThrough", value: "Synced through %1$@", comment: "eg. Synced through <Jan 12, 2015>")
+        static let failed = NSLocalizedString("SyncingView.failed", value: "Sync Failed", comment: "Sync failed label")
     }
     
     enum ReScan {
@@ -480,11 +510,18 @@ enum S {
         static let pinSet = NSLocalizedString("Alerts.pinSet", value:"PIN Set", comment: "Alert Header label (the PIN was set)")
         static let paperKeySet = NSLocalizedString("Alerts.paperKeySet", value:"Paper Key Set", comment: "Alert Header Label (the paper key was set)")
         static let sendSuccess = NSLocalizedString("Alerts.sendSuccess", value:"Send Confirmation", comment: "Send success alert header label (confirmation that the send happened)")
+        static let sendAssetSuccess = NSLocalizedString("Alerts.sendAssetSuccess", value:"Transfer Confirmation", comment: "Send success alert header label (confirmation that the send happened)")
+        static let burnAssetSuccess = NSLocalizedString("Alerts.burnAssetSuccess", value:"Burn Confirmation", comment: "Send success alert header label (confirmation that the burn happened)")
         static let createSuccess = NSLocalizedString("Alerts.createSuccess", value:"Create Confirmation", comment: "Create success alert header label (confirmation that the send happened)")
+        static let getDataAssetSuccessHeader = NSLocalizedString("Alerts.getDataAssetSuccessHeader", value:"Get Data Confirmation", comment: "get asset data Header")
+        static let getDataAssetSuccess = NSLocalizedString("Alerts.getDataAssetSuccess", value:"Get Data %@ Success", comment: "get asset data success")
+        static let getDataAssetError = NSLocalizedString("Asset.getDataAssetError", value:" %@ Data Not Found", comment: "get data asset Error message")
         static let sendFailure = NSLocalizedString("Alerts.sendFailure", value:"Send failed", comment: "Send failure alert header label (the send failed to happen)")
         static let paperKeySetSubheader = NSLocalizedString("Alerts.paperKeySetSubheader", value:"Awesome!", comment: "Alert Subheader label (playfully positive)")
         static let sendSuccessSubheader = NSLocalizedString("Alerts.sendSuccessSubheader", value:"Money Sent!", comment: "Send success alert subheader label (e.g. the money was sent)")
-        static let createSuccessSubheader = NSLocalizedString("Alerts.createSuccessSubheader", value:"Asste transaction sent to network: ", comment: "Create success alert subheader label (e.g. the money was sent)")
+        static let sendAssetSuccessSubheader = NSLocalizedString("Alerts.sendAssetSuccessSubheader", value:"Asset Transferred!", comment: "Send asset success alert subheader label (e.g. the money was sent)")
+        static let burnAssetSuccessSubheader = NSLocalizedString("Alerts.burnAssetSuccessSubheader", value:"Asset Burnt!", comment: "Burn asset success alert subheader label (e.g. the money was sent)")
+        static let createSuccessSubheader = NSLocalizedString("Alerts.createSuccessSubheader", value:"Asset transaction sent to network: ", comment: "Create success alert subheader label (e.g. the money was sent)")
         static let copiedAddressesHeader = NSLocalizedString("Alerts.copiedAddressesHeader", value:"Addresses Copied", comment: "'the addresses were copied'' Alert title")
         static let copiedAddressesSubheader = NSLocalizedString("Alerts.copiedAddressesSubheader", value:"All wallet addresses successfully copied.", comment: "Addresses Copied Alert sub header")
         static let addressAdded = NSLocalizedString("Alerts.addressAdded", value:"Addresses Added", comment: "'the addresses were added'' Alert title")
@@ -494,6 +531,7 @@ enum S {
             static let title = NSLocalizedString("Alerts.BurnAsset.title", value: "Confirm Asset  Burn", comment: "Burn Asset title")
             static let body = NSLocalizedString("Alerts.BurnAsset.body", value: "Are you sure you want to burn the asset? Once burned there is no way you can get it back.", comment: "Burn Asset body")
         }
+
     }
     
     enum MenuButton {
@@ -510,7 +548,7 @@ enum S {
     enum HomeScreen {
         static let totalAssets = NSLocalizedString("HomeScreen.totalAssets", value: "Total Assets", comment: "header")
         static let portfolio = NSLocalizedString("HomeScreen.portfolio", value: "Wallet", comment: "Section header")
-        static let asset = NSLocalizedString("HomeScreen.asset", value: "Asset", comment: "Section header")
+        static let asset = NSLocalizedString("HomeScreen.asset", value: "Assets", comment: "Section header")
         static let admin = NSLocalizedString("HomeScreen.admin", value: "Admin", comment: "Section header")
     }
     
@@ -660,13 +698,13 @@ enum S {
     }
     
     enum WipeWallet {
-        static let title = NSLocalizedString("WipeWallet.title", value: "Start or Recover Another Wallet", comment: "Initial wallet navigation item title.")
-        static let alertTitle = NSLocalizedString("WipeWallet.alertTitle", value: "Erase Wallet?", comment: "Erase wallet alert title")
-        static let alertMessage = NSLocalizedString("WipeWallet.alertMessage", value: "Are you sure you want to delete this wallet? You will not be able to recover your funds without your 12 word passphrase", comment: "Erase wallet alert message")
-        static let wipe = NSLocalizedString("WipeWallet.wipe", value: "Wipe", comment: "Wipe wallet button title")
-        static let wiping = NSLocalizedString("WipeWallet.wiping", value: "Wiping...", comment: "Wiping activity message")
+        static let title = NSLocalizedString("WipeWallet.title", value: "Start or Recover Another Wallet", comment: "Wipe wallet navigation item title.")
+        static let alertTitle = NSLocalizedString("WipeWallet.alertTitle", value: "Reset Wallet?", comment: "Wipe wallet alert title")
+        static let alertMessage = NSLocalizedString("WipeWallet.alertMessage", value: "Are you sure you want to delete this wallet?", comment: "Wipe wallet alert message")
+        static let wipe = NSLocalizedString("WipeWallet.wipe", value: "Reset", comment: "Wipe wallet button title")
+        static let wiping = NSLocalizedString("WipeWallet.wiping", value: "Resetting...", comment: "Wiping activity message")
         static let failedTitle = NSLocalizedString("WipeWallet.failedTitle", value: "Failed", comment: "Failed wipe wallet alert title")
-        static let failedMessage = NSLocalizedString("WipeWallet.failedMessage", value: "Failed to wipe wallet.", comment: "Failed wipe wallet alert message")
+        static let failedMessage = NSLocalizedString("WipeWallet.failedMessage", value: "Failed to reset wallet.", comment: "Failed wipe wallet alert message")
         static let instruction = NSLocalizedString("WipeWallet.instruction", value: "To start a new wallet or restore an existing wallet, you must first erase the wallet that is currently installed. To continue, enter the current wallet's Paper Key.", comment: "Enter key to wipe wallet instruction.")
         static let startMessage = NSLocalizedString("WipeWallet.startMessage", value: "Starting or recovering another wallet allows you to access and manage a different RVN Wallet on this device.", comment: "Start wipe wallet view message")
         static let startWarning = NSLocalizedString("WipeWallet.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore it in the future, you will need to enter your Paper Key.", comment: "Start wipe wallet view warning")
@@ -687,10 +725,14 @@ enum S {
         static let send = NSLocalizedString("Confirmation.send", value: "Send", comment: "Send: (amount)")
         static let to = NSLocalizedString("Confirmation.to", value: "To", comment: "To: (address)")
         static let processingTime = NSLocalizedString("Confirmation.processingTime", value: "Processing time: This transaction is predicted to complete in %1$@.", comment: "E.g. Processing time: This transaction is predicted to complete in [10-60 minutes].")
-        static let amountLabel = NSLocalizedString("Confirmation.amountLabel", value: "Amount to Send:", comment: "Amount to Send: ($1.00)")
+        static let amountSendLabel = NSLocalizedString("Confirmation.amountSendLabel", value: "Amount to Send:", comment: "Amount to Send: ($1.00)")
+        static let amountCreateLabel = NSLocalizedString("Confirmation.amountCreateLabel", value: "Amount to Create:", comment: "Amount to Create: ($1.00)")
+        static let amountManageLabel = NSLocalizedString("Confirmation.amountManageLabel", value: "Amount to Reissue:", comment: "Amount to Reissue: ($1.00)")
         static let feeLabel = NSLocalizedString("Confirmation.feeLabel", value: "Network Fee:", comment: "Network Fee: ($1.00)")
-        static let createFeeLabel = NSLocalizedString("Confirmation.createFeeLabel", value: "Creation Fee:", comment: "Create Fee: ($1.00)")
-        static let manageFeeLabel = NSLocalizedString("Confirmation.manageFeeLabel", value: "Manage Fee:", comment: "Manage Fee: ($1.00)")
+        static let createFeeLabel = NSLocalizedString("Confirmation.createFeeLabel", value: "Creation Fee:", comment: "Create Fee: ($500.00)")
+        static let manageFeeLabel = NSLocalizedString("Confirmation.manageFeeLabel", value: "Manage Fee:", comment: "Manage Fee: ($100.00)")
+        static let subAssetFeeLabel = NSLocalizedString("Confirmation.subAssetFeeLabel", value: "Sub Fee:", comment: "Sub Fee: ($100.00)")
+        static let uniqueAssetFeeLabel = NSLocalizedString("Confirmation.uniqueAssetFeeLabel", value: "Unique Fee:", comment: "Unique Fee: ($100.00)")
         static let totalLabel = NSLocalizedString("Confirmation.totalLabel", value: "Total Cost:", comment: "Total Cost: ($5.00)")
     }
     
@@ -708,7 +750,7 @@ enum S {
     }
     
     enum WipeSetting {
-        static let title = NSLocalizedString("WipeSetting.title", value: "Wipe", comment: "Wipe device")
+        static let title = NSLocalizedString("WipeSetting.title", value: "Reset", comment: "Reset device")
 
     }
     

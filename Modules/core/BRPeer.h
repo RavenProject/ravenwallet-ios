@@ -65,7 +65,7 @@ extern "C" {
 
 #define VERSION "0.1.0"
 #define USER_AGENT "/rvnwallet:" VERSION "/"
-
+        
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification
 #define MSG_VERSION     "version"
 #define MSG_VERACK      "verack"
@@ -92,7 +92,8 @@ extern "C" {
 
 #define MSG_GETASSETDATA "getassetdata"
 #define MSG_ASSETDATA    "assetdata"
-
+#define MSG_ASSETNOTFOUND "asstnotfound"
+    
 #define REJECT_INVALID     0x10 // transaction is invalid for some reason (invalid signature, output value > input, etc)
 #define REJECT_SPENT       0x12 // an input is already spent
 #define REJECT_NONSTANDARD 0x40 // not mined/relayed because it is "non-standard" (type or version unknown by server)
@@ -108,12 +109,13 @@ typedef enum {
 typedef struct {
     UInt128 address; // IPv6 address of peer
     uint16_t port; // port number for peer connection
-    uint64_t services; // bitcoin network services supported by peer
+    uint64_t services; // network services supported by peer
     uint64_t timestamp; // timestamp reported by peer
     uint8_t flags; // scratch variable
+    void *assetCallbackInfo;
 } BRPeer;
 
-#define PEER_NONE ((BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
+#define PEER_NONE ((const BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
 
 // NOTE: Peer functions are not thread-safe
 
@@ -193,14 +195,12 @@ void BRPeerSendMempool(BRPeer *peer, const UInt256 *knownTxHashes, size_t knownT
                        void (*completionCallback)(void *info, int success));
 void BRPeerSendGetheaders(BRPeer *peer, const UInt256 *locators, size_t locatorsCount, UInt256 hashStop);
 void BRPeerSendGetblocks(BRPeer *peer, const UInt256 *locators, size_t locatorsCount, UInt256 hashStop);
+void BRPeerSendGetAsset(BRPeer *peer, char *assetName, size_t nameLen, void (*receiveAssetData) (void *info, BRAsset *asset));
 void BRPeerSendInv(BRPeer *peer, const UInt256 *txHashes, size_t txCount);
 void BRPeerSendGetdata(BRPeer *peer, const UInt256 *txHashes, size_t txCount, const UInt256 *blockHashes,
                        size_t blockCount);
 void BRPeerSendGetaddr(BRPeer *peer);
 void BRPeerSendPing(BRPeer *peer, void *info, void (*pongCallback)(void *info, int success));
-
-void BRPeerSendGetAsset(BRPeer *peer, const uint8_t assetName);
-
 // useful to get additional tx after a bloom filter update
 void BRPeerRerequestBlocks(BRPeer *peer, UInt256 fromBlock);
 

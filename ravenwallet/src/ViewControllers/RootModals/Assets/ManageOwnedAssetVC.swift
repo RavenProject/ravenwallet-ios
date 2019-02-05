@@ -10,7 +10,7 @@ import UIKit
 import LocalAuthentication
 import Core
 
-private let verticalButtonPadding: CGFloat = 32.0
+private let manageAddressHeight: CGFloat = 110.0
 
 class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
 
@@ -28,7 +28,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         self.initialRequest = initialRequest
         self.walletManager = walletManager
         self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: .manageAsset)
-        self.addressCell = AddressCell(currency: self.currency, type: .create)
+        self.addressCell = AddressCreateAssetCell(currency: self.currency, type: .create)
         self.feeView = FeeAmountVC(walletManager: walletManager, sender: self.sender, operationType: .manageAsset)
         self.quantityView = QuantityCell(placeholder: S.Asset.quantity, keyboardType: .quantityPad)
         super.init(nibName: nil, bundle: nil)
@@ -45,17 +45,19 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     private var asset: Asset
     private let sender: SenderAsset
     private let walletManager: WalletManager
-    private let addressCell: AddressCell
+    private let addressCell: AddressCreateAssetCell
     private let quantityView: QuantityCell
     private let feeView: FeeAmountVC
-    private let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel, isEnabled: false)
-    private let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissubaleLabel)
+    private let unitsCell = UnitsCell(placeholder: S.Asset.unitsLabel, isEnabled: true)
+    private let reissubaleCell = CheckBoxCell(labelCheckBox: S.Asset.isReissuableLabel)
     private let ipfsCell = IPFSCell(labelCheckBox: S.Asset.hasIpfsLabel, placeholder: S.Asset.ipfsHashLabel)
     private let createButton = ShadowButton(title: S.Asset.create, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
     private var currencySwitcherHeightConstraint: NSLayoutConstraint?
     private var pinPadHeightConstraint: NSLayoutConstraint?
     private var balance: UInt64 = 0
+    private var quantity: Satoshis?
+    private var feeAmount: UInt64 = 0
     private var amount: Satoshis?
     private var didIgnoreUsedAddressWarning = false
     private var didIgnoreIdentityNotCertified = false
@@ -67,9 +69,9 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     override func viewDidLoad() {
         addSubviews()
         addConstraints()
+        addSubscriptions()
         addButtonActions()
         setInitialData()
-        addSubscriptions()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -85,7 +87,12 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     }
     
     private func addConstraints() {
-        addressCell.constrainTopCorners(height: SendCell.defaultHeight)
+        addressCell.constrain([
+            addressCell.widthAnchor.constraint(equalTo: view.widthAnchor),
+            addressCell.topAnchor.constraint(equalTo: view.topAnchor),
+            addressCell.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            addressCell.heightAnchor.constraint(equalToConstant: !UserDefaults.hasActivatedExpertMode ? 0.0 : manageAddressHeight) ])
+
         
         addChild(quantityView, layout: {
             quantityView.view.constrain([
@@ -105,14 +112,14 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             reissubaleCell.widthAnchor.constraint(equalTo: unitsCell.view.widthAnchor),
             reissubaleCell.topAnchor.constraint(equalTo: unitsCell.view.bottomAnchor),
             reissubaleCell.leadingAnchor.constraint(equalTo: unitsCell.view.leadingAnchor),
-            reissubaleCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2]) ])
-        
+            reissubaleCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
+
         ipfsCell.constrain([
             ipfsCell.widthAnchor.constraint(equalTo: reissubaleCell.widthAnchor),
             ipfsCell.topAnchor.constraint(equalTo: reissubaleCell.bottomAnchor),
             ipfsCell.leadingAnchor.constraint(equalTo: reissubaleCell.leadingAnchor),
-            ipfsCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: 0) ])
-        
+            ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
+
         addChild(feeView, layout: {
             feeView.view.constrain([
                 feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -131,21 +138,48 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     private func setInitialData() {
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
-            //BMEX amountView.expandPinPad()
         }
-        
+        if !UserDefaults.hasActivatedExpertMode {
+            self.generateTapped()
+        }
+        self.unitsCell.amount = Satoshis(UInt64(self.asset.units) * C.satoshis)
+        //reissuable is true by default
+        reissubaleCell.btnCheckBox.isSelected = true
     }
     
     private func addSubscriptions() {
-        //
+        Store.subscribe(self, selector: { $0[self.currency].balance != $1[self.currency].balance },
+                        callback: { [unowned self] in
+                            if let balance = $0[self.currency].balance {
+                                self.balance = balance
+                            }
+        })
+        
+        Store.subscribe(self, selector: { $0[self.currency].fees != $1[self.currency].fees }, callback: { [unowned self] in
+            if let fees = $0[self.currency].fees {
+                if let feeType = self.feeType {
+                    switch feeType {
+                    case .regular :
+                        self.walletManager.wallet?.feePerKb = fees.regular
+                    case .economy:
+                        self.walletManager.wallet?.feePerKb = fees.economy
+                    }
+                } else {
+                    self.walletManager.wallet?.feePerKb = fees.regular
+                }
+            }
+        })
     }
 
     private func addButtonActions() {
         addressCell.paste.addTarget(self, action: #selector(ManageOwnedAssetVC.pasteTapped), for: .touchUpInside)
         addressCell.scan.addTarget(self, action: #selector(ManageOwnedAssetVC.scanTapped), for: .touchUpInside)
         addressCell.addressBook.addTarget(self, action: #selector(ManageOwnedAssetVC.addressBookTapped), for: .touchUpInside)
+        addressCell.generate.addTarget(self, action: #selector(ManageOwnedAssetVC.generateTapped), for: .touchUpInside)
+        
         ipfsCell.paste.addTarget(self, action: #selector(ManageOwnedAssetVC.pasteTapped), for: .touchUpInside)
         ipfsCell.scan.addTarget(self, action: #selector(ManageOwnedAssetVC.scanTapped), for: .touchUpInside)
+        
         createButton.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
         
         ipfsCell.didBeginEditing = { [weak self] in
@@ -153,14 +187,10 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             self?.unitsCell.closePinPad()
         }
         
-        /*unitsCell.didReturn = { textField in
-            guard (textField.text?.isEmpty)! else {
-                guard Int(textField.text!)! < 8 else {
-                    return self.showAlert(title: S.Alert.error, message: S.Asset.errorUnitsMessage, buttonLabel: S.Button.ok)
-                }
-                return
-            }
-        }*/
+        ipfsCell.didReturn = { textField in
+            textField.resignFirstResponder()
+        }
+        
         addressCell.didBeginEditing = strongify(self) { myself in
             myself.quantityView.closePinPad()
         }
@@ -173,6 +203,10 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             }
         }
         
+        quantityView.didUpdateAmount = { [weak self] amount in
+            self?.quantity = amount
+        }
+        
         unitsCell.didChangeFirstResponder = { [weak self] isFirstResponder in
             if isFirstResponder {
                 self?.addressCell.textField.resignFirstResponder()
@@ -180,6 +214,21 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
                 self?.ipfsCell.textField.resignFirstResponder()
             }
         }
+        
+        unitsCell.didUpdateAmount = { amount in
+            guard (Int(exactly: amount!.rawValue / 100000000)! >= self.asset.units) else {
+                self.unitsCell.amount = Satoshis(UInt64(self.asset.units) * C.satoshis)
+                return self.showAlert(title: S.Alert.error, message: String(format: S.Asset.errorUnitsValue, self.asset.units), buttonLabel: S.Button.ok)
+            }
+        }
+        
+        feeView.didUpdateAssetFee = { [weak self] feeAmount in
+            self?.feeAmount = feeAmount
+        }
+        
+        //initiate feeview balance
+        feeView.balance = self.balance
+
     }
 
     @objc private func pasteTapped(sender: UIButton) {
@@ -187,14 +236,18 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             return showAlert(title: S.Alert.error, message: S.Send.emptyPasteboard, buttonLabel: S.Button.ok)
         }
 
-        guard PaymentRequest(string: pasteboard, currency: currency) != nil else {
-            let message = String.init(format: S.Send.invalidAddressOnPasteboard, currency.name)
-            return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
-        }
         if sender.superview == addressCell {
+            guard PaymentRequest(string: pasteboard, currency: currency) != nil else {
+                let message = String.init(format: S.Send.invalidAddressOnPasteboard, currency.name)
+                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+            }
             addressCell.setContent(pasteboard)
         }
         else if sender.superview == ipfsCell{
+            guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: pasteboard) else {
+                let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
+                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+            }
             ipfsCell.textField.text = pasteboard
         }
     }
@@ -225,62 +278,121 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         })))
     }
     
+    @objc private func generateTapped() {
+        guard let addressText = currency.state.receiveAddress else { return }
+        addressCell.setContent(addressText)
+    }
+    
     @objc private func sendTapped() {
         if addressCell.textField.isFirstResponder {
             addressCell.textField.resignFirstResponder()
         }
-
-        if sender.transaction == nil {
-            guard let address = addressCell.address else {
-                return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
-            }
-            
-            guard currency.state.fees != nil else {
-                return showAlert(title: S.Alert.error, message: S.Send.noFeesError, buttonLabel: S.Button.ok)
-            }
-            guard address.isValidAddress else {
-                let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
-                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
-            }
-            guard let amount = amount else {
-                return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
-            }
-            if let minOutput = walletManager.wallet?.minOutputAmount {
-                guard amount.rawValue >= minOutput else {
-                    let minOutputAmount = Amount(amount: minOutput, rate: Rate.empty, maxDigits: currency.state.maxDigits, currency: currency)
-                    let message = String(format: S.PaymentProtocol.Errors.smallPayment, minOutputAmount.string(isBtcSwapped: Store.state.isSwapped))
-                    return showAlert(title: S.Alert.error, message: message, buttonLabel: S.Button.ok)
-                }
-            }
-            guard !(walletManager.wallet?.containsAddress(address) ?? false) else {
-                return showAlert(title: S.Alert.error, message: S.Send.containsAddress, buttonLabel: S.Button.ok)
-            }
-            guard amount.rawValue <= (walletManager.wallet?.maxOutputAmount ?? 0) else {
-                return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
-            }
-            
-            if ipfsCell.hasIpfs {
-                guard let ipfsHash = ipfsCell.content else {
-                    return showAlert(title: S.Alert.error, message: S.Asset.noIpfsHash, buttonLabel: S.Button.ok)
-                }
-                guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: ipfsHash) else {
-                    let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
-                    return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
-                }
-            }
-            //sender
-            
+        
+        guard let address = addressCell.address else {
+            return showAlert(title: S.Alert.error, message: S.Send.noAddress, buttonLabel: S.Button.ok)
         }
         
-
-        guard amount != nil else { return }
+        guard currency.state.fees != nil else {
+            return showAlert(title: S.Alert.error, message: S.Send.noFeesError, buttonLabel: S.Button.ok)
+        }
+        guard address.isValidAddress else {
+            let message = String.init(format: S.Send.invalidAddressMessage, currency.name)
+            return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+        }
+        guard quantity != nil else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
+        }
+        
+        guard let amount = quantity else {
+            return showAlert(title: S.Alert.error, message: S.Send.noAmount, buttonLabel: S.Button.ok)
+        }
+        
+        guard amount != Satoshis.zero else {
+            return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
+        }
+        
+        //BMEX Todo : manage maxOutputAmount and minOutputAmount
+        guard feeAmount <= balance else {
+            return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
+        }
+        
+        if ipfsCell.hasIpfs {
+            guard let ipfsHash = ipfsCell.ipfsHash else {
+                return showAlert(title: S.Alert.error, message: S.Asset.noIpfsHash, buttonLabel: S.Button.ok)
+            }
+            guard AssetValidator.shared.IsIpfsHashValid(ipfsHash: ipfsHash) else {
+                let message = String.init(format: S.Asset.invalidIpfsHashMessage, currency.name)
+                return showAlert(title: S.Send.invalidAddressTitle, message: message, buttonLabel: S.Button.ok)
+            }
+        }
+        
+        showConfirmationView(amount: amount, address: address)
         return
+    }
+    
+    func showConfirmationView(amount:Satoshis, address:String) {
+        //sender
+        asset = Asset.init(idAsset: -1, name: asset.name, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
+        
+        let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset, type: REISSUE, amount: amount)
+        guard sender.createAssetTransaction(amount: C.manageAssetFee, to: address, asset: assetToSend) else {
+            return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
+        }
+        
+        
+        let confirm = ConfirmationViewController(amount: amount, fee: Satoshis(sender.fee), feeType: feeType ?? .regular, selectedRate: nil, minimumFractionDigits: quantityView.minimumFractionDigits, address: addressCell.displayAddress ?? "", isUsingBiometrics: sender.canUseBiometrics, operationType: .manageAsset, assetToSend: asset)
+        confirm.successCallback = {
+            confirm.dismiss(animated: true, completion: {
+                self.send()
+            })
+        }
+        confirm.cancelCallback = {
+            confirm.dismiss(animated: true, completion: {
+                self.sender.transaction = nil
+            })
+        }
+        confirmTransitioningDelegate.shouldShowMaskView = false
+        confirm.transitioningDelegate = confirmTransitioningDelegate
+        confirm.modalPresentationStyle = .overFullScreen
+        confirm.modalPresentationCapturesStatusBarAppearance = true
+        present(confirm, animated: true, completion: nil)
     }
 
     private func send() {
-        guard currency.state.currentRate != nil else { return }
-        guard (walletManager.wallet?.feePerKb) != nil else { return }
-        //BMEX
+        guard let rate = currency.state.currentRate else { return }
+        guard let feePerKb = walletManager.wallet?.feePerKb else { return }
+        
+        sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
+                    rate: rate,
+                    comment: "",
+                    feePerKb: feePerKb,
+                    verifyPinFunction: { [weak self] pinValidationCallback in
+                        self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in
+                            self?.parent?.view.isFrameChangeBlocked = false
+                            pinValidationCallback(pin)
+                        }
+            }, completion: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.dismiss(animated: true, completion: {
+                        guard let myself = self else { return }
+                        Store.trigger(name: .showStatusBar)
+                        if myself.isPresentedFromLock {
+                            Store.trigger(name: .loginFromSend)
+                        }
+                        myself.onPublishSuccess?()
+                    })
+                    self?.saveEvent("manage.success")
+                case .creationError(let message):
+                    self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
+                    self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": message])
+                case .publishFailure(let error):
+                    if case .posixError(let code, let description) = error {
+                        self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
+                        self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
+                    }
+                }
+        })
     }
 
     private func showError(title: String, message: String, ignore: @escaping () -> Void) {

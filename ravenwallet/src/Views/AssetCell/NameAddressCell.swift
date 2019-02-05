@@ -33,22 +33,24 @@ class NameAddressCell : SendCell {
     }
 
     let textField = UITextField()
-    fileprivate let placeholder = UILabel(font: .customBody(size: 16.0), color: .grayTextTint)
-    private func setupViews() {
+    let placeholder = UILabel(font: .customBody(size: 16.0), color: .grayTextTint)
+
+    func setupViews() {
         addSubview(textField)
+        textField.addSubview(placeholder)
+        
         textField.constrain([
-            textField.constraint(.leading, toView: self, constant: 11.0),
-            textField.topAnchor.constraint(equalTo: topAnchor, constant: C.padding[2]),
+            textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 11.0),
+            textField.centerYAnchor.constraint(equalTo: centerYAnchor),
             textField.heightAnchor.constraint(greaterThanOrEqualToConstant: 30.0),
             textField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]) ])
 
-        textField.addSubview(placeholder)
         placeholder.constrain([
             placeholder.centerYAnchor.constraint(equalTo: textField.centerYAnchor),
             placeholder.leadingAnchor.constraint(equalTo: textField.leadingAnchor, constant: 5.0) ])
     }
     
-    private func setInitialData() {
+    func setInitialData() {
         textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
 
@@ -78,7 +80,13 @@ extension NameAddressCell : UITextFieldDelegate {
         return true
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        didReturn?(textField)
+    //func textFieldDidEndEditing(_ textField: UITextField) {
+    //    didReturn?(textField)
+    //}
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let count = text.count + string.count - range.length
+        return count <= C.MAX_ADDRESSBOOK_NAME_LENGTH
     }
 }

@@ -1,15 +1,13 @@
 //
-//  AdressTableViewController.swift
+//  ManageAssetTableVC.swift
 //  ravenwallet
 //
-//  Created by Bendnaiba on 2016-11-16.
+//  Created by Ben on 2016-11-16.
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
 import UIKit
 import SafariServices
-
-private let promptDelay: TimeInterval = 0.6
 
 class ManageAssetTableVC : UITableViewController, Subscriber, Trackable {
     

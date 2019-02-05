@@ -21,18 +21,20 @@
 #define ASSET_ACTIVATION        435456
 #endif
 
-//typedef int64_t Amount;
-
 #define OWNER_TAG "!"
 #define OWNER_LENGTH 1
 #define OWNER_UNITS 0
 #define MIN_ASSET_LENGTH 3
 #define OWNER_ASSET_AMOUNT 1 * COIN
 
+#define SUB_ASST_SEPARATOR "/"
+#define UNIQUE_ASST_SEPARATOR "#"
+
 #define ASSET_TRANSFER_STRING "transfer_asset"
 #define ASSET_NEW_STRING "new_asset"
 #define ASSET_REISSUE_STRING "reissue_asset"
 
+const char *GetAssetScriptType(BRAssetScriptType type);
 const char *GetAssetType(BRAssetType type);
 
 // Functions to be used to get access to the current burn amount required for specific asset issuance transactions
@@ -47,7 +49,7 @@ bool ReissueAssetFromTransaction(const BRTransaction *tx, BRAsset* reissue, char
 
 bool TransferAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen,
                                    BRAsset *asset);
-bool AssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *asset);
+bool NewAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *asset);
 bool OwnerAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *asset);
 bool ReissueAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen,
                                   BRAsset *reissue);
@@ -69,24 +71,33 @@ bool GetAssetData(const uint8_t *script, size_t scriptLen, BRAsset *data);
 size_t DecodeIPFS(uint8_t *data, size_t dataLen, const char *str);
 size_t EncodeIPFS(char *str, size_t strLen, const uint8_t *data, size_t dataLen);
 
-size_t ConstructNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructTransferAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
-size_t ConstructOwnerAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetTransferAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetOwnerAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+size_t BRTxOutputSetTransferOwnerAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+
+// TODO: test test remove this, don't FORGET!
+size_t BRTxOutputSetTransferOwnerAssetScriptWithoutTag(uint8_t *script, size_t scriptLen, BRAsset *asset);
 
 bool CreateAssetTransaction(BRWallet* wallet, const BRAsset* asset, const char *address, char *rvnChangeAddress,
-        BRKey* key, Amount* nFeeRequired);
+                            BRKey* key, Amount* nFeeRequired);
 bool CreateReissueAssetTransaction(BRWallet *pwallet, const BRAsset *asset, const char *address,
-        const char *changeAddress, BRKey* key, Amount* nFeeRequired);
+                                   const char *changeAddress, BRKey* key, Amount* nFeeRequired);
 bool CreateTransferAssetTransaction(BRWallet* pwallet, const char *changeAddress, BRKey* key, Amount* nFeeRequired);
 bool SendAssetTransaction(BRWallet* pwallet, BRKey* key);
 
 // returns a newly allocated empty asset that must be freed by calling AssetFree()
 BRAsset *NewAsset(void);
 
+void showAsset(BRAsset* asset);//BMEX
+void showTransaction(BRTransaction* tx);//BMEX
+
 // frees memory allocated for tx
 void AssetFree(BRAsset *asset);
 
 char *PrintAsset(BRAsset asset);
+
+void CopyAsset(BRAsset *asst, BRTransaction *tx);
 
 #endif //BRASSETS_H

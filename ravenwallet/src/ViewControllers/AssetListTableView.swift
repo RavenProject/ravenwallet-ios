@@ -144,7 +144,7 @@ class AssetListTableView: UITableViewController, Subscriber {
 
         switch section {
         case .wallet:
-            return E.isIPhoneXOrLater ? 260.0 : 220.0
+            return E.isIPhoneXOrLater ? 260.0 : 260.0
         case .asset:
             return 60.0
         case .menu:
@@ -185,21 +185,19 @@ class AssetListTableView: UITableViewController, Subscriber {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard let section = Section(rawValue: section) else { return C.padding[2] }
         switch section {
-        case 0:
-            return C.padding[3]
-        case 1:
-            return AssetManager.shared.showedAssetList.count == 0 ? 0 : C.padding[2]
-        case 2:
-            return C.padding[2]
-        default:
-            return C.padding[2]
+        case .wallet:
+            return 0
+        case .asset:
+            return AssetManager.shared.showedAssetList.count == 0 ? 0 : C.padding[1]
+        case .menu:
+            return C.padding[1]
         }
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let section = Section(rawValue: section) else { return nil }
-
         switch section {
         case .wallet:
             return S.HomeScreen.portfolio

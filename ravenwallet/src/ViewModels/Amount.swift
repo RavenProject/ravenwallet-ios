@@ -94,6 +94,12 @@ struct Amount {
         format.currencySymbol = rate.currencySymbol
         return format
     }
+    
+    var homeScreenFormat: NumberFormatter {
+        let format = self.localFormat
+        format.maximumFractionDigits = maxDigits
+        return format
+    }
 }
 
 struct DisplayAmount {
@@ -125,6 +131,13 @@ struct DisplayAmount {
         }
         return selectedRate != nil ? fiatDescription : bitcoinDescription
     }
+    
+    func description(isBtcSwapped: Bool) -> String {
+        if asset != nil {
+            return assetDescription
+        }
+        return isBtcSwapped ? fiatDescription : bitcoinDescription
+    }
 
     var combinedDescription: String {
         return Store.state.isSwapped ? "\(fiatDescription) (\(bitcoinDescription))" : "\(bitcoinDescription) (\(fiatDescription))"
@@ -143,9 +156,10 @@ struct DisplayAmount {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        guard var string = assetFormat.string(from: number) else { return "" }
-        string = string + " " + asset!.pointee.nameString
-        return string
+        var string = assetFormat.string(from: number)
+        //var string = number.stringValue
+        string = string! + " " + asset!.pointee.nameString
+        return string!
     }
 
     private var bitcoinDescription: String {
@@ -153,7 +167,7 @@ struct DisplayAmount {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-currency.state.maxDigits), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        guard let string = rvnFormat.string(from: number) else { return "" }
+        let string = (rvnFormat.string(from: number)! + " " + currencySympbole)
         return string
     }
 
@@ -176,26 +190,23 @@ struct DisplayAmount {
 
     var rvnFormat: NumberFormatter {
         let format = NumberFormatter()
-        if locale != nil {
-            format.locale = locale
-        }
+        //if locale != nil {
+            format.locale = selectedRate?.locale
+        //}
         format.isLenient = true
-        format.numberStyle = .currency
+        format.numberStyle = .decimal
         format.generatesDecimalNumbers = true
         format.negativeFormat = "-\(format.positiveFormat!)"
-        format.currencyCode = currency.code
+        //format.currencyCode = currency.code
         switch currency.state.maxDigits {
         case 2:
-            format.currencySymbol = "\((locale != nil) ? S.Symbols.ulRvn : S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*100000 as NSNumber
         case 5:
-            format.currencySymbol = "m\((locale != nil) ? S.Symbols.lRvn : S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*1000 as NSNumber
         case 8:
-            format.currencySymbol = "\((locale != nil) ? S.Symbols.lRvn : S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = C.maxMoney/C.satoshis as NSNumber
         default:
-            format.currencySymbol = "\((locale != nil) ? S.Symbols.ulRvn : S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
+            break
         }
 
         format.maximumFractionDigits = currency.state.maxDigits
@@ -204,17 +215,36 @@ struct DisplayAmount {
         if let minimumFractionDigits = minimumFractionDigits {
             format.minimumFractionDigits = minimumFractionDigits
         }
+        else{
+            format.minimumFractionDigits = 2
+        }
 
         return format
     }
+    
+    
+    var currencySympbole:String {
+        switch currency.state.maxDigits {
+        case 2:
+            return "\(S.Symbols.ulRvn)\(S.Symbols.narrowSpace)"
+        case 5:
+            return "m\(S.Symbols.lRvn)\(S.Symbols.narrowSpace)"
+        case 8:
+            return "\(S.Symbols.lRvn)\(S.Symbols.narrowSpace)"
+        default:
+            return "\(S.Symbols.ulRvn)\(S.Symbols.narrowSpace)"
+        }
+    }
+    
     
     var assetFormat: NumberFormatter {
         let format = NumberFormatter()
         format.isLenient = true
         format.generatesDecimalNumbers = true
-        format.negativeFormat = "-\(format.positiveFormat!)"
-        format.minimumFractionDigits = Int(asset!.pointee.unit)
-
+        format.numberStyle = .decimal
+        //format.negativeFormat = "-\(format.positiveFormat!)"
+        //format.minimumFractionDigits = Int(asset!.pointee.unit)
+        format.locale = selectedRate?.locale
         return format
     }
 }

@@ -29,15 +29,17 @@ class ChartModel {
 
         URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
             guard error == nil else { print("get chart Data error: \(error!)"); return }
-            guard let response = response, let data = data else { print("no response or data"); return }
+            guard let _ = response, let data = data else { print("no response or data"); return }
             do {
                 if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     let result:Bool = convertedJsonIntoDict.object(forKey: "success") as! Bool
                     if(result) {
-                        UserDefaults.shouldReloadChart = false
-                        UserDefaults.isChartDrawed = true
-                        let elements:NSArray = convertedJsonIntoDict.object(forKey: "result") as! NSArray
-                        self.callback(Array(elements) as NSArray)
+                        if(convertedJsonIntoDict.object(forKey: "result") != nil && !(convertedJsonIntoDict.object(forKey: "result") is NSNull)){
+                            UserDefaults.shouldReloadChart = false
+                            UserDefaults.isChartDrawed = true
+                            let elements:NSArray = convertedJsonIntoDict.object(forKey: "result") as! NSArray
+                            self.callback(Array(elements) as NSArray)
+                        }
                     }
                     else {
                         let message: String = convertedJsonIntoDict.object(forKey: "message") as! String
