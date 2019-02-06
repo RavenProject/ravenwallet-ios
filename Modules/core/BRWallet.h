@@ -134,29 +134,54 @@ void BRWalletSetFeePerKb(BRWallet *wallet, uint64_t feePerKb);
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTransaction(BRWallet *wallet, uint64_t amount, const char *addr);
 
-// TODO:
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
 
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst);
     
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst);
 
-BRTransaction *BRWalletCreateTxForRootAssetManage(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
-
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
+BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
+    
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
 
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
+
 BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
-    
+
+//
+//
+// returns an unsigned transaction that sends the specified amount from the wallet to the given address
+// result must be freed by calling TransactionFree()
+
 BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset);
 
-    
 // returns an unsigned transaction that satisifes the given transaction outputs
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
-// deprecated/
-BRTransaction *BRWalletCreateTxForOutputsV2(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount, BRAsset *asset);
-
-
+    
 // signs any inputs in tx that can be signed using private keys from the wallet
 // forkId is 0 for bitcoin, 0x40 for b-cash
 // seed is the master private key (wallet seed) corresponding to the master public key given when the wallet was created

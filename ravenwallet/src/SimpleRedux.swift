@@ -71,6 +71,7 @@ enum TriggerName {
     case didUpdateFeatureFlags
     case showTermsOfUse()
     case reloadSettings
+    case playGif(String)
     case selectAddressBook( AddressBookType?, ((String)->Void)?)
 } //NB : remember to add to triggers to == fuction below
 
@@ -145,6 +146,8 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
     case (.showTermsOfUse(_), .showTermsOfUse(_)):
         return true
     case (.reloadSettings, .reloadSettings):
+        return true
+    case (.playGif(_), .playGif(_)):
         return true
     case (.selectAddressBook(_, _), .selectAddressBook(_, _)):
         return true

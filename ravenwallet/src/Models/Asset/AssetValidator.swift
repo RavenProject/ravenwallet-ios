@@ -38,7 +38,7 @@ let UNIQUE_INDICATOR = try? NSRegularExpression(pattern: "^[^#]+#[^#]+$", option
 let CHANNEL_INDICATOR = try? NSRegularExpression(pattern: "^[^~]+~[^~]+$", options: [])
 let OWNER_INDICATOR = try? NSRegularExpression(pattern: "^[^!]+!$", options: [])
 
-let RAVEN_NAMES = try? NSRegularExpression(pattern: "^RVN|^RAVEN|^RAVENCOIN|^RAVENC0IN|^RAVENCO1N|^RAVENC01N", options: [])
+let RAVEN_NAMES = try? NSRegularExpression(pattern: "^RVN$|^RAVEN$|^RAVENCOIN$|^RAVENC0IN$|^RAVENCO1N$|^RAVENC01N$", options: [])
 
 
 let IPFSHASH = try? NSRegularExpression(pattern: "^[^!]+!$", options: [])

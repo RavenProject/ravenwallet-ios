@@ -36,15 +36,15 @@ struct C {
     static let maxMoney: UInt64 = 21000000000*100000000
     static let maxAsset: UInt64 = 21000000000*100000000
     static let satoshis: UInt64 = 100000000
-    // TODO Ravenize
+    // TODO Ravenize: check if it can be changed without affecting anything
     static let walletQueue = "com.breadwallet.walletqueue"
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
     static let feedbackEmail = "feedback@ravenwallet.org"
     static let iosEmail = "ios@ravenwallet.org"
-    //TODO: change reviewLink
-    static let reviewLink = "https://itunes.apple.com/app/breadwallet-bitcoin-wallet/id885251393?action=write-review"
+    static let reviewLink = "https://itunes.apple.com/us/app/rvn-wallet/id1371751946?action=write-review"
+    
     static var standardPort: Int {
         return E.isTestnet ? 18770 : 8767
     }

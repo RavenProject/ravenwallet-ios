@@ -36,7 +36,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 
 static const char *dns_seeds[] = {
 //       "127.0.0.1", NULL
-        "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.bitactivate.com.", NULL
+        "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.ravencoin.com.", "seed-testnet-raven.bitactivate.com.", NULL
 };
 
 #else // main net

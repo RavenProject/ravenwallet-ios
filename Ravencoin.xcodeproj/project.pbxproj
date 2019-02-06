@@ -57,6 +57,7 @@
 		411281D2217DD29F002A6205 /* CheckBoxCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411281D0217DD29F002A6205 /* CheckBoxCell.swift */; };
 		411281D3217DD29F002A6205 /* NameAddressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411281D1217DD29F002A6205 /* NameAddressCell.swift */; };
 		411281D5217DD2F9002A6205 /* NumberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411281D4217DD2F8002A6205 /* NumberCell.swift */; };
+		4115D13E22098AE200417C73 /* logoGif.gif in Resources */ = {isa = PBXBuildFile; fileRef = 4115D13D22098AE100417C73 /* logoGif.gif */; };
 		411DF56E216E6C110003A8BA /* AddressBookManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411DF56D216E6C110003A8BA /* AddressBookManager.swift */; };
 		411DF573216E7ECC0003A8BA /* AssetValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411DF572216E7ECC0003A8BA /* AssetValidator.swift */; };
 		411DF576216F59D70003A8BA /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411DF575216F59D60003A8BA /* Checkbox.swift */; };
@@ -802,6 +803,7 @@
 		411281D0217DD29F002A6205 /* CheckBoxCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckBoxCell.swift; sourceTree = "<group>"; };
 		411281D1217DD29F002A6205 /* NameAddressCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NameAddressCell.swift; sourceTree = "<group>"; };
 		411281D4217DD2F8002A6205 /* NumberCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumberCell.swift; sourceTree = "<group>"; };
+		4115D13D22098AE100417C73 /* logoGif.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = logoGif.gif; sourceTree = SOURCE_ROOT; };
 		411DF56D216E6C110003A8BA /* AddressBookManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookManager.swift; path = src/Models/AddressBookManager.swift; sourceTree = "<group>"; };
 		411DF572216E7ECC0003A8BA /* AssetValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetValidator.swift; sourceTree = "<group>"; };
 		411DF575216F59D60003A8BA /* Checkbox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
@@ -3115,6 +3117,7 @@
 				CEDA9EDB1FDE0C56005E8D1B /* countries.plist */,
 				8B12806F20FB010A002A139F /* GoogleService-Info.plist */,
 				75A2A79F1DA5934300A983D8 /* Info.plist */,
+				4115D13D22098AE100417C73 /* logoGif.gif */,
 				75A2A7931DA5934300A983D8 /* AppDelegate.swift */,
 				CE20C8F11DBAF71500C8397A /* ApplicationController.swift */,
 				754AE0BB1DFE8A46007FD001 /* BRCore.swift */,
@@ -4328,6 +4331,7 @@
 				2218BD791E8F6CBA0091D5E8 /* AssetBundles.plist in Resources */,
 				CEAA9EA41DC2FC700066731D /* CircularPro-Medium.otf in Resources */,
 				CEAA9E9E1DC2F90C0066731D /* CircularPro-Bold.otf in Resources */,
+				4115D13E22098AE200417C73 /* logoGif.gif in Resources */,
 				CED486DE1F70A179007406D3 /* bread-frontend.tar in Resources */,
 				8B12807020FB010B002A139F /* GoogleService-Info.plist in Resources */,
 			);

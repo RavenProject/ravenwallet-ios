@@ -29,7 +29,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     private let totalHeader = UILabel(font: .customMedium(size: 18.0), color: .mediumGray)
     private let prompt = UIView()
     private var promptHiddenConstraint: NSLayoutConstraint!
-
+    
     var didSelectCurrency : ((CurrencyDef) -> Void)?
     var didSelectAsset : ((Asset) -> Void)?
     var didSelectShowMoreAsset: (() -> Void)?
@@ -39,14 +39,14 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     var didTapAddressBook: ((CurrencyDef) -> Void)?
     var didTapCreateAsset: (() -> Void)?
     var didTapTutorial: (() -> Void)?
-
+    
     // MARK: -
     
     init(primaryWalletManager: WalletManager?) {
         self.primaryWalletManager = primaryWalletManager
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     override func viewDidLoad() {
         currencyList.didSelectCurrency = didSelectCurrency
         currencyList.didSelectAsset = didSelectAsset //BMEX
@@ -60,6 +60,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         
         addSubviews()
         addConstraints()
+        addActions()
         setInitialData()
         setupSubscriptions()
     }
@@ -72,7 +73,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
     
     // MARK: Setup
-
+    
     private func addSubviews() {
         view.addSubview(subHeaderView)
         subHeaderView.addSubview(logo)
@@ -80,7 +81,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         subHeaderView.addSubview(total)
         view.addSubview(prompt)
     }
-
+    
     private func addConstraints() {
         let height: CGFloat = 60.0//Height with total label = 136.0
         if #available(iOS 11.0, *) {
@@ -132,7 +133,13 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                 currencyList.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)])
         })
     }
-
+    
+    private func addActions() {
+        let gr = UILongPressGestureRecognizer(target: self, action: #selector(longPressed))
+        logo.addGestureRecognizer(gr)
+        logo.isUserInteractionEnabled = true
+    }
+    
     private func setInitialData() {
         view.backgroundColor = .whiteBackground
         subHeaderView.backgroundColor = .whiteBackground
@@ -152,13 +159,19 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
         
         updateTotalAssets()
     }
-
+    
+    @objc private func longPressed(sender:UILongPressGestureRecognizer) {
+        if (sender.state == .began) {
+            Store.trigger(name: .playGif("logoGif"))
+        }
+    }
+    
     private func updateTotalAssets() {
         let fiatTotal = Store.state.currencies.map {
             let balance = Store.state[$0].balance ?? 0
             let rate = Store.state[$0].currentRate?.rate ?? 0
             return Double(balance)/$0.baseUnit * rate * 0.001
-        }.reduce(0.0, +)
+            }.reduce(0.0, +)
         
         let format = NumberFormatter()
         format.isLenient = true
@@ -212,6 +225,21 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                 self.currentPrompt = nil
             }
         })
+        Store.subscribe(self, name: .playGif(""), callback: {  [weak self] in
+            guard let trigger = $0 else { return }
+            if case .playGif(let gifName) = trigger {
+                let logoGif = UIImage.gifImageWithName(name: gifName)
+                let imageView = UIImageView(image: logoGif)
+                imageView.frame = CGRect(x: 0, y: 0, width: self!.view.frame.size.width + 50, height: self!.view.frame.size.height)
+                imageView.alpha = 1.0
+                self!.view.addSubview(imageView)
+                imageView.fadeIn(0.5, delay: 0.0, completion: { _ in
+                    imageView.fadeOut(0.5, delay: 6.1, completion: { _ in
+                        imageView.removeFromSuperview()
+                    })
+                })
+            }
+        })
     }
     
     // MARK: - Prompt
@@ -237,7 +265,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                     newPrompt.constrain(toSuperviewEdges: .zero)
                     prompt.layoutIfNeeded()
                     promptHiddenConstraint.isActive = false
-
+                    
                     // fade-in after fade-out and layout
                     UIView.animate(withDuration: 0.2, delay: afterFadeOut + 0.15, options: .curveEaseInOut, animations: {
                         newPrompt.alpha = 1.0
@@ -285,7 +313,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
     
     // MARK: -
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

@@ -189,9 +189,9 @@ class AssetPopUpVC : UIViewController, Subscriber {
                         mySelf.walletManager.db!.updateAssetData(assetRef!)
                         DispatchQueue.main.async {
                             let amount = Double(assetRef!.pointee.amount / C.oneAsset)
-                            let message = "\nName: " + mySelf.asset.name +  "\namount: " + String(amount) + "\nunits: "
-                                + assetRef!.pointee.unit.description + "\nreissubale: " + assetRef!.pointee.reissuable.description + "\nhasIpfs: "
-                                + assetRef!.pointee.hasIPFS.description + "\nipfsHash: "
+                            let message = "\nname: " + mySelf.asset.name +  "\ntotal amount: " + String(amount) + "\nunits: "
+                                + assetRef!.pointee.unit.description + "\nis-reissuable: " + assetRef!.pointee.reissuable.description + "\nhas-ipfs: "
+                                + assetRef!.pointee.hasIPFS.description + "\nipf sHash: "
                                 + assetRef!.pointee.ipfsHashString + ""
                             let paragraphStyle = NSMutableParagraphStyle()
                             paragraphStyle.alignment = NSTextAlignment.left
@@ -247,6 +247,9 @@ class AssetPopUpVC : UIViewController, Subscriber {
             getAssetDataHeight?.constant = C.Sizes.buttonHeight
             self.view.layoutIfNeeded()
         }
+        if asset.amount == Satoshis.zero {
+            burn.isEnabled = false
+        }
         if AssetValidator.shared.IsAssetNameValid(name: asset.name).1 == .UNIQUE {
             subAsset.heightAnchor.constraint(equalToConstant: 0).isActive = true
             uniqueAsset.heightAnchor.constraint(equalToConstant: 0).isActive = true
@@ -274,6 +277,9 @@ class AssetPopUpVC : UIViewController, Subscriber {
             if !asset.isOwnerShip {//enable subAsset/uniqueAsset only if is owner
                 subAsset.isEnabled = false
                 uniqueAsset.isEnabled = false
+            }
+            if asset.amount == Satoshis.zero {
+                burn.isEnabled = false
             }
         }
     }

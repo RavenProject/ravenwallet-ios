@@ -24,10 +24,12 @@ class StartImportViewController : UIViewController {
     private let illustration = UIImageView(image: #imageLiteral(resourceName: "ImportIllustration"))
     private let message = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let warning = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
+    private let assetWarning = UILabel.wrapping(font: .customBody(size: 16.0), color: .sentRed)
     private let button = ShadowButton(title: S.Import.scan, type: .primary)
-    private let bullet = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
-    private let leftCaption = UILabel.wrapping(font: .customMedium(size: 13.0), color: .darkText)
-    private let rightCaption = UILabel.wrapping(font: .customMedium(size: 13.0), color: .darkText)
+    private let bulletWarning = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
+    private let bulletAssetWarning = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
+    private let leftCaption = UILabel.wrapping(font: .customMedium(size: 13.0), color: .white)
+    private let rightCaption = UILabel.wrapping(font: .customMedium(size: 13.0), color: .white)
     private let balanceActivity = BRActivityViewController(message: S.Import.checking)
     private let importingActivity = BRActivityViewController(message: S.Import.importing)
     private let unlockingActivity = BRActivityViewController(message: S.Import.unlockingActivity)
@@ -55,8 +57,10 @@ class StartImportViewController : UIViewController {
         header.addSubview(rightCaption)
         view.addSubview(message)
         view.addSubview(button)
-        view.addSubview(bullet)
+        view.addSubview(bulletWarning)
+        view.addSubview(bulletAssetWarning)
         view.addSubview(warning)
+        view.addSubview(assetWarning)
     }
 
     private func addConstraints() {
@@ -80,15 +84,24 @@ class StartImportViewController : UIViewController {
             message.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
             message.topAnchor.constraint(equalTo: header.bottomAnchor, constant: C.padding[2]),
             message.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]) ])
-        bullet.constrain([
-            bullet.leadingAnchor.constraint(equalTo: message.leadingAnchor),
-            bullet.topAnchor.constraint(equalTo: message.bottomAnchor, constant: C.padding[4]),
-            bullet.widthAnchor.constraint(equalToConstant: 16.0),
-            bullet.heightAnchor.constraint(equalToConstant: 16.0) ])
+        bulletWarning.constrain([
+            bulletWarning.leadingAnchor.constraint(equalTo: message.leadingAnchor),
+            bulletWarning.topAnchor.constraint(equalTo: message.bottomAnchor, constant: C.padding[4]),
+            bulletWarning.widthAnchor.constraint(equalToConstant: 16.0),
+            bulletWarning.heightAnchor.constraint(equalToConstant: 16.0) ])
         warning.constrain([
-            warning.leadingAnchor.constraint(equalTo: bullet.trailingAnchor, constant: C.padding[2]),
-            warning.topAnchor.constraint(equalTo: bullet.topAnchor, constant: 0.0),
+            warning.leadingAnchor.constraint(equalTo: bulletWarning.trailingAnchor, constant: C.padding[2]),
+            warning.topAnchor.constraint(equalTo: bulletWarning.topAnchor, constant: 0.0),
             warning.trailingAnchor.constraint(equalTo: message.trailingAnchor) ])
+        bulletAssetWarning.constrain([
+            bulletAssetWarning.leadingAnchor.constraint(equalTo: message.leadingAnchor),
+            bulletAssetWarning.topAnchor.constraint(equalTo: warning.bottomAnchor, constant: C.padding[2]),
+            bulletAssetWarning.widthAnchor.constraint(equalToConstant: 16.0),
+            bulletAssetWarning.heightAnchor.constraint(equalToConstant: 16.0) ])
+        assetWarning.constrain([
+            assetWarning.leadingAnchor.constraint(equalTo: warning.leadingAnchor),
+            assetWarning.topAnchor.constraint(equalTo: warning.bottomAnchor, constant: C.padding[2]),
+            assetWarning.trailingAnchor.constraint(equalTo: warning.trailingAnchor) ])
         button.constrain([
             button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[3]),
             button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[4]),
@@ -105,6 +118,7 @@ class StartImportViewController : UIViewController {
         rightCaption.text = S.Import.rightCaption
         rightCaption.textAlignment = .center
         warning.text = S.Import.importWarning
+        assetWarning.text = S.Import.importAssettWarning
 
         button.tap = strongify(self) { myself in
             let scan = ScanViewController(scanKeyCompletion: { address in

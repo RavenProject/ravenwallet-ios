@@ -95,7 +95,7 @@ class SettingsViewController : UITableViewController, CustomTitleView, Subscribe
                 newAdvancedSettings?.append(setting)
             }
             self.rows[.network] = newAdvancedSettings
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: {
                 self.tableView.reloadData()
             })
         })
