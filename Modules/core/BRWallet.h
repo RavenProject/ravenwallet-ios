@@ -175,7 +175,6 @@ BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, u
 //
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
 // result must be freed by calling TransactionFree()
-
 BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset);
 
 // returns an unsigned transaction that satisifes the given transaction outputs

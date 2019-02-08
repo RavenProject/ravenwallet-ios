@@ -190,8 +190,8 @@ class AssetPopUpVC : UIViewController, Subscriber {
                         DispatchQueue.main.async {
                             let amount = Double(assetRef!.pointee.amount / C.oneAsset)
                             let message = "\nname: " + mySelf.asset.name +  "\ntotal amount: " + String(amount) + "\nunits: "
-                                + assetRef!.pointee.unit.description + "\nis-reissuable: " + assetRef!.pointee.reissuable.description + "\nhas-ipfs: "
-                                + assetRef!.pointee.hasIPFS.description + "\nipf sHash: "
+                                + assetRef!.pointee.unit.description + "\nis-reissuable: " + assetRef!.pointee.reissuable.description + "\nhas-IPFS: "
+                                + assetRef!.pointee.hasIPFS.description + "\nIPFS Hash: "
                                 + assetRef!.pointee.ipfsHashString + ""
                             let paragraphStyle = NSMutableParagraphStyle()
                             paragraphStyle.alignment = NSTextAlignment.left

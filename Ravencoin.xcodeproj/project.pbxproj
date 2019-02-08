@@ -50,6 +50,8 @@
 		22C431341DF89DFE0017CAEA /* BRCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C431331DF89DFE0017CAEA /* BRCoderTests.swift */; };
 		22C431361DF8A6DF0017CAEA /* BRAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C431351DF8A6DF0017CAEA /* BRAPIClientTests.swift */; };
 		22E773041EE7813000397E0E /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E773031EE7813000397E0E /* Bonjour.swift */; };
+		4106E6C8220D892200C29B86 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4106E6C6220D892100C29B86 /* Fabric.framework */; };
+		4106E6C9220D892200C29B86 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4106E6C7220D892100C29B86 /* Crashlytics.framework */; };
 		41085231216965F30027DB2A /* AddressBookFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41085230216965F30027DB2A /* AddressBookFooterView.swift */; };
 		410C3EC12192E7BC002B5208 /* ConfirmationTermsUseVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410C3EC02192E7BB002B5208 /* ConfirmationTermsUseVC.swift */; };
 		410C3EC32192E861002B5208 /* TermsUseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410C3EC22192E860002B5208 /* TermsUseCell.swift */; };
@@ -796,6 +798,8 @@
 		22C431331DF89DFE0017CAEA /* BRCoderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRCoderTests.swift; sourceTree = "<group>"; };
 		22C431351DF8A6DF0017CAEA /* BRAPIClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRAPIClientTests.swift; sourceTree = "<group>"; };
 		22E773031EE7813000397E0E /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
+		4106E6C6220D892100C29B86 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
+		4106E6C7220D892100C29B86 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		41085230216965F30027DB2A /* AddressBookFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookFooterView.swift; path = src/Views/AddressBookFooterView.swift; sourceTree = "<group>"; };
 		410C3EC02192E7BB002B5208 /* ConfirmationTermsUseVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConfirmationTermsUseVC.swift; path = src/ViewControllers/ConfirmationTermsUseVC.swift; sourceTree = "<group>"; };
 		410C3EC22192E860002B5208 /* TermsUseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsUseCell.swift; path = src/Views/TermsUseCell.swift; sourceTree = "<group>"; };
@@ -1978,6 +1982,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				417C68B2216E0BC10090710E /* SwipeCellKit.framework in Frameworks */,
+				4106E6C8220D892200C29B86 /* Fabric.framework in Frameworks */,
 				22A9A9661DF61FEE000F0016 /* WebKit.framework in Frameworks */,
 				22A9A9641DF61FE7000F0016 /* Security.framework in Frameworks */,
 				22A9A9621DF61FE0000F0016 /* SystemConfiguration.framework in Frameworks */,
@@ -1986,6 +1991,7 @@
 				223DB21B1DF69F0F0076A151 /* libbz2.framework in Frameworks */,
 				752FB04D1DF8BF4B009086FB /* sqlite3.framework in Frameworks */,
 				759DA0BE1DAC36A3008CC49B /* libBRCore.a in Frameworks */,
+				4106E6C9220D892200C29B86 /* Crashlytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2112,6 +2118,15 @@
 			path = libbz2;
 			sourceTree = "<group>";
 		};
+		4106E6C5220D892100C29B86 /* Crashlytics */ = {
+			isa = PBXGroup;
+			children = (
+				4106E6C6220D892100C29B86 /* Fabric.framework */,
+				4106E6C7220D892100C29B86 /* Crashlytics.framework */,
+			);
+			path = Crashlytics;
+			sourceTree = "<group>";
+		};
 		411281CF217DD29F002A6205 /* AssetCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -2213,6 +2228,7 @@
 		417C6810216CDE4F0090710E /* External */ = {
 			isa = PBXGroup;
 			children = (
+				4106E6C5220D892100C29B86 /* Crashlytics */,
 				41BD211921FB87800026716A /* AlertVC */,
 				419BD10E21B6DDE60070B2C8 /* AAInfographics */,
 				411DF574216F59D60003A8BA /* Checkbox */,
@@ -3963,6 +3979,7 @@
 				75A2A7E21DA5934400A983D8 /* Embed Watch Content */,
 				75A2A8031DA5935F00A983D8 /* Embed App Extensions */,
 				22A9A9831DF63288000F0016 /* Embed Frameworks */,
+				4106E6CA220D896D00C29B86 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -4402,6 +4419,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4106E6CA220D896D00C29B86 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/External/Crashlytics/Fabric.framework/run\" dbf6fef7bb2fb1c0c7ce1def9fb3db9e942fedf2 14f34cbec0f7d725a62a167e3ea29413eaa2f660d3730f1079241d6c4c49abf6\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		22A9A9911DF63426000F0016 /* Sources */ = {
@@ -5748,6 +5786,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
+					"$(PROJECT_DIR)/External/Crashlytics",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -5775,6 +5814,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
+					"$(PROJECT_DIR)/External/Crashlytics",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -6080,6 +6120,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
+					"$(PROJECT_DIR)/External/Crashlytics",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -6395,6 +6436,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
+					"$(PROJECT_DIR)/External/Crashlytics",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -6707,6 +6749,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
 					"$(PROJECT_DIR)/External/SwipeCellKit",
+					"$(PROJECT_DIR)/External/Crashlytics",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

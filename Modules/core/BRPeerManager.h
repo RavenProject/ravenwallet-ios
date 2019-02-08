@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-#define PEER_MAX_CONNECTIONS 25// TODO: Change back to 6 or 3
+#define PEER_MAX_CONNECTIONS 6
 
 typedef struct PeerManagerStruct BRPeerManager;
 

@@ -25,6 +25,8 @@
 
 import UIKit
 import LocalAuthentication
+import Fabric
+import Crashlytics
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -34,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let applicationController = ApplicationController()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Fabric.with([Crashlytics.self])
         redirectStdOut()
         UIView.swizzleSetFrame()
         applicationController.launch(application: application, options: launchOptions)

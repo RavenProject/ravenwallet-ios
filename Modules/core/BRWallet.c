@@ -683,10 +683,10 @@ BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, u
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asset) {
     
-    size_t newAsset_outcount = 3;
-    BRTxOutput outputs[newAsset_outcount];
+    size_t asstCount = 3, off = 0;
+    BRTxOutput outputs[asstCount];
     
-    for (size_t i = 0; i < newAsset_outcount; i++) {
+    for (size_t i = 0; i < asstCount; i++) {
         outputs[i] = TX_OUTPUT_NONE;
     }
     
@@ -695,44 +695,47 @@ BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t a
     assert(addr != NULL && BRAddressIsValid(addr));
     
     // Add burn output
-    outputs[0].amount = amount;
+    outputs[off].amount = amount;
 #if TESTNET
     //strIssueAssetBurnAddressTestNet
-    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressTestNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueAssetBurnAddressTestNet);
 #elif REGTEST
     //strIssueAssetBurnAddressRegTest
-    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressRegTest);
+    BRTxOutputSetAddress(&outputs[off], strIssueAssetBurnAddressRegTest);
 #else
     //strIssueAssetBurnAddressMainNet
-    BRTxOutputSetAddress(&outputs[0], strIssueAssetBurnAddressMainNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueAssetBurnAddressMainNet);
 #endif
     
     BRTransaction *tx = BRWalletCreateTxForOutputs(wallet, outputs, 1);
+    off++;
     
     // The order is important here: Ownership script before NewAsset script
      //Add new asset Ownership Output
-    outputs[1].amount = 0;
+    outputs[off].amount = 0;
     
-    strncpy(outputs[1].address, addr, sizeof(outputs[1].address) - 1);
-    outputs[1].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
-    array_new(outputs[1].script, outputs[1].scriptLen);
-    array_set_count(outputs[1].script, outputs[1].scriptLen);
-    BRAddressScriptPubKey(outputs[1].script, outputs[1].scriptLen, addr);
+    strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
     
-    BRTxOutputSetOwnerAssetScript(outputs[1].script, outputs[1].scriptLen, asset);
-    BRTransactionAddOutput(tx, outputs[1].amount, outputs[1].script, outputs[1].scriptLen);
+    BRTxOutputSetOwnerAssetScript(outputs[off].script, outputs[off].scriptLen, asset);
+    BRTransactionAddOutput(tx, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
+    off++;
 
     // Add new asset output
-    outputs[2].amount = 0;
+    outputs[off].amount = 0;
     
-    strncpy(outputs[2].address, addr, sizeof(outputs[2].address) - 1);
-    outputs[2].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
-    array_new(outputs[2].script, outputs[2].scriptLen);
-    array_set_count(outputs[2].script, outputs[2].scriptLen);
-    BRAddressScriptPubKey(outputs[2].script, outputs[2].scriptLen, addr);
+    strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
     
-    BRTxOutputSetNewAssetScript(outputs[2].script, outputs[2].scriptLen, asset);
-    BRTransactionAddOutput(tx, outputs[2].amount, outputs[2].script, outputs[2].scriptLen);
+    BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asset);
+    BRTransactionAddOutput(tx, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
+    off++;
     
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asset, tx);
@@ -746,10 +749,10 @@ BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t a
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst) {
 
-    size_t newAsset_outcount = 4;
-    BRTxOutput outputs[newAsset_outcount];
+    size_t asstCount = 4, off = 0;
+    BRTxOutput outputs[asstCount];
     
-    for (size_t i = 0; i < newAsset_outcount; i++) {
+    for (size_t i = 0; i < asstCount; i++) {
         outputs[i] = TX_OUTPUT_NONE;
     }
     
@@ -758,31 +761,32 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
     assert(addr != NULL && BRAddressIsValid(addr));
     
     // Add burn output
-    outputs[0].amount = amount;
+    outputs[off].amount = amount;
 #if TESTNET
     //n1issueSubAssetXXXXXXXXXXXXXbNiH6v
-    BRTxOutputSetAddress(&outputs[0], strIssueSubAssetBurnAddressTestNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueSubAssetBurnAddressTestNet);
 #elif REGTEST
     //n1issueSubAssetXXXXXXXXXXXXXbNiH6v
-    BRTxOutputSetAddress(&outputs[0], strIssueSubAssetBurnAddressRegTest);
+    BRTxOutputSetAddress(&outputs[off], strIssueSubAssetBurnAddressRegTest);
 #else
     //RXissueSubAssetXXXXXXXXXXXXXWcwhwL
-    BRTxOutputSetAddress(&outputs[0], strIssueSubAssetBurnAddressMainNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueSubAssetBurnAddressMainNet);
 #endif
     
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, outputs, 1);
+    off++;
 
     /* Move Ownership Output + Input */
     BRAddress address = ADDRESS_NONE;
     
-    outputs[1].amount = 0;
+    outputs[off].amount = 0;
     pthread_mutex_unlock(&wallet->lock); // TODO: remove!
     BRWalletUnusedAddrs(wallet, &address, 1, 1);
-    strncpy(outputs[1].address, address.s, sizeof(outputs[1].address) - 1);
-    outputs[1].scriptLen = BRTxOutputSetTransferOwnerAssetScriptWithoutTag(NULL, 0, rootAsst);
-    array_new(outputs[1].script, outputs[1].scriptLen);
-    array_set_count(outputs[1].script, outputs[1].scriptLen);
-    BRAddressScriptPubKey(outputs[1].script, outputs[1].scriptLen, address.s);
+    strncpy(outputs[off].address, address.s, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetTransferOwnerAssetScriptWithoutTag(NULL, 0, rootAsst);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, address.s);
     
 #warning TODO: Free asstWithOwner ...!
     char *asstWithOwner;
@@ -790,9 +794,9 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
     strcpy(asstWithOwner, rootAsst->name);
     strcat(asstWithOwner, OWNER_TAG);
     
-    BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[1].script, outputs[1].scriptLen, rootAsst);
+    BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[off].script, outputs[off].scriptLen, rootAsst);
     
-    BRTransactionAddOutput(transaction, outputs[1].amount, outputs[1].script, outputs[1].scriptLen);
+    BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     
     //    pthread_mutex_lock(&wallet->lock); // not tested // tested crashes in BRWalletFees!!
     
@@ -814,31 +818,34 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
         free(temp);
         break;
     }
+    off++;
     
     // The order is important here: Ownership script before NewAsset script
     //Add new asset ownership output
-    outputs[2].amount = 0;
+    outputs[off].amount = 0;
     
-    strncpy(outputs[2].address, addr, sizeof(outputs[2].address) - 1);
-    outputs[2].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asst);
-    array_new(outputs[2].script, outputs[2].scriptLen);
-    array_set_count(outputs[2].script, outputs[2].scriptLen);
-    BRAddressScriptPubKey(outputs[2].script, outputs[2].scriptLen, addr);
+    strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asst);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
     
-    BRTxOutputSetOwnerAssetScript(outputs[2].script, outputs[2].scriptLen, asst);
-    BRTransactionAddOutput(transaction, outputs[2].amount, outputs[2].script, outputs[2].scriptLen);
+    BRTxOutputSetOwnerAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
+    BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
+    off++;
     
     // Add new asset output
-    outputs[3].amount = 0;
+    outputs[off].amount = 0;
     
-    strncpy(outputs[3].address, addr, sizeof(outputs[3].address) - 1);
-    outputs[3].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
-    array_new(outputs[3].script, outputs[3].scriptLen);
-    array_set_count(outputs[3].script, outputs[3].scriptLen);
-    BRAddressScriptPubKey(outputs[3].script, outputs[3].scriptLen, addr);
+    strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
     
-    BRTxOutputSetNewAssetScript(outputs[3].script, outputs[3].scriptLen, asst);
-    BRTransactionAddOutput(transaction, outputs[3].amount, outputs[3].script, outputs[3].scriptLen);
+    BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
+    BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
+    off++;
     
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asst, transaction);
@@ -852,10 +859,10 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst) {
     
-    size_t newAsset_outcount = 3;
-    BRTxOutput outputs[newAsset_outcount];
+    size_t asstCount = 3, off = 0;
+    BRTxOutput outputs[asstCount];
     
-    for (size_t i = 0; i < newAsset_outcount; i++) {
+    for (size_t i = 0; i < asstCount; i++) {
         outputs[i] = TX_OUTPUT_NONE;
     }
     
@@ -864,31 +871,32 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
     assert(addr != NULL && BRAddressIsValid(addr));
     
     // Add burn output
-    outputs[0].amount = amount;
+    outputs[off].amount = amount;
 #if TESTNET
     //n1issueUniqueAssetXXXXXXXXXXS4695i
-    BRTxOutputSetAddress(&outputs[0], strIssueUniqueAssetBurnAddressTestNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueUniqueAssetBurnAddressTestNet);
 #elif REGTEST
     //n1issueUniqueAssetXXXXXXXXXXS4695i
-    BRTxOutputSetAddress(&outputs[0], strIssueUniqueAssetBurnAddressRegTest);
+    BRTxOutputSetAddress(&outputs[off], strIssueUniqueAssetBurnAddressRegTest);
 #else
     //RXissueUniqueAssetXXXXXXXXXXWEAe58
-    BRTxOutputSetAddress(&outputs[0], strIssueUniqueAssetBurnAddressMainNet);
+    BRTxOutputSetAddress(&outputs[off], strIssueUniqueAssetBurnAddressMainNet);
 #endif
     
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, outputs, 1);
+    off++;
     
     /* Move Ownership Output + Input */
     BRAddress address = ADDRESS_NONE;
     
-    outputs[1].amount = 0;
+    outputs[off].amount = 0;
     pthread_mutex_unlock(&wallet->lock); // TODO: remove
     BRWalletUnusedAddrs(wallet, &address, 1, 1);
-    strncpy(outputs[1].address, address.s, sizeof(outputs[1].address) - 1);
-    outputs[1].scriptLen = BRTxOutputSetTransferOwnerAssetScriptWithoutTag(NULL, 0, rootAsst);
-    array_new(outputs[1].script, outputs[1].scriptLen);
-    array_set_count(outputs[1].script, outputs[1].scriptLen);
-    BRAddressScriptPubKey(outputs[1].script, outputs[1].scriptLen, address.s);
+    strncpy(outputs[off].address, address.s, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetTransferOwnerAssetScriptWithoutTag(NULL, 0, rootAsst);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, address.s);
     
 #warning TODO: Free this!
     char *asstWithOwner;
@@ -896,9 +904,9 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
     strcpy(asstWithOwner, rootAsst->name);
     strcat(asstWithOwner, OWNER_TAG);
     
-    BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[1].script, outputs[1].scriptLen, rootAsst);
+    BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[off].script, outputs[off].scriptLen, rootAsst);
     
-    BRTransactionAddOutput(transaction, outputs[1].amount, outputs[1].script, outputs[1].scriptLen);
+    BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     
     //    pthread_mutex_lock(&wallet->lock); // not tested // tested crashes in BRWalletFees!!
     
@@ -920,6 +928,7 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
         free(temp);
         break;
     }
+    off++;
     
     // Unique Asset does have ownership token
     // The order is important here: Ownership script before NewAsset script
@@ -937,16 +946,17 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
 //    BRTransactionAddOutput(transaction, outputs[2].amount, outputs[2].script, outputs[2].scriptLen);
 //
     // Add new asset output
-    outputs[2].amount = 0;
+    outputs[off].amount = 0;
     
-    strncpy(outputs[2].address, addr, sizeof(outputs[2].address) - 1);
-    outputs[2].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
-    array_new(outputs[2].script, outputs[2].scriptLen);
-    array_set_count(outputs[2].script, outputs[2].scriptLen);
-    BRAddressScriptPubKey(outputs[2].script, outputs[2].scriptLen, addr);
+    strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
+    outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
+    array_new(outputs[off].script, outputs[off].scriptLen);
+    array_set_count(outputs[off].script, outputs[off].scriptLen);
+    BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
     
-    BRTxOutputSetNewAssetScript(outputs[2].script, outputs[2].scriptLen, asst);
-    BRTransactionAddOutput(transaction, outputs[2].amount, outputs[2].script, outputs[2].scriptLen);
+    BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
+    BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
+    off++;
     
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asst, transaction);
@@ -1795,7 +1805,7 @@ size_t BRTransactionDecompose(BRWallet *wallet, const BRTransaction *tx, BRTrans
     if(!txDecomposed && txsCount == 0)
         return (burn ? asstCount + 1 : asstCount);
     
-    // allocation is done in SWIFT, SafePointer is freed by garbage collector.
+    // allocation is done in SWIFT, UnSafePointer is freed by garbage collector.
     //    txDecomposed = BRTransactionNew(burn ? asstCount + 1 : asstCount);
 
     BRTxInput *inputs = txDecomposed[count].inputs;
