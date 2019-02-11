@@ -149,8 +149,4 @@ extension NameAssetCell {
         verifyResult.isHidden = true
         msgLabel.isHidden = true
     }
-    
-    override func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return true
-    }
 }

@@ -143,7 +143,7 @@ import Core
                         return self.showAlert(title: S.Alert.error, message: S.Asset.notVerifiedName, buttonLabel: S.Button.ok)
                     }
                     else {
-                        self.showConfirmationView(amount: amount, address: address, units: Int(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
+                        self.showConfirmationView(amount: amount, address: address, units: UInt8(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
                     }
                 }
             }

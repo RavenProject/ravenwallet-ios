@@ -16,24 +16,6 @@ struct TxListViewModel: TxViewModel {
     
     let tx: Transaction
     
-    var shortDescription: String {//TODO: BMEX to remove when shortAttributeDescription completed
-        let isComplete = tx.status == .complete
-        
-        if let comment = comment, comment.count > 0, isComplete {
-            return comment
-        } else {
-            var format: String
-            switch tx.direction {
-            case .sent, .moved:
-                format = isComplete ? S.Transaction.sentTo : S.Transaction.sendingTo
-            case .received:
-                format = isComplete ? S.Transaction.receivedVia : S.Transaction.receivingVia
-            }
-            let address = tx.toAddress
-            return String(format: format, address)
-        }
-    }
-    
     var shortAttributeDescription: NSAttributedString {
         let isComplete = tx.status == .complete
         

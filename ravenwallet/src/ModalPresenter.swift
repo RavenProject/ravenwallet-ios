@@ -685,7 +685,7 @@ class ModalPresenter : Subscriber, Trackable {
                                 let nodeSelector = NodeSelectorViewController(walletManager: walletManager)
                                 settingsNav.pushViewController(nodeSelector, animated: true)
                             }),
-                            Setting(title: S.Settings.usedAddresses, callback: { [weak self] in
+                            Setting(title: S.Settings.usedAddresses, isHidden: !UserDefaults.hasActivatedExpertMode, callback: { [weak self] in
                                 guard let `self` = self else { return }
                                 let nc = ModalNavigationController()
                                 nc.setClearNavbar()

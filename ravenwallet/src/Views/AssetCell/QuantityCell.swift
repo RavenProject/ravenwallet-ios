@@ -77,7 +77,7 @@ class QuantityCell : NumberCell {
     }
     
     private func balanceTextForQuantity() -> NSAttributedString? {
-        let balanceOutput = String(format: S.Asset.balance, NumberFormatter.formattedString(value: (self.asset?.amount.doubleValue)!, minimumFractionDigits: 0, maxDigits: (self.asset?.units)!), (asset?.name)!)
+        let balanceOutput = String(format: S.Asset.balance, NumberFormatter.formattedString(value: (self.asset?.amount.doubleValue)!, minimumFractionDigits: 0, maxDigits: Int((self.asset?.units)!)), (asset?.name)!)
         var color: UIColor = .grayTextTint
         if let amount = amount, amount.rawValue > 0 {
             if ((asset?.amount.rawValue)! < amount.rawValue) {

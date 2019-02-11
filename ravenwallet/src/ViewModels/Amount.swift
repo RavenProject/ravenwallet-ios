@@ -156,10 +156,11 @@ struct DisplayAmount {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        var string = assetFormat.string(from: number)
-        //var string = number.stringValue
-        string = string! + " " + asset!.pointee.nameString
-        return string!
+        var string = asset!.pointee.nameString
+        if !string.contains("!") {
+            string = assetFormat.string(from: number)! + " " + string
+        }
+        return string
     }
 
     private var bitcoinDescription: String {

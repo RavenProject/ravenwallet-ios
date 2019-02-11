@@ -15,7 +15,9 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             setInitialData()
             setupSubscriptions()
             currencyList.reload()
-            attemptShowPrompt()
+            if(!UserDefaults.hasDismissedPrompt){
+                attemptShowPrompt()
+            }
         }
     }
     private let currencyList = AssetListTableView()
@@ -68,7 +70,9 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         DispatchQueue.main.asyncAfter(deadline: .now() + promptDelay) { [weak self] in
-            self?.attemptShowPrompt()
+            if(!UserDefaults.hasDismissedPrompt){
+                self?.attemptShowPrompt()
+            }
         }
     }
     
@@ -230,7 +234,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             if case .playGif(let gifName) = trigger {
                 let logoGif = UIImage.gifImageWithName(name: gifName)
                 let imageView = UIImageView(image: logoGif)
-                imageView.frame = CGRect(x: 0, y: 0, width: self!.view.frame.size.width + 50, height: self!.view.frame.size.height)
+                imageView.frame = CGRect(x: 0, y: 0, width: self!.view.frame.size.width, height: self!.view.frame.size.height)
                 imageView.alpha = 1.0
                 self!.view.addSubview(imageView)
                 imageView.fadeIn(0.5, delay: 0.0, completion: { _ in
@@ -293,6 +297,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             currentPrompt!.dismissButton.tap = { [unowned self] in
                 self.saveEvent("prompt.\(type.name).dismissed")
                 self.currentPrompt = nil
+                UserDefaults.hasDismissedPrompt = true
             }
             currentPrompt!.continueButton.tap = { [unowned self] in
                 if let trigger = type.trigger(currency: Currencies.rvn) {

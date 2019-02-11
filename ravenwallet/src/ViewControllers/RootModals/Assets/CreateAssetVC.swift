@@ -458,14 +458,14 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                         return self.showAlert(title: S.Alert.error, message: S.Asset.notVerifiedName, buttonLabel: S.Button.ok)
                     }
                     else {
-                        self.showConfirmationView(amount: amount, address: address, units: Int(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
+                        self.showConfirmationView(amount: amount, address: address, units: UInt8(exactly: self.unitsCell.amount!.rawValue / 100000000)!, reissubale:self.reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
                     }
                 }
             }
         }
         else
         {
-            showConfirmationView(amount: amount, address: address, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale:reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
+            showConfirmationView(amount: amount, address: address, units: UInt8(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale:reissubaleCell.btnCheckBox.isSelected ? 1 : 0)
         }
         return
     }
@@ -475,7 +475,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         return (assetToSend, nil)
     }
     
-    func showConfirmationView(amount:Satoshis, address:String, units:Int, reissubale:Int) {
+    func showConfirmationView(amount:Satoshis, address:String, units:UInt8, reissubale:UInt8) {
         //sender
         asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: units, reissubale: reissubale, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
         

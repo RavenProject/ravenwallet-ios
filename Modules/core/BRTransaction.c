@@ -409,8 +409,6 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
         /*RVN PROCESS START*/
         if (!tx->asset) {
             if(tx->blockHeight >= ASSET_ACTIVATION) {// if assets are deployed
-                
-                //                    if (output->scriptLen > 25)
                 if (IsScriptAsset(output->script, output->scriptLen) && !IsScriptOwnerAsset(output->script, output->scriptLen)) {
                     tx->asset = NewAsset();
                     GetAssetData(output->script, output->scriptLen, tx->asset);
@@ -436,8 +434,7 @@ BRTransaction *BRTransactionParse(const uint8_t *buf, size_t bufLen) {
         BRTransactionFree(tx);
         tx = NULL;
     } else if (isSigned) SHA256_2(&tx->txHash, buf, off);
-//    if(tx->asset)
-//        printf("/nBMEX TransactionParse 436: Name %s, %llu\n", tx->asset->name, tx->asset->amount / COIN);
+    
     return tx;
 }
 

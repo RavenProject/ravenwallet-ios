@@ -16,6 +16,7 @@ private let hasActivatedExpertModeKey = "has_activated_expert_mode"
 private let legacyWalletNeedsBackupKey = "WALLET_NEEDS_BACKUP"
 private let writePaperPhraseDateKey = "writepaperphrasedatekey"
 private let hasPromptedBiometricsKey = "haspromptedtouched"
+private let hasDismissedPromptKey = "hasDismissedPromptKey"
 private let hasRescannedBlockChainKey = "hasRescannedBlockChain"
 private let isBtcSwappedKey = "isBtcSwappedKey"
 private let maxDigitsKey = "SETTINGS_MAX_DIGITS"
@@ -139,6 +140,11 @@ extension UserDefaults {
     static var hasPromptedShareData: Bool {
         get { return defaults.bool(forKey: hasPromptedBiometricsKey) }
         set { defaults.set(newValue, forKey: hasPromptedBiometricsKey) }
+    }
+    
+    static var hasDismissedPrompt: Bool {
+        get { return defaults.bool(forKey: hasDismissedPromptKey) }
+        set { defaults.set(newValue, forKey: hasDismissedPromptKey) }
     }
     
     static var hasRescannedBlockChain: Bool {

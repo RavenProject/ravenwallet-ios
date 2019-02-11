@@ -34,6 +34,7 @@ class AssetHomeCell : UITableViewCell, Subscriber {
     private let imgAsset = UIImageView(image: #imageLiteral(resourceName: "owned"))
     private let container = BackgroundAsset()
     private var imgAssetWidth: NSLayoutConstraint?
+    private let arrow = UIImageView(image: #imageLiteral(resourceName: "RightArrow").withRenderingMode(.alwaysTemplate))
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -64,6 +65,7 @@ class AssetHomeCell : UITableViewCell, Subscriber {
         container.addSubview(assetName)
         container.addSubview(assetAmount)
         container.addSubview(imgAsset)
+        container.addSubview(arrow)
     }
 
     private func addConstraints() {
@@ -86,14 +88,20 @@ class AssetHomeCell : UITableViewCell, Subscriber {
             assetAmount.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             assetAmount.leadingAnchor.constraint(greaterThanOrEqualTo: assetName.trailingAnchor, constant: C.padding[1])
             ])
+        arrow.constrain([
+            arrow.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -6),
+            arrow.widthAnchor.constraint(equalToConstant: 5.0),
+            arrow.heightAnchor.constraint(equalToConstant: 8.5),
+            arrow.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: 1)
+            ])
     }
 
     private func setupStyle() {
         selectionStyle = .none
         backgroundColor = .clear
         imgAsset.contentMode = .scaleAspectFit
-        //add shadow
         container.backgroundColor = .white
+        arrow.tintColor = .white
     }
     
     override func prepareForReuse() {

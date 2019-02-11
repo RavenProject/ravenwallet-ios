@@ -30,7 +30,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         self.sender = SenderAsset(walletManager: self.walletManager, currency: self.currency, operationType: .transferAsset)
         self.addressCell = AddressCell(currency: self.currency)
         self.feeView = FeeAmountVC(walletManager: walletManager, sender: self.sender, operationType: .transferAsset)
-        self.quantityView = QuantityCell(asset: asset, placeholder: S.Asset.quantity, keyboardType: asset.units == 0 ? .quantityPad : .decimalPad, maxDigits: asset.units)
+        self.quantityView = QuantityCell(asset: asset, placeholder: S.Asset.quantity, keyboardType: asset.units == 0 ? .quantityPad : .decimalPad, maxDigits: Int(asset.units))
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)

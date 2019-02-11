@@ -89,7 +89,7 @@ class SettingsViewController : UITableViewController, CustomTitleView, Subscribe
                 if(setting.title == S.Settings.expertMode){
                     setting.toggleDefaultValue = UserDefaults.hasActivatedExpertMode
                 }
-                else if(setting.title == S.WipeSetting.title){
+                else if(setting.title == S.WipeSetting.title || setting.title == S.Settings.usedAddresses){
                     setting.isHidden = !UserDefaults.hasActivatedExpertMode
                 }
                 newAdvancedSettings?.append(setting)

@@ -51,6 +51,8 @@ extern "C" {
     
 #define BR_RAND_MAX          ((RAND_MAX > 0x7fffffff) ? 0x7fffffff : RAND_MAX)
     
+#define IPFS_HASH_LENGTH     34
+    
     // returns a random number less than upperBound (for non-cryptographic use only)
     uint32_t BRRand(uint32_t upperBound);
     
@@ -106,18 +108,14 @@ extern "C" {
     const char *GetAssetTypeName(BRAssetScriptType code);
     
     typedef struct {
-        BRAssetScriptType type; // enum
-        char *name;
-        //    char name[31]; // MAX 31 Bytes
-        size_t nameLen;
+        BRAssetScriptType type; // enum type
+        char *name; // up to 30 Bytes
+        size_t nameLen; // 1 Byte
         uint64_t amount;     // 8 Bytes
-        
-        //TODO: must change these int to char or uint8
-        int unit;        // 1 Byte
-        int reissuable;  // 1 Byte
-        int hasIPFS;     // 1 Byte
-        char IPFSHash[46]; // MAX 40 Bytes
-        //    char destination[36];
+        uint8_t unit;        // 1 Byte
+        uint8_t reissuable;  // 1 Byte
+        uint8_t hasIPFS;     // 1 Byte
+        char IPFSHash[46]; // MAX 46 Bytes
     } BRAsset;
     // RVN ASSETS END
     

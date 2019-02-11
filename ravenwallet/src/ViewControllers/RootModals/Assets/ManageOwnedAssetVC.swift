@@ -354,7 +354,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     
     func showConfirmationView(amount:Satoshis, address:String) {
         //sender
-        asset = Asset.init(idAsset: -1, name: asset.name, amount: amount, units: Int(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
+        asset = Asset.init(idAsset: -1, name: asset.name, amount: amount, units: UInt8(exactly: unitsCell.amount!.rawValue / 100000000)!, reissubale: reissubaleCell.btnCheckBox.isSelected ? 1 : 0, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
         
         let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset, type: REISSUE, amount: amount)
         guard sender.createAssetTransaction(amount: C.manageAssetFee, to: address, asset: assetToSend) else {

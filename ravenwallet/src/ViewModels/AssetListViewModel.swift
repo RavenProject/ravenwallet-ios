@@ -13,6 +13,6 @@ struct AssetListViewModel {
     var asset: Asset
     
     var assetAmount: String {
-        return asset.amount.description(minimumFractionDigits: asset.units)
+        return asset.amount.description(minimumFractionDigits: Int(asset.units))
     }
 }

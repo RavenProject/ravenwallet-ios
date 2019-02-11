@@ -12,9 +12,9 @@ struct Asset {
     var idAsset: Int
     var name: String
     var amount: Satoshis
-    var units:Int
-    var reissubale:Int
-    var hasIpfs:Int
+    var units:UInt8
+    var reissubale:UInt8
+    var hasIpfs:UInt8
     var ipfsHash:String
     var ownerShip:Int
     var hidden:Int

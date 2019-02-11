@@ -1497,23 +1497,6 @@ static void _peerSetFeePerKb(void *info, uint64_t feePerKb) {
     pthread_mutex_unlock(&manager->lock);
 }
 
-//static void _peerRequestedTxPingDone(void *info, int success)
-//{
-//    Peer *peer = ((PeerCallbackInfo *)info)->peer;
-//    PeerManager *manager = ((PeerCallbackInfo *)info)->manager;
-//    UInt256 txHash = ((PeerCallbackInfo *)info)->hash;
-//
-//    free(info);
-//    pthread_mutex_lock(&manager->lock);
-//
-//    if (success && ! _TxPeerListHasPeer(manager->txRequests, txHash, peer)) {
-//        _TxPeerListAddPeer(&manager->txRequests, txHash, peer);
-//        PeerSendGetdata(peer, &txHash, 1, NULL, 0); // check if peer will relay the transaction back
-//    }
-//    
-//    pthread_mutex_unlock(&manager->lock);
-//}
-
 static BRTransaction *_peerRequestedTx(void *info, UInt256 txHash) {
     BRPeer *peer = ((PeerCallbackInfo *) info)->peer;
     BRPeerManager *manager = ((PeerCallbackInfo *) info)->manager;

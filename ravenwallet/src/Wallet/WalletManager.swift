@@ -289,19 +289,21 @@ extension WalletManager : BRWalletListener {
     }
 
     func txAdded(_ tx: BRTxRef) {
-        print("BMEX txAdded")
         db?.txAdded(tx)
         //add asset if not null
         if AssetValidator.shared.checkInvalidAsset(asset: tx.pointee.asset) {
-            DispatchQueue.main.async {
-                self.assetAdded(tx)
+            if(tx.pointee.asset!.pointee.type != NEW_ASSET && tx.pointee.asset!.pointee.type != REISSUE){
+                DispatchQueue.main.async {
+                    self.assetAdded(tx)
+                }
             }
         }
     }
     
     func assetAdded(_ tx: BRTxRef) {
         let rvnTx = RvnTransaction(tx, walletManager: self, kvStore: self.kvStore, rate: self.currency.state.currentRate)
-        if(tx.pointee.asset!.pointee.type == NEW_ASSET || tx.pointee.asset!.pointee.type == REISSUE){//BMEX should dont write asset if not confirmed
+        if(tx.pointee.asset!.pointee.type == NEW_ASSET || tx.pointee.asset!.pointee.type == REISSUE){
+            //BMEX should dont write asset if not confirmed
             if(rvnTx?.status == .pending || rvnTx?.status == .invalid){
                 return
             }
@@ -327,7 +329,6 @@ extension WalletManager : BRWalletListener {
     }
 
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {
-        print("BMEX txUpdated")
         db?.txUpdated(txHashes, blockHeight: blockHeight, timestamp: timestamp)
         //BMEX write new asset confirmed
         //db?.loadTransactions(callback: { transactions in
@@ -347,7 +348,6 @@ extension WalletManager : BRWalletListener {
     }
 
     func txDeleted(_ txHash: UInt256, notifyUser: Bool, recommendRescan: Bool) {
-        print("BMEX txDeleted")
         if notifyUser {
             if recommendRescan {
                 DispatchQueue.main.async { [weak self] in

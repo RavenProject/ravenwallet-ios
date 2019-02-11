@@ -279,7 +279,46 @@ static int _PeerAcceptVerackMessage(BRPeer *peer, const uint8_t *msg, size_t msg
 
     return r;
 }
+/**
+ * Request -> getassetdata
+ * HEADER: 43524f576765746173736574646174611d0000004a54c291
+ * DATA: 020c41535345545f4a4552454d590e4241445f41535345545f4e414d45
+ * Data Breakdown:
+ * 02 - Varint size of the vector
+ * 0c - Size of element = e.g. 12 Bytes
+ * 41535345545f4a4552454d59 - Name of asset = e.g. "ASSET_JEREMY"
+ * 0e - Size of element = e.g. 14 Bytes
+ * 4241445f41535345545f4e414d45 - Name of asset = e.g. "BAD_ASSET_NAME"
+ * --------------------------------------------------------------------
+ *
+ * First Response -> assetdata
+ * HEADER: 43524f576173736574646174610000001d000000200a58aa
+ * DATA: 0c41535345545f4a4552454d5900e1f50500000000 00010000f5010000
+ * Data Breakdown:
+ * 0c - Size of name = e.g. 12 Bytes
+ * 41535345545f4a4552454d59 - Name of asset = e.g. "ASSET_JEREMY"
+ * 00e1f50500000000 - Amount = e.g. 100000000
+ * 00 - Units = e.g. 0
+ * 01 - Reissuable = e.g. 1
+ *
+ * 00 - hasIPFS = e.g. 0
+ * 00 - Size of IPFS hash
+ *
+ * 01 - hasIPFS = e.g. 1
+ * 22 - Size of IPFS hash - 34 Bytes
+ * 1220da203afd5eda1f45deeafb70ae9d5c15907cd32ec2cd747c641fc1e9ab55b8e8 - IPFS hash data
 
+ * f5010000 - Block height
+ *
+ *
+ * Second Response -> asstnotfound
+ * HEADER: 43524f57617373746e6f74666f756e6410000000571db430
+ * DATA: 010e4241445f41535345545f4e414d45
+ * Data Breakdown:
+ * 01 - Varint size of the vector
+ * Oe - Size of element = e.g. 14 Bytes
+ * 4241445f41535345545f4e414d45 - Name of asset = e.g. "BAD_ASSET_NAME"
+ */
 static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen) {
     size_t off = 0, count = (size_t) BRVarInt(msg, msgLen, &off), sLen = 0;
     int r = 1;
@@ -312,16 +351,15 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         asset->amount = (off + sizeof(uint64_t) <= msgLen) ? UInt64GetLE(&msg[off]) : 0;
         off += sizeof(uint64_t);
         
-        // TODO: change VarInt reading to UINT8
-        asset->unit = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
-        off += sLen;
-        
-        asset->reissuable = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
-        off += sLen;
-        
-        asset->hasIPFS = BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0), &sLen);
-        off += sLen;
-        
+        asset->unit = msg[off];
+        off += sizeof(uint8_t);
+
+        asset->reissuable = msg[off];
+        off += sizeof(uint8_t);
+
+        asset->hasIPFS = msg[off];
+        off += sizeof(uint8_t);
+
         size_t IPFS_length = (size_t) BRVarInt(&msg[off], (off <= (msgLen) ? (msgLen) - off : 0),
                                                &sLen);
         off += sLen;
