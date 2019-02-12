@@ -589,22 +589,12 @@ BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t a
         tx = BRSetGet(wallet->allTx, o);
         
         BRAsset *temp = calloc(1, sizeof(*asst));
-
 #warning find better way to do this.
-        if(!GetAssetData(tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, temp)) {
-            free(temp);
-            temp = NULL;
-        }
+        if(!GetAssetData(tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, temp)) temp = NULL;
         
-        if (!tx || !temp || o->n >= tx->outCount) {
-            free(temp);
-            continue;
-        }
+        if (!tx || !temp || o->n >= tx->outCount) continue;
         
-        if (strcmp(temp->name, asst->name) != 0) {
-            free(temp);
-            continue;
-        }
+        if (strcmp(temp->name, asst->name) != 0) continue;
         
         BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
                               tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
@@ -671,7 +661,6 @@ BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, u
         if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, tx->asset))
             tx->asset = NULL;
 
-        
         if (!tx || !tx->asset || utxo->n >= tx->outCount) continue;
         
         if (strcmp(tx->asset->name, asst->name) != 0) continue;
@@ -815,8 +804,7 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
         tx = BRSetGet(wallet->allTx, utxo);
         
         BRAsset *temp = calloc(1, sizeof(*asst));
-        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp))
-            temp = NULL;
+        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) temp = NULL;
         
         if (!tx || !temp || utxo->n >= tx->outCount) continue;
         
@@ -926,20 +914,11 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
         tx = BRSetGet(wallet->allTx, utxo);
         
         BRAsset *temp = calloc(1, sizeof(*asst));
-        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) {
-            free(temp);
-            temp = NULL;
-        }
+        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) temp = NULL;
         
-        if (!tx || !temp || utxo->n >= tx->outCount) {
-            free(temp);
-            continue;
-        }
+        if (!tx || !temp || utxo->n >= tx->outCount) continue;
         
-        if (strcmp(temp->name, asstWithOwner) != 0) {
-            free(temp);
-            continue;
-        }
+        if (strcmp(temp->name, asstWithOwner) != 0) continue;
         
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
                               tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
@@ -1050,20 +1029,11 @@ BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amoun
         tx = BRSetGet(wallet->allTx, utxo);
         
         BRAsset *temp = calloc(1, sizeof(*asst));
-        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) {
-            free(temp);
-            temp = NULL;
-        }
+        if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) temp = NULL;
+            
+        if (!tx || !temp || utxo->n >= tx->outCount) continue;
         
-        if (!tx || !temp || utxo->n >= tx->outCount) {
-            free(temp);
-            continue;
-        }
-        
-        if (strcmp(temp->name, asstWithOwner) != 0) {
-            free(temp);
-            continue;
-        }
+        if (strcmp(temp->name, asstWithOwner) != 0) continue;
         
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
                               tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
@@ -1128,26 +1098,20 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
         tx = BRSetGet(wallet->allTx, o);
         
         BRAsset *temp = calloc(1, sizeof(*asst));
-        if(!GetAssetData(tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, temp)) {
-            free(temp);
-            temp = NULL;
-        }
+        if(!GetAssetData(tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, temp)) temp = NULL;
         
-        if (!tx || !temp || o->n >= tx->outCount) {
-            free(temp);
-            continue;
-        }
+        if (!tx || !temp || o->n >= tx->outCount) continue;
         
-        if (strcmp(temp->name, asst->name) != 0) {
-            free(temp);
-            continue;
-        }
+        if (strcmp(temp->name, asst->name) != 0) continue;
         
         BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
                               tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
         
         asst_balance += temp->amount;
+        
         free(temp);
+        temp = NULL;
+        
         if(asst->amount < asst_balance) {
             // add change for Asset if any
             pthread_mutex_unlock(&wallet->lock);

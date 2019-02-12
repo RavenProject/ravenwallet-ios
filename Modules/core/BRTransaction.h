@@ -110,7 +110,7 @@ extern "C" {
     typedef struct {
         BRAssetScriptType type; // enum type
         char *name; // up to 30 Bytes
-        size_t nameLen; // 1 Byte
+        size_t nameLen; // 4 Byte
         uint64_t amount;     // 8 Bytes
         uint8_t unit;        // 1 Byte
         uint8_t reissuable;  // 1 Byte

@@ -321,8 +321,72 @@ OwnerAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, si
 }
 
 bool
-ReissueAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *reissue) {
-    // right now using the new asset issue function which does the same work.
+ReissueAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *asset) {
+    
+    assert(script != NULL || scriptLen == 0);
+    if (!script || scriptLen == 0 || scriptLen > MAX_SCRIPT_LENGTH) return 0;
+    
+    size_t off = 0, sLen = 0;
+    
+    uint8_t *assetScript;
+    size_t assetScriptLen = scriptLen - 31;
+    uint64_t amount;
+    
+    assetScript = malloc(assetScriptLen);
+    assert(assetScript);
+    
+    memcpy(assetScript, script + 31, assetScriptLen);
+    
+    size_t name_size = (size_t) BRVarInt(&assetScript[off], (off <= (assetScriptLen) ? (assetScriptLen) - off : 0),
+                                         &sLen);
+    off += sLen;
+    
+    if (off <= assetScriptLen) {
+        asset->name = malloc(name_size + 1);
+        memcpy(asset->name, assetScript + off, name_size);
+        asset->nameLen = name_size;
+        off += name_size;
+        
+        *(asset->name + name_size) = '\0';
+        assert(*(asset->name + name_size) == '\0');
+    }
+    
+    amount = (off + sizeof(uint64_t) <= assetScriptLen) ? UInt64GetLE(&assetScript[off]) : 0;
+    asset->amount = amount;
+    off += sizeof(uint64_t);
+    
+    asset->unit = assetScript[off];
+    off += sizeof(uint8_t);
+    
+    asset->reissuable = assetScript[off];
+    off += sizeof(uint8_t);
+    
+    // Check the end of the script
+    if (assetScript[off] == OP_DROP) {
+        asset->hasIPFS = 0;
+        free(assetScript);
+        return true;
+    }
+    
+    asset->hasIPFS = 1;
+    size_t IPFS_length = 34;
+    uint8_t IPFS_hash[IPFS_length];
+    
+    if (off <= assetScriptLen + IPFS_length) {
+        memcpy(&IPFS_hash, assetScript + off, IPFS_length);
+        off += IPFS_length;
+        
+        // Encode IPFS Hash to Base58, give a char array of 46 characters.
+        size_t n = EncodeIPFS(NULL, 0, IPFS_hash, IPFS_length);
+        EncodeIPFS(asset->IPFSHash, n, IPFS_hash, IPFS_length);
+        
+        if (assetScript[off] != OP_DROP) {
+            free(assetScript);
+            return false;
+        }
+    }
+    
+    free(assetScript);
     return true;
 }
 
@@ -411,7 +475,7 @@ bool GetAssetData(const uint8_t *script, size_t scriptLen, BRAsset *data) {
         return OwnerAssetFromScriptPubKey(addr.s, sizeof(addr), script, scriptLen, data);
     } else if (IsScriptReissueAsset(script, scriptLen)) {
         data->type = REISSUE;
-        return NewAssetFromScriptPubKey(addr.s, sizeof(addr), script, scriptLen, data);
+        return ReissueAssetFromScriptPubKey(addr.s, sizeof(addr), script, scriptLen, data);
     }
     
     return false;
@@ -650,7 +714,6 @@ size_t BRTxOutputSetTransferOwnerAssetScript(uint8_t *script, size_t scriptLen, 
 // TODO: Test Test, remove this, please don't forget (cry)
 size_t BRTxOutputSetTransferOwnerAssetScriptWithoutTag(uint8_t *script, size_t scriptLen, BRAsset *asset) {
     
-    
     size_t off = 25;
     
     assert(script != NULL || scriptLen == 0);
@@ -707,6 +770,10 @@ void AssetFree(BRAsset *asset) {
         if(asset->name) free(asset->name); // Check allocation problem for freeing
         free(asset);
     }
+}
+
+void showAsset(BRAsset* asset){
+    printf("/nBMEX asset: Name %s, amount %llu\n", asset->name, asset->amount);
 }
 
 void CopyAsset(BRAsset *asst, BRTransaction *tx) {

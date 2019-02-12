@@ -234,8 +234,10 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             if case .playGif(let gifName) = trigger {
                 let logoGif = UIImage.gifImageWithName(name: gifName)
                 let imageView = UIImageView(image: logoGif)
+                imageView.backgroundColor = UIColor.black
                 imageView.frame = CGRect(x: 0, y: 0, width: self!.view.frame.size.width, height: self!.view.frame.size.height)
-                imageView.alpha = 1.0
+                imageView.contentMode = UIView.ContentMode.scaleAspectFit
+                imageView.alpha = 0.0
                 self!.view.addSubview(imageView)
                 imageView.fadeIn(0.5, delay: 0.0, completion: { _ in
                     imageView.fadeOut(0.5, delay: 6.1, completion: { _ in

@@ -91,8 +91,7 @@ class Sender {
             DispatchQueue.walletQueue.async {
                 if self.walletManager.signTransaction(tx, forkId: (self.currency as! Raven).forkId, pin: pin) {
                     self.publish(completion: completion)
-                }
-                else {
+                } else {
                     DispatchQueue.main.async {
                         completion(.creationError("authentication error"))
                     }

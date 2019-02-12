@@ -21,18 +21,21 @@
 #define ASSET_ACTIVATION        435456
 #endif
 
-#define OWNER_TAG "!"
-#define OWNER_LENGTH 1
-#define OWNER_UNITS 0
-#define MIN_ASSET_LENGTH 3
-#define OWNER_ASSET_AMOUNT 1 * COIN
+#define OWNER_TAG               "!"
+#define OWNER_LENGTH            1
+#define OWNER_UNITS             0
+#define MIN_ASSET_LENGTH        3
+#define OWNER_ASSET_AMOUNT      1 * COIN
 
-#define SUB_ASST_SEPARATOR "/"
-#define UNIQUE_ASST_SEPARATOR "#"
+#define SUB_ASST_SEPARATOR      "/"
+#define UNIQUE_ASST_SEPARATOR   "#"
 
-#define ASSET_TRANSFER_STRING "transfer_asset"
-#define ASSET_NEW_STRING "new_asset"
-#define ASSET_REISSUE_STRING "reissue_asset"
+#define ASSET_TRANSFER_STRING   "transfer_asset"
+#define ASSET_NEW_STRING        "new_asset"
+#define ASSET_REISSUE_STRING    "reissue_asset"
+
+#define IPFS_SHA2_256           0x12
+#define IPFS_SHA2_256_LEN       0x20
 
 const char *GetAssetScriptType(BRAssetScriptType type);
 const char *GetAssetType(BRAssetType type);
@@ -59,7 +62,7 @@ bool NewAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script,
 bool OwnerAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen, BRAsset *asset);
 
 bool ReissueAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script, size_t scriptLen,
-                                  BRAsset *reissue);
+                                  BRAsset *asset);
 
 bool CheckIssueBurnTx(const BRTxOutput *txOut);
 
@@ -113,6 +116,8 @@ BRAsset *NewAsset(void);
 void AssetFree(BRAsset *asset);
 
 char *PrintAsset(BRAsset asset);
+
+void showAsset(BRAsset* asset);
 
 void CopyAsset(BRAsset *asst, BRTransaction *tx);
 

@@ -52,6 +52,7 @@ class WalletCoordinator : Subscriber, Trackable {
                 Store.perform(action: WalletChange(currency).setIsRescanning(true))
                 DispatchQueue.walletQueue.async {
                     self.walletManagers[currency.code]?.peerManager?.rescan()
+                    self.walletManagers[currency.code]?.lastBlockHeight = 0
                 }
             })
         }
