@@ -200,7 +200,7 @@ bool NewAssetFromScriptPubKey(char *addr, size_t addrLen, const uint8_t *script,
     off += sizeof(uint8_t);
     
     // Check the end of the script
-    if (asset->hasIPFS == '0' || assetScript[off] == OP_DROP) {
+    if (asset->hasIPFS == 0 || assetScript[off] == OP_DROP) {
         free(assetScript);
         return true;
     }
@@ -497,7 +497,7 @@ size_t BRTxOutputSetNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *a
     
     assert(asset != NULL && asset->type == NEW_ASSET);
     if(!script) {
-        if(asset->hasIPFS == '0')
+        if(asset->hasIPFS == 0)
             return 25 + 6 + 1 + asset->nameLen + sizeof(uint64_t) + 3*sizeof(uint8_t) + 1;
         else
             return 25 + 6 + 1 + asset->nameLen + sizeof(uint64_t) + 3*sizeof(uint8_t) + 1 + IPFS_HASH_LENGTH;
@@ -531,7 +531,7 @@ size_t BRTxOutputSetNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *a
     script[off] = (int) (asset->hasIPFS - '0');
     off += sizeof(uint8_t);
 
-    if(asset->hasIPFS == '1') {
+    if(asset->hasIPFS == 1) {
         size_t n = DecodeIPFS(NULL, 0, asset->IPFSHash);
         uint8_t IPFS_hash[n];
         DecodeIPFS(IPFS_hash, n, asset->IPFSHash);
@@ -588,7 +588,7 @@ size_t BRTxOutputSetReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsse
     
     assert(asset != NULL && asset->type != NEW_ASSET);
     if(!script) {
-        if(asset->hasIPFS == '0')
+        if(asset->hasIPFS == 0)
             return 25 + 6 + 1 + asset->nameLen + sizeof(uint64_t) + 3 * sizeof(uint8_t) + 1;
         else
             return 25 + 6 + 1 + asset->nameLen + sizeof(uint64_t) + 3 * sizeof(uint8_t) + 1 + IPFS_HASH_LENGTH;
@@ -612,13 +612,13 @@ size_t BRTxOutputSetReissueAssetScript(uint8_t *script, size_t scriptLen, BRAsse
     UInt64SetLE(&script[off], asset->amount);
     off += sizeof(uint64_t);
     
-    script[off] = (int) (asset->unit - '0');
+    script[off] = (int) (asset->unit);
     off += sizeof(uint8_t);
     
-    script[off] = (int) (asset->reissuable - '0');
+    script[off] = (int) (asset->reissuable);
     off += sizeof(uint8_t);
     
-    if(asset->hasIPFS == '1') {
+    if(asset->hasIPFS == 1) {
         size_t n = DecodeIPFS(NULL, 0, asset->IPFSHash);
         uint8_t IPFS_hash[n];
         DecodeIPFS(IPFS_hash, n, asset->IPFSHash);
@@ -773,7 +773,7 @@ void AssetFree(BRAsset *asset) {
 }
 
 void showAsset(BRAsset* asset){
-    printf("/nBMEX asset: Name %s, amount %llu\n", asset->name, asset->amount);
+    printf("/nBMEX asset: Name %s, amount %llu unit %d, reissu %d, hasIpfs %d\n ", asset->name, asset->amount, asset->unit, asset->reissuable, asset->hasIPFS);
 }
 
 void CopyAsset(BRAsset *asst, BRTransaction *tx) {
@@ -786,6 +786,6 @@ void CopyAsset(BRAsset *asst, BRTransaction *tx) {
     tx->asset->reissuable = asst->reissuable;
     tx->asset->unit = asst->unit;
     tx->asset->hasIPFS = asst->hasIPFS;
-    if(asst->hasIPFS == '1')
+    if(asst->hasIPFS == 1)
         strcpy(tx->asset->IPFSHash, asst->IPFSHash);
 }

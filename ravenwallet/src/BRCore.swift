@@ -127,9 +127,9 @@ extension BRAsset {
         newAsset.pointee.nameLen = nameLen
         newAsset.pointee.amount = amount.rawValue
         newAsset.pointee.type = type
-        copyAssetPropertyValue(value: String(asset.units), pointer: &newAsset.pointee.unit)
-        copyAssetPropertyValue(value: String(asset.reissubale), pointer: &newAsset.pointee.reissuable)
-        copyAssetPropertyValue(value: String(asset.hasIpfs), pointer: &newAsset.pointee.hasIPFS)
+        newAsset.pointee.unit = asset.units
+        newAsset.pointee.reissuable = asset.reissubale
+        newAsset.pointee.hasIPFS = asset.hasIpfs
         copyAssetPropertyValue(value: asset.ipfsHash, pointer: &newAsset.pointee.IPFSHash)
         return newAsset
     }
