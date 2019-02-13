@@ -54,6 +54,14 @@ enum SearchFilterType {
                         return true
                     }
                 }
+                guard let rvnTx = transaction as? RvnTransaction else {
+                    return false
+                }
+                if let asset = rvnTx.asset {
+                    if asset.pointee.nameString.lowercased().contains(loweredText) {
+                        return true
+                    }
+                }
                 return false
             }
         }
