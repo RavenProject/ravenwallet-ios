@@ -241,7 +241,7 @@ enum S {
     }
     
     enum Asset {
-        static let settingTitle = NSLocalizedString("Asset.settingTitle", value:"Manage Assets Display", comment: "Manage Assets Display title")
+        static let settingTitle = NSLocalizedString("Asset.settingTitle", value:"Asset Display Settings", comment: "Asset Display title")
         static let emptyMessage = NSLocalizedString("Asset.emptyMessage", value:"Your assets will appear here.", comment: "Empty assets list message.")
         static let showTitle = NSLocalizedString("Asset.showTitle", value:"Show", comment: "button show title.")
         static let hideTitle = NSLocalizedString("Asset.hideTitle", value:" Hide ", comment: "button hide title.")
@@ -520,7 +520,7 @@ enum S {
         static let getDataAssetError = NSLocalizedString("Asset.getDataAssetError", value:" %@ Data Not Found", comment: "get data asset Error message")
         static let sendFailure = NSLocalizedString("Alerts.sendFailure", value:"Send failed", comment: "Send failure alert header label (the send failed to happen)")
         static let paperKeySetSubheader = NSLocalizedString("Alerts.paperKeySetSubheader", value:"Awesome!", comment: "Alert Subheader label (playfully positive)")
-        static let sendSuccessSubheader = NSLocalizedString("Alerts.sendSuccessSubheader", value:"Money Sent!", comment: "Send success alert subheader label (e.g. the money was sent)")
+        static let sendSuccessSubheader = NSLocalizedString("Alerts.sendSuccessSubheader", value:"RVN Sent!", comment: "Send success alert subheader label (e.g. the money was sent)")
         static let sendAssetSuccessSubheader = NSLocalizedString("Alerts.sendAssetSuccessSubheader", value:"Asset Transferred!", comment: "Send asset success alert subheader label (e.g. the money was sent)")
         static let burnAssetSuccessSubheader = NSLocalizedString("Alerts.burnAssetSuccessSubheader", value:"Asset Burnt!", comment: "Burn asset success alert subheader label (e.g. the money was sent)")
         static let reissueAssetSuccessSubheader = NSLocalizedString("Alerts.reissueAssetSuccessSubheader", value:"Reissue success!", comment: "Reissue asset success alert subheader label")
@@ -528,7 +528,7 @@ enum S {
         static let assetAppearance = NSLocalizedString("Alerts.assetAppearance", value:"\nAsset will appear after one confirmation.", comment: "Asset will appear after one confirmation")
         static let copiedAddressesHeader = NSLocalizedString("Alerts.copiedAddressesHeader", value:"Addresses Copied", comment: "'the addresses were copied'' Alert title")
         static let copiedAddressesSubheader = NSLocalizedString("Alerts.copiedAddressesSubheader", value:"All wallet addresses successfully copied.", comment: "Addresses Copied Alert sub header")
-        static let addressAdded = NSLocalizedString("Alerts.addressAdded", value:"Addresses Added", comment: "'the addresses were added'' Alert title")
+        static let addressAdded = NSLocalizedString("Alerts.addressAdded", value:"Address Added", comment: "'the addresses were added'' Alert title")
         static let addressDeleted = NSLocalizedString("Alerts.addressDeleted", value:"Addresses Deleted", comment: "'the addresses were deleted'' Alert title")
         static let addressUpdated = NSLocalizedString("Alerts.addressUpdated", value:"Addresses Updated", comment: "'the addresses were updated'' Alert title")
         enum BurnAsset {

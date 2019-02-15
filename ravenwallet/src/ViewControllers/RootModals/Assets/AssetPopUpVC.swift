@@ -154,11 +154,18 @@ class AssetPopUpVC : UIViewController, Subscriber {
         }
         ipfs.tap = { [weak self] in
             DispatchQueue.main.async {
-                let browser = BRBrowserViewController()
-                let ipfsUrl = C.ipfsHost + (self?.asset.ipfsHash)!
-                let req = URLRequest(url: URL.init(string: ipfsUrl)!)
-                browser.load(req)
-                self?.present(browser, animated: true, completion: nil)
+                let ipfsUrlString = C.ipfsHost + (self?.asset.ipfsHash)!
+                let ipfsUrl = URL.init(string: ipfsUrlString)
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(ipfsUrl!, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(ipfsUrl!)
+                }
+                //Internal browser
+                //let browser = BRBrowserViewController()
+                //let req = URLRequest(url: ipfsUrl!)
+                //browser.load(req)
+                //self?.present(browser, animated: true, completion: nil)
             }
         }
         

@@ -213,7 +213,6 @@ class ModalPresenter : Subscriber, Trackable {
         supportCenter.modalPresentationStyle = .overFullScreen
         supportCenter.modalPresentationCapturesStatusBarAppearance = true
 
-//        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
         let url = articleId == nil ? "/support?" : "/support/\(articleId!)"
 
         supportCenter.navigate(to: url)

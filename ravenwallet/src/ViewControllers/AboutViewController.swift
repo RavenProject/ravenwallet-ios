@@ -93,7 +93,7 @@ class AboutViewController : UIViewController {
             myself.presentURL(string: "https://reddit.com/r/ravencoin/")
         }
         privacy.tap = strongify(self) { myself in
-            myself.presentURL(string: "http://ravenwallet.org/support/privacy.html")
+            myself.presentURL(string: "https://ravencoin.org/mobilewallet/support/privacy.html")
         }
     }
 

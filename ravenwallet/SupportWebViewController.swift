@@ -10,11 +10,11 @@ import WebKit
 
 class SupportWebViewController: UIViewController, WKNavigationDelegate {
     var webView = WKWebView()
-    var url = URL(string: "http://ravenwallet.org/support")
+    var url = URL(string: "https://ravencoin.org/mobilewallet/support")
     private let close = UIImageView(image: #imageLiteral(resourceName: "WebClose"))
     
     func navigate(to: String) {
-        url = URL(string: "http://ravenwallet.org/\(to)")!
+        url = URL(string: "https://ravencoin.org/mobilewallet/\(to)")!
         webView.load(URLRequest(url: url!))
     }
     

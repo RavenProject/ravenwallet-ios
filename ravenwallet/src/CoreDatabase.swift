@@ -316,6 +316,32 @@ class CoreDatabase {
         }
     }
     
+    func rejectAssetTx(_ assetRef: BRAssetRef) {
+        queue.async {
+            var assetName = assetRef.pointee.nameString
+            if (AssetValidator.shared.IsAssetNameAnOwner(name: assetName)) {
+                assetName = String(assetName.dropLast())
+            }
+            let (isExiste, asset) = self.isAssetExiste(assetName: assetName)
+            if isExiste {
+                var req = ""
+                var amount = (asset?.amount.rawValue)!
+                amount = amount + assetRef.pointee.amount
+                req = String(format: "update ZBRAsset set Z_AMOUNT = '%@' where Z_NAME = '%@'", String(amount), assetName)
+                var sql: OpaquePointer? = nil
+                sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
+                defer { sqlite3_finalize(sql) }
+                guard sqlite3_step(sql) == SQLITE_DONE else {
+                    print(String(cString: sqlite3_errmsg(self.db)))
+                    return
+                }
+                //commit querys
+                sqlite3_exec(self.db, "commit", nil, nil, nil)
+                self.setDBFileAttributes()
+            }
+        }
+    }
+    
     func updateAssetData(_ assetRef: BRAssetRef) {
         queue.async {
             //add asset
@@ -609,7 +635,7 @@ class CoreDatabase {
                 print("BMEX database loadTransactions error")
                 print(String(cString: sqlite3_errmsg(self.db)))
             }
-
+            
             DispatchQueue.main.async {
                 callback(transactions)
             }
@@ -728,17 +754,17 @@ class CoreDatabase {
     }
     
     func getAssetsCount() {
-            var sql: OpaquePointer? = nil
-            sqlite3_prepare_v2(self.db, "SELECT count() from ZBRAsset", -1, &sql, nil)
-            defer { sqlite3_finalize(sql) }
-            
-            while sqlite3_step(sql) == SQLITE_ROW {
-                self.assetsCount = Int(sqlite3_column_int(sql, 0))
-            }
-            
-            if sqlite3_errcode(self.db) != SQLITE_DONE {
-                print(String(cString: sqlite3_errmsg(self.db)))
-            }
+        var sql: OpaquePointer? = nil
+        sqlite3_prepare_v2(self.db, "SELECT count() from ZBRAsset", -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        while sqlite3_step(sql) == SQLITE_ROW {
+            self.assetsCount = Int(sqlite3_column_int(sql, 0))
+        }
+        
+        if sqlite3_errcode(self.db) != SQLITE_DONE {
+            print(String(cString: sqlite3_errmsg(self.db)))
+        }
     }
     
     func updateSortAsset(_ newValue: Asset, where idOldValue:Int, callback: ((Bool)->Void)? = nil)

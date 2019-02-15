@@ -67,7 +67,7 @@ class WalletManager {
         db?.loadTransactions { txns in
             guard self.masterPubKey != BRMasterPubKey() else {
                 #if !Debug
-                    self.db?.delete()
+                self.db?.delete()
                 #endif
                 return callback(false)
             }
@@ -79,11 +79,11 @@ class WalletManager {
             callback(self.wallet != nil)
         }
     }
-
+    
     func initWallet(transactions: [BRTxRef]) {
         guard self.masterPubKey != BRMasterPubKey() else {
             #if !Debug
-                self.db?.delete()
+            self.db?.delete()
             #endif
             return
         }
@@ -93,13 +93,13 @@ class WalletManager {
             Store.perform(action: WalletChange(self.currency).set(self.currency.state.mutate(receiveAddress: wallet.receiveAddress)))
         }
     }
-
+    
     func initPeerManager(blocks: [BRBlockRef?]) {
         guard let wallet = self.wallet else { return }
         self.peerManager = BRPeerManager(currency: currency, wallet: wallet, earliestKeyTime: earliestKeyTime,
-                                          blocks: blocks, peers: [], listener: self)
+                                         blocks: blocks, peers: [], listener: self)
     }
-
+    
     func initPeerManager(callback: @escaping () -> Void) {
         db?.loadBlocks { [unowned self] blocks in
             self.db?.loadPeers { peers in
@@ -115,19 +115,19 @@ class WalletManager {
         guard self.masterPubKey != BRMasterPubKey() else { return nil }
         return lazyAPIClient
     }
-
+    
     var peerManager: BRPeerManager?
-
+    
     private lazy var lazyAPIClient: BRAPIClient? = {
         guard let wallet = self.wallet else { return nil }
         return BRAPIClient(authenticator: self)
     }()
-
+    
     var wordList: [NSString]? {
         guard let path = Bundle.main.path(forResource: "BIP39Words", ofType: "plist") else { return nil }
         return NSArray(contentsOfFile: path) as? [NSString]
     }
-
+    
     lazy var allWordsLists: [[NSString]] = {
         var array: [[NSString]] = []
         Bundle.main.localizations.forEach { lang in
@@ -139,7 +139,7 @@ class WalletManager {
         }
         return array
     }()
-
+    
     lazy var allWords: Set<String> = {
         var set: Set<String> = Set()
         Bundle.main.localizations.forEach { lang in
@@ -151,12 +151,12 @@ class WalletManager {
         }
         return set
     }()
-
+    
     var rawWordList: [UnsafePointer<CChar>?]? {
         guard let wordList = wordList, wordList.count == 2048 else { return nil }
         return wordList.map({ $0.utf8String })
     }
-
+    
     init(currency: CurrencyDef, masterPubKey: BRMasterPubKey, earliestKeyTime: TimeInterval, dbPath: String? = nil) throws {
         self.currency = currency
         self.masterPubKey = masterPubKey
@@ -167,7 +167,7 @@ class WalletManager {
             self.db = CoreDatabase()
         }
     }
-
+    
     func isPhraseValid(_ phrase: String) -> Bool {
         for wordList in allWordsLists {
             var words = wordList.map({ $0.utf8String })
@@ -179,11 +179,11 @@ class WalletManager {
         }
         return false
     }
-
+    
     func isWordValid(_ word: String) -> Bool {
         return allWords.contains(word)
     }
-
+    
     var isWatchOnly: Bool {
         let mpkData = Data(masterPubKey: masterPubKey)
         return mpkData.count == 0
@@ -202,7 +202,7 @@ class WalletManager {
 }
 
 extension WalletManager : BRPeerManagerListener, Trackable {
-
+    
     func syncStarted() {
         DispatchQueue.main.async() {
             self.db?.setDBFileAttributes()
@@ -210,7 +210,7 @@ extension WalletManager : BRPeerManagerListener, Trackable {
             Store.perform(action: WalletChange(self.currency).setSyncingState(.syncing))
         }
     }
-
+    
     func syncStopped(_ error: BRPeerManagerError?) {
         DispatchQueue.main.async() {
             if UIApplication.shared.applicationState != .active {
@@ -219,10 +219,10 @@ extension WalletManager : BRPeerManagerListener, Trackable {
                 }
                 return
             }
-
+            
             switch error {
             case .some(let .posixError(errorCode, description)):
-
+                
                 Store.perform(action: WalletChange(self.currency).setSyncingState(.connecting))
                 self.saveEvent("event.syncErrorMessage", attributes: ["message": "\(description) (\(errorCode))"])
                 if self.retryTimer == nil && self.networkIsReachable() {
@@ -245,21 +245,21 @@ extension WalletManager : BRPeerManagerListener, Trackable {
             }
         }
     }
-
+    
     func txStatusUpdate() {
         DispatchQueue.main.async { [weak self] in
             self?.requestTxUpdate()
         }
     }
-
+    
     func saveBlocks(_ replace: Bool, _ blocks: [BRBlockRef?]) {
         db?.saveBlocks(replace, blocks)
     }
-
+    
     func savePeers(_ replace: Bool, _ peers: [BRPeer]) {
         db?.savePeers(replace, peers)
     }
-
+    
     func networkIsReachable() -> Bool {
         var flags: SCNetworkReachabilityFlags = []
         var zeroAddress = sockaddr()
@@ -269,7 +269,7 @@ extension WalletManager : BRPeerManagerListener, Trackable {
         if !SCNetworkReachabilityGetFlags(reachability, &flags) { return false }
         return flags.contains(.reachable) && !flags.contains(.connectionRequired)
     }
-
+    
     @objc private func updateProgress() {
         DispatchQueue.walletQueue.async {
             guard let progress = self.peerManager?.syncProgress(fromStartHeight: self.lastBlockHeight), let timestamp = self.peerManager?.lastBlockTimestamp else { return }
@@ -292,7 +292,7 @@ extension WalletManager : BRWalletListener {
             myself.requestTxUpdate()
         }
     }
-
+    
     func txAdded(_ tx: BRTxRef) {
         db?.txAdded(tx)
         //add asset if not null
@@ -332,11 +332,9 @@ extension WalletManager : BRWalletListener {
             })
         }
     }
-
+    
     func txUpdated(_ txHashes: [UInt256], blockHeight: UInt32, timestamp: UInt32) {
         db?.txUpdated(txHashes, blockHeight: blockHeight, timestamp: timestamp)
-        //BMEX write new asset confirmed
-        //db?.loadTransactions(callback: { transactions in
         let transactions = self.wallet?.transactions
         for tx in transactions! {
             if(txHashes.contains((tx?.pointee.txHash)!)){
@@ -349,10 +347,22 @@ extension WalletManager : BRWalletListener {
                 }
             }
         }
-    //})
     }
-
+    
     func txDeleted(_ txHash: UInt256, notifyUser: Bool, recommendRescan: Bool) {
+        //verify asset
+        db?.loadTransactions(callback: { transactions in
+            for tx in transactions {
+                if(txHash == tx?.pointee.txHash){
+                    if AssetValidator.shared.checkInvalidAsset(asset: tx!.pointee.asset) {
+                        if(tx!.pointee.asset!.pointee.type == TRANSFER){
+                            self.db?.rejectAssetTx(tx!.pointee.asset)
+                        }
+                    }
+                }
+            }
+        })
+        // notify User to recommendScan
         if notifyUser {
             if recommendRescan {
                 DispatchQueue.main.async { [weak self] in
@@ -363,9 +373,10 @@ extension WalletManager : BRWalletListener {
         DispatchQueue.main.async { [weak self] in
             self?.requestTxUpdate()
         }
+        //remove tx
         db?.txDeleted(txHash, notifyUser: notifyUser, recommendRescan: true)
     }
-
+    
     private func checkForReceived(newBalance: UInt64) {
         if let oldBalance = currency.state.balance {
             if newBalance > oldBalance {
@@ -377,7 +388,7 @@ extension WalletManager : BRWalletListener {
             }
         }
     }
-
+    
     private func showReceived(amount: UInt64) {
         if let rate = currency.state.currentRate {
             let maxDigits = currency.state.maxDigits
@@ -390,13 +401,13 @@ extension WalletManager : BRWalletListener {
             ping()
         }
     }
-
+    
     private func requestTxUpdate() {
         if updateTimer == nil {
             updateTimer = Timer.scheduledTimer(timeInterval: updateDebounceInterval, target: self, selector: #selector(updateTransactions), userInfo: nil, repeats: false)
         }
     }
-
+    
     @objc private func updateTransactions() {
         updateTimer?.invalidate()
         updateTimer = nil
@@ -404,7 +415,7 @@ extension WalletManager : BRWalletListener {
             guard let myself = self else { return }
             guard let txRefs = myself.wallet?.transactions else { return }
             let transactions = myself.makeTransactionViewModels(transactions: txRefs,
-                                                              rate: myself.currency.state.currentRate)
+                                                                rate: myself.currency.state.currentRate)
             if transactions.count > 0 {
                 DispatchQueue.main.async {
                     Store.perform(action: WalletChange(myself.currency).setTransactions(transactions))
@@ -412,7 +423,7 @@ extension WalletManager : BRWalletListener {
             }
         }
     }
-
+    
     func makeTransactionViewModels(transactions: [BRTxRef?], rate: Rate?) -> [Transaction] {
         let decomposedList = decomposeTransactionsList(transactions: transactions)
         return decomposedList.compactMap{ $0 }.sorted {
@@ -428,9 +439,9 @@ extension WalletManager : BRWalletListener {
         }
     }
     
-//    var outputs: [BRTxOutput] {
-//        return [BRTxOutput](UnsafeBufferPointer(start: self.pointee.outputs, count: self.pointee.outCount))
-//    }
+    //    var outputs: [BRTxOutput] {
+    //        return [BRTxOutput](UnsafeBufferPointer(start: self.pointee.outputs, count: self.pointee.outCount))
+    //    }
     
     func decomposeTransaction(brTxRef:BRTxRef?) -> [BRTxRef?] {
         var decomposedTransactions: [BRTxRef?] = [BRTxRef?]()
@@ -472,7 +483,7 @@ extension WalletManager : BRWalletListener {
         }
         return decomposedTransactionsList
     }
-
+    
     private func ping() {
         guard let url = Bundle.main.url(forResource: "coinflip", withExtension: "aiff") else { return }
         var id: SystemSoundID = 0
@@ -482,7 +493,7 @@ extension WalletManager : BRWalletListener {
         }, nil)
         AudioServicesPlaySystemSound(id)
     }
-
+    
     private func showLocalNotification(message: String) {
         guard UIApplication.shared.applicationState == .background || UIApplication.shared.applicationState == .inactive else { return }
         guard Store.state.isPushNotificationsEnabled else { return }
