@@ -282,6 +282,13 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
             }
         }
         
+        unitsCell.didUpdateAmount = { amount in
+            guard amount != nil else {
+                self.unitsCell.amount = Satoshis.zero
+                return
+            }
+        }
+        
         unitsCell.didReturn = { [weak self] in
             self?.parentView?.frame = self!.origineParentFrame!
         }

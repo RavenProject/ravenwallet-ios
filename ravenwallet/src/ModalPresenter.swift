@@ -374,7 +374,7 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash + S.Alerts.assetAppearance, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
                 Store.trigger(name: .lightWeightAlert(S.Receive.copied))
                 UIPasteboard.general.string = txHash
             })
@@ -411,7 +411,7 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash + S.Alerts.assetAppearance, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
                 Store.trigger(name: .lightWeightAlert(S.Receive.copied))
                 UIPasteboard.general.string = txHash
             })
@@ -449,7 +449,7 @@ class ModalPresenter : Subscriber, Trackable {
         }
         createAssetVC.onPublishSuccess = { txHash in
             let qrImage = UIImage.qrCode(data: txHash.data(using: .utf8)!, color: CIColor(color: .black))?.resize(CGSize(width: 186, height: 186))!
-            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
+            self.topViewController?.showImageAlert(title: S.Alerts.createSuccess, message: S.Alerts.createSuccessSubheader + txHash + S.Alerts.assetAppearance, image: qrImage!, buttonLabel: S.Button.copy, callback: { _ in
                 Store.trigger(name: .lightWeightAlert(S.Receive.copied))
                 UIPasteboard.general.string = txHash
             })
@@ -485,7 +485,7 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         manageOwnedAssetVC.onPublishSuccess = { [weak self] in
-            self?.presentAlert(.sendSuccess, completion: {})
+            self?.presentAlert(.reissueAssetSuccess, completion: {})
         }
         return root
     }

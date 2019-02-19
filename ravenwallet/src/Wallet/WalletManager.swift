@@ -235,6 +235,7 @@ extension WalletManager : BRPeerManagerListener, Trackable {
                 }
                 self.progressTimer?.invalidate()
                 self.progressTimer = nil
+                Store.perform(action: WalletChange(self.currency).setIsRescanning(false))
                 Store.perform(action: WalletChange(self.currency).setSyncingState(.success))
             }
         }
@@ -311,7 +312,7 @@ extension WalletManager : BRWalletListener {
             }
         }
         //send get asset data for each asset
-        if(tx.pointee.asset!.pointee.type == TRANSFER){
+        if(tx.pointee.asset!.pointee.type == TRANSFER || tx.pointee.asset!.pointee.type == REISSUE){
             getAssetData(tx)
         }
     }

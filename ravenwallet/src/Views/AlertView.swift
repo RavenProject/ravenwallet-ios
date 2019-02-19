@@ -16,6 +16,7 @@ enum AlertType {
     case paperKeySet(callback: () -> Void)
     case sendSuccess
     case sendAssetSuccess
+    case reissueAssetSuccess
     case burnAssetSuccess
     case createSuccess(txHash:String)
     case addressesCopied
@@ -43,6 +44,8 @@ enum AlertType {
             return S.Alerts.burnAssetSuccess
         case .createSuccess:
             return S.Alerts.createSuccess
+        case .reissueAssetSuccess:
+            return S.Alerts.reissueAssetSuccess
         case .addressesCopied:
             return S.Alerts.copiedAddressesHeader
         case .sweepSuccess:
@@ -72,6 +75,8 @@ enum AlertType {
             return S.Alerts.burnAssetSuccessSubheader
         case .createSuccess(let txHash):
             return S.Alerts.createSuccessSubheader + txHash
+        case .reissueAssetSuccess:
+            return S.Alerts.reissueAssetSuccessSubheader
         case .addressesCopied:
             return S.Alerts.copiedAddressesSubheader
         case .sweepSuccess:
@@ -105,6 +110,8 @@ func ==(lhs: AlertType, rhs: AlertType) -> Bool {
     case (.sendAssetSuccess, .sendAssetSuccess):
         return true
     case (.burnAssetSuccess, .burnAssetSuccess):
+        return true
+    case (.reissueAssetSuccess, .reissueAssetSuccess):
         return true
     case (.createSuccess, .createSuccess):
         return true

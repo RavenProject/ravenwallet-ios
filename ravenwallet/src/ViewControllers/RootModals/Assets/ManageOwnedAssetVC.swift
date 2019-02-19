@@ -43,6 +43,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
     }
 
     private var asset: Asset
+    private var qtAmountAsset: Satoshis? = nil
     private let sender: SenderAsset
     private let walletManager: WalletManager
     private let addressCell: AddressCreateAssetCell
@@ -145,6 +146,8 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         self.unitsCell.amount = Satoshis(UInt64(self.asset.units) * C.satoshis)
         //reissuable is true by default
         reissubaleCell.btnCheckBox.isSelected = true
+        //get Asset Data
+        getAssetData(assetName: asset.name)
     }
     
     private func addSubscriptions() {
@@ -216,6 +219,10 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         }
         
         unitsCell.didUpdateAmount = { amount in
+            guard amount != nil else {
+                self.unitsCell.amount = Satoshis.zero
+                return
+            }
             guard (Int(exactly: amount!.rawValue / 100000000)! >= self.asset.units) else {
                 self.unitsCell.amount = Satoshis(UInt64(self.asset.units) * C.satoshis)
                 return self.showAlert(title: S.Alert.error, message: String(format: S.Asset.errorUnitsValue, self.asset.units), buttonLabel: S.Button.ok)
@@ -229,6 +236,16 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         //initiate feeview balance
         feeView.balance = self.balance
 
+    }
+    
+    func getAssetData(assetName:String) {
+        let asssetNamePointer = UnsafeMutablePointer<Int8>(mutating: (assetName as NSString).utf8String)
+        PeerManagerGetAssetData(self.walletManager.peerManager?.cPtr, Unmanaged.passUnretained(self).toOpaque(), asssetNamePointer, assetName.count, {(info, assetRef) in
+            guard let info = info else { return }
+            guard assetRef != nil else { return }
+            let mySelf = Unmanaged<ManageOwnedAssetVC>.fromOpaque(info).takeUnretainedValue()
+            mySelf.qtAmountAsset = Satoshis.init((assetRef?.pointee.amount)!)
+        })
     }
 
     @objc private func pasteTapped(sender: UIButton) {
@@ -309,6 +326,11 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         
         guard amount != Satoshis.zero else {
             return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
+        }
+        
+        let totalAmount = amount.rawValue + (qtAmountAsset != nil ? qtAmountAsset!.rawValue : 0)
+        guard totalAmount <= C.maxAsset else {
+            return showAlert(title: S.Alert.error, message: S.Asset.maxQuanityToManage, buttonLabel: S.Button.ok)
         }
         
         //BMEX Todo : manage maxOutputAmount and minOutputAmount

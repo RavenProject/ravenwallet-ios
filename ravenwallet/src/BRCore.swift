@@ -561,7 +561,7 @@ class BRWallet {
     }
     
     func createTxForRootAssetManage(forAmount: UInt64, toAddress: String, asset:BRAssetRef) -> BRTxRef? {
-        return BRWalletCreateTxForRootAssetManage(cPtr, forAmount, toAddress, asset)
+        return BRWalletCreateTxForAssetsReissue(cPtr, forAmount, toAddress, asset)
     }
     
     func burnAssetTransaction(asset:BRAssetRef) -> BRTxRef? {

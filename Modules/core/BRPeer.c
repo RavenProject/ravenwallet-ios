@@ -338,6 +338,8 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
             }
         }
         
+        // TODO: parse Block Height, if hasn't IPFS make sure to ignore the 00 size of IPFH Hash.
+        
             ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
     }
     
@@ -1606,8 +1608,8 @@ void BRPeerFree(BRPeer *peer) {
     if (ctx->knownBlockHashes) array_free(ctx->knownBlockHashes);
     if (ctx->knownTxHashes) array_free(ctx->knownTxHashes);
     if (ctx->knownTxHashSet) BRSetFree(ctx->knownTxHashSet);
-    if (ctx->pongCallback) array_free(ctx->pongCallback);
     if (ctx->pongInfo) array_free(ctx->pongInfo);
+    if (ctx->pongCallback) array_free(ctx->pongCallback);
     free(ctx);
 }
 

@@ -54,7 +54,7 @@ extension Satoshis {
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
         let number = NSDecimalNumber(decimal: amount)
-        guard let string = satoshiFormat(minimumFractionDigits: minimumFractionDigits).string(from: number) else { return "" }
+        guard let string = number == NSDecimalNumber(decimal: 0.0) ? "0" : satoshiFormat(minimumFractionDigits: minimumFractionDigits).string(from: number) else { return "" }
         return string
     }
     
