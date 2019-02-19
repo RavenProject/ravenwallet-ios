@@ -8,13 +8,20 @@
 
 import UIKit
 
+private let countToShowMore:Int = 3
+
 class AssetListTableView: UITableViewController, Subscriber {
 
     var didSelectCurrency: ((CurrencyDef) -> Void)?
+    var didSelectAsset: ((Asset) -> Void)?
+    var didSelectShowMoreAsset: (() -> Void)?
     var didTapSecurity: (() -> Void)?
     var didTapSupport: (() -> Void)?
     var didTapSettings: (() -> Void)?
-    
+    var didTapCreateAsset: (() -> Void)?
+    var didTapAddressBook: ((CurrencyDef) -> Void)?
+    var didTapTutorial: (() -> Void)?
+
     // MARK: - Init
     
     init() {
@@ -24,10 +31,14 @@ class AssetListTableView: UITableViewController, Subscriber {
     override func viewDidLoad() {
         tableView.backgroundColor = .whiteBackground
         tableView.register(HomeScreenCell.self, forCellReuseIdentifier: HomeScreenCell.cellIdentifier)
+        tableView.register(AssetHomeCell.self, forCellReuseIdentifier: AssetHomeCell.cellIdentifier)
+        tableView.register(ShowMoreCell.self, forCellReuseIdentifier: ShowMoreCell.cellIdentifier)
+        
         tableView.register(MenuCell.self, forCellReuseIdentifier: MenuCell.cellIdentifier)
         tableView.separatorStyle = .none
         
         tableView.reloadData()
+        
         
         Store.subscribe(self, selector: {
             var result = false
@@ -44,6 +55,15 @@ class AssetListTableView: UITableViewController, Subscriber {
         }, callback: { _ in
             self.tableView.reloadData()
         })
+        //BMEX detect transactions changes
+        Store.subscribe(self, selector: {
+            $0[Store.state.currencies[0]].transactions != $1[Store.state.currencies[0]].transactions
+        },
+                        callback: { state in
+                            AssetManager.shared.loadAsset { assets in
+                                self.reload()
+                            }
+        })
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -52,6 +72,9 @@ class AssetListTableView: UITableViewController, Subscriber {
             if let cell = $0 as? HomeScreenCell {
                 cell.refreshAnimations()
             }
+        }
+        AssetManager.shared.loadAsset { assets in
+            self.reload()
         }
     }
     
@@ -66,39 +89,51 @@ class AssetListTableView: UITableViewController, Subscriber {
     // MARK: - Data Source
     
     enum Section: Int {
-        case assets
+        case wallet
+        case asset
         case menu
     }
     
     enum Menu: Int {
+        case createAsset
         case settings
+        case addressBook
         case security
         case support
-        
+        case tutorial
+
         var content: (String, UIImage) {
             switch self {
+            case .createAsset:
+                return (S.MenuButton.createAsset, #imageLiteral(resourceName: "CreateAsset"))
             case .settings:
                 return (S.MenuButton.settings, #imageLiteral(resourceName: "Settings"))
+            case .addressBook:
+                return (S.MenuButton.addressBook, #imageLiteral(resourceName: "AddressBook"))
             case .security:
                 return (S.MenuButton.security, #imageLiteral(resourceName: "Shield"))
             case .support:
                 return (S.MenuButton.support, #imageLiteral(resourceName: "Faq"))
+            case .tutorial:
+                return (S.MenuButton.tutorial, #imageLiteral(resourceName: "Faq"))
             }
         }
         
-        static let allItems: [Menu] = [.settings, .security, .support]
+        static let allItems: [Menu] = [ .createAsset, .settings, .security, .support, .addressBook, .tutorial]
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let section = Section(rawValue: section) else { return 0 }
         
         switch section {
-        case .assets:
+        case .wallet:
             return Store.state.wallets.count
+        case .asset:
+            return AssetManager.shared.showedAssetList.count > 3 ? 4 : AssetManager.shared.showedAssetList.count
         case .menu:
             return Menu.allItems.count
         }
@@ -108,8 +143,10 @@ class AssetListTableView: UITableViewController, Subscriber {
         guard let section = Section(rawValue: indexPath.section) else { return 0 }
 
         switch section {
-        case .assets:
-            return 85.0
+        case .wallet:
+            return E.isIPhoneXOrLater ? 260.0 : 260.0
+        case .asset:
+            return 60.0
         case .menu:
             return 53.0
         }
@@ -119,14 +156,25 @@ class AssetListTableView: UITableViewController, Subscriber {
         guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
         
         switch section {
-        case .assets:
+        case .wallet:
             let currency = Store.state.currencies[indexPath.row]
-            let viewModel = AssetListViewModel(currency: currency)
-            
+            let viewModel = WalletListViewModel(currency: currency)
             let cell = tableView.dequeueReusableCell(withIdentifier: HomeScreenCell.cellIdentifier, for: indexPath) as! HomeScreenCell
             cell.set(viewModel: viewModel)
             return cell
             
+        case .asset:
+            if (indexPath.row == countToShowMore)
+            {
+                let cell = tableView.dequeueReusableCell(withIdentifier: ShowMoreCell.cellIdentifier, for: indexPath) as! ShowMoreCell
+                return cell
+            }else {
+                let asset = AssetManager.shared.showedAssetList[indexPath.row]
+                let viewModel = AssetListViewModel(asset: asset)
+                let cell = tableView.dequeueReusableCell(withIdentifier: AssetHomeCell.cellIdentifier, for: indexPath) as! AssetHomeCell
+                cell.set(viewModel: viewModel)
+                return cell
+            }
         case .menu:
             let cell = tableView.dequeueReusableCell(withIdentifier: MenuCell.cellIdentifier, for: indexPath) as! MenuCell
             guard let item = Menu(rawValue: indexPath.row) else { return cell }
@@ -135,15 +183,29 @@ class AssetListTableView: UITableViewController, Subscriber {
             return cell
         }
     }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard let section = Section(rawValue: section) else { return C.padding[2] }
+        switch section {
+        case .wallet:
+            return 0
+        case .asset:
+            return AssetManager.shared.showedAssetList.count == 0 ? 0 : C.padding[1]
+        case .menu:
+            return C.padding[1]
+        }
+    }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let section = Section(rawValue: section) else { return nil }
-
         switch section {
-        case .assets:
+        case .wallet:
             return S.HomeScreen.portfolio
+        case .asset:
+            return S.HomeScreen.asset
         case .menu:
             return S.HomeScreen.admin
+        
         }
     }
     
@@ -162,18 +224,33 @@ class AssetListTableView: UITableViewController, Subscriber {
         guard let section = Section(rawValue: indexPath.section) else { return }
         
         switch section {
-        case .assets:
+        case .wallet:
             didSelectCurrency?(Store.state.currencies[indexPath.row])
+        case .asset:
+            if (indexPath.row == countToShowMore)
+            {
+                didSelectShowMoreAsset?()
+            }else {
+                didSelectAsset?(AssetManager.shared.showedAssetList[indexPath.row])
+            }
         case .menu:
             guard let item = Menu(rawValue: indexPath.row) else { return }
             switch item {
+            case .createAsset:
+                didTapCreateAsset?()
             case .settings:
                 didTapSettings?()
             case .security:
                 didTapSecurity?()
             case .support:
                 didTapSupport?()
+            case .addressBook:
+                didTapAddressBook?(Store.state.currencies[0])
+            case .tutorial:
+                didTapTutorial?()
             }
+            
+        
         }
     }
 }

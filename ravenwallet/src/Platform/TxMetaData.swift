@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 import Foundation
-import BRCore
+import Core
 
 // MARK: - Txn Metadata
 

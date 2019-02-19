@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import BRCore
+import Core
 import UIKit
 
 // MARK: - Protocols
@@ -119,7 +119,7 @@ struct Currencies {
                              colors: (UIColor(red: 46.0/255.0, green: 62.0/255.0, blue: 128.0/255.0, alpha: 1.0),
                                       UIColor(red: 34.0/255.0, green: 45.0/255.0, blue: 105.0/255.0, alpha: 1.0)),
                              // TODO change this to new path
-                             dbPath: "BreadWallet.sqlite",
+                             dbPath: "RavenWallet.sqlite",//"BreadWallet.sqlite",
                              forkId: 0,
                              urlScheme: "Raven")
 }

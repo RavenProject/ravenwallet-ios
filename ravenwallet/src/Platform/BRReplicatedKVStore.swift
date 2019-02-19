@@ -26,7 +26,7 @@
 
 import Foundation
 import sqlite3
-import BRCore
+import Core
 
 
 public enum BRReplicatedKVStoreError: Error {

@@ -26,7 +26,7 @@
 import Foundation
 import UIKit
 import LocalAuthentication
-import BRCore
+import Core
 import sqlite3
 
 private let WalletSecAttrService = "com.mediciventures.ravenwallet"
@@ -68,7 +68,7 @@ extension WalletManager : WalletAuthenticator {
             BRBIP39DeriveKey(&seed, seedPhrase, nil)
 //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
+            let mpk = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
             try setKeychainItem(key: KeychainKey.mnemonic, item: seedPhrase, authenticated: true)
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: mpk))
@@ -238,7 +238,7 @@ extension WalletManager : WalletAuthenticator {
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
 //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-            let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/ Int32(type))
+            let mpk = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
             let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
             guard mpkData?.masterPubKey == mpk else { return false }
@@ -342,7 +342,7 @@ extension WalletManager : WalletAuthenticator {
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
 //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-            self.masterPubKey = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, /*Int32(walletType)*/Int32(type))
+            self.masterPubKey = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
             if self.earliestKeyTime < BIP39CreationTime { self.earliestKeyTime = BIP39CreationTime }
             try setKeychainItem(key: KeychainKey.masterPubKey, item: Data(masterPubKey: self.masterPubKey))
@@ -416,7 +416,7 @@ extension WalletManager : WalletAuthenticator {
                 CFStringNormalize(nfkdPhrase, .KD)
                 BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
                 let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-                let mpk = BIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
+                let mpk = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
                 
                 seed = UInt512() // clear seed
                 let mpkData: Data? = try keychainItem(key: KeychainKey.masterPubKey)
@@ -567,10 +567,12 @@ extension WalletManager : WalletAuthenticator {
                 guard let wallet = wallet else { return false }
                 guard let phrase: String = try keychainItem(key: KeychainKey.mnemonic) else { return false }
                 BRBIP39DeriveKey(&seed, phrase, nil)
-                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-                return wallet.signTransaction(tx, forkId: forkId, seed: &seed, type: Int32(type))
+//                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+                return wallet.signTransaction(tx, forkId: forkId, seed: &seed)
             }
-            catch { return false }
+            catch {
+                return false
+            }
         }
     }
 }
@@ -616,7 +618,7 @@ private func setKeychainItem<T>(key: String, item: T?, authenticated: Bool = fal
         case is Data.Type:
             data = item as? Data
         case is String.Type:
-            data = CFStringCreateExternalRepresentation(secureAllocator, item as! CFString,
+            data = CFStringCreateExternalRepresentation(secureAllocator, (item as! CFString),
                                                         CFStringBuiltInEncodings.UTF8.rawValue, 0) as Data
         case is Int64.Type:
             data = CFDataCreateMutable(secureAllocator, MemoryLayout<T>.stride) as Data

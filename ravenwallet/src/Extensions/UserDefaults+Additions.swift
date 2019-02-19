@@ -12,9 +12,12 @@ private let defaults = UserDefaults.standard
 private let isBiometricsEnabledKey = "istouchidenabled"
 private let defaultCurrencyCodeKey = "defaultcurrency"
 private let hasAquiredShareDataPermissionKey = "has_acquired_permission"
+private let hasActivatedExpertModeKey = "has_activated_expert_mode"
 private let legacyWalletNeedsBackupKey = "WALLET_NEEDS_BACKUP"
 private let writePaperPhraseDateKey = "writepaperphrasedatekey"
 private let hasPromptedBiometricsKey = "haspromptedtouched"
+private let hasDismissedPromptKey = "hasDismissedPromptKey"
+private let hasRescannedBlockChainKey = "hasRescannedBlockChain"
 private let isBtcSwappedKey = "isBtcSwappedKey"
 private let maxDigitsKey = "SETTINGS_MAX_DIGITS"
 private let pushTokenKey = "pushTokenKey"
@@ -30,6 +33,7 @@ private let selectedCurrencyCodeKey = "selectedCurrencyCodeKey"
 private let mostRecentSelectedCurrencyCodeKey = "mostRecentSelectedCurrencyCodeKey"
 private let hasSetSelectedCurrencyKey = "hasSetSelectedCurrencyKey"
 private let hasBchConnectedKey = "hasBchConnectedKey"
+private let shouldReloadChartKey = "shouldReloadChartKey"
 
 extension UserDefaults {
 
@@ -56,6 +60,11 @@ extension UserDefaults {
     static var hasAquiredShareDataPermission: Bool {
         get { return defaults.bool(forKey: hasAquiredShareDataPermissionKey) }
         set { defaults.set(newValue, forKey: hasAquiredShareDataPermissionKey) }
+    }
+    
+    static var hasActivatedExpertMode: Bool {
+        get { return defaults.bool(forKey: hasActivatedExpertModeKey) }
+        set { defaults.set(newValue, forKey: hasActivatedExpertModeKey) }
     }
 
     static var isBtcSwapped: Bool {
@@ -132,6 +141,16 @@ extension UserDefaults {
         get { return defaults.bool(forKey: hasPromptedBiometricsKey) }
         set { defaults.set(newValue, forKey: hasPromptedBiometricsKey) }
     }
+    
+    static var hasDismissedPrompt: Bool {
+        get { return defaults.bool(forKey: hasDismissedPromptKey) }
+        set { defaults.set(newValue, forKey: hasDismissedPromptKey) }
+    }
+    
+    static var hasRescannedBlockChain: Bool {
+        get { return defaults.bool(forKey: hasRescannedBlockChainKey) }
+        set { defaults.set(newValue, forKey: hasRescannedBlockChainKey) }
+    }
 
     static var hasShownWelcome: Bool {
         get { return defaults.bool(forKey: hasShownWelcomeKey) }
@@ -152,6 +171,20 @@ extension UserDefaults {
                 defaults.set(data, forKey: feesKey)
             }
         }
+    }
+    
+    private static func lastBlockHeightKey(for currency: CurrencyDef) -> String {
+        return "LastBlockHeightKey-\(currency.code)"
+    }
+    
+    // Returns the stored value for the height of the last block that was successfully sync'd for the given currency.
+    static func lastSyncedBlockHeight(for currency: CurrencyDef) -> UInt32 {
+        return UInt32(UserDefaults.standard.integer(forKey: lastBlockHeightKey(for: currency)))
+    }
+    
+    // Sets the stored value for the height of the last block that was successfully sync'd for the given currency.
+    static func setLastSyncedBlockHeight(height: UInt32, for currency: CurrencyDef) {
+        UserDefaults.standard.set(height, forKey: lastBlockHeightKey(for: currency))
     }
 }
 
@@ -244,5 +277,35 @@ extension UserDefaults {
     static var hasBchConnected: Bool {
         get { return defaults.bool(forKey: hasBchConnectedKey) }
         set { defaults.set(newValue, forKey: hasBchConnectedKey) }
+    }
+}
+
+//MARK: - Chart Data
+extension UserDefaults {
+    
+    static var isChartDrawed:Bool = false
+    
+    static var shouldReloadChart: Bool {
+        get {
+            let lastTimeIntervale = defaults.integer(forKey: shouldReloadChartKey)
+            let lastDate:Date = Date(timeIntervalSince1970: TimeInterval(lastTimeIntervale))
+            let difference = abs(lastDate.timeIntervalSince(Date()))
+            let hoursDiff = Int(difference) / 3600
+            if(hoursDiff > 1)
+            {
+                return true
+            }
+            return false
+        }
+        set { defaults.set(Date().timeIntervalSince1970, forKey: shouldReloadChartKey) }
+    }
+    
+    static func initChartDate()
+    {
+        //BMEX reinit dataChart
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let date = dateFormatter.date(from: "1970-01-01")
+        defaults.set(date, forKey: shouldReloadChartKey)
     }
 }

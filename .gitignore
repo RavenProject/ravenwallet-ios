@@ -70,3 +70,4 @@ ravenwallet/Icon.xcassets/AppIcon-Internal.appiconset
 ravenwallet/Config.plist
 ravenwallet/OnetimeWipeViewController.swift
 ravenwallet/Icon.xcassets/AppIcon-Internal.appiconset/*.png
+MessagesExtension/Info.plist

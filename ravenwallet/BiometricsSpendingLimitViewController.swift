@@ -8,7 +8,7 @@
 
 import UIKit
 import LocalAuthentication
-import BRCore
+import Core
 
 class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
 
@@ -30,7 +30,7 @@ class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
             selectedLimit = walletManager.spendingLimit
         }
         tableView.register(SeparatorCell.self, forCellReuseIdentifier: cellIdentifier)
-        tableView.sectionHeaderHeight = UITableViewAutomaticDimension
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.estimatedSectionHeaderHeight = 50.0
         tableView.backgroundColor = .whiteTint
         tableView.separatorStyle = .none
@@ -78,6 +78,7 @@ class BiometricsSpendingLimitViewController: UITableViewController, Subscriber {
             let check = UIImageView(image: #imageLiteral(resourceName: "CircleCheck").withRenderingMode(.alwaysTemplate))
             check.tintColor = C.defaultTintColor
             cell.accessoryView = check
+            cell.accessoryView?.frame = CGRect.init(x: 0, y: 0, width: 30, height: 30)
         } else {
             cell.accessoryView = nil
         }

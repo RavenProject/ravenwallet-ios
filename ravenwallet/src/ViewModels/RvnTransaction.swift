@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import BRCore
+import Core
 
 /// Wrapper for BTC transaction model + metadata
 struct RvnTransaction: Transaction {
@@ -23,6 +23,7 @@ struct RvnTransaction: Transaction {
     let blockHeight: UInt64
     let confirmations: UInt64
     let isValid: Bool
+    let asset: BRAssetRef?
     
     var hasKvStore: Bool {
         return kvStore != nil
@@ -74,7 +75,7 @@ struct RvnTransaction: Transaction {
         
         // direction
         var direction: TransactionDirection
-        if amountSent > 0 && (amountReceived + fee) == amountSent {
+        if (tx.pointee.asset == nil) && amountSent > 0 && (amountReceived + fee) == amountSent {
             direction = .moved
         } else if amountSent > 0 {
             direction = .sent
@@ -117,9 +118,9 @@ struct RvnTransaction: Transaction {
         
         if isValid {
             switch confirmations {
-            case 0:
+            case C.Blocks.unconfirmed:
                 status = .pending
-            case 1..<6:
+            case C.Blocks.pendingStart..<C.Blocks.pendingEnd:
                 status = .confirmed
             default:
                 status = .complete
@@ -137,6 +138,9 @@ struct RvnTransaction: Transaction {
         } else {
             metaDataContainer = nil
         }
+        
+        //Asset
+        asset = tx.pointee.asset
     }
     
     // MARK: -

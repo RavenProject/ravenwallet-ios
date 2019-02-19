@@ -1,5 +1,5 @@
 //
-//  BRPeer.h
+//  Peer.h
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
@@ -38,7 +38,7 @@
 #define _va_rest(first, ...) __VA_ARGS__
 
 #if defined(TARGET_OS_MAC)
-#include <Foundation/Foundation.h>
+d#include <Foundation/Foundation.h>
 #define _peer_log(...) NSLog(__VA_ARGS__)
 #elif defined(__ANDROID__)
 #include <android/log.h>
@@ -52,19 +52,20 @@
 extern "C" {
 #endif
 
-#if BITCOIN_TESTNET
-#define STANDARD_PORT 18768
+#if TESTNET
+#define STANDARD_PORT 18770
+#elif REGTEST
+#define STANDARD_PORT 18444
 #else
 #define STANDARD_PORT 8767
 #endif
 
 #define SERVICES_NODE_NETWORK 0x01 // services value indicating a node carries full blocks, not just headers
 #define SERVICES_NODE_BLOOM   0x04 // BIP111: https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki
-#define SERVICES_NODE_BCASH   0x20 // https://github.com/Bitcoin-UAHF/spec/blob/master/uahf-technical-spec.md
-    
-#define BR_VERSION "0.6.2"
-#define USER_AGENT "/rvnwallet:" BR_VERSION "/"
 
+#define VERSION "0.1.0"
+#define USER_AGENT "/rvnwallet:" VERSION "/"
+        
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification
 #define MSG_VERSION     "version"
 #define MSG_VERACK      "verack"
@@ -89,6 +90,10 @@ extern "C" {
 #define MSG_REJECT      "reject"   // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
 #define MSG_FEEFILTER   "feefilter"// described in BIP133 https://github.com/bitcoin/bips/blob/master/bip-0133.mediawiki
 
+#define MSG_GETASSETDATA "getassetdata"
+#define MSG_ASSETDATA    "assetdata"
+#define MSG_ASSETNOTFOUND "asstnotfound"
+    
 #define REJECT_INVALID     0x10 // transaction is invalid for some reason (invalid signature, output value > input, etc)
 #define REJECT_SPENT       0x12 // an input is already spent
 #define REJECT_NONSTANDARD 0x40 // not mined/relayed because it is "non-standard" (type or version unknown by server)
@@ -104,28 +109,29 @@ typedef enum {
 typedef struct {
     UInt128 address; // IPv6 address of peer
     uint16_t port; // port number for peer connection
-    uint64_t services; // bitcoin network services supported by peer
+    uint64_t services; // network services supported by peer
     uint64_t timestamp; // timestamp reported by peer
     uint8_t flags; // scratch variable
+    void *assetCallbackInfo;
 } BRPeer;
 
-#define BR_PEER_NONE ((BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
+#define PEER_NONE ((const BRPeer) { UINT128_ZERO, 0, 0, 0, 0 })
 
-// NOTE: BRPeer functions are not thread-safe
+// NOTE: Peer functions are not thread-safe
 
-// returns a newly allocated BRPeer struct that must be freed by calling BRPeerFree()
+// returns a newly allocated Peer struct that must be freed by calling BRPeerFree()
 BRPeer *BRPeerNew(void);
 
 // info is a void pointer that will be passed along with each callback call
 // void connected(void *) - called when peer handshake completes successfully
 // void disconnected(void *, int) - called when peer connection is closed, error is an errno.h code
-// void relayedPeers(void *, const BRPeer[], size_t) - called when an "addr" message is received from peer
-// void relayedTx(void *, BRTransaction *) - called when a "tx" message is received from peer
+// void relayedPeers(void *, const Peer[], size_t) - called when an "addr" message is received from peer
+// void relayedTx(void *, Transaction *) - called when a "tx" message is received from peer
 // void hasTx(void *, UInt256 txHash) - called when an "inv" message with an already-known tx hash is received from peer
 // void rejectedTx(void *, UInt256 txHash, uint8_t) - called when a "reject" message is received from peer
-// void relayedBlock(void *, BRMerkleBlock *) - called when a "merkleblock" or "headers" message is received from peer
+// void relayedBlock(void *, MerkleBlock *) - called when a "merkleblock" or "headers" message is received from peer
 // void notfound(void *, const UInt256[], size_t, const UInt256[], size_t) - called when "notfound" message is received
-// BRTransaction *requestedTx(void *, UInt256) - called when "getdata" message with a tx hash is received from peer
+// Transaction *requestedTx(void *, UInt256) - called when "getdata" message with a tx hash is received from peer
 // int networkIsReachable(void *) - must return true when networking is available, false otherwise
 // void threadCleanup(void *) - called before a thread terminates to faciliate any needed cleanup    
 void BRPeerSetCallbacks(BRPeer *peer, void *info,
@@ -182,19 +188,19 @@ uint64_t BRPeerFeePerKb(BRPeer *peer);
 // average ping time for connected peer
 double BRPeerPingTime(BRPeer *peer);
 
-// sends a bitcoin protocol message to peer
+// sends a Ravencoin protocol message to peer
 void BRPeerSendMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, const char *type);
 void BRPeerSendFilterload(BRPeer *peer, const uint8_t *filter, size_t filterLen);
-void BRPeerSendMempool(BRPeer *peer, const UInt256 knownTxHashes[], size_t knownTxCount, void *info,
+void BRPeerSendMempool(BRPeer *peer, const UInt256 *knownTxHashes, size_t knownTxCount, void *info,
                        void (*completionCallback)(void *info, int success));
-void BRPeerSendGetheaders(BRPeer *peer, const UInt256 locators[], size_t locatorsCount, UInt256 hashStop);
-void BRPeerSendGetblocks(BRPeer *peer, const UInt256 locators[], size_t locatorsCount, UInt256 hashStop);
-void BRPeerSendInv(BRPeer *peer, const UInt256 txHashes[], size_t txCount);
-void BRPeerSendGetdata(BRPeer *peer, const UInt256 txHashes[], size_t txCount, const UInt256 blockHashes[],
+void BRPeerSendGetheaders(BRPeer *peer, const UInt256 *locators, size_t locatorsCount, UInt256 hashStop);
+void BRPeerSendGetblocks(BRPeer *peer, const UInt256 *locators, size_t locatorsCount, UInt256 hashStop);
+void BRPeerSendGetAsset(BRPeer *peer, char *assetName, size_t nameLen, void (*receiveAssetData) (void *info, BRAsset *asset));
+void BRPeerSendInv(BRPeer *peer, const UInt256 *txHashes, size_t txCount);
+void BRPeerSendGetdata(BRPeer *peer, const UInt256 *txHashes, size_t txCount, const UInt256 *blockHashes,
                        size_t blockCount);
 void BRPeerSendGetaddr(BRPeer *peer);
 void BRPeerSendPing(BRPeer *peer, void *info, void (*pongCallback)(void *info, int success));
-
 // useful to get additional tx after a bloom filter update
 void BRPeerRerequestBlocks(BRPeer *peer, UInt256 fromBlock);
 
@@ -222,4 +228,4 @@ void BRPeerFree(BRPeer *peer);
 }
 #endif
 
-#endif // BRPeer_h
+#endif // Peer_h

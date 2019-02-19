@@ -8,7 +8,7 @@
 
 import Foundation
 import UIKit
-import BRCore
+import Core
 
 enum SendResult {
     case success
@@ -88,17 +88,14 @@ class Sender {
                            verifyPinFunction: (@escaping(String) -> Void) -> Void,
                            completion:@escaping (SendResult) -> Void) {
         verifyPinFunction({ pin in
-            let group = DispatchGroup()
-            group.enter()
             DispatchQueue.walletQueue.async {
                 if self.walletManager.signTransaction(tx, forkId: (self.currency as! Raven).forkId, pin: pin) {
                     self.publish(completion: completion)
+                } else {
+                    DispatchQueue.main.async {
+                        completion(.creationError("authentication error"))
+                    }
                 }
-                group.leave()
-            }
-            let result = group.wait(timeout: .now() + 4.0)
-            if result == .timedOut {
-                fatalError("send-tx-timeout")
             }
         })
     }

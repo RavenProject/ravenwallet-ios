@@ -21,9 +21,23 @@ private class CallbackWrapper : NSObject, NSCopying {
     }
 }
 
+private class CallbackBoolWrapper : NSObject, NSCopying {
+    
+    init(_ callback: @escaping (Bool) -> Void) {
+        self.boolCallback = callback
+    }
+    
+    let boolCallback: (Bool) -> Void
+    
+    func copy(with zone: NSZone? = nil) -> Any {
+        return CallbackBoolWrapper(boolCallback)
+    }
+}
+
 private struct AssociatedKeys {
     static var didTapCallback = "didTapCallback"
     static var valueChangedCallback = "valueChangedCallback"
+    static var boolChangedCallback = "boolChangedCallback"
     static var valueEditingChangedCallback = "valueEditingChangedCallback"
 }
 
@@ -55,6 +69,18 @@ extension UIControl {
             objc_setAssociatedObject(self, &AssociatedKeys.valueChangedCallback, CallbackWrapper(newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
+    
+    var boolChanged: ((Bool) -> Void)? {
+        get {
+            guard let callbackBoolWrapper = objc_getAssociatedObject(self, &AssociatedKeys.boolChangedCallback) as? CallbackBoolWrapper else { return nil }
+            return callbackBoolWrapper.boolCallback
+        }
+        set {
+            guard let newValue = newValue else { return }
+            addTarget(self, action: #selector(boolDidChange(sender:)), for: .valueChanged)
+            objc_setAssociatedObject(self, &AssociatedKeys.boolChangedCallback, CallbackBoolWrapper(newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
 
     var editingChanged: (() -> Void)? {
         get {
@@ -70,6 +96,10 @@ extension UIControl {
 
     @objc private func valueDidChange() {
         valueChanged?()
+    }
+    
+    @objc private func boolDidChange(sender:UISwitch) {
+        boolChanged?(sender.isOn)
     }
 
     @objc private func editingChange() {

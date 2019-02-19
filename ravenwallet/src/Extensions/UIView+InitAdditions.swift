@@ -22,5 +22,15 @@ extension UIView {
         UIGraphicsEndImageContext()
         return tempImage!
     }
+    
+    func parentViewController() -> UIViewController? {
+        if let nextResponder = self.next as? UIViewController {
+            return nextResponder
+        } else if let nextResponder = self.next as? UIView {
+            return nextResponder.parentViewController()
+        } else {
+            return nil
+        }
+    }
 
 }

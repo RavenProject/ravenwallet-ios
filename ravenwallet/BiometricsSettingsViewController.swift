@@ -61,7 +61,7 @@ class BiometricsSettingsViewController : UIViewController, Subscriber {
         header.constrain([header.heightAnchor.constraint(equalToConstant: C.Sizes.largeHeaderHeight)])
         illustration.constrain([
             illustration.centerXAnchor.constraint(equalTo: header.centerXAnchor),
-            illustration.centerYAnchor.constraint(equalTo: header.centerYAnchor, constant: E.isIPhoneX ? C.padding[4] : C.padding[2]) ])
+            illustration.centerYAnchor.constraint(equalTo: header.centerYAnchor, constant: E.isIPhoneXOrLater ? C.padding[4] : C.padding[2]) ])
         label.constrain([
             label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: C.padding[2]),
             label.topAnchor.constraint(equalTo: header.bottomAnchor, constant: C.padding[2]),
@@ -132,12 +132,12 @@ class BiometricsSettingsViewController : UIViewController, Subscriber {
         let linkText = LAContext.biometricType() == .face ? S.FaceIDSettings.linkText : S.TouchIdSettings.linkText
         let string = "\(String(format: S.TouchIdSettings.spendingLimit, amount.bits, amount.localCurrency))\n\n\(String(format: customizeText, linkText))"
         let attributedString = NSMutableAttributedString(string: string, attributes: [
-                NSAttributedStringKey.font: UIFont.customBody(size: 13.0),
-                NSAttributedStringKey.foregroundColor: UIColor.darkText
+                NSAttributedString.Key.font: UIFont.customBody(size: 13.0),
+                NSAttributedString.Key.foregroundColor: UIColor.darkText
             ])
         let linkAttributes = [
-                NSAttributedStringKey.font: UIFont.customMedium(size: 13.0),
-                NSAttributedStringKey.link: NSURL(string:"http://spending-limit")!]
+                NSAttributedString.Key.font: UIFont.customMedium(size: 13.0),
+                NSAttributedString.Key.link: NSURL(string:"http://spending-limit")!]
 
         if let range = string.range(of: linkText, options: [], range: nil, locale: nil) {
             let from = range.lowerBound.samePosition(in: string.utf16)!

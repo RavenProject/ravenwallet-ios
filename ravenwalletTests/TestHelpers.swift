@@ -8,7 +8,7 @@
 
 import Foundation
 import XCTest
-@testable import breadwallet
+@testable import Ravencoin
 
 func clearKeychain() {
     let classes = [kSecClassGenericPassword as String,

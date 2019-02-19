@@ -12,6 +12,7 @@ enum SettingsSections: String {
     case wallet
     case preferences
     case currencies
+    case assets
     case other
     case currency
     case network
@@ -24,6 +25,8 @@ enum SettingsSections: String {
             return S.Settings.preferences
         case .currencies:
             return S.Settings.currencySettings
+        case .assets:
+            return S.Settings.assets
         case .other:
             return S.Settings.other
         default:
@@ -32,7 +35,7 @@ enum SettingsSections: String {
     }
 }
 
-class SettingsViewController : UITableViewController, CustomTitleView {
+class SettingsViewController : UITableViewController, CustomTitleView, Subscriber {
     
     init(sections: [SettingsSections], rows: [SettingsSections: [Setting]], optionalTitle: String? = nil) {
         self.sections = sections
@@ -50,7 +53,7 @@ class SettingsViewController : UITableViewController, CustomTitleView {
     }
 
     private let sections: [SettingsSections]
-    private let rows: [SettingsSections: [Setting]]
+    private var rows: [SettingsSections: [Setting]]
     private let cellIdentifier = "CellIdentifier"
     let titleLabel = UILabel(font: .customBold(size: 28.0), color: .darkGray)
     let customTitle: String
@@ -69,11 +72,33 @@ class SettingsViewController : UITableViewController, CustomTitleView {
         tableView.separatorStyle = .none
         tableView.backgroundColor = .whiteBackground
         addCustomTitle()
+        addSubscriptions()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+    }
+    
+    private func addSubscriptions() {
+        Store.subscribe(self, name: .reloadSettings, callback: { _ in
+            let advancedSetting = self.rows[.network]
+            guard advancedSetting != nil else { return }
+            var newAdvancedSettings:[Setting]? = []
+            for var setting:Setting in advancedSetting! {
+                if(setting.title == S.Settings.expertMode){
+                    setting.toggleDefaultValue = UserDefaults.hasActivatedExpertMode
+                }
+                else if(setting.title == S.WipeSetting.title || setting.title == S.Settings.usedAddresses){
+                    setting.isHidden = !UserDefaults.hasActivatedExpertMode
+                }
+                newAdvancedSettings?.append(setting)
+            }
+            self.rows[.network] = newAdvancedSettings
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: {
+                self.tableView.reloadData()
+            })
+        })
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -86,16 +111,26 @@ class SettingsViewController : UITableViewController, CustomTitleView {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-
+        
         if let setting = rows[sections[indexPath.section]]?[indexPath.row] {
+            cell.selectionStyle = .default
             cell.textLabel?.text = setting.title
             cell.textLabel?.font = .customBody(size: 16.0)
             cell.textLabel?.textColor = .darkGray
+            
+            if(setting.accessoryText != nil){
+                let label = UILabel(font: .customMedium(size: 16.0), color: .darkGray)
+                label.text = setting.accessoryText?()
+                label.sizeToFit()
+                cell.accessoryView = label
+            }
+            else if(setting.toggle != nil){
+                cell.selectionStyle = .none
+                setting.toggle?.boolChanged = setting.toggleCallback
+                setting.toggle?.isOn = setting.toggleDefaultValue
+                cell.accessoryView = setting.toggle
+            }
 
-            let label = UILabel(font: .customMedium(size: 16.0), color: .darkGray)
-            label.text = setting.accessoryText?()
-            label.sizeToFit()
-            cell.accessoryView = label
         }
         return cell
     }
@@ -125,7 +160,8 @@ class SettingsViewController : UITableViewController, CustomTitleView {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let setting = rows[sections[indexPath.section]]?[indexPath.row] {
-            setting.callback()
+            guard setting.toggle == nil else { return }
+            setting.callback!()
         }
     }
 
@@ -134,6 +170,10 @@ class SettingsViewController : UITableViewController, CustomTitleView {
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let setting = rows[sections[indexPath.section]]?[indexPath.row]
+        if setting!.isHidden {
+            return 0.0
+        }
         return 48.0
     }
 

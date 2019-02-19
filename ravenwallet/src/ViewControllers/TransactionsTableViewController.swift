@@ -9,8 +9,6 @@
 import UIKit
 import SafariServices
 
-private let promptDelay: TimeInterval = 0.6
-
 class TransactionsTableViewController : UITableViewController, Subscriber, Trackable {
 
     //MARK: - Public
@@ -48,7 +46,8 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         didSet { reload() }
     }
     private let emptyMessage = UILabel.wrapping(font: .customBody(size: 16.0), color: .grayTextTint)
-    
+    private let emptyImage = UIImageView(image: #imageLiteral(resourceName: "EmptyTxs"))
+
     private var currentPrompt: Prompt? {
         didSet {
             if currentPrompt != nil && oldValue == nil {
@@ -74,13 +73,15 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
 
         tableView.separatorStyle = .none
         tableView.estimatedRowHeight = 60.0
-        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = .whiteTint
         
         emptyMessage.textAlignment = .center
         emptyMessage.text = S.TransactionDetails.emptyMessage
         
-        setContentInset()
+        emptyImage.contentMode = .scaleAspectFit
+        
+        //setContentInset()
 
         setupSubscriptions()
     }
@@ -108,7 +109,9 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
             }
         })
         
-        Store.subscribe(self, selector: { $0[self.currency].transactions != $1[self.currency].transactions },
+        Store.subscribe(self, selector: {
+            $0[self.currency].transactions != $1[self.currency].transactions
+        },
                         callback: { state in
                             self.allTransactions = state[self.currency].transactions
                             self.reload()
@@ -116,7 +119,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
     }
 
     private func setContentInset() {
-        let insets = UIEdgeInsets(top: accountHeaderHeight - 64.0 - (E.isIPhoneX ? 28.0 : 0.0), left: 0, bottom: accountFooterHeight + C.padding[2], right: 0)
+        let insets = UIEdgeInsets(top: accountHeaderHeight - 64.0 - (E.isIPhoneXOrLater ? 28.0 : 0.0), left: 0, bottom: accountFooterHeight + C.padding[2], right: 0)
         tableView.contentInset = insets
         tableView.scrollIndicatorInsets = insets
     }
@@ -183,8 +186,17 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
                     emptyMessage.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -accountHeaderHeight),
                     emptyMessage.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -C.padding[2]) ])
             }
+            emptyMessage.isHidden = true
+            if emptyImage.superview == nil {
+                tableView.addSubview(emptyImage)
+                emptyImage.constrain([
+                    emptyImage.centerXAnchor.constraint(equalTo: tableView.centerXAnchor),
+                    emptyImage.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -(accountHeaderHeight/2)),
+                    emptyImage.widthAnchor.constraint(equalTo: view.widthAnchor) ])
+            }
         } else {
             emptyMessage.removeFromSuperview()
+            emptyImage.removeFromSuperview()
         }
     }
 

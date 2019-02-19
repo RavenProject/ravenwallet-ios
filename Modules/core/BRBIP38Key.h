@@ -1,5 +1,5 @@
 //
-//  BRBIP38Key.h
+//  BIP38Key.h
 //
 //  Created by Aaron Voisine on 9/7/15.
 //  Copyright (c) 2015 breadwallet LLC

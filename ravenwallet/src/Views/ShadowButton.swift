@@ -14,9 +14,12 @@ enum ButtonType {
     case tertiary
     case blackTransparent
     case search
+    case checkBox
+    case burn
 }
 
 private let minTargetSize: CGFloat = 48.0
+private let imageSize: CGFloat = 30.0
 
 class ShadowButton: UIControl {
 
@@ -36,25 +39,39 @@ class ShadowButton: UIControl {
         accessibilityLabel = title
         setupViews()
     }
+    
+    init(type: ButtonType, image: UIImage, selectedImage: UIImage? = nil) {
+        self.type = type
+        self.image = image
+        self.defaultImage = image
+        self.selectedImage = selectedImage
+        super.init(frame: .zero)
+        setupViews()
+    }
 
     var isToggleable = false
-    var title: String {
+    var title: String? {
         didSet {
             label.text = title
         }
     }
+    
     var image: UIImage? {
         didSet {
             imageView?.image = image
         }
     }
+    
     private let type: ButtonType
-    private let container = UIView()
-    private let shadowView = UIView()
-    private let label = UILabel()
+    let container = UIView()
+    let shadowView = UIView()
+    let label = UILabel()
     private let shadowYOffset: CGFloat = 4.0
     private let cornerRadius: CGFloat = 5.0
     private var imageView: UIImageView?
+    private var defaultImage: UIImage?
+    private var selectedImage: UIImage?
+    var selectCallback: ((Bool) -> Void)?
 
     override var isHighlighted: Bool {
         didSet {
@@ -83,6 +100,29 @@ class ShadowButton: UIControl {
                     setColors()
                 }
             }
+            else if type == .checkBox {
+                if isSelected {
+                    image = selectedImage
+                    container.backgroundColor = .primaryButton
+                } else {
+                    image = defaultImage
+                    setColors()
+                }
+            }
+            if selectCallback != nil {
+                self.selectCallback!(isSelected)
+            }
+        }
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            if isEnabled {
+                setColors()
+            }
+            else {
+                container.backgroundColor = UIColor.disabled
+            }
         }
     }
 
@@ -110,28 +150,45 @@ class ShadowButton: UIControl {
         shadowView.isUserInteractionEnabled = false
     }
 
-    private func addContent() {
+    func addContent() {
         addSubview(container)
         container.backgroundColor = .primaryButton
         container.layer.cornerRadius = cornerRadius
         container.isUserInteractionEnabled = false
         container.constrain(toSuperviewEdges: nil)
-        label.text = title
-        label.textColor = .white
-        label.textAlignment = .center
-        label.isUserInteractionEnabled = false
-        label.font = UIFont.customMedium(size: 18.0)
+        if title != nil {
+            label.text = title
+            label.textColor = .white
+            label.textAlignment = .center
+            label.isUserInteractionEnabled = false
+            label.font = UIFont.customMedium(size: 18.0)
+        }
         configureContentType()
     }
 
     private func configureContentType() {
-        if let icon = image {
-            setupImageOption(icon: icon)
+        if (image != nil) && (title != nil) {
+            setupImageOption(icon: image!)
+        }
+        else if (image != nil) && (title == nil) {
+            setupImageOnly(icon: image!)
         } else {
             setupLabelOnly()
         }
     }
 
+    private func setupImageOnly(icon: UIImage) {
+        let content = UIView()
+        let iconImageView = UIImageView(image: icon.withRenderingMode(.alwaysTemplate))
+        iconImageView.contentMode = .scaleAspectFit
+        container.addSubview(content)
+        content.addSubview(iconImageView)
+        content.constrainToCenter()
+        iconImageView.constrainTopCorners(height: imageSize)
+        imageView = iconImageView
+        iconImageView.constrainToCenter()
+    }
+    
     private func setupImageOption(icon: UIImage) {
         let content = UIView()
         let iconImageView = UIImageView(image: icon.withRenderingMode(.alwaysTemplate))
@@ -178,6 +235,13 @@ class ShadowButton: UIControl {
             shadowView.layer.shadowColor = UIColor.black.cgColor
             shadowView.layer.shadowOpacity = 0.15
             imageView?.tintColor = .white
+        case .checkBox:
+            container.backgroundColor = .gray
+            container.layer.borderColor = nil
+            container.layer.borderWidth = 0.0
+            shadowView.layer.shadowColor = UIColor.black.cgColor
+            shadowView.layer.shadowOpacity = 0.15
+            imageView?.tintColor = .white
         case .blackTransparent:
             container.backgroundColor = .clear
             label.textColor = .darkText
@@ -189,6 +253,14 @@ class ShadowButton: UIControl {
             label.font = UIFont.customBody(size: 13.0)
             container.backgroundColor = .secondaryButton
             label.textColor = .white
+            container.layer.borderColor = nil
+            container.layer.borderWidth = 0.0
+            shadowView.layer.shadowColor = UIColor.black.cgColor
+            shadowView.layer.shadowOpacity = 0.15
+            imageView?.tintColor = .white
+        case .burn:
+            container.backgroundColor = .redButton
+            label.textColor = .primaryText
             container.layer.borderColor = nil
             container.layer.borderWidth = 0.0
             shadowView.layer.shadowColor = UIColor.black.cgColor

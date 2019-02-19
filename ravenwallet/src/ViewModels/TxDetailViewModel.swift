@@ -30,7 +30,12 @@ struct TxDetailViewModel: TxViewModel {
         case .received:
             return status == .complete ? S.TransactionDetails.titleReceived : S.TransactionDetails.titleReceiving
         case .sent:
-            return status == .complete ? S.TransactionDetails.titleSent : S.TransactionDetails.titleSending
+            if(C.setBurnAddresses.contains(tx.toAddress)){
+                return status == .complete ? S.Transaction.burn : S.Transaction.burning
+            }
+            else{
+                return status == .complete ? S.TransactionDetails.titleSent : S.TransactionDetails.titleSending
+            }
         }
     }
     
@@ -125,7 +130,9 @@ extension TxDetailViewModel {
                                    selectedRate: nil,
                                    minimumFractionDigits: nil,
                                    currency: tx.currency,
-                                   negative: (tx.direction == .sent))
+                                   negative: (tx.direction == .sent),
+                                   locale: Locale(identifier: "fr_FR"),
+                                   asset: tx.asset)
         return amount.description
     }
     

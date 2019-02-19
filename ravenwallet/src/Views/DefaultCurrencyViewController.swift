@@ -54,7 +54,7 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
             self.setExchangeRateLabel()
         })
 
-        tableView.sectionHeaderHeight = UITableViewAutomaticDimension
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.estimatedSectionHeaderHeight = 140.0
         tableView.backgroundColor = .whiteTint
         tableView.separatorStyle = .none
@@ -95,6 +95,7 @@ class DefaultCurrencyViewController : UITableViewController, Subscriber {
             let check = UIImageView(image: #imageLiteral(resourceName: "CircleCheck").withRenderingMode(.alwaysTemplate))
             check.tintColor = C.defaultTintColor
             cell.accessoryView = check
+            cell.accessoryView?.frame = CGRect.init(x: 0, y: 0, width: 30, height: 30)
         } else {
             cell.accessoryView = nil
         }

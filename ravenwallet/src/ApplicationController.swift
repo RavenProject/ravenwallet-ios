@@ -7,12 +7,13 @@
 //
 
 import UIKit
-import BRCore
+import Core
+import UserNotifications
 
 private let timeSinceLastExitKey = "TimeSinceLastExit"
 private let shouldRequireLoginTimeoutKey = "ShouldRequireLoginTimeoutKey"
 
-class ApplicationController : Subscriber, Trackable {
+class ApplicationController : NSObject, Subscriber, Trackable {
 
     let window = UIWindow()
     private var startFlowController: StartFlowPresenter?
@@ -38,7 +39,8 @@ class ApplicationController : Subscriber, Trackable {
     private var hasPerformedWalletDependentInitialization = false
     private var didInitWallet = false
 
-    init() {
+    override init() {
+        super.init()
         guardProtected(queue: DispatchQueue.walletQueue) {
                 self.initWallet(completion: self.didAttemptInitWallet)
         }
@@ -59,6 +61,7 @@ class ApplicationController : Subscriber, Trackable {
         guard let currency = currency as? Raven else { return }
         guard let walletManager = try? WalletManager(currency: currency, dbPath: currency.dbPath) else { return }
         walletManagers[currency.code] = walletManager
+        self.exchangeUpdaters[currency.code] = ExchangeUpdater(currency: currency, walletManager: walletManager)
         walletManager.initWallet { success in
             guard success else {
                 // always keep RVN wallet manager, even if not initialized, since it the primaryWalletManager and needed for onboarding
@@ -70,7 +73,6 @@ class ApplicationController : Subscriber, Trackable {
                 dispatchGroup.leave()
                 return
             }
-            self.exchangeUpdaters[currency.code] = ExchangeUpdater(currency: currency, walletManager: walletManager)
             walletManager.initPeerManager {
                 walletManager.peerManager?.connect()
                 dispatchGroup.leave()
@@ -87,9 +89,9 @@ class ApplicationController : Subscriber, Trackable {
         }
     }
 
-    func launch(application: UIApplication, options: [UIApplicationLaunchOptionsKey: Any]?) {
+    func launch(application: UIApplication, options: [UIApplication.LaunchOptionsKey: Any]?) {
         self.application = application
-        application.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+        application.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
         setup()
         handleLaunchOptions(options)
         reachability.didChange = { isReachable in
@@ -175,6 +177,9 @@ class ApplicationController : Subscriber, Trackable {
             UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: timeSinceLastExitKey)
         }
     }
+    
+    func WillTerminate() {
+    }
 
     func performFetch(_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         fetchCompletionHandler = completionHandler
@@ -250,7 +255,7 @@ class ApplicationController : Subscriber, Trackable {
     }
 
     private func setupAppearance() {
-        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.font: UIFont.header]
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.font: UIFont.header]
     }
 
     private func setupRootViewController() {
@@ -266,14 +271,33 @@ class ApplicationController : Subscriber, Trackable {
             nc.pushViewController(accountViewController, animated: true)
         }
         
+        home.didSelectAsset = { asset in //BMEX
+            Store.perform(action: RootModalActions.Present(modal: .selectAsset(asset: asset)))
+        }
+        
+        home.didSelectShowMoreAsset = {
+            let allAssetVC = AllAssetVC(didSelectAsset: home.didSelectAsset!)
+            nc.pushViewController(allAssetVC, animated: true)
+        }
+        
+        home.didTapCreateAsset = {
+            Store.perform(action: RootModalActions.Present(modal: .createAsset(initialAddress: nil)))
+         }
+        
         home.didTapSupport = {
             self.modalPresenter?.presentFaq()
-//            Wipping Backup for tests ... I'am Stupid
-//            self.modalPresenter?.wipeWallet()
         }
         
         home.didTapSecurity = {
             self.modalPresenter?.presentSecurityCenter()
+        }
+        
+        home.didTapAddressBook = { currency in
+            Store.trigger(name: .selectAddressBook(.normal, nil))
+        }
+        
+        home.didTapTutorial = {
+            self.modalPresenter?.presentTutorial()
         }
         
         home.didTapSettings = {
@@ -334,7 +358,7 @@ class ApplicationController : Subscriber, Trackable {
         }
     }
 
-    private func handleLaunchOptions(_ options: [UIApplicationLaunchOptionsKey: Any]?) {
+    private func handleLaunchOptions(_ options: [UIApplication.LaunchOptionsKey: Any]?) {
         if let url = options?[.url] as? URL {
             do {
                 let file = try Data(contentsOf: url)
@@ -416,19 +440,29 @@ class ApplicationController : Subscriber, Trackable {
 }
 
 //MARK: - Push notifications
-extension ApplicationController {
+extension ApplicationController : UNUserNotificationCenterDelegate {
     func listenForPushNotificationRequest() {
         Store.subscribe(self, name: .registerForPushNotificationToken, callback: { _ in
-            let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
-            self.application?.registerUserNotificationSettings(settings)
+            // BMEX *** UIUserNotificationSettings is Deprecated ****
+            //let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
+            //self.application?.registerUserNotificationSettings(settings)
+            // *** use UNUserNotificationCenter ***
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: {_, _ in })
+            UNUserNotificationCenter.current().delegate = self
+            self.application?.registerForRemoteNotifications()
         })
     }
 
-    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
+    /* BMEX UIUserNotificationSettings was deprecated
+     func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
         if !notificationSettings.types.isEmpty {
             application.registerForRemoteNotifications()
         }
     }
+     */
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 //        guard let apiClient = walletManager?.apiClient else { return }

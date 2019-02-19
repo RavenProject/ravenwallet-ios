@@ -25,6 +25,8 @@
 
 import UIKit
 import LocalAuthentication
+import Fabric
+import Crashlytics
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -33,7 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     let applicationController = ApplicationController()
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Fabric.with([Crashlytics.self])
         redirectStdOut()
         UIView.swizzleSetFrame()
         applicationController.launch(application: application, options: launchOptions)
@@ -53,6 +56,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         applicationController.didEnterBackground()
     }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        applicationController.WillTerminate()
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         applicationController.willResignActive()
@@ -62,13 +69,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         applicationController.performFetch(completionHandler)
     }
 
-    func application(_ application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplicationExtensionPointIdentifier) -> Bool {
+    func application(_ application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier) -> Bool {
         return false // disable extensions such as custom keyboards for security purposes
     }
 
+    /* BMEX UIUserNotificationSettings was deprecated
     func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
         applicationController.application(application, didRegister: notificationSettings)
     }
+     */
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         applicationController.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
@@ -78,7 +87,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         applicationController.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
 
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return applicationController.open(url: url)
     }
 

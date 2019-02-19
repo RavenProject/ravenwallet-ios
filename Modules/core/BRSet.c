@@ -1,5 +1,5 @@
 //
-//  BRSet.c
+//  Set.c
 //
 //  Created by Aaron Voisine on 9/11/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -38,7 +38,7 @@ static const size_t tableSizes[] = { // starting with 1, multiply by 3/2, round 
 
 #define TABLE_SIZES_LEN (sizeof(tableSizes)/sizeof(*tableSizes))
 
-struct BRSetStruct {
+struct SetStruct {
     void **table; // hashtable
     size_t size; // number of buckets in table
     size_t itemCount; // number of items in set
@@ -46,7 +46,7 @@ struct BRSetStruct {
     int (*eq)(const void *, const void *); // equality function
 };
 
-static void _BRSetInit(BRSet *set, size_t (*hash)(const void *), int (*eq)(const void *, const void *), size_t capacity)
+static void _SetInit(BRSet *set, size_t (*hash)(const void *), int (*eq)(const void *, const void *), size_t capacity)
 {
     assert(set != NULL);
     assert(hash != NULL);
@@ -68,7 +68,7 @@ static void _BRSetInit(BRSet *set, size_t (*hash)(const void *), int (*eq)(const
     set->eq = eq;
 }
 
-// retruns a newly allocated empty set that must be freed by calling BRSetFree()
+// retruns a newly allocated empty set that must be freed by calling SetFree()
 // size_t hash(const void *) is a function that returns a hash value for a given set item
 // int eq(const void *, const void *) is a function that returns true if two set items are equal
 // any two items that are equal must also have identical hash values
@@ -78,16 +78,16 @@ BRSet *BRSetNew(size_t (*hash)(const void *), int (*eq)(const void *, const void
     BRSet *set = calloc(1, sizeof(*set));
     
     assert(set != NULL);
-    _BRSetInit(set, hash, eq, capacity);
+    _SetInit(set, hash, eq, capacity);
     return set;
 }
 
 // rebuilds hashtable to hold up to capacity items
-static void _BRSetGrow(BRSet *set, size_t capacity)
+static void _SetGrow(BRSet *set, size_t capacity)
 {
     BRSet newSet;
-    
-    _BRSetInit(&newSet, set->hash, set->eq, capacity);
+
+    _SetInit(&newSet, set->hash, set->eq, capacity);
     BRSetUnion(&newSet, set);
     free(set->table);
     set->table = newSet.table;
@@ -112,7 +112,7 @@ void *BRSetAdd(BRSet *set, void *item)
 
     if (! t) set->itemCount++;
     set->table[i] = item;
-    if (set->itemCount > ((size + 2)/3)*2) _BRSetGrow(set, size); // limit load factor to 2/3
+    if (set->itemCount > ((size + 2)/3)*2) _SetGrow(set, size); // limit load factor to 2/3
     return t;
 }
 
@@ -233,7 +233,7 @@ void *BRSetIterate(const BRSet *set, const void *previous)
 }
 
 // writes up to count items from set to allItems and returns the number of items written
-size_t BRSetAll(const BRSet *set, void *allItems[], size_t count)
+size_t BRSetAll(const BRSet *set, void **allItems, size_t count)
 {
     assert(set != NULL);
     assert(allItems != NULL || count == 0);
@@ -307,7 +307,7 @@ void BRSetIntersect(BRSet *set, const BRSet *otherSet)
     while (i < size) {
         t = set->table[i];
 
-        if (t && ! BRSetContains(otherSet, t)) {
+        if (t && !BRSetContains(otherSet, t)) {
             BRSetRemove(set, t);
         }
         else i++;

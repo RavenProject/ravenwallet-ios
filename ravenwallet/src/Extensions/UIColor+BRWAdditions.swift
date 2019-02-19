@@ -35,8 +35,17 @@ extension UIColor {
         return UIColor(red: 241.0/255.0, green: 103.0/255.0, blue: 38.0/255.0, alpha: 1.0)
     }
     
+    static var redButton: UIColor {
+        return UIColor(red: 230.0/255.0, green: 69.0/255.0, blue: 60.0/255.0, alpha: 1.0)
+    }
+
+    
     static var darkText: UIColor {
         return UIColor(red: 35.0/255.0, green: 37.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    }
+    
+    static var syncingBackground: UIColor {
+        return UIColor.fromHex("E5E5E5")
     }
 
     static var darkLine: UIColor {
@@ -97,7 +106,7 @@ extension UIColor {
     }
 
     static var darkPurple: UIColor {
-        return UIColor(red: 127.0/255.0, green: 83.0/255.0, blue: 230.0/255.0, alpha: 1.0)
+        return UIColor(red: 54.0/255.0, green: 44.0/255.0, blue: 70.0/255.0, alpha: 1.0)
     }
 
     static var pink: UIColor {
@@ -139,6 +148,22 @@ extension UIColor {
     static var blueGradientEnd: UIColor {
         return UIColor(red: 56.0/255.0, green: 141.0/255.0, blue: 252.0/255.0, alpha: 1.0)
     }
+    
+    static func assetGradientStart(isOwnerShip:Bool) -> UIColor {
+        return isOwnerShip ? .darkBlueGradientStart : .orangeGradientStart
+    }
+    
+    static func assetGradientEnd(isOwnerShip:Bool) -> UIColor {
+        return isOwnerShip ? .darkBlueGradientEnd : .orangeGradientEnd
+    }
+    
+    static var darkBlueGradientStart: UIColor {
+        return UIColor(red: 71.0/255.0, green: 100.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+    }
+    
+    static var darkBlueGradientEnd: UIColor {
+        return UIColor(red: 67.0/255.0, green: 95.0/255.0, blue: 170.0/255.0, alpha: 1.0)
+    }
 
     static var orangeGradientStart: UIColor {
         return UIColor(red: 241.0/255.0, green: 91.0/255.0, blue: 35.0/255.0, alpha: 1.0)
@@ -168,6 +193,10 @@ extension UIColor {
         return UIColor(red: 120.0/255.0, green: 143.0/255.0, blue: 158.0/255.0, alpha: 1.0)
     }
     
+    static var disabled: UIColor {
+        return UIColor(red: 200.0/255.0, green: 200.0/255.0, blue: 200.0/255.0, alpha: 1.0)
+    }
+    
     static var receivedGreen: UIColor {
         return UIColor(red: 23.0/255.0, green: 175.0/255.0, blue: 99.0/255.0, alpha: 1.0)
     }
@@ -190,5 +219,32 @@ extension UIColor {
     
     static var separator: UIColor {
         return UIColor(red: 236.0/255.0, green: 236.0/255.0, blue: 236.0/255.0, alpha: 1.0)
+    }
+}
+
+extension UIColor {
+    static func fromHex(_ hex: String) -> UIColor {
+        var sanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if sanitized.hasPrefix("#") {
+            sanitized.remove(at: sanitized.startIndex)
+        }
+        guard sanitized.count == 6 else { return .lightGray }
+        var rgbValue: UInt32 = 0
+        Scanner(string: sanitized).scanHexInt32(&rgbValue)
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0))
+    }
+    
+    var toHex: String {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        let rgb: Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
+        return String(format: "#%06x", rgb)
     }
 }

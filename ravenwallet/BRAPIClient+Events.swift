@@ -6,7 +6,7 @@
 //  Copyright © 2018 Ravenwallet Team. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 /// Implement Trackabble in your class to have access to these functions
 public protocol Trackable {
@@ -63,8 +63,8 @@ class EventManager {
     private let sampleChance: UInt32 = 10
     private var isSubscribed = false
     private let eventToNotifications: [String: NSNotification.Name] = [
-        "foreground": .UIApplicationDidBecomeActive,
-        "background": .UIApplicationDidEnterBackground
+        "foreground": UIApplication.didBecomeActiveNotification,
+        "background": UIApplication.didEnterBackgroundNotification
     ]
     private var buffer = [Event]()
     private let adaptor: BRAPIAdaptor
@@ -104,7 +104,7 @@ class EventManager {
         eventToNotifications.forEach { key, value in
             NotificationCenter.default.addObserver(forName: value, object: nil, queue: self.queue, using: { [weak self] note in
                 self?.saveEvent(key)
-                if note.name == .UIApplicationDidEnterBackground {
+                if note.name == UIApplication.didEnterBackgroundNotification {
                     self?.persistToDisk()
                     self?.sendToServer()
                 }

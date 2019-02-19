@@ -11,7 +11,7 @@ import LocalAuthentication
 
 class ConfirmationViewController : UIViewController, ContentBoxPresenter {
 
-    init(amount: Satoshis, fee: Satoshis, feeType: Fee, selectedRate: Rate?, minimumFractionDigits: Int?, address: String, isUsingBiometrics: Bool) {
+    init(amount: Satoshis, fee: Satoshis, feeType: Fee, selectedRate: Rate?, minimumFractionDigits: Int?, address: String, isUsingBiometrics: Bool, operationType: OperationType? = OperationType.transferRvn, assetToSend:Asset? = nil) {
         self.amount = amount
         self.feeAmount = fee
         self.feeType = feeType
@@ -19,6 +19,8 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
         self.minimumFractionDigits = minimumFractionDigits
         self.addressText = address
         self.isUsingBiometrics = isUsingBiometrics
+        self.asset = assetToSend
+        self.operationType = operationType!
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -29,6 +31,9 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
     private let minimumFractionDigits: Int?
     private let addressText: String
     private let isUsingBiometrics: Bool
+    private var asset: Asset?
+    private let operationType: OperationType
+
 
     //ContentBoxPresenter
     let contentBox = UIView(color: .white)
@@ -50,10 +55,13 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
     private let processingTime = UILabel.wrapping(font: .customBody(size: 14.0), color: .grayTextTint)
     private let sendLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
     private let feeLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
+    private let operationAssetFeeLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
+    private var operationAssetFeeHeight: NSLayoutConstraint?
     private let totalLabel = UILabel(font: .customMedium(size: 14.0), color: .darkText)
 
     private let send = UILabel(font: .customBody(size: 14.0), color: .darkText)
     private let fee = UILabel(font: .customBody(size: 14.0), color: .darkText)
+    private let operationAssetFee = UILabel(font: .customBody(size: 14.0), color: .darkText)
     private let total = UILabel(font: .customMedium(size: 14.0), color: .darkText)
 
     override func viewDidLoad() {
@@ -72,9 +80,11 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
         contentBox.addSubview(processingTime)
         contentBox.addSubview(sendLabel)
         contentBox.addSubview(feeLabel)
+        contentBox.addSubview(operationAssetFeeLabel)
         contentBox.addSubview(totalLabel)
         contentBox.addSubview(send)
         contentBox.addSubview(fee)
+        contentBox.addSubview(operationAssetFee)
         contentBox.addSubview(total)
         contentBox.addSubview(cancel)
         contentBox.addSubview(sendButton)
@@ -116,9 +126,18 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
         fee.constrain([
             fee.trailingAnchor.constraint(equalTo: contentBox.trailingAnchor, constant: -C.padding[2]),
             fee.firstBaselineAnchor.constraint(equalTo: feeLabel.firstBaselineAnchor) ])
+        operationAssetFeeHeight = operationAssetFeeLabel.heightAnchor.constraint(equalToConstant: 0.0)
+        operationAssetFeeLabel.constrain([
+            operationAssetFeeLabel.leadingAnchor.constraint(equalTo: feeLabel.leadingAnchor),
+            operationAssetFeeLabel.topAnchor.constraint(equalTo: feeLabel.bottomAnchor),
+            operationAssetFeeHeight])
+        operationAssetFee.constrain([
+            operationAssetFee.trailingAnchor.constraint(equalTo: contentBox.trailingAnchor, constant: -C.padding[2]),
+            operationAssetFee.firstBaselineAnchor.constraint(equalTo: operationAssetFeeLabel.firstBaselineAnchor),
+            operationAssetFeeHeight])
         totalLabel.constrain([
             totalLabel.leadingAnchor.constraint(equalTo: feeLabel.leadingAnchor),
-            totalLabel.topAnchor.constraint(equalTo: feeLabel.bottomAnchor) ])
+            totalLabel.topAnchor.constraint(equalTo: operationAssetFeeLabel.bottomAnchor) ])
         total.constrain([
             total.trailingAnchor.constraint(equalTo: contentBox.trailingAnchor, constant: -C.padding[2]),
             total.firstBaselineAnchor.constraint(equalTo: totalLabel.firstBaselineAnchor) ])
@@ -136,13 +155,44 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
 
     private func setInitialData() {
         view.backgroundColor = .clear
-        payLabel.text = S.Confirmation.send
 
+        var assetFee = Satoshis.zero
+        switch operationType {
+        case .createAsset:
+            assetFee = Satoshis(C.creatAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.createFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        case .manageAsset:
+            assetFee = Satoshis(C.manageAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.manageFeeLabel
+            sendLabel.text = S.Confirmation.amountManageLabel
+            payLabel.text = S.Asset.manageTitle
+        case .subAsset:
+            assetFee = Satoshis(C.subAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.subAssetFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        case .uniqueAsset:
+            assetFee = Satoshis(C.uniqueAssetFee)
+            operationAssetFeeLabel.text = S.Confirmation.uniqueAssetFeeLabel
+            sendLabel.text = S.Confirmation.amountCreateLabel
+            payLabel.text = S.Asset.create
+        default:
+            assetFee = Satoshis.zero
+            sendLabel.text = S.Confirmation.amountSendLabel
+            payLabel.text = S.Confirmation.send
+        }
+        let displayAssetFee = DisplayAmount(amount: assetFee, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
+        var totalFee = amount + feeAmount
+        if operationType != .transferRvn {
+            totalFee = assetFee + feeAmount
+        }
         let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         let displayFee = DisplayAmount(amount: feeAmount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
-        let displayTotal = DisplayAmount(amount: amount + feeAmount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
+        let displayTotal = DisplayAmount(amount: totalFee, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
 
-        amountLabel.text = displayAmount.combinedDescription
+        amountLabel.text = operationType == .transferRvn ? displayAmount.combinedDescription : amount.description(minimumFractionDigits: minimumFractionDigits!) + " " + asset!.name
 
         toLabel.text = S.Confirmation.to
         address.text = addressText
@@ -154,14 +204,29 @@ class ConfirmationViewController : UIViewController, ContentBoxPresenter {
             processingTime.text = String(format: S.Confirmation.processingTime, S.FeeSelector.economyTime)
         }
 
-        sendLabel.text = S.Confirmation.amountLabel
+
         sendLabel.adjustsFontSizeToFitWidth = true
-        send.text = displayAmount.description
+        send.text = asset == nil ? displayAmount.description : amount.description(minimumFractionDigits: minimumFractionDigits!) + " " + asset!.name
         feeLabel.text = S.Confirmation.feeLabel
         fee.text = displayFee.description
+        
+        operationAssetFee.text = displayAssetFee.description
+        switch operationType {
+        case .createAsset, .manageAsset, .subAsset, .uniqueAsset :
+            operationAssetFeeHeight?.constant = 20
+            operationAssetFee.isHidden = false //BMEX Todo : should work only with autolayout
+        default:
+            operationAssetFeeHeight?.constant = 0
+            operationAssetFee.isHidden = true
+        }
+        self.view.layoutIfNeeded()
 
         totalLabel.text = S.Confirmation.totalLabel
         total.text = displayTotal.description
+        if operationType == .transferAsset {
+            totalLabel.isHidden = true
+            total.isHidden = true
+        }
 
         cancel.tap = strongify(self) { myself in
             myself.cancelCallback?()

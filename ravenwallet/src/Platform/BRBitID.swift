@@ -25,7 +25,7 @@
 
 import Foundation
 import Security
-import BRCore
+import Core
 
 
 open class BRBitID : NSObject {

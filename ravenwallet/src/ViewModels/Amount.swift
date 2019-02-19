@@ -94,6 +94,12 @@ struct Amount {
         format.currencySymbol = rate.currencySymbol
         return format
     }
+    
+    var homeScreenFormat: NumberFormatter {
+        let format = self.localFormat
+        format.maximumFractionDigits = maxDigits
+        return format
+    }
 }
 
 struct DisplayAmount {
@@ -102,13 +108,17 @@ struct DisplayAmount {
     let minimumFractionDigits: Int?
     let currency: CurrencyDef
     let negative: Bool
+    let asset:BRAssetRef?
+    let locale:Locale?
     
-    init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef, negative: Bool) {
+    init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef, negative: Bool, locale:Locale? = nil, asset:BRAssetRef? = nil) {
         self.amount = amount
         self.selectedRate = selectedRate
         self.minimumFractionDigits = minimumFractionDigits
         self.currency = currency
         self.negative = negative
+        self.asset = asset
+        self.locale = locale
     }
     
     init(amount: Satoshis, selectedRate: Rate?, minimumFractionDigits: Int?, currency: CurrencyDef) {
@@ -116,7 +126,17 @@ struct DisplayAmount {
     }
     
     var description: String {
+        if asset != nil {
+            return assetDescription
+        }
         return selectedRate != nil ? fiatDescription : bitcoinDescription
+    }
+    
+    func description(isBtcSwapped: Bool) -> String {
+        if asset != nil {
+            return assetDescription
+        }
+        return isBtcSwapped ? fiatDescription : bitcoinDescription
     }
 
     var combinedDescription: String {
@@ -129,13 +149,26 @@ struct DisplayAmount {
         guard let string = localFormat.string(from: tokenAmount/100000000.0*rate.rate as NSNumber) else { return "" }
         return string
     }
+    
+    private var assetDescription: String {
+        let amountSatoshi: Satoshis = Satoshis.init(UInt64(asset!.pointee.amount))
+        var decimal = Decimal(amountSatoshi.rawValue)
+        var amount: Decimal = 0.0
+        NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-8), .up)
+        let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
+        var string = asset!.pointee.nameString
+        if !string.contains("!") {
+            string = assetFormat.string(from: number)! + " " + string
+        }
+        return string
+    }
 
     private var bitcoinDescription: String {
         var decimal = Decimal(self.amount.rawValue)
         var amount: Decimal = 0.0
         NSDecimalMultiplyByPowerOf10(&amount, &decimal, Int16(-currency.state.maxDigits), .up)
         let number = NSDecimalNumber(decimal: amount * (negative ? -1.0 : 1.0))
-        guard let string = rvnFormat.string(from: number) else { return "" }
+        let string = (rvnFormat.string(from: number)! + " " + currencySympbole)
         return string
     }
 
@@ -158,23 +191,23 @@ struct DisplayAmount {
 
     var rvnFormat: NumberFormatter {
         let format = NumberFormatter()
+        //if locale != nil {
+            format.locale = selectedRate?.locale
+        //}
         format.isLenient = true
-        format.numberStyle = .currency
+        format.numberStyle = .decimal
         format.generatesDecimalNumbers = true
         format.negativeFormat = "-\(format.positiveFormat!)"
-        format.currencyCode = currency.code
+        //format.currencyCode = currency.code
         switch currency.state.maxDigits {
         case 2:
-            format.currencySymbol = "\(S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*100000 as NSNumber
         case 5:
-            format.currencySymbol = "m\(S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = (C.maxMoney/C.satoshis)*1000 as NSNumber
         case 8:
-            format.currencySymbol = "\(S.Symbols.rvn)\(S.Symbols.narrowSpace)"
             format.maximum = C.maxMoney/C.satoshis as NSNumber
         default:
-            format.currencySymbol = "\(S.Symbols.uRvn)\(S.Symbols.narrowSpace)"
+            break
         }
 
         format.maximumFractionDigits = currency.state.maxDigits
@@ -183,7 +216,36 @@ struct DisplayAmount {
         if let minimumFractionDigits = minimumFractionDigits {
             format.minimumFractionDigits = minimumFractionDigits
         }
+        else{
+            format.minimumFractionDigits = 2
+        }
 
+        return format
+    }
+    
+    
+    var currencySympbole:String {
+        switch currency.state.maxDigits {
+        case 2:
+            return "\(S.Symbols.ulRvn)\(S.Symbols.narrowSpace)"
+        case 5:
+            return "m\(S.Symbols.lRvn)\(S.Symbols.narrowSpace)"
+        case 8:
+            return "\(S.Symbols.lRvn)\(S.Symbols.narrowSpace)"
+        default:
+            return "\(S.Symbols.ulRvn)\(S.Symbols.narrowSpace)"
+        }
+    }
+    
+    
+    var assetFormat: NumberFormatter {
+        let format = NumberFormatter()
+        format.isLenient = true
+        format.generatesDecimalNumbers = true
+        format.numberStyle = .decimal
+        //format.negativeFormat = "-\(format.positiveFormat!)"
+        //format.minimumFractionDigits = Int(asset!.pointee.unit)
+        format.locale = selectedRate?.locale
         return format
     }
 }

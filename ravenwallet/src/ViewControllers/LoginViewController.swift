@@ -45,7 +45,7 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     private let scanButton = SegmentedButton(title: S.UnlockScreen.scan, type: .right)
     private let isPresentedForLock: Bool
     private let disabledView: WalletDisabledView
-    private let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    private let activityView = UIActivityIndicatorView(style: .whiteLarge)
 
     private var logo: UIImageView = {
         let image = UIImageView(image: #imageLiteral(resourceName: "Logo"))
@@ -115,8 +115,8 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
             nc.viewControllers = [recover]
             nc.navigationBar.tintColor = .darkText
             nc.navigationBar.titleTextAttributes = [
-                NSAttributedStringKey.foregroundColor: UIColor.darkText,
-                NSAttributedStringKey.font: UIFont.customBold(size: 17.0)
+                NSAttributedString.Key.foregroundColor: UIColor.darkText,
+                NSAttributedString.Key.font: UIFont.customBold(size: 17.0)
             ]
             nc.setClearNavbar()
             nc.navigationBar.isTranslucent = false
@@ -132,7 +132,7 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         guard UIApplication.shared.applicationState != .background else { return }
-        if shouldUseBiometrics && !hasAttemptedToShowBiometrics && !isPresentedForLock && UserDefaults.hasShownWelcome {
+        if shouldUseBiometrics && !hasAttemptedToShowBiometrics && !isPresentedForLock {
             hasAttemptedToShowBiometrics = true
             biometricsTapped()
         }
@@ -177,8 +177,8 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     private func addConstraints() {
         backgroundView.constrain(toSuperviewEdges: nil)
         if walletManager != nil {
-            addChildViewController(pinPad, layout: {
-                pinPadPottom = pinPad.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneX ? -C.padding[3] : 0.0)
+            addChild(pinPad, layout: {
+                pinPadPottom = pinPad.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[3] : 0.0)
                 pinPad.view.constrain([
                     pinPad.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                     pinPad.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -188,7 +188,7 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
         }
         pinViewContainer.constrain(toSuperviewEdges: nil)
 
-        topControlTop = topControlContainer.topAnchor.constraint(equalTo: view.topAnchor, constant: E.isIPhoneX ? C.padding[1] + 35.0 : C.padding[1] + 20.0)
+        topControlTop = topControlContainer.topAnchor.constraint(equalTo: view.topAnchor, constant: E.isIPhoneXOrLater ? C.padding[1] + 35.0 : C.padding[1] + 20.0)
         topControlContainer.constrain([
             topControlTop,
             topControlContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),

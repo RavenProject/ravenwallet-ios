@@ -1,5 +1,5 @@
 //
-//  BRKey.c
+//  Key.c
 //
 //  Created by Aaron Voisine on 8/19/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -30,8 +30,9 @@
 #include <assert.h>
 #include <pthread.h>
 
-#define BITCOIN_PRIVKEY      128
-#define BITCOIN_PRIVKEY_TEST 239
+#define RAVENCOIN_PRIVKEY             128
+#define RAVENCOIN_PRIVKEY_TEST        239
+#define RAVENCOIN_PRIVKEY_REGTEST     239
 
 #if __BIG_ENDIAN__ || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) ||\
     __ARMEB__ || __THUMBEB__ || __AARCH64EB__ || __MIPSEB__
@@ -48,7 +49,9 @@
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wconditional-uninitialized"
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include "secp256k1/src/basic-config.h"
 #include "secp256k1/src/secp256k1.c"
 #pragma clang diagnostic pop
@@ -130,10 +133,12 @@ int BRPrivKeyIsValid(const char *privKey)
     strLen = strlen(privKey);
     
     if (dataLen == 33 || dataLen == 34) { // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
-#if BITCOIN_TESTNET
-        r = (data[0] == BITCOIN_PRIVKEY_TEST);
+#if TESTNET
+        r = (data[0] == RAVENCOIN_PRIVKEY_TEST);
+#elif REGTEST
+        r = (data[0] == RAVENCOIN_PRIVKEY_REGTEST);
 #else
-        r = (data[0] == BITCOIN_PRIVKEY);
+        r = (data[0] == RAVENCOIN_PRIVKEY);
 #endif
     }
     else if ((strLen == 30 || strLen == 22) && privKey[0] == 'S') { // mini private key format
@@ -141,7 +146,7 @@ int BRPrivKeyIsValid(const char *privKey)
         
         strncpy(s, privKey, sizeof(s));
         s[sizeof(s) - 2] = '?';
-        BRSHA256(data, s, sizeof(s) - 1);
+        SHA256(data, s, sizeof(s) - 1);
         mem_clean(s, sizeof(s));
         r = (data[0] == 0);
     }
@@ -169,11 +174,13 @@ int BRKeySetSecret(BRKey *key, const UInt256 *secret, int compressed)
 int BRKeySetPrivKey(BRKey *key, const char *privKey)
 {
     size_t len = strlen(privKey);
-    uint8_t data[34], version = BITCOIN_PRIVKEY;
+    uint8_t data[34], version = RAVENCOIN_PRIVKEY;
     int r = 0;
     
-#if BITCOIN_TESTNET
-    version = BITCOIN_PRIVKEY_TEST;
+#if TESTNET
+    version = RAVENCOIN_PRIVKEY_TEST;
+#elif REGTEST
+    version = RAVENCOIN_PRIVKEY_REGTEST;
 #endif
 
     assert(key != NULL);
@@ -181,9 +188,9 @@ int BRKeySetPrivKey(BRKey *key, const char *privKey)
     
     // mini private key format
     if ((len == 30 || len == 22) && privKey[0] == 'S') {
-        if (! BRPrivKeyIsValid(privKey)) return 0;
-        BRSHA256(data, privKey, strlen(privKey));
-        r = BRKeySetSecret(key, (UInt256 *)data, 0);
+        if (!BRPrivKeyIsValid(privKey)) return 0;
+        SHA256(data, privKey, strlen(privKey));
+        r = BRKeySetSecret(key, (UInt256 *) data, 0);
     }
     else {
         len = BRBase58CheckDecode(data, sizeof(data), privKey);
@@ -196,10 +203,10 @@ int BRKeySetPrivKey(BRKey *key, const char *privKey)
         }
 
         if ((len == sizeof(UInt256) + 1 || len == sizeof(UInt256) + 2) && data[0] == version) {
-            r = BRKeySetSecret(key, (UInt256 *)&data[1], (len == sizeof(UInt256) + 2));
+            r = BRKeySetSecret(key, (UInt256 *) &data[1], (len == sizeof(UInt256) + 2));
         }
         else if (len == sizeof(UInt256)) {
-            r = BRKeySetSecret(key, (UInt256 *)data, 0);
+            r = BRKeySetSecret(key, (UInt256 *) data, 0);
         }
     }
 
@@ -232,9 +239,11 @@ size_t BRKeyPrivKey(const BRKey *key, char *privKey, size_t pkLen)
     assert(key != NULL);
     
     if (secp256k1_ec_seckey_verify(_ctx, key->secret.u8)) {
-        data[0] = BITCOIN_PRIVKEY;
-#if BITCOIN_TESTNET
-        data[0] = BITCOIN_PRIVKEY_TEST;
+        data[0] = RAVENCOIN_PRIVKEY;
+#if TESTNET
+        data[0] = RAVENCOIN_PRIVKEY_TEST;
+#elif REGTEST
+        data[0] = RAVENCOIN_PRIVKEY_REGTEST;
 #endif
         
         UInt256Set(&data[1], key->secret);
@@ -277,7 +286,7 @@ UInt160 BRKeyHash160(BRKey *key)
     
     assert(key != NULL);
     len = BRKeyPubKey(key, NULL, 0);
-    if (len > 0 && secp256k1_ec_pubkey_parse(_ctx, &pk, key->pubKey, len)) BRHash160(&hash, key->pubKey, len);
+    if (len > 0 && secp256k1_ec_pubkey_parse(_ctx, &pk, key->pubKey, len)) Hash160(&hash, key->pubKey, len);
     return hash;
 }
 
@@ -291,9 +300,11 @@ size_t BRKeyAddress(BRKey *key, char *addr, size_t addrLen)
     assert(key != NULL);
     
     hash = BRKeyHash160(key);
-    data[0] = BITCOIN_PUBKEY_ADDRESS;
-#if BITCOIN_TESTNET
-    data[0] = BITCOIN_PUBKEY_ADDRESS_TEST;
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS;
+#if TESTNET
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_TEST;
+#elif REGTEST
+    data[0] = RAVENCOIN_PUBKEY_ADDRESS_REGTEST;
 #endif
     UInt160Set(&data[1], hash);
 

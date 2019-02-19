@@ -51,7 +51,13 @@ struct E {
         return (UIApplication.shared.keyWindow?.bounds.height == 568.0) && (E.is32Bit)
     }
     static let isIPhoneX: Bool = {
-        return (UIScreen.main.bounds.size.height == 812.0)
+        return (UIScreen.main.bounds.size.height == 812.0) || (UIScreen.main.bounds.size.height == 896.0)
+    }()
+    static let isIPhoneXSMax: Bool = {
+        return (UIScreen.main.bounds.size.height == 896.0)
+    }()
+    static let isIPhoneXOrLater: Bool = {
+        return (UIScreen.main.bounds.size.height >= 812.0)
     }()
     static let is32Bit: Bool = {
         return MemoryLayout<Int>.size == MemoryLayout<UInt32>.size

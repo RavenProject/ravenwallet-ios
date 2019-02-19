@@ -149,7 +149,7 @@ class AmountViewController : UIViewController, Trackable {
             feeLabel.topAnchor.constraint(equalTo: balanceLabel.bottomAnchor),
             feeLabel.trailingAnchor.constraint(equalTo: editFee.leadingAnchor, constant: C.padding[1]) ])
         pinPadHeight = pinPad.view.heightAnchor.constraint(equalToConstant: 0.0)
-        addChildViewController(pinPad, layout: {
+        addChild(pinPad, layout: {
             pinPad.view.constrain([
                 pinPad.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 pinPad.view.topAnchor.constraint(equalTo: border.bottomAnchor),
@@ -206,7 +206,7 @@ class AmountViewController : UIViewController, Trackable {
             self?.toggleFeeSelector()
         }
         editFee.setImage(#imageLiteral(resourceName: "Edit"), for: .normal)
-        editFee.imageEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0)
+        editFee.imageEdgeInsets = UIEdgeInsets(top: 15.0, left: 15.0, bottom: 15.0, right: 15.0)
         editFee.tintColor = .grayTextTint
         editFee.isHidden = true
         feeLabel.numberOfLines = 0
@@ -253,7 +253,11 @@ class AmountViewController : UIViewController, Trackable {
         }
 
         var newAmount: Satoshis?
-        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {
+        if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {//BMEX TODO : need optimisation
+            if(Double(outputAmount) > Double(C.maxMoney/C.oneAsset)){
+                pinPad.removeLast()
+                return
+            }
             if let rate = selectedRate {
                 newAmount = Satoshis(value: outputAmount, rate: rate)
             } else {
@@ -282,6 +286,9 @@ class AmountViewController : UIViewController, Trackable {
         guard let amount = amount else { amountLabel.text = ""; return }
         let displayAmount = DisplayAmount(amount: amount, selectedRate: selectedRate, minimumFractionDigits: minimumFractionDigits, currency: Currencies.rvn)
         var output = displayAmount.description
+        output = output.replacingOccurrences(of: "RVN", with: "")
+        output = output.replacingOccurrences(of: S.Symbols.narrowSpace, with: "")
+        output = String(output.dropLast())
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)
         }

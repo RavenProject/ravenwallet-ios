@@ -1,5 +1,5 @@
 //
-//  BRKey.h
+//  Key.h
 //
 //  Created by Aaron Voisine on 8/19/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRKey_h
-#define BRKey_h
+#ifndef Key_h
+#define Key_h
 
 #include "BRInt.h"
 #include <stddef.h>
@@ -113,4 +113,4 @@ int BRKeyRecoverPubKey(BRKey *key, UInt256 md, const void *compactSig, size_t si
 }
 #endif
 
-#endif // BRKey_h
+#endif // Key_h

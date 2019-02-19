@@ -15,7 +15,7 @@ enum ArticleIds {
     static let securityCenter = "security"
     static let paperKey = "security/paper-key.html"
     static let enableTouchId = "security/fingerprint.html"
-    static let touchIdSpendingLimit = "fingerprint-spending-limit"
+    static let touchIdSpendingLimit = "fingerprint"
     static let transactionDetails = "send-receive/rvn-transaction.html"
     static let manageWallet = "app-settings"
     static let receiveBitcoin = "send-receive"

@@ -8,10 +8,17 @@
 
 import UIKit
 
+enum AddressCellType {//BMEX
+    case send
+    case create
+}
+
 class AddressCell : UIView {
 
-    init(currency: CurrencyDef) {
+    init(currency: CurrencyDef, type:AddressCellType = .send, isAddressBookBtnHidden:Bool = false) {
         self.currency = currency
+        self.addressCellType = type
+        self.isAddressBookBtnHidden = isAddressBookBtnHidden
         super.init(frame: .zero)
         setupViews()
     }
@@ -41,13 +48,15 @@ class AddressCell : UIView {
     let textField = UITextField()
     let paste = ShadowButton(title: S.Send.pasteLabel, type: .secondary)
     let scan = ShadowButton(title: S.Send.scanLabel, type: .secondary)
-    fileprivate let contentLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
-    private let label = UILabel(font: .customBody(size: 16.0))
+    let addressBook = ShadowButton(type: .secondary, image: #imageLiteral(resourceName: "AddressBookWhite"))
+    let contentLabel = UILabel(font: .customBody(size: 14.0), color: .darkText)
+    let label = UILabel(font: .customBody(size: 16.0))
     fileprivate let gr = UITapGestureRecognizer()
-    fileprivate let tapView = UIView()
-    private let border = UIView(color: .secondaryShadow)
-    
+    let tapView = UIView()
+    let border = UIView(color: .secondaryShadow)
+    var addressCellType: AddressCellType
     fileprivate let currency: CurrencyDef
+    var isAddressBookBtnHidden: Bool = false
 
     private func setupViews() {
         addSubviews()
@@ -55,17 +64,18 @@ class AddressCell : UIView {
         setInitialData()
     }
 
-    private func addSubviews() {
+    func addSubviews() {
         addSubview(label)
         addSubview(contentLabel)
         addSubview(textField)
         addSubview(tapView)
         addSubview(border)
         addSubview(paste)
+        addSubview(addressBook)
         addSubview(scan)
     }
 
-    private func addConstraints() {
+    func addConstraints() {
         label.constrain([
             label.constraint(.centerY, toView: self),
             label.constraint(.leading, toView: self, constant: C.padding[2]) ])
@@ -85,18 +95,33 @@ class AddressCell : UIView {
         scan.constrain([
             scan.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2]),
             scan.centerYAnchor.constraint(equalTo: centerYAnchor) ])
+        addressBook.constrain([
+            addressBook.centerYAnchor.constraint(equalTo: centerYAnchor),
+            addressBook.trailingAnchor.constraint(equalTo: scan.leadingAnchor, constant: -C.padding[1]),
+            addressBook.widthAnchor.constraint(equalTo: scan.widthAnchor, multiplier: isAddressBookBtnHidden ? 0 : 1),
+            addressBook.heightAnchor.constraint(equalTo: scan.heightAnchor)])
         paste.constrain([
             paste.centerYAnchor.constraint(equalTo: centerYAnchor),
-            paste.trailingAnchor.constraint(equalTo: scan.leadingAnchor, constant: -C.padding[1]) ])
+            paste.trailingAnchor.constraint(equalTo: addressBook.leadingAnchor, constant: -C.padding[1]) ])
         border.constrain([
             border.leadingAnchor.constraint(equalTo: leadingAnchor),
             border.bottomAnchor.constraint(equalTo: bottomAnchor),
             border.trailingAnchor.constraint(equalTo: trailingAnchor),
             border.heightAnchor.constraint(equalToConstant: 1.0) ])
     }
+    
+    func removePastAndScan()
+    {
+        self.scan.removeFromSuperview()
+        self.paste.removeFromSuperview()
+        self.addressBook.removeFromSuperview()
+        contentLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -C.padding[2])
+    }
 
     private func setInitialData() {
-        label.text = S.Send.toLabel
+        self.clipsToBounds = true
+        addressBook.clipsToBounds = true
+        label.text = (addressCellType == .send) ? S.Send.toLabel : S.AddressBook.addressLabel
         textField.font = contentLabel.font
         textField.textColor = contentLabel.textColor
         textField.isHidden = true

@@ -18,7 +18,7 @@ class ScanViewController : UIViewController, Trackable {
         let alertController = UIAlertController(title: S.Send.cameraUnavailableTitle, message: S.Send.cameraUnavailableMessage, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))
         alertController.addAction(UIAlertAction(title: S.Button.settings, style: .`default`, handler: { _ in
-            if let appSettings = URL(string: UIApplicationOpenSettingsURLString) {
+            if let appSettings = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(appSettings)
             }
         }))
@@ -69,7 +69,7 @@ class ScanViewController : UIViewController, Trackable {
         view.addSubview(guide)
 
         toolbar.constrainBottomCorners(sidePadding: 0, bottomPadding: 0)
-        if E.isIPhoneX {
+        if E.isIPhoneXOrLater {
             toolbar.constrain([ toolbar.constraint(.height, constant: 60.0) ])
             
             close.constrain([

@@ -1,5 +1,5 @@
 //
-//  BRCrypto.h
+//  Crypto.h
 //
 //  Created by Aaron Voisine on 8/8/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -35,62 +35,62 @@ extern "C" {
 #endif
 
 // sha-1 - not recommended for cryptographic use
-void BRSHA1(void *md20, const void *data, size_t len);
+void SHA1(void *md20, const void *data, size_t len);
 
-void BRSHA256(void *md32, const void *data, size_t len);
+void SHA256(void *md32, const void *data, size_t len);
 
-void BRSHA224(void *md28, const void *data, size_t len);
+void SHA224(void *md28, const void *data, size_t len);
 
-void BRX16R(void *md32, const void *data, size_t len);
+void X16R(void *md32, const void *data, size_t len);
 
-    // double-sha-256 = sha-256(sha-256(x))
-void BRSHA256_2(void *md32, const void *data, size_t len);
+// double-sha-256 = sha-256(sha-256(x))
+void SHA256_2(void *md32, const void *data, size_t len);
 
-void BRSHA384(void *md48, const void *data, size_t len);
+void SHA384(void *md48, const void *data, size_t len);
 
-void BRSHA512(void *md64, const void *data, size_t len);
+void SHA512(void *md64, const void *data, size_t len);
 
 // ripemd-160: http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
-void BRRMD160(void *md20, const void *data, size_t len);
+void RMD160(void *md20, const void *data, size_t len);
 
 // bitcoin hash-160 = ripemd-160(sha-256(x))
-void BRHash160(void *md20, const void *data, size_t len);
+void Hash160(void *md20, const void *data, size_t len);
 
 // md5 - for non-cryptographic use only
-void BRMD5(void *md16, const void *data, size_t len);
+void MD5(void *md16, const void *data, size_t len);
 
 // murmurHash3 (x86_32): https://code.google.com/p/smhasher/ - for non cryptographic use only
-uint32_t BRMurmur3_32(const void *data, size_t len, uint32_t seed);
+uint32_t Murmur3_32(const void *data, size_t len, uint32_t seed);
 
-void BRHMAC(void *mac, void (*hash)(void *, const void *, size_t), size_t hashLen, const void *key, size_t keyLen,
-            const void *data, size_t dataLen);
+void HMAC(void *mac, void (*hash)(void *, const void *, size_t), size_t hashLen, const void *key, size_t keyLen,
+          const void *data, size_t dataLen);
 
 // hmac-drbg with no prediction resistance or additional input
 // K and V must point to buffers of size hashLen, and ps (personalization string) may be NULL
 // to generate additional drbg output, use K and V from the previous call, and set seed, nonce and ps to NULL
-void BRHMACDRBG(void *out, size_t outLen, void *K, void *V, void (*hash)(void *, const void *, size_t), size_t hashLen,
-                const void *seed, size_t seedLen, const void *nonce, size_t nonceLen, const void *ps, size_t psLen);
+void HMACDRBG(void *out, size_t outLen, void *K, void *V, void (*hash)(void *, const void *, size_t), size_t hashLen,
+              const void *seed, size_t seedLen, const void *nonce, size_t nonceLen, const void *ps, size_t psLen);
 
 // poly1305 authenticator: https://tools.ietf.org/html/rfc7539
 // NOTE: must use constant time mem comparison when verifying mac to defend against timing attacks
-void BRPoly1305(void *mac16, const void *key32, const void *data, size_t len);
+void Poly1305(void *mac16, const void *key32, const void *data, size_t len);
 
 // chacha20 stream cypher: https://cr.yp.to/chacha.html
-void BRChacha20(void *out, const void *key32, const void *iv8, const void *data, size_t len, uint64_t counter);
+void Chacha20(void *out, const void *key32, const void *iv8, const void *data, size_t len, uint64_t counter);
     
 // chacha20-poly1305 authenticated encryption with associated data (AEAD): https://tools.ietf.org/html/rfc7539
-size_t BRChacha20Poly1305AEADEncrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
-                                     const void *data, size_t dataLen, const void *ad, size_t adLen);
+size_t Chacha20Poly1305AEADEncrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
+                                   const void *data, size_t dataLen, const void *ad, size_t adLen);
 
-size_t BRChacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
-                                     const void *data, size_t dataLen, const void *ad, size_t adLen);
+size_t Chacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, const void *nonce12,
+                                   const void *data, size_t dataLen, const void *ad, size_t adLen);
     
-void BRPBKDF2(void *dk, size_t dkLen, void (*hash)(void *, const void *, size_t), size_t hashLen,
-              const void *pw, size_t pwLen, const void *salt, size_t saltLen, unsigned rounds);
+void PBKDF2(void *dk, size_t dkLen, void (*hash)(void *, const void *, size_t), size_t hashLen,
+            const void *pw, size_t pwLen, const void *salt, size_t saltLen, unsigned rounds);
 
 // scrypt key derivation: http://www.tarsnap.com/scrypt.html
-void BRScrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *salt, size_t saltLen,
-              unsigned n, unsigned r, unsigned p);
+void Scrypt(void *dk, size_t dkLen, const void *pw, size_t pwLen, const void *salt, size_t saltLen,
+            unsigned n, unsigned r, unsigned p);
 
 // zeros out memory in a way that can't be optimized out by the compiler
 inline static void mem_clean(void *ptr, size_t len)
@@ -114,4 +114,4 @@ inline static void _var_clean(size_t size, ...)
 }
 #endif
 
-#endif // BRCrypto_h
+#endif // Crypto_h

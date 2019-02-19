@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import breadwallet
+@testable import Ravencoin
 
 class TestObject: BRCoding {
     var string: String

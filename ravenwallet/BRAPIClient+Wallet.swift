@@ -66,15 +66,15 @@ extension BRAPIClient {
                     guard let ratio : Double = Double(arr["price_btc"] as! String) else {
                         return handler(0.00, "Error getting from arr")
                     }
-                    print("\(ratio)");
+                    print("BMEX Ratio \(ratio)");
                     return handler(ratio, nil)
                 } else {
-                    return handler(0.00, "Error fetching from Raven multiplier url")
+                    return handler(0.00, "BMEX Ratio Error fetching from Raven multiplier url")
                 }
                 
                 
             } catch let error {
-                return handler(0.00, "price_btc data error caught \(error)");
+                return handler(0.00, "BMEX Ratio price_btc data error caught \(error)");
             }
         }
         task.resume()
@@ -152,7 +152,7 @@ extension BRAPIClient {
 //    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
     func fetchUTXOS(address: String, currency: CurrencyDef, completion: @escaping ([[String: Any]]?)->Void) {
         let path = "https://ravencoin.network/api/addrs/utxo"
-        // Todo take testnet in consideration
+        // TODO: take testnet in consideration
 //        let path = "https://network.ravencoin.network/api/addrs/utxo"
         var req = URLRequest(url: URL(string: path)!)
         req.httpMethod = "POST"

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import BRCore
+import Core
 import MachO
 
 let accountHeaderHeight: CGFloat = 152.0
@@ -22,13 +22,13 @@ class AccountViewController : UIViewController, Subscriber {
         self.walletManager = walletManager
         self.currency = walletManager.currency
         self.headerView = AccountHeaderView(currency: currency)
-        self.footerView = AccountFooterView(currency: currency)
+        self.footerView = AccountFooterView(walletManager: walletManager)
         super.init(nibName: nil, bundle: nil)
         self.transactionsTableView = TransactionsTableViewController(walletManager: walletManager, didSelectTransaction: didSelectTransaction)
         
         headerView.isWatchOnly = walletManager.isWatchOnly
         footerView.sendCallback     = { Store.perform(action: RootModalActions.Present(modal: .send(currency: walletManager.currency))) }
-        footerView.receiveCallback  = { Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency))) }
+        footerView.receiveCallback  = { Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency, isRequestAmountVisible: true, initialAddress: nil))) }
     }
 
     //MARK: - Private
@@ -68,16 +68,16 @@ class AccountViewController : UIViewController, Subscriber {
                     isJailbroken = true
                 }
             }
-            NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
+            NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { note in
                 self.showJailbreakWarnings(isJailbroken: isJailbroken)
             }
             showJailbreakWarnings(isJailbroken: isJailbroken)
         }
 
         setupNavigationBar()
-        addTransactionsView()
         addSubviews()
         addConstraints()
+        addTransactionsView()
         addSubscriptions()
         setInitialData()
     }
@@ -119,10 +119,15 @@ class AccountViewController : UIViewController, Subscriber {
     }
 
     private func addConstraints() {
-        headerContainer.constrainTopCorners(height: accountHeaderHeight)
+        let topConstraint = headerContainer.topAnchor.constraint(equalTo: view.topAnchor)
+        topConstraint.priority = .required
+        headerContainer.constrain([
+            headerContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topConstraint,
+            headerContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
         headerView.constrain(toSuperviewEdges: nil)
         searchHeaderview.constrain(toSuperviewEdges: nil)
-
+        
         if #available(iOS 11.0, *) {
             footerView.constrain([
                 footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -141,7 +146,11 @@ class AccountViewController : UIViewController, Subscriber {
     }
 
     private func addSubscriptions() {
-        Store.subscribe(self, selector: { $0.isLoginRequired != $1.isLoginRequired }, callback: { self.isLoginRequired = $0.isLoginRequired })
+        Store.subscribe(self, selector: {
+            $0.isLoginRequired != $1.isLoginRequired
+        }, callback: {
+                self.isLoginRequired = $0.isLoginRequired
+        })
         Store.subscribe(self, name: .showStatusBar, callback: { _ in
             self.shouldShowStatusBar = true
         })
@@ -159,16 +168,19 @@ class AccountViewController : UIViewController, Subscriber {
 
     private func addTransactionsView() {
         view.backgroundColor = .whiteTint
-        addChildViewController(transactionsTableView, layout: {
+        addChild(transactionsTableView, layout: {
             if #available(iOS 11.0, *) {
                 transactionsTableView.view.constrain([
-                    transactionsTableView.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                transactionsTableView.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                transactionsTableView.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                transactionsTableView.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                ])
+                    transactionsTableView.view.topAnchor.constraint(equalTo: headerContainer.bottomAnchor),
+                    transactionsTableView.view.bottomAnchor.constraint(equalTo: footerView.topAnchor),
+                    transactionsTableView.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                    transactionsTableView.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)])
             } else {
-                transactionsTableView.view.constrain(toSuperviewEdges: nil)
+                transactionsTableView.view.constrain([
+                    transactionsTableView.view.topAnchor.constraint(equalTo: headerContainer.bottomAnchor),
+                    transactionsTableView.view.bottomAnchor.constraint(equalTo: footerView.topAnchor),
+                    transactionsTableView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    transactionsTableView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
             }
         })
     }

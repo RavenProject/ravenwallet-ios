@@ -27,18 +27,18 @@ fileprivate class BRBrowserViewControllerInternal: UIViewController, WKNavigatio
     let toolbarView = UIToolbar()
     let progressView = UIProgressView()
     let refreshButtonItem = UIBarButtonItem(
-        barButtonSystemItem: UIBarButtonSystemItem.refresh, target: self,
+        barButtonSystemItem: UIBarButtonItem.SystemItem.refresh, target: self,
         action: #selector(BRBrowserViewControllerInternal.refresh))
     var stopButtonItem = UIBarButtonItem(
-        barButtonSystemItem: UIBarButtonSystemItem.stop, target: self,
+        barButtonSystemItem: UIBarButtonItem.SystemItem.stop, target: self,
         action: #selector(BRBrowserViewControllerInternal.stop))
     var flexibleSpace = UIBarButtonItem(
-        barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
     var backButtonItem = UIBarButtonItem(
-        title: "\u{25C0}\u{FE0E}", style: UIBarButtonItemStyle.plain, target: self,
+        title: "\u{25C0}\u{FE0E}", style: UIBarButtonItem.Style.plain, target: self,
         action: #selector(BRBrowserViewControllerInternal.goBack))
     var forwardButtonItem = UIBarButtonItem(
-        title: "\u{25B6}\u{FE0E}", style: UIBarButtonItemStyle.plain, target: self,
+        title: "\u{25B6}\u{FE0E}", style: UIBarButtonItem.Style.plain, target: self,
         action: #selector(BRBrowserViewControllerInternal.goForward))
     
     open override var edgesForExtendedLayout: UIRectEdge {
@@ -216,11 +216,11 @@ fileprivate class BRBrowserViewControllerInternal: UIViewController, WKNavigatio
     
     // MARK: - WKNavigationDelegate
     open func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        print("[BRBrowserViewController] webView didCommit navigation = \(navigation)")
+        print("[BRBrowserViewController] webView didCommit navigation = \(String(describing: navigation))")
     }
     
     open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("[BRBrowserViewController] webView didFinish navigation = \(navigation)")
+        print("[BRBrowserViewController] webView didFinish navigation = \(String(describing: navigation))")
         // this is part two of executing a POST request when loading the initial request 
         // since WKWebView looses the POST body when calling load(request:) we have to use our
         // custom POST bouncer, an html file with a javascript function called `post(url:,body:)` 
@@ -248,14 +248,14 @@ fileprivate class BRBrowserViewControllerInternal: UIViewController, WKNavigatio
     }
     
     open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print("[BRBrowserViewController] webView didFail navigation = \(navigation) error = \(error)")
+        print("[BRBrowserViewController] webView didFail navigation = \(String(describing: navigation)) error = \(error)")
         showLoading(false)
         showError(error.localizedDescription)
     }
     
     open func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,
                       withError error: Error) {
-        print("[BRBrowserViewController] webView didFailProvisionalNavigation navigation = \(navigation) error = \(error)")
+        print("[BRBrowserViewController] webView didFailProvisionalNavigation navigation = \(String(describing: navigation)) error = \(error)")
         showLoading(false)
         showError(error.localizedDescription)
     }
@@ -283,7 +283,7 @@ fileprivate class BRBrowserViewControllerInternal: UIViewController, WKNavigatio
     }
     
     open func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        print("[BRBrowserViewController] webView didStartProfisionalNavigation navigation = \(navigation)")
+        print("[BRBrowserViewController] webView didStartProfisionalNavigation navigation = \(String(describing: navigation))")
         showLoading(true)
     }
     

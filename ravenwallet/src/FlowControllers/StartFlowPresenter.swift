@@ -30,7 +30,9 @@ class StartFlowPresenter : Subscriber {
         let button = UIButton.close
         button.tintColor = .white
         button.tap = {
-            Store.perform(action: HideStartFlow())
+            //BMEX not hide star flow befor user confirm terms of use
+            //Store.perform(action: HideStartFlow())
+            Store.trigger(name: .showTermsOfUse())
         }
         return button
     }
@@ -46,6 +48,16 @@ class StartFlowPresenter : Subscriber {
         Store.subscribe(self, name: .lock, callback: { _ in
             self.presentLoginFlow(isPresentedForLock: true)
         })
+        //Terms of use
+        Store.subscribe(self, name: .showTermsOfUse(), callback: { _ in
+            self.showTermsOfUse()
+        })
+    }
+    
+    func showTermsOfUse() {
+        let termsUseVC = ConfirmationTermsUseVC()
+        self.navigationController?.setWhiteStyle()
+        self.navigationController?.pushViewController(termsUseVC, animated: true)
     }
 
     private func handleStartFlowChange(state: State) {
@@ -76,6 +88,8 @@ class StartFlowPresenter : Subscriber {
             myself.navigationController?.setClearNavbar()
             myself.navigationController?.setNavigationBarHidden(false, animated: false)
             myself.navigationController?.pushViewController(recoverIntro, animated: true)
+            }, didTapTutorial: { [weak self] in
+                self?.pushTutorialVC()
         })
 
         navigationController = ModalNavigationController(rootViewController: startViewController)
@@ -132,6 +146,15 @@ class StartFlowPresenter : Subscriber {
         navigationController?.setClearNavbar()
         navigationController?.pushViewController(pinCreationViewController, animated: true)
     }
+    
+    private func pushTutorialVC() {
+        let tutorialVC = TutorialVC {
+            self.pushPinCreationViewControllerForNewWallet()
+        }
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.setClearNavbar()
+        navigationController?.pushViewController(tutorialVC, animated: true)
+    }
 
     private func handleWalletCreationError() {
         let alert = UIAlertController(title: S.Alert.error, message: "Could not create wallet", preferredStyle: .alert)
@@ -152,8 +175,8 @@ class StartFlowPresenter : Subscriber {
         paperPhraseViewController.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
 
         navigationController?.navigationBar.titleTextAttributes = [
-            NSAttributedStringKey.foregroundColor: UIColor.white,
-            NSAttributedStringKey.font: UIFont.customBold(size: 17.0)
+            NSAttributedString.Key.foregroundColor: UIColor.white,
+            NSAttributedString.Key.font: UIFont.customBold(size: 17.0)
         ]
         navigationController?.pushViewController(paperPhraseViewController, animated: true)
     }
@@ -170,7 +193,7 @@ class StartFlowPresenter : Subscriber {
     private func pushConfirmPaperPhraseViewController(pin: String) {
         let confirmViewController = ConfirmPaperPhraseViewController(walletManager: walletManager, pin: pin, callback: {
             Store.perform(action: Alert.Show(.paperKeySet(callback: {
-                Store.perform(action: HideStartFlow())
+                Store.trigger(name: .showTermsOfUse())
             })))
         })
         confirmViewController.title = S.SecurityCenter.Cells.paperKeyTitle

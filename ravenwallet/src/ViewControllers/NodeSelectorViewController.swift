@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import BRCore
+import Core
 
 class NodeSelectorViewController : UIViewController, Trackable {
 

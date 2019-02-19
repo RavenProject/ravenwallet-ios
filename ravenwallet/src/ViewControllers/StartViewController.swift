@@ -11,9 +11,10 @@ import UIKit
 class StartViewController : UIViewController {
 
     //MARK: - Public
-    init(didTapCreate: @escaping () -> Void, didTapRecover: @escaping () -> Void) {
+    init(didTapCreate: @escaping () -> Void, didTapRecover: @escaping () -> Void, didTapTutorial: @escaping () -> Void) {
         self.didTapRecover = didTapRecover
         self.didTapCreate = didTapCreate
+        self.didTapTutorial = didTapTutorial
         self.faq = UIButton.buildFaqButton(articleId: ArticleIds.startView)
         super.init(nibName: nil, bundle: nil)
     }
@@ -23,7 +24,8 @@ class StartViewController : UIViewController {
     private let create = ShadowButton(title: S.StartViewController.createButton, type: .tertiary)
     private let recover = ShadowButton(title: S.StartViewController.recoverButton, type: .secondary)
     private let didTapRecover: () -> Void
-    private let didTapCreate: () -> Void
+    let didTapCreate: () -> Void
+    private let didTapTutorial: () -> Void
     private let background = LoginBackgroundView()
     private var logo: UIImageView = {
         let image = UIImageView(image: #imageLiteral(resourceName: "Logo"))
@@ -47,6 +49,7 @@ class StartViewController : UIViewController {
     }
 
     private func setData() {
+        UserDefaults.hasRescannedBlockChain = true
         message.text = S.StartViewController.message
         message.lineBreakMode = .byWordWrapping
         message.numberOfLines = 0
@@ -60,7 +63,7 @@ class StartViewController : UIViewController {
         view.addSubview(message)
         view.addSubview(create)
         view.addSubview(recover)
-//        view.addSubview(faq)
+        //view.addSubview(faq)
     }
 
     private func addConstraints() {
@@ -87,7 +90,7 @@ class StartViewController : UIViewController {
             create.constraint(.width, toView: recover, constant: nil),
             create.constraint(.height, constant: C.Sizes.buttonHeight) ])
 //        faq.constrain([
-//            faq.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: C.padding[2]),
+//            faq.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: C.padding[2]),
 //            faq.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[2]),
 //            faq.widthAnchor.constraint(equalToConstant: 44.0),
 //            faq.heightAnchor.constraint(equalToConstant: 44.0) ])
@@ -95,7 +98,7 @@ class StartViewController : UIViewController {
 
     private func addButtonActions() {
         recover.tap = didTapRecover
-        create.tap = didTapCreate
+        create.tap = didTapTutorial
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

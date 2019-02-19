@@ -44,7 +44,7 @@ class AboutViewController : UIViewController {
     private func addConstraints() {
         titleLabel.constrain([
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
-            titleLabel.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: C.padding[2]) ])
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: C.padding[2]) ])
         logoBackground.constrain([
             logoBackground.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoBackground.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: C.padding[3]),
@@ -93,7 +93,7 @@ class AboutViewController : UIViewController {
             myself.presentURL(string: "https://reddit.com/r/ravencoin/")
         }
         privacy.tap = strongify(self) { myself in
-            myself.presentURL(string: "http://ravenwallet.org/support/privacy.html")
+            myself.presentURL(string: "https://ravencoin.org/mobilewallet/support/privacy.html")
         }
     }
 

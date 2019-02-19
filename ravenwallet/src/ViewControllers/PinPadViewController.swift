@@ -16,6 +16,8 @@ enum PinPadStyle {
 enum KeyboardType {
     case decimalPad
     case pinPad
+    case unitsPad
+    case quantityPad
 }
 
 let deleteKeyIdentifier = "del"
@@ -30,7 +32,7 @@ class PinPadViewController : UICollectionViewController {
         switch keyboardType {
         case .decimalPad:
             return 48.0*4.0+3*2.5
-        case .pinPad:
+        case .pinPad, .unitsPad, .quantityPad:
             return 54.0*4.0+3*2.5
         }
     }
@@ -63,9 +65,13 @@ class PinPadViewController : UICollectionViewController {
         case .decimalPad:
             items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", currencyDecimalSeparator, "0", deleteKeyIdentifier]
             layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 48.0 - 1.0)
-        case .pinPad:
+        case .pinPad, .quantityPad:
             items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", deleteKeyIdentifier]
             layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 54.0 - 0.5)
+        case .unitsPad:
+            items = ["1", "2", "3", "4", "5", "6", "7", "8", "", "", "0", deleteKeyIdentifier]
+            layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 54.0 - 0.5)
+
         }
 
         super.init(collectionViewLayout: layout)
@@ -87,11 +93,14 @@ class PinPadViewController : UICollectionViewController {
             case .pinPad:
                 collectionView?.backgroundColor = .whiteTint
                 collectionView?.register(WhiteNumberPad.self, forCellWithReuseIdentifier: cellIdentifier)
+            case .unitsPad, .quantityPad:
+                collectionView?.backgroundColor = .white
+                collectionView?.register(WhiteDecimalPad.self, forCellWithReuseIdentifier: cellIdentifier)
             }
         case .clear:
             collectionView?.backgroundColor = .clear
 
-            if keyboardType == .pinPad {
+            if keyboardType == .pinPad || keyboardType == .unitsPad || keyboardType == .quantityPad{
                 collectionView?.register(ClearNumberPad.self, forCellWithReuseIdentifier: cellIdentifier)
             } else {
                 assert(false, "Invalid cell")

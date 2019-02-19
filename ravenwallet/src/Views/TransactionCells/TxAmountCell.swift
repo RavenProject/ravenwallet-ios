@@ -24,10 +24,11 @@ class TxAmountCell: UITableViewCell, Subscriber {
         return label
     }()
     private let separator = UIView(color: .clear)
-    
+    private var fiatHeight: NSLayoutConstraint?
+
     // MARK: - Init
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
     }
@@ -49,17 +50,18 @@ class TxAmountCell: UITableViewCell, Subscriber {
                                                            left: C.padding[2],
                                                            bottom: -C.padding[2],
                                                            right: -C.padding[2]))
-        
         tokenAmountLabel.constrain([
             tokenAmountLabel.constraint(.top, toView: container),
             tokenAmountLabel.constraint(.leading, toView: container),
-            tokenAmountLabel.constraint(.trailing, toView: container),
+            tokenAmountLabel.constraint(.trailing, toView: container)
             ])
+        fiatHeight = fiatAmountLabel.heightAnchor.constraint(equalToConstant: 20.0)
         fiatAmountLabel.constrain([
             fiatAmountLabel.constraint(toBottom: tokenAmountLabel, constant: 0),
             fiatAmountLabel.constraint(.leading, toView: container),
             fiatAmountLabel.constraint(.trailing, toView: container),
-            fiatAmountLabel.constraint(.bottom, toView: container)
+            fiatAmountLabel.constraint(.bottom, toView: container),
+            fiatHeight
             ])
         
         separator.constrainBottomCorners(height: 0.5)
@@ -83,6 +85,12 @@ class TxAmountCell: UITableViewCell, Subscriber {
         tokenAmountLabel.attributedText = amountText
         
         // fiat amount label
+
+        if let tx = viewModel.tx as? RvnTransaction {
+            if AssetValidator.shared.checkInvalidAsset(asset: tx.asset) {
+                fiatHeight?.constant = 0
+            }
+        }
         
         let currentAmount = viewModel.fiatAmount
         let originalAmount = viewModel.originalFiatAmount

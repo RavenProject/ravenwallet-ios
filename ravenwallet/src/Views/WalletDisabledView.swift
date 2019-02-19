@@ -45,6 +45,7 @@ class WalletDisabledView : UIView {
     private let faq: UIButton
     private let blur: UIVisualEffectView
     private let reset = ShadowButton(title: S.UnlockScreen.resetPin, type: .blackTransparent)
+    private let wipe = ShadowButton(title: S.WipeSetting.title, type: .blackTransparent)
     private let effect = UIBlurEffect(style: .light)
 
     private func setup() {
@@ -57,9 +58,8 @@ class WalletDisabledView : UIView {
         addSubview(blur)
         addSubview(label)
         addSubview(faq)
-// Apple rejected app because the FAQ button launched an invalid URL. Hidding for now to get through approval.
-        faq.isHidden = true
         addSubview(reset)
+        addSubview(wipe)
     }
 
     private func addConstraints() {
@@ -77,11 +77,24 @@ class WalletDisabledView : UIView {
             reset.centerYAnchor.constraint(equalTo: faq.centerYAnchor),
             reset.heightAnchor.constraint(equalToConstant: C.Sizes.buttonHeight),
             reset.widthAnchor.constraint(equalToConstant: 200.0) ])
+        wipe.constrain([
+            wipe.trailingAnchor.constraint(equalTo: reset.trailingAnchor),
+            wipe.bottomAnchor.constraint(equalTo: reset.topAnchor, constant: -C.padding[1]),
+            wipe.heightAnchor.constraint(equalToConstant: C.Sizes.buttonHeight),
+            wipe.widthAnchor.constraint(equalToConstant: 200.0) ])
 
     }
 
     private func setData() {
         label.textAlignment = .center
+        wipe.tap = {
+            let alert = UIAlertController(title: S.WipeWallet.alertTitle, message: S.WipeWallet.alertResetMessage, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: S.Button.cancel, style: .default, handler: nil))
+            alert.addAction(UIAlertAction(title: S.WipeWallet.wipe, style: .destructive, handler: { _ in
+                Store.trigger(name: .wipeWalletNoPrompt)
+            }))
+            self.parentViewController()!.present(alert, animated: true, completion: nil)
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {

@@ -1,5 +1,5 @@
 //
-//  BRSet.h
+//  Set.h
 //
 //  Created by Aaron Voisine on 9/11/15.
 //  Copyright (c) 2015 breadwallet LLC
@@ -22,8 +22,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#ifndef BRSet_h
-#define BRSet_h
+#ifndef Set_h
+#define Set_h
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -32,9 +32,9 @@
 extern "C" {
 #endif
 
-typedef struct BRSetStruct BRSet;
+typedef struct SetStruct BRSet;
 
-// retruns a newly allocated empty set that must be freed by calling BRSetFree()
+// returns a newly allocated empty set that must be freed by calling SetFree()
 // size_t hash(const void *) is a function that returns a hash value for a given set item
 // int eq(const void *, const void *) is a function that returns true if two set items are equal
 // any two items that are equal must also have identical hash values
@@ -67,7 +67,7 @@ void *BRSetGet(const BRSet *set, const void *item);
 void *BRSetIterate(const BRSet *set, const void *previous);
 
 // writes up to count items from set to allItems and returns number of items written
-size_t BRSetAll(const BRSet *set, void *allItems[], size_t count);
+size_t BRSetAll(const BRSet *set, void **allItems, size_t count);
 
 // calls apply() with each item in set
 void BRSetApply(const BRSet *set, void *info, void (*apply)(void *info, void *item));

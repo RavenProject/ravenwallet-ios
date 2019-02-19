@@ -14,15 +14,15 @@ extension UINavigationController {
         setClearNavbar()
         navigationBar.tintColor = .mediumGray
         navigationBar.titleTextAttributes = [
-            NSAttributedStringKey.font: UIFont.customBold(size: 16.0)
+            NSAttributedString.Key.font: UIFont.customBold(size: 16.0)
         ]
     }
 
     func setWhiteStyle() {
         navigationBar.tintColor = .white
         navigationBar.titleTextAttributes = [
-            NSAttributedStringKey.foregroundColor: UIColor.white,
-            NSAttributedStringKey.font: UIFont.customBold(size: 16.0)
+            NSAttributedString.Key.foregroundColor: UIColor.white,
+            NSAttributedString.Key.font: UIFont.customBold(size: 16.0)
         ]
     }
     
@@ -33,7 +33,7 @@ extension UINavigationController {
         navigationBar.barTintColor = .whiteBackground
         navigationBar.tintColor = .mediumGray
         navigationBar.titleTextAttributes = [
-            NSAttributedStringKey.font: UIFont.customBold(size: 16.0)
+            NSAttributedString.Key.font: UIFont.customBold(size: 16.0)
         ]
     }
 
