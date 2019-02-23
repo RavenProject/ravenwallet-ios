@@ -44,12 +44,10 @@ class AssetListTableView: UITableViewController, Subscriber {
             var result = false
             let oldState = $0
             let newState = $1
-            $0.currencies.forEach { currency in
-                if oldState[currency].balance != newState[currency].balance
-                    || oldState[currency].currentRate?.rate != newState[currency].currentRate?.rate
-                    || oldState[currency].maxDigits != newState[currency].maxDigits {
-                    result = true
-                }
+            if oldState[$0.currency].balance != newState[$0.currency].balance
+                || oldState[$0.currency].currentRate?.rate != newState[$0.currency].currentRate?.rate
+                || oldState[$0.currency].maxDigits != newState[$0.currency].maxDigits {
+                result = true
             }
             return result
         }, callback: { _ in
@@ -57,7 +55,7 @@ class AssetListTableView: UITableViewController, Subscriber {
         })
         //BMEX detect transactions changes
         Store.subscribe(self, selector: {
-            $0[Store.state.currencies[0]].transactions != $1[Store.state.currencies[0]].transactions
+            $0[Store.state.currency].transactions != $1[Store.state.currency].transactions
         },
                         callback: { state in
                             AssetManager.shared.loadAsset { assets in
@@ -131,7 +129,7 @@ class AssetListTableView: UITableViewController, Subscriber {
         
         switch section {
         case .wallet:
-            return Store.state.wallets.count
+            return 1
         case .asset:
             return AssetManager.shared.showedAssetList.count > 3 ? 4 : AssetManager.shared.showedAssetList.count
         case .menu:
@@ -157,7 +155,7 @@ class AssetListTableView: UITableViewController, Subscriber {
         
         switch section {
         case .wallet:
-            let currency = Store.state.currencies[indexPath.row]
+            let currency = Store.state.currency
             let viewModel = WalletListViewModel(currency: currency)
             let cell = tableView.dequeueReusableCell(withIdentifier: HomeScreenCell.cellIdentifier, for: indexPath) as! HomeScreenCell
             cell.set(viewModel: viewModel)
@@ -225,7 +223,7 @@ class AssetListTableView: UITableViewController, Subscriber {
         
         switch section {
         case .wallet:
-            didSelectCurrency?(Store.state.currencies[indexPath.row])
+            didSelectCurrency?(Store.state.currency)
         case .asset:
             if (indexPath.row == countToShowMore)
             {
@@ -245,7 +243,7 @@ class AssetListTableView: UITableViewController, Subscriber {
             case .support:
                 didTapSupport?()
             case .addressBook:
-                didTapAddressBook?(Store.state.currencies[0])
+                didTapAddressBook?(Store.state.currency)
             case .tutorial:
                 didTapTutorial?()
             }

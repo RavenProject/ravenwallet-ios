@@ -226,7 +226,7 @@ class StartImportViewController : UIViewController {
         present(importingActivity, animated: true, completion: {
             tx.addOutput(amount: balance - fee, script: script)
             var keys = [key]
-            let _ = tx.sign(forkId: (self.currency as! Raven).forkId, keys: &keys)
+            let _ = tx.sign(keys: &keys)
                 guard tx.isSigned else {
                     self.importingActivity.dismiss(animated: true, completion: {
                         self.showErrorMessage(S.Import.Error.signing)

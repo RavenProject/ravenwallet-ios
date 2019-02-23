@@ -10,7 +10,7 @@ import UIKit
 
 class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     
-    var primaryWalletManager: WalletManager? {
+    var walletManager: WalletManager? {
         didSet {
             setInitialData()
             setupSubscriptions()
@@ -44,8 +44,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     
     // MARK: -
     
-    init(primaryWalletManager: WalletManager?) {
-        self.primaryWalletManager = primaryWalletManager
+    init(walletManager: WalletManager?) {
+        self.walletManager = walletManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -171,11 +171,9 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
     
     private func updateTotalAssets() {
-        let fiatTotal = Store.state.currencies.map {
-            let balance = Store.state[$0].balance ?? 0
-            let rate = Store.state[$0].currentRate?.rate ?? 0
-            return Double(balance)/$0.baseUnit * rate * 0.001
-            }.reduce(0.0, +)
+        let balance = Store.state[Store.state.currency].balance ?? 0
+        let rate = Store.state[Store.state.currency].currentRate?.rate ?? 0
+        let fiatTotal = Double(balance)/Store.state.currency.baseUnit * rate * 0.001
         
         let format = NumberFormatter()
         format.isLenient = true
@@ -193,14 +191,12 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             var result = false
             let oldState = $0
             let newState = $1
-            $0.currencies.forEach { currency in
-                if oldState[currency].balance != newState[currency].balance {
-                    result = true
-                }
-                
-                if oldState[currency].currentRate?.rate != newState[currency].currentRate?.rate {
-                    result = true
-                }
+            if oldState[$0.currency].balance != newState[$0.currency].balance {
+                result = true
+            }
+            
+            if oldState[$0.currency].currentRate?.rate != newState[$0.currency].currentRate?.rate {
+                result = true
             }
             return result
         },
@@ -289,7 +285,7 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
     
     private func attemptShowPrompt() {
-        guard let walletManager = primaryWalletManager else {
+        guard let walletManager = walletManager else {
             currentPrompt = nil
             return
         }

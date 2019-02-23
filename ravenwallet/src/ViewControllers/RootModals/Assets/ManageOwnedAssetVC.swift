@@ -386,7 +386,6 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         
         sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
                     rate: rate,
-                    comment: "",
                     feePerKb: feePerKb,
                     verifyPinFunction: { [weak self] pinValidationCallback in
                         self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in

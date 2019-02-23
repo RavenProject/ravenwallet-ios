@@ -25,18 +25,10 @@ struct RvnTransaction: Transaction {
     let isValid: Bool
     let asset: BRAssetRef?
     
-    var hasKvStore: Bool {
-        return kvStore != nil
-    }
-    
     // MARK: BTC-specific properties
     
     var rawTransaction: BRTransaction? {
         return tx.pointee
-    }
-    
-    var metaData: TxMetaData? {
-        return metaDataContainer?.metaData
     }
     
     let amount: UInt64
@@ -47,17 +39,14 @@ struct RvnTransaction: Transaction {
     // MARK: Private
     
     private let tx: BRTxRef
-    private let metaDataContainer: MetaDataContainer?
-    private let kvStore: BRReplicatedKVStore?
     
     // MARK: - Init
     
-    init?(_ tx: BRTxRef, walletManager: WalletManager, kvStore: BRReplicatedKVStore?, rate: Rate?) {
+    init?(_ tx: BRTxRef, walletManager: WalletManager, rate: Rate?) {
         guard let wallet = walletManager.wallet,
             let peerManager = walletManager.peerManager else { return nil }
         self.currency = walletManager.currency
         self.tx = tx
-        self.kvStore = kvStore
         
         let amountReceived = wallet.amountReceivedFromTx(tx)
         let amountSent = wallet.amountSentByTx(tx)
@@ -129,77 +118,8 @@ struct RvnTransaction: Transaction {
             status = .invalid
         }
         
-        if let kvStore = kvStore {
-            metaDataContainer = MetaDataContainer(key: tx.pointee.txHash.txKey, kvStore: kvStore)
-            if let rate = rate,
-                confirmations < 6 && direction == .received {
-                metaDataContainer!.createMetaData(tx: tx, rate: rate)
-            }
-        } else {
-            metaDataContainer = nil
-        }
-        
         //Asset
         asset = tx.pointee.asset
     }
     
-    // MARK: -
-    
-    func saveComment(comment: String, rate: Rate) {
-        guard let metaDataContainer = metaDataContainer else { return }
-        metaDataContainer.save(comment: comment, tx: tx, rate: rate)
-    }
-}
-
-/// Encapsulates the transaction metadata in the KV store
-class MetaDataContainer {
-    var metaData: TxMetaData? {
-        get {
-            guard metaDataCache == nil else { return metaDataCache }
-            guard let data = TxMetaData(txKey: key, store: kvStore) else { return nil }
-            metaDataCache = data
-            return metaDataCache
-        }
-    }
-    
-    private var key: String
-    private var kvStore: BRReplicatedKVStore
-    private var metaDataCache: TxMetaData?
-    
-    init(key: String, kvStore: BRReplicatedKVStore) {
-        self.key = key
-        self.kvStore = kvStore
-    }
-    
-    /// Creates and stores new metadata in KV store if it does not exist
-    func createMetaData(tx: BRTxRef, rate: Rate, comment: String? = nil) {
-        guard metaData == nil else { return }
-        
-        let newData = TxMetaData(transaction: tx.pointee,
-                                 exchangeRate: rate.rate,
-                                 exchangeRateCurrency: rate.code,
-                                 feeRate: 0.0,
-                                 deviceId: UserDefaults.standard.deviceID)
-        if let comment = comment {
-            newData.comment = comment
-        }
-        do {
-            let _ = try kvStore.set(newData)
-        } catch let error {
-            print("could not update metadata: \(error)")
-        }
-    }
-    
-    func save(comment: String, tx: BRTxRef, rate: Rate) {
-        if let metaData = metaData {
-            metaData.comment = comment
-            do {
-                let _ = try kvStore.set(metaData)
-            } catch let error {
-                print("could not update metadata: \(error)")
-            }
-        } else {
-            createMetaData(tx: tx, rate: rate, comment: comment)
-        }
-    }
 }

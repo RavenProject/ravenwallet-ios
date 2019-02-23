@@ -19,29 +19,25 @@ struct TxListViewModel: TxViewModel {
     var shortAttributeDescription: NSAttributedString {
         let isComplete = tx.status == .complete
         
-        if let comment = comment, comment.count > 0, isComplete {
-            return NSAttributedString(string: comment, attributes: [.foregroundColor: UIColor.lightGray])
-        } else {
-            let address = tx.toAddress
-            var color = UIColor.lightGray
-            var format: String
-            switch tx.direction {
-            case .sent, .moved:
-                format = isComplete ? S.Transaction.sentTo : S.Transaction.sendingTo
-                let rvnTx = self.tx as? RvnTransaction
-                if(C.setBurnAddresses.contains(tx.toAddress) && (rvnTx?.amount == C.creatAssetFee || rvnTx?.amount == C.manageAssetFee || rvnTx?.amount == C.uniqueAssetFee || rvnTx?.amount == C.subAssetFee)){
-                    color = UIColor.sentRed
-                    format = getShortSentBurnDescription(isComplete: isComplete)
-                    return NSAttributedString(string: format, attributes: [.foregroundColor: color])
-                }
-                return NSAttributedString(string: String(format: format, address), attributes: [.foregroundColor: color])
-            case .received:
-                format = isComplete ? S.Transaction.receivedVia : S.Transaction.receivingVia
-                return NSAttributedString(string: String(format: format, address), attributes: [.foregroundColor: color])
+        let address = tx.toAddress
+        var color = UIColor.lightGray
+        var format: String
+        switch tx.direction {
+        case .sent, .moved:
+            format = isComplete ? S.Transaction.sentTo : S.Transaction.sendingTo
+            let rvnTx = self.tx as? RvnTransaction
+            if(C.setBurnAddresses.contains(tx.toAddress) && (rvnTx?.amount == C.creatAssetFee || rvnTx?.amount == C.manageAssetFee || rvnTx?.amount == C.uniqueAssetFee || rvnTx?.amount == C.subAssetFee)){
+                color = UIColor.sentRed
+                format = getShortSentBurnDescription(isComplete: isComplete)
+                return NSAttributedString(string: format, attributes: [.foregroundColor: color])
             }
+            return NSAttributedString(string: String(format: format, address), attributes: [.foregroundColor: color])
+        case .received:
+            format = isComplete ? S.Transaction.receivedVia : S.Transaction.receivingVia
+            return NSAttributedString(string: String(format: format, address), attributes: [.foregroundColor: color])
         }
     }
-
+    
     func amount(rate: Rate, isBtcSwapped: Bool) -> NSAttributedString {
         guard let tx = tx as? RvnTransaction else { return NSAttributedString(string: "") }
         let text = DisplayAmount(amount: Satoshis(rawValue: tx.amount),

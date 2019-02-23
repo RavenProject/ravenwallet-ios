@@ -30,10 +30,10 @@ private let hasCompletedKYC = "hasCompletedKYCKey"
 private let hasAgreedToCrowdsaleTermsKey = "hasAgreedToCrowdsaleTermsKey"
 private let feesKey = "feesKey"
 private let selectedCurrencyCodeKey = "selectedCurrencyCodeKey"
-private let mostRecentSelectedCurrencyCodeKey = "mostRecentSelectedCurrencyCodeKey"
 private let hasSetSelectedCurrencyKey = "hasSetSelectedCurrencyKey"
 private let hasBchConnectedKey = "hasBchConnectedKey"
 private let shouldReloadChartKey = "shouldReloadChartKey"
+private let rescanStateKeyPrefix = "lastRescan" // append uppercased currency code for key
 
 extension UserDefaults {
 
@@ -173,6 +173,17 @@ extension UserDefaults {
         }
     }
     
+    static func rescanState(for currency: CurrencyDef) -> RescanState? {
+        let key = rescanStateKeyPrefix + currency.code.uppercased()
+        guard let data = defaults.object(forKey: key) as? Data else { return nil }
+        return try? PropertyListDecoder().decode(RescanState.self, from: data)
+    }
+    
+    static func setRescanState(for currency: CurrencyDef, to state: RescanState) {
+        let key = rescanStateKeyPrefix + currency.code.uppercased()
+        defaults.set(try? PropertyListEncoder().encode(state), forKey: key)
+    }
+    
     private static func lastBlockHeightKey(for currency: CurrencyDef) -> String {
         return "LastBlockHeightKey-\(currency.code)"
     }
@@ -263,15 +274,6 @@ extension UserDefaults {
     static var hasSetSelectedCurrency: Bool {
         get { return defaults.bool(forKey: hasSetSelectedCurrencyKey) }
         set { defaults.setValue(newValue, forKey: hasSetSelectedCurrencyKey) }
-    }
-
-    static var mostRecentSelectedCurrencyCode: String {
-        get {
-            return defaults.string(forKey: mostRecentSelectedCurrencyCodeKey) ?? Currencies.rvn.code
-        }
-        set {
-            defaults.setValue(newValue, forKey: mostRecentSelectedCurrencyCodeKey)
-        }
     }
 
     static var hasBchConnected: Bool {

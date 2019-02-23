@@ -15,12 +15,10 @@ class TxDetailDataSource: NSObject {
     enum Field: String {
         case amount
         case status
-        case memo
         case timestamp
         case address
         case startingBalance
         case endingBalance
-        case exchangeRate
         case blockHeight
         case transactionId
         
@@ -30,8 +28,6 @@ class TxDetailDataSource: NSObject {
                 return TxAmountCell.self
             case .status:
                 return TxStatusCell.self
-            case .memo:
-                return TxMemoCell.self
             case .address, .transactionId:
                 return TxAddressCell.self
             default:
@@ -59,10 +55,8 @@ class TxDetailDataSource: NSObject {
             .status,
             .timestamp,
             .address,
-            .memo,
             .startingBalance,
             .endingBalance,
-            .exchangeRate,
             .blockHeight,
             .transactionId
         ]
@@ -74,7 +68,6 @@ class TxDetailDataSource: NSObject {
                     .status,
                     .timestamp,
                     .address,
-                    .memo,
                     .blockHeight,
                     .transactionId
                 ]
@@ -82,10 +75,6 @@ class TxDetailDataSource: NSObject {
         }
         
         if viewModel.status == .complete, let index = fields.index(of: .status) {
-            fields.remove(at: index)
-        }
-        
-        if viewModel.comment == nil, let index = fields.index(of: .memo) {
             fields.remove(at: index)
         }
     }
@@ -98,16 +87,12 @@ class TxDetailDataSource: NSObject {
         switch field {
         case .status:
             return S.TransactionDetails.statusHeader
-        case .memo:
-            return S.TransactionDetails.commentsHeader
         case .address:
             return viewModel.addressHeader
         case .startingBalance:
             return S.TransactionDetails.startingBalanceHeader
         case .endingBalance:
             return S.TransactionDetails.endingBalanceHeader
-        case .exchangeRate:
-            return S.TransactionDetails.exchangeRateHeader
         case .blockHeight:
             return S.TransactionDetails.blockHeightLabel
         case .transactionId:
@@ -146,10 +131,6 @@ extension TxDetailDataSource: UITableViewDataSource {
             let statusCell = cell as! TxStatusCell
             statusCell.set(txInfo: viewModel)
             
-        case .memo:
-            let memoCell = cell as! TxMemoCell
-            memoCell.set(viewModel: viewModel, tableView: tableView)
-            
         case .timestamp:
             let labelCell = cell as! TxLabelCell
             labelCell.titleLabel.attributedText = viewModel.timestampHeader
@@ -166,11 +147,7 @@ extension TxDetailDataSource: UITableViewDataSource {
         case .endingBalance:
             let labelCell = cell as! TxLabelCell
             labelCell.value = viewModel.endingBalance
-            
-        case .exchangeRate:
-            let labelCell = cell as! TxLabelCell
-            labelCell.value = viewModel.exchangeRate
-            
+
         case .blockHeight:
             let labelCell = cell as! TxLabelCell
             labelCell.value = viewModel.blockHeight

@@ -31,19 +31,12 @@ protocol Transaction {
     var timestamp: TimeInterval { get }
     var toAddress: String { get }
     
-    var metaData: TxMetaData? { get }
-    var comment: String? { get }
-    var hasKvStore: Bool { get }
-    
     var isPending: Bool { get }
     var isValid: Bool { get }
 }
 
 // MARK: Default Values
 extension Transaction {
-    var metaData: TxMetaData? { return nil }
-    var comment: String? { return metaData?.comment }
-    var hasKvStore: Bool { return false }
     var isPending: Bool {
         return status == .pending
     }
@@ -55,9 +48,7 @@ extension Equatable where Self: Transaction {}
 
 func ==(lhs: Transaction, rhs: Transaction) -> Bool {
     return lhs.hash == rhs.hash &&
-        lhs.status == rhs.status &&
-        lhs.comment == rhs.comment &&
-        lhs.hasKvStore == rhs.hasKvStore
+        lhs.status == rhs.status
 }
 
 func ==(lhs: [Transaction], rhs: [Transaction]) -> Bool {

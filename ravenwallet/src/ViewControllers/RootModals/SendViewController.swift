@@ -47,7 +47,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     private let walletManager: WalletManager
     private let amountView: AmountViewController
     private let addressCell: AddressCell
-    private let memoCell = DescriptionSendCell(placeholder: S.Send.descriptionLabel)
     private let checkBoxNameCell = CheckBoxCell(labelCheckBox: S.Send.saveInAddresBook, placeholder: S.AddressBook.nameAddressLabel)
     private let sendButton = ShadowButton(title: S.Send.sendLabel, type: .tertiary)
     private let currencyBorder = UIView(color: .secondaryShadow)
@@ -65,7 +64,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     override func viewDidLoad() {
         view.backgroundColor = .white
         view.addSubview(addressCell)
-        view.addSubview(memoCell)
         view.addSubview(checkBoxNameCell)
         view.addSubview(sendButton)
 
@@ -80,21 +78,12 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
                 amountView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
                 amountView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
         })
-
-        memoCell.constrain([
-            memoCell.widthAnchor.constraint(equalTo: amountView.view.widthAnchor),
-            memoCell.topAnchor.constraint(equalTo: amountView.view.bottomAnchor),
-            memoCell.leadingAnchor.constraint(equalTo: amountView.view.leadingAnchor),
-            memoCell.heightAnchor.constraint(equalTo: memoCell.textView.heightAnchor, constant: C.padding[4]) ])
-
-        memoCell.accessoryView.constrain([
-                memoCell.accessoryView.constraint(.width, constant: 0.0) ])
         
         checkBoxNameCell.constrain([
-            checkBoxNameCell.widthAnchor.constraint(equalTo: memoCell.widthAnchor),
-            checkBoxNameCell.topAnchor.constraint(equalTo: memoCell.bottomAnchor),
-            checkBoxNameCell.leadingAnchor.constraint(equalTo: memoCell.leadingAnchor),
-            checkBoxNameCell.heightAnchor.constraint(equalTo: memoCell.heightAnchor, constant: -C.padding[2]) ])
+            checkBoxNameCell.widthAnchor.constraint(equalTo: amountView.view.widthAnchor),
+            checkBoxNameCell.topAnchor.constraint(equalTo: amountView.view.bottomAnchor),
+            checkBoxNameCell.leadingAnchor.constraint(equalTo: amountView.view.leadingAnchor),
+            checkBoxNameCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2]) ])
         
         checkBoxNameCell.accessoryView.constrain([
             checkBoxNameCell.accessoryView.constraint(.width, constant: 0.0) ])
@@ -144,12 +133,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
         addressCell.scan.addTarget(self, action: #selector(SendViewController.scanTapped), for: .touchUpInside)
         addressCell.addressBook.addTarget(self, action: #selector(SendViewController.addressBookTapped), for: .touchUpInside)
         sendButton.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
-        memoCell.didReturn = { textView in
-            textView.resignFirstResponder()
-        }
-        memoCell.didBeginEditing = { [weak self] in
-            self?.amountView.closePinPad()
-        }
         addressCell.didBeginEditing = strongify(self) { myself in
             myself.amountView.closePinPad()
         }
@@ -178,7 +161,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
 
         amountView.didChangeFirstResponder = { [weak self] isFirstResponder in
             if isFirstResponder {
-                self?.memoCell.textView.resignFirstResponder()
                 self?.addressCell.textField.resignFirstResponder()
             }
         }
@@ -231,7 +213,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     }
 
     @objc private func scanTapped() {
-        memoCell.textView.resignFirstResponder()
         addressCell.textField.resignFirstResponder()
         presentScan? { [weak self] paymentRequest in
             guard let request = paymentRequest else { return }
@@ -240,7 +221,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
     }
     
     @objc private func addressBookTapped() {
-        memoCell.textView.resignFirstResponder()
         addressCell.textField.resignFirstResponder()
         Store.trigger(name: .selectAddressBook(.select, ({ address in
             self.addressCell.setContent(address)
@@ -255,12 +235,10 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             let newAddress = AddressBook(name: checkBoxNameCell.textField.text!, address: addressCell.address!)
             let addressBookManager = AddressBookManager()
             addressBookManager.addAddressBook(newAddress: newAddress, successCallBack: {
-                Store.perform(action: Alert.Show(.addressAdded(callback: { [weak self] in
-                })))
+                Store.perform(action: Alert.Show(.addressAdded(callback: nil)))
             }, faillerCallBack: {
                 //if already existe dont show error
             })
-            
         }
     }
 
@@ -335,9 +313,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
             if let amount = request.amount {
                 amountView.forceUpdateAmount(amount: amount)
             }
-            if request.label != nil {
-                memoCell.content = request.label
-            }
         case .remote:
             let loadingView = BRActivityViewController(message: S.Send.loadingRequest)
             present(loadingView, animated: true, completion: nil)
@@ -373,7 +348,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
 
         sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
                     rate: rate,
-                    comment: memoCell.textView.text,
                     feePerKb: feePerKb,
                     verifyPinFunction: { [weak self] pinValidationCallback in
                         self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in
@@ -455,8 +429,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable, Track
         if requestAmount > 0 {
             amountView.forceUpdateAmount(amount: requestAmount)
         }
-        memoCell.content = protoReq.details.memo
-
         if requestAmount == 0 {
             if let amount = amount {
                 guard sender.createTransaction(amount: amount.rawValue, to: address) else {

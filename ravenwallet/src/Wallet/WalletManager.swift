@@ -59,9 +59,6 @@ class WalletManager {
     
     private var retryTimer: RetryTimer?
     private var updateTimer: Timer?
-    var kvStore: BRReplicatedKVStore? {
-        didSet { requestTxUpdate() }
-    }
     
     func initWallet(callback: @escaping (Bool) -> Void) {
         db?.loadTransactions { txns in
@@ -306,7 +303,7 @@ extension WalletManager : BRWalletListener {
     }
     
     func assetAdded(_ tx: BRTxRef) {
-        let rvnTx = RvnTransaction(tx, walletManager: self, kvStore: self.kvStore, rate: self.currency.state.currentRate)
+        let rvnTx = RvnTransaction(tx, walletManager: self, rate: self.currency.state.currentRate)
         if(tx.pointee.asset!.pointee.type == NEW_ASSET || tx.pointee.asset!.pointee.type == REISSUE){
             //BMEX should dont write asset if not confirmed
             if(rvnTx?.status == .pending || rvnTx?.status == .invalid){
@@ -435,7 +432,7 @@ extension WalletManager : BRWalletListener {
                 return $0.pointee.timestamp > $1.pointee.timestamp
             }
             }.compactMap {
-                return RvnTransaction($0, walletManager: self, kvStore: kvStore, rate: rate)
+                return RvnTransaction($0, walletManager: self, rate: rate)
         }
     }
     

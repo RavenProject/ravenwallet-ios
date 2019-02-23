@@ -280,13 +280,13 @@ extension WalletManager : WalletAuthenticator {
     }
     
     // sign the given transaction using pin authentication
-    func signTransaction(_ tx: BRTxRef, forkId: Int, pin: String) -> Bool {
+    func signTransaction(_ tx: BRTxRef, pin: String) -> Bool {
         guard authenticate(pin: pin) else { return false }
-        return signTx(tx, forkId: forkId)
+        return signTx(tx)
     }
     
     // sign the given transaction using biometric authentication
-    func signTransaction(_ tx: BRTxRef, forkId: Int, biometricsPrompt: String, completion: @escaping (BiometricsResult) -> ()) {
+    func signTransaction(_ tx: BRTxRef, biometricsPrompt: String, completion: @escaping (BiometricsResult) -> ()) {
         do {
             let spendLimit: Int64 = try keychainItem(key: KeychainKey.spendLimit) ?? 0
             guard let wallet = wallet, wallet.amountSentByTx(tx) - wallet.amountReceivedFromTx(tx) + wallet.totalSent <= UInt64(spendLimit) else {
@@ -298,7 +298,7 @@ extension WalletManager : WalletAuthenticator {
         authenticate(biometricsPrompt: biometricsPrompt) { result in
             Store.perform(action: biometricsActions.setIsPrompting(false))
             guard result == .success else { return completion(result) }
-            completion(self.signTx(tx, forkId: forkId) == true ? .success : .failure)
+            completion(self.signTx(tx) == true ? .success : .failure)
         }
     }
     
@@ -462,7 +462,6 @@ extension WalletManager : WalletAuthenticator {
             if let bundleId = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: bundleId)
             }
-            try? FileManager.default.removeItem(at: BRReplicatedKVStore.dbPath)
             try setKeychainItem(key: KeychainKey.apiAuthKey, item: nil as Data?)
             try setKeychainItem(key: KeychainKey.spendLimit, item: nil as Int64?)
             try setKeychainItem(key: KeychainKey.creationTime, item: nil as Data?)
@@ -559,7 +558,7 @@ extension WalletManager : WalletAuthenticator {
         public static let pinUnlockTime = "PIN_UNLOCK_TIME"
     }
     
-    private func signTx(_ tx: BRTxRef, forkId: Int) -> Bool {
+    private func signTx(_ tx: BRTxRef) -> Bool {
         return autoreleasepool {
             do {
                 var seed = UInt512()
@@ -568,7 +567,7 @@ extension WalletManager : WalletAuthenticator {
                 guard let phrase: String = try keychainItem(key: KeychainKey.mnemonic) else { return false }
                 BRBIP39DeriveKey(&seed, phrase, nil)
 //                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
-                return wallet.signTransaction(tx, forkId: forkId, seed: &seed)
+                return wallet.signTransaction(tx, seed: &seed)
             }
             catch {
                 return false

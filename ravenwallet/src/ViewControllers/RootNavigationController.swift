@@ -80,7 +80,6 @@ extension RootNavigationController : UINavigationControllerDelegate {
             UserDefaults.selectedCurrencyCode = nil
         } else if let accountView = viewController as? AccountViewController {
             UserDefaults.selectedCurrencyCode = accountView.currency.code
-            UserDefaults.mostRecentSelectedCurrencyCode = accountView.currency.code
         }
     }
 }

@@ -18,7 +18,6 @@ struct TxDetailViewModel: TxViewModel {
     let originalFiatAmount: String?
     let startingBalance: String
     let endingBalance: String
-    let exchangeRate: String
     let transactionHash: String
     let tx: Transaction
     
@@ -84,7 +83,6 @@ extension TxDetailViewModel {
         
         startingBalance = balances.0
         endingBalance = balances.1
-        exchangeRate = TxDetailViewModel.exchangeRateText(tx: tx) ?? ""
         transactionHash = tx.hash
         self.tx = tx
     }
@@ -111,19 +109,6 @@ extension TxDetailViewModel {
         return (startingString, endingString)
     }
     
-    /// The fiat exchange rate at the time of transaction
-    /// Assumes fiat currency does not change
-    private static func exchangeRateText(tx: Transaction) -> String? {
-        guard let tx = tx as? RvnTransaction,
-            let rate = tx.metaData?.exchangeRate,
-            let symbol = tx.currency.state.currentRate?.currencySymbol else { return nil }
-        
-        let nf = NumberFormatter()
-        nf.currencySymbol = symbol
-        nf.numberStyle = .currency
-        return nf.string(from: rate as NSNumber) ?? nil
-    }
-    
     private static func tokenAmount(tx: Transaction) -> String? {
         guard let tx = tx as? RvnTransaction else { return nil }
         let amount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
@@ -140,30 +125,12 @@ extension TxDetailViewModel {
     /// Returns (currentFiatAmount, originalFiatAmount)
     private static func fiatAmounts(tx: Transaction, currentRate: Rate) -> (String, String?) {
         guard let tx = tx as? RvnTransaction else { return ("", nil) }
-        if let txRate = tx.metaData?.exchangeRate {
-            let originalRate = Rate(code: currentRate.code,
-                                    name: currentRate.name,
-                                    rate: txRate)
-            let currentAmount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
-                                              selectedRate: currentRate,
-                                              minimumFractionDigits: nil,
-                                              currency: tx.currency,
-                                              negative: false).description
-            let originalAmount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
-                                               selectedRate: originalRate,
-                                               minimumFractionDigits: nil,
-                                               currency: tx.currency,
-                                               negative: false).description
-            return (currentAmount, originalAmount)
-            
-        } else {
-            // no tx-time rate
-            let currentAmount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
-                                              selectedRate: currentRate,
-                                              minimumFractionDigits: nil,
-                                              currency: tx.currency,
-                                              negative: false)
-            return (currentAmount.description, nil)
-        }
+        // no tx-time rate
+        let currentAmount = DisplayAmount(amount: Satoshis(rawValue: tx.amount),
+                                            selectedRate: currentRate,
+                                            minimumFractionDigits: nil,
+                                            currency: tx.currency,
+                                            negative: false)
+        return (currentAmount.description, nil)
     }
 }

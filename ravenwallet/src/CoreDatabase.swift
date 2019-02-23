@@ -244,7 +244,7 @@ class CoreDatabase {
     func assetAdded(_ tx: BRTxRef, walletManager:WalletManager) {
         queue.async {
             //add asset
-            let rvnTx = RvnTransaction(tx, walletManager: walletManager, kvStore: walletManager.kvStore, rate: walletManager.currency.state.currentRate)
+            let rvnTx = RvnTransaction(tx, walletManager: walletManager, rate: walletManager.currency.state.currentRate)
 
             let assetRef = tx.pointee.asset!
             var assetName = assetRef.pointee.nameString
@@ -265,12 +265,12 @@ class CoreDatabase {
                 }else {
                     switch assetRef.pointee.type {
                     case TRANSFER:
-                        var amount = (asset?.amount.rawValue)!
+                        var amount = Int64((asset?.amount.rawValue)!)
                         if(rvnTx?.direction == .received){
-                            amount = amount + UInt64(assetRef.pointee.amount)
+                            amount = amount + Int64(assetRef.pointee.amount)
                         }
                         else{
-                            amount = amount - UInt64(assetRef.pointee.amount)
+                            amount = amount - Int64(assetRef.pointee.amount)
                         }
                         req = String(format: "update ZBRAsset set Z_AMOUNT = '%@' where Z_NAME = '%@'", String(amount), assetName)
                         break
@@ -730,7 +730,8 @@ class CoreDatabase {
             while sqlite3_step(sql) == SQLITE_ROW {
                 let idAsset = Int(sqlite3_column_int(sql, 0))
                 let name = String(cString: sqlite3_column_text(sql, 1))
-                let amount = UInt64(sqlite3_column_int64(sql, 2))
+                let intAmount = sqlite3_column_int64(sql, 2)
+                let amount = intAmount >= 0 ? UInt64(sqlite3_column_int64(sql, 2)) : 0 //Todo : should never be 0
                 let units = UInt8(sqlite3_column_int(sql, 3))
                 let reissubale = UInt8(sqlite3_column_int(sql, 4))
                 let hasIpfs = UInt8(sqlite3_column_int(sql, 5))

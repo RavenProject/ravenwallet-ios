@@ -49,11 +49,6 @@ enum SearchFilterType {
                 if transaction.toAddress.lowercased().contains(loweredText) {
                     return true
                 }
-                if let metaData = transaction.metaData {
-                    if metaData.comment.lowercased().contains(loweredText) {
-                        return true
-                    }
-                }
                 guard let rvnTx = transaction as? RvnTransaction else {
                     return false
                 }
