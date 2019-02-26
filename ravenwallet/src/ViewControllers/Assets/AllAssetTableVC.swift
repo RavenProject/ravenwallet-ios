@@ -9,7 +9,7 @@
 import UIKit
 import SafariServices
 
-class AllAssetTableVC : UITableViewController, Subscriber, Trackable {
+class AllAssetTableVC : UITableViewController, Subscriber {
     
     //MARK: - Public
     init(didSelectAsset: @escaping (Asset) -> Void) {

@@ -17,7 +17,7 @@ struct Page {
 
 let PAGES = [
     Page(title: "Welcome to Ravencoin wallet", image: #imageLiteral(resourceName: "Tuto1") , description: "You pay by scanning a QR-code, and receive payments reliably and instantly"),
-    Page(title: "12 mnemonic recovery word phrase", image: #imageLiteral(resourceName: "Tuto2") , description: "Back up your funds to ensure you always have access"),
+    Page(title: "12 word recovery phrase", image: #imageLiteral(resourceName: "Tuto2") , description: "Back up your funds to ensure you always have access"),
     Page(title: "BTC/Fiat & Gold/Silver", image: #imageLiteral(resourceName: "Tuto3") , description: "Choose your preferred display currency: Settings/Display Currency."),
     Page(title: "Wallet generates new Key pair for every transaction", image: #imageLiteral(resourceName: "Tuto4"), description: "Public address is changed with every transaction, RVN Wallet still manages all keys for you, you can re-use old addresses but this is against best practices"),
     Page(title: "RVN Wallet doesn’t store your money", image: #imageLiteral(resourceName: "Tuto5") , description: "Your money is on the network, the wallet contains keys … a keychain."),

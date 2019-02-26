@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeScreenViewController : UIViewController, Subscriber, Trackable {
+class HomeScreenViewController : UIViewController, Subscriber {
     
     var walletManager: WalletManager? {
         didSet {
@@ -290,10 +290,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             return
         }
         if let type = PromptType.nextPrompt(walletManager: walletManager) {
-            self.saveEvent("prompt.\(type.name).displayed")
             currentPrompt = Prompt(type: type)
             currentPrompt!.dismissButton.tap = { [unowned self] in
-                self.saveEvent("prompt.\(type.name).dismissed")
                 self.currentPrompt = nil
                 UserDefaults.hasDismissedPrompt = true
             }
@@ -301,7 +299,6 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                 if let trigger = type.trigger(currency: Currencies.rvn) {
                     Store.trigger(name: trigger)
                 }
-                self.saveEvent("prompt.\(type.name).trigger")
                 self.currentPrompt = nil
             }
             if type == .biometrics {

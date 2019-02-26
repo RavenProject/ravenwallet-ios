@@ -12,7 +12,7 @@ import Core
 
 private let manageAddressHeight: CGFloat = 110.0
 
-class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK - Public
     var presentScan: PresentScan?
@@ -403,14 +403,11 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
                         }
                         myself.onPublishSuccess?()
                     })
-                    self?.saveEvent("manage.success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })

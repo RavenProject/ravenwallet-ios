@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AllAddressesTableVC : UITableViewController, Subscriber, Trackable {
+class AllAddressesTableVC : UITableViewController, Subscriber {
     
     //MARK: - Public
     init(walletManager: WalletManager, didSelectAddress: @escaping ([String], Int) -> Void) {

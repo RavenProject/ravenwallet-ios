@@ -14,7 +14,7 @@ struct Fees : Codable {
     let timestamp: TimeInterval
 }
 
-class FeeUpdater : Trackable {
+class FeeUpdater {
 
     //MARK: - Public
     init(walletManager: WalletManager) {

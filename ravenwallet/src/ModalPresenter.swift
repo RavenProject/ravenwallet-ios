@@ -9,7 +9,7 @@
 import UIKit
 import LocalAuthentication
 
-class ModalPresenter : Subscriber, Trackable {
+class ModalPresenter : Subscriber {
 
     //MARK: - Public
     let walletManager: WalletManager
@@ -210,7 +210,6 @@ class ModalPresenter : Subscriber, Trackable {
         supportCenter.modalPresentationStyle = .overFullScreen
         supportCenter.modalPresentationCapturesStatusBarAppearance = true
 
-//        let url = articleId == nil ? "/support?" : "/support/\(articleId!).html"
         let url = articleId == nil ? "/support?" : "/support/\(articleId!)"
 
         supportCenter.navigate(to: url)
@@ -719,7 +718,6 @@ class ModalPresenter : Subscriber, Trackable {
     private func presentScan(parent: UIViewController, currency: CurrencyDef) -> PresentScan {
         return { [weak parent] scanCompletion in
             guard ScanViewController.isCameraAllowed else {
-                self.saveEvent("scan.cameraDenied")
                 if let parent = parent {
                     ScanViewController.presentCameraUnavailableAlert(fromRoot: parent)
                 }

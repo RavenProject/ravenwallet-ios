@@ -198,7 +198,7 @@ class WalletManager {
     }
 }
 
-extension WalletManager : BRPeerManagerListener, Trackable {
+extension WalletManager : BRPeerManagerListener {
     
     func syncStarted() {
         DispatchQueue.main.async() {
@@ -221,7 +221,6 @@ extension WalletManager : BRPeerManagerListener, Trackable {
             case .some(let .posixError(errorCode, description)):
                 
                 Store.perform(action: WalletChange(self.currency).setSyncingState(.connecting))
-                self.saveEvent("event.syncErrorMessage", attributes: ["message": "\(description) (\(errorCode))"])
                 if self.retryTimer == nil && self.networkIsReachable() {
                     self.retryTimer = RetryTimer()
                     self.retryTimer?.callback = strongify(self) { myself in

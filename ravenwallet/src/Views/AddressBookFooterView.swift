@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddressBookFooterView: UIView, Subscriber, Trackable {
+class AddressBookFooterView: UIView, Subscriber {
 
     var addAddressCallback: (() -> Void)?
     var receiveCallback: (() -> Void)?

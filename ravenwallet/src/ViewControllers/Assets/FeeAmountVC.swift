@@ -20,7 +20,7 @@ enum OperationType {
 }
 
 
-class FeeAmountVC : UIViewController, Trackable, Subscriber {
+class FeeAmountVC : UIViewController, Subscriber {
     
     private let currency: CurrencyDef = Currencies.rvn
 

@@ -9,7 +9,7 @@
 import UIKit
 import SafariServices
 
-class TransactionsTableViewController : UITableViewController, Subscriber, Trackable {
+class TransactionsTableViewController : UITableViewController, Subscriber {
 
     //MARK: - Public
     init(walletManager: WalletManager, didSelectTransaction: @escaping ([Transaction], Int) -> Void) {

@@ -9,7 +9,7 @@
 import UIKit
 import SafariServices
 
-class ManageAssetTableVC : UITableViewController, Subscriber, Trackable {
+class ManageAssetTableVC : UITableViewController, Subscriber {
     
     //MARK: - Public
     init() {

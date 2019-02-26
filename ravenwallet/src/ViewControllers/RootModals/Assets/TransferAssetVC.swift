@@ -12,7 +12,7 @@ import Core
 
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
-class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class TransferAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK - Public
     var presentScan: PresentScan?
@@ -109,7 +109,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             checkBoxNameCell.widthAnchor.constraint(equalTo: feeView.view.widthAnchor),
             checkBoxNameCell.topAnchor.constraint(equalTo: feeView.view.bottomAnchor),
             checkBoxNameCell.leadingAnchor.constraint(equalTo: feeView.view.leadingAnchor),
-            checkBoxNameCell.heightAnchor.constraint(equalTo: feeView.view.heightAnchor, constant: -C.padding[0]) ])
+            checkBoxNameCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2]) ])
         
         checkBoxNameCell.accessoryView.constrain([
             checkBoxNameCell.accessoryView.constraint(.width, constant: 0.0) ])
@@ -338,14 +338,11 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                         }
                         myself.onPublishSuccess?()
                     })
-                    self?.saveEvent("send.success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("send.publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("send.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })

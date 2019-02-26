@@ -22,7 +22,7 @@ struct PaymentRequest {
             if let scheme = url.scheme, let resourceSpecifier = url.resourceSpecifier, url.host == nil {
                 url = NSURL(string: "\(scheme)://\(resourceSpecifier)")!
                 
-                if url.scheme == currency.urlScheme {
+                if url.scheme?.lowercased() == currency.urlScheme!.lowercased() {
                     let host = url.host
 
                         toAddress = host

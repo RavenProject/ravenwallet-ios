@@ -17,7 +17,7 @@ enum ActionAddressType {//BMEX
 
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
-class AddAddressBookVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class AddAddressBookVC : UIViewController, Subscriber, ModalPresentable {
     
     //MARK - Public
     var presentScan: PresentScan?

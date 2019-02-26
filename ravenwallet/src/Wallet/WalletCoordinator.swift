@@ -11,7 +11,7 @@ import UIKit
 
 //Coordinates the sync state of all wallet managers to
 //display the activity indicator and control backtround tasks
-class WalletCoordinator : Subscriber, Trackable {
+class WalletCoordinator : Subscriber {
 
     // 24-hours until incremental rescan is reset
     private let incrementalRescanInterval: TimeInterval = (24*60*60)

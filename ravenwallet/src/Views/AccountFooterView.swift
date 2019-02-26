@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AccountFooterView: UIView, Subscriber, Trackable {
+class AccountFooterView: UIView, Subscriber {
 
     var sendCallback: (() -> Void)?
     var receiveCallback: (() -> Void)?

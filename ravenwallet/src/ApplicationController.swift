@@ -13,7 +13,7 @@ import UserNotifications
 private let timeSinceLastExitKey = "TimeSinceLastExit"
 private let shouldRequireLoginTimeoutKey = "ShouldRequireLoginTimeoutKey"
 
-class ApplicationController : NSObject, Subscriber, Trackable {
+class ApplicationController : NSObject, Subscriber {
 
     let window = UIWindow()
     private var startFlowController: StartFlowPresenter?
@@ -297,7 +297,6 @@ class ApplicationController : NSObject, Subscriber, Trackable {
     private func startDataFetchers() {
         feeUpdater!.refresh()
         defaultsUpdater?.refresh()
-        walletManager!.apiClient?.events?.up()
         exchangeUpdater!.refresh(completion: {
             self.watchSessionManager.rate = Currencies.rvn.state.currentRate
         })
