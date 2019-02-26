@@ -372,7 +372,8 @@ class CoreDatabase {
         while sqlite3_step(sql) == SQLITE_ROW {
             let idAsset = Int(sqlite3_column_int(sql, 0))
             let name = String(cString: sqlite3_column_text(sql, 1))
-            let amount = UInt64(sqlite3_column_int64(sql, 2))
+            let intAmount = sqlite3_column_int64(sql, 2)
+            let amount = intAmount >= 0 ? UInt64(sqlite3_column_int64(sql, 2)) : 0 //Todo : should never be 0
             let units = UInt8(sqlite3_column_int(sql, 3))
             let reissubale = UInt8(sqlite3_column_int(sql, 4))
             let hasIpfs = UInt8(sqlite3_column_int(sql, 5))
