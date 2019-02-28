@@ -59,6 +59,9 @@ struct E {
     static let isIPhoneXOrLater: Bool = {
         return (UIScreen.main.bounds.size.height >= 812.0)
     }()
+    static let isIPad: Bool = {
+        return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad)
+    }()
     static let is32Bit: Bool = {
         return MemoryLayout<Int>.size == MemoryLayout<UInt32>.size
     }()

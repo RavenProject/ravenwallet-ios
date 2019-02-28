@@ -62,10 +62,8 @@ class URLController {
             }
             return true
         default:
-            if(Store.state.currency.urlScheme != scheme){
-                return false
-            }
-            return handlePaymentRequestUri(url, currency: Store.state.currency)
+            guard let currency = Store.state.currencies.first(where: { $0.urlScheme == scheme }) else { return false }
+            return handlePaymentRequestUri(url, currency: currency)
         }
     }
 

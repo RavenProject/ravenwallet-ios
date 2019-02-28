@@ -61,16 +61,17 @@ class PinPadViewController : UICollectionViewController {
         layout.minimumInteritemSpacing = 1.0
         layout.sectionInset = .zero
 
+        let columnSpace:CGFloat = E.isIPad ? 3 : 2.0/3.0
         switch keyboardType {
         case .decimalPad:
             items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", currencyDecimalSeparator, "0", deleteKeyIdentifier]
-            layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 48.0 - 1.0)
+            layout.itemSize = CGSize(width: screenWidth/3.0 - columnSpace, height: 48.0 - 1.0)
         case .pinPad, .quantityPad:
             items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", deleteKeyIdentifier]
-            layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 54.0 - 0.5)
+            layout.itemSize = CGSize(width: screenWidth/3.0 - columnSpace, height: 54.0 - 0.5)
         case .unitsPad:
             items = ["1", "2", "3", "4", "5", "6", "7", "8", "", "", "0", deleteKeyIdentifier]
-            layout.itemSize = CGSize(width: screenWidth/3.0 - 2.0/3.0, height: 54.0 - 0.5)
+            layout.itemSize = CGSize(width: screenWidth/3.0 - columnSpace, height: 54.0 - 0.5)
 
         }
 

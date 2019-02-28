@@ -44,7 +44,9 @@ class ApplicationController : NSObject, Subscriber {
 
     private func initWallet(completion: @escaping () -> Void) {
         let dispatchGroup = DispatchGroup()
-        initWallet(currency: Store.state.currency, dispatchGroup: dispatchGroup)
+        Store.state.currencies.forEach { currency in
+            initWallet(currency: currency, dispatchGroup: dispatchGroup)
+        }
         dispatchGroup.notify(queue: .main) {
             completion()
         }
@@ -158,7 +160,7 @@ class ApplicationController : NSObject, Subscriber {
 
     func didEnterBackground() {
         // disconnect synced peer managers
-        if(Store.state.currency.state.syncState == .success){
+        Store.state.currencies.filter { $0.state.syncState == .success }.forEach { currency in
             DispatchQueue.walletQueue.async {
                 self.walletManager!.peerManager?.disconnect()
             }

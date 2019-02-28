@@ -171,10 +171,11 @@ class HomeScreenViewController : UIViewController, Subscriber {
     }
     
     private func updateTotalAssets() {
-        let balance = Store.state[Store.state.currency].balance ?? 0
-        let rate = Store.state[Store.state.currency].currentRate?.rate ?? 0
-        let fiatTotal = Double(balance)/Store.state.currency.baseUnit * rate * 0.001
-        
+        let fiatTotal = Store.state.currencies.map {
+            let balance = Store.state[$0].balance ?? 0
+            let rate = Store.state[$0].currentRate?.rate ?? 0
+            return Double(balance)/$0.baseUnit * rate * 0.001
+            }.reduce(0.0, +)
         let format = NumberFormatter()
         format.isLenient = true
         format.numberStyle = .currency
@@ -191,12 +192,14 @@ class HomeScreenViewController : UIViewController, Subscriber {
             var result = false
             let oldState = $0
             let newState = $1
-            if oldState[$0.currency].balance != newState[$0.currency].balance {
-                result = true
-            }
-            
-            if oldState[$0.currency].currentRate?.rate != newState[$0.currency].currentRate?.rate {
-                result = true
+            $0.currencies.forEach { currency in
+                if oldState[currency].balance != newState[currency].balance {
+                    result = true
+                }
+                
+                if oldState[currency].currentRate?.rate != newState[currency].currentRate?.rate {
+                    result = true
+                }
             }
             return result
         },

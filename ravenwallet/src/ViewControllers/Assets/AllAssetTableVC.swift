@@ -40,7 +40,7 @@ class AllAssetTableVC : UITableViewController, Subscriber {
         
         //BMEX detect transactions changes
         Store.subscribe(self, selector: {
-            $0[Store.state.currency].transactions != $1[Store.state.currency].transactions
+            $0[Store.state.currencies[0]].transactions != $1[Store.state.currencies[0]].transactions
         },
                         callback: { state in
                             AssetManager.shared.loadAsset { assets in

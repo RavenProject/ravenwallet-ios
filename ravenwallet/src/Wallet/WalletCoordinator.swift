@@ -32,29 +32,33 @@ class WalletCoordinator : Subscriber {
 
         //Listen for sync state changes in all wallets
         Store.subscribe(self, selector: {
-            if $0.walletState.syncState != $1.walletState.syncState {
-                return true
+            for (key, val) in $0.wallets {
+                if val.syncState != $1.wallets[key]!.syncState {
+                    return true
+                }
             }
             return false
         }, callback: { [weak self] state in
             self?.syncStateDidChange(state: state)
         })
 
-        Store.subscribe(self, name: .retrySync(Store.state.currency), callback: { _ in
-            DispatchQueue.walletQueue.async {
-                self.walletManager.peerManager?.connect()
-            }
-        })
-
-        Store.subscribe(self, name: .rescan(Store.state.currency), callback: { _ in
-            UserDefaults.hasRescannedBlockChain = true
-            Store.perform(action: WalletChange(Store.state.currency).setRecommendScan(false))
-            Store.perform(action: WalletChange(Store.state.currency).setIsRescanning(true))
-            DispatchQueue.walletQueue.async {
-                self.walletManager.peerManager?.rescan()
-                self.walletManager.lastBlockHeight = 0
-            }
-        })
+        Store.state.currencies.forEach { currency in
+            Store.subscribe(self, name: .retrySync(currency), callback: { _ in
+                DispatchQueue.walletQueue.async {
+                    self.walletManager.peerManager?.connect()
+                }
+            })
+            
+            Store.subscribe(self, name: .rescan(currency), callback: { _ in
+                UserDefaults.hasRescannedBlockChain = true
+                Store.perform(action: WalletChange(currency).setRecommendScan(false))
+                Store.perform(action: WalletChange(currency).setIsRescanning(true))
+                DispatchQueue.walletQueue.async {
+                    self.walletManager.peerManager?.rescan()
+                    self.walletManager.lastBlockHeight = 0
+                }
+            })
+        }
     }
     
     private func initiateRescan(currency: CurrencyDef) {
@@ -138,7 +142,8 @@ class WalletCoordinator : Subscriber {
     }
 
     private func syncStateDidChange(state: State) {
-        if state.walletState.syncState == .success {
+        let allWalletsFinishedSyncing = state.wallets.values.filter { $0.syncState == .success}.count == state.wallets.values.count
+        if allWalletsFinishedSyncing {
             endActivity()
             endBackgroundTask()
         } else {
@@ -168,7 +173,9 @@ class WalletCoordinator : Subscriber {
             DispatchQueue.walletQueue.async {
                 self.walletManager.peerManager?.disconnect()
                 DispatchQueue.main.async {
-                    Store.perform(action: WalletChange(Store.state.currency).setSyncingState(.connecting))
+                    Store.state.currencies.forEach {
+                        Store.perform(action: WalletChange($0).setSyncingState(.connecting))
+                    }
                 }
             }
         }

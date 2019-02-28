@@ -22,18 +22,26 @@ struct State {
     let isPushNotificationsEnabled: Bool
     let isPromptingBiometrics: Bool
     let pinLength: Int
-    var walletState: WalletState
+    let wallets: [String: WalletState]
     
     subscript(currency: CurrencyDef) -> WalletState {
+        guard let walletState = wallets[currency.code] else {
+            // this should never happen as long as all currencies in use are initialized in State.initial
+            fatalError("unsupported currency!")
+        }
         return walletState
     }
     
-    var currency: CurrencyDef {
-        return walletState.currency
+    var orderedWallets: [WalletState] {
+        return wallets.values.sorted(by: { $0.displayOrder < $1.displayOrder })
+    }
+    
+    var currencies: [CurrencyDef] {
+        return orderedWallets.map { $0.currency }
     }
     
     var primaryWallet: WalletState {
-        return walletState
+        return wallets[Currencies.rvn.code]!
     }
 }
 
@@ -49,7 +57,7 @@ extension State {
                         isPushNotificationsEnabled: UserDefaults.pushToken != nil,
                         isPromptingBiometrics: false,
                         pinLength: 6,
-                        walletState: WalletState.initial(Currencies.rvn, displayOrder: 0))
+                        wallets: [Currencies.rvn.code: WalletState.initial(Currencies.rvn, displayOrder: 0)])
     }
     
     func mutate(   isStartFlowVisible: Bool? = nil,
@@ -62,7 +70,7 @@ extension State {
                    isPushNotificationsEnabled: Bool? = nil,
                    isPromptingBiometrics: Bool? = nil,
                    pinLength: Int? = nil,
-                   walletState:WalletState? = nil) -> State {
+                   wallets: [String: WalletState]? = nil) -> State {
         return State(isStartFlowVisible: isStartFlowVisible ?? self.isStartFlowVisible,
                      isLoginRequired: isLoginRequired ?? self.isLoginRequired,
                      rootModal: rootModal ?? self.rootModal,
@@ -73,13 +81,13 @@ extension State {
                      isPushNotificationsEnabled: isPushNotificationsEnabled ?? self.isPushNotificationsEnabled,
                      isPromptingBiometrics: isPromptingBiometrics ?? self.isPromptingBiometrics,
                      pinLength: pinLength ?? self.pinLength,
-                     walletState: walletState ?? self.walletState)
+                     wallets: wallets ?? self.wallets)
     }
     
-    mutating func mutate(wallet: WalletState) -> State {
-        let oldWalletState = self.walletState
-        self.walletState = wallet
-        return mutate(walletState: oldWalletState)
+    func mutate(walletState: WalletState) -> State {
+        var wallets = self.wallets
+        wallets[walletState.currency.code] = walletState
+        return mutate(wallets: wallets)
     }
 }
 

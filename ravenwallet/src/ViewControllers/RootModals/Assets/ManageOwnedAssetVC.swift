@@ -328,8 +328,14 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
             return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
         }
         
-        let totalAmount = amount.rawValue + (qtAmountAsset != nil ? qtAmountAsset!.rawValue : 0)
-        guard totalAmount <= C.maxAsset else {
+        let currentTotalAmount = (qtAmountAsset != nil ? qtAmountAsset!.rawValue : 0)
+        if currentTotalAmount < C.maxAsset {
+            guard amount != Satoshis.zero else {
+                return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
+            }
+        }
+        let newTotalAmount = amount.rawValue + currentTotalAmount
+        guard newTotalAmount <= C.maxAsset else {
             return showAlert(title: S.Alert.error, message: S.Asset.maxQuanityToManage, buttonLabel: S.Button.ok)
         }
         
