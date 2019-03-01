@@ -70,7 +70,6 @@ struct Raven: CurrencyDef {
     let symbol: String
     let colors: (UIColor, UIColor)
     let dbPath: String
-    let forkId: Int
     let urlScheme: String?
     
     func isValidAddress(_ address: String) -> Bool {
@@ -120,6 +119,5 @@ struct Currencies {
                                       UIColor(red: 34.0/255.0, green: 45.0/255.0, blue: 105.0/255.0, alpha: 1.0)),
                              // TODO change this to new path
                              dbPath: "RavenWallet.sqlite",//"BreadWallet.sqlite",
-                             forkId: 0,
                              urlScheme: "Raven")
 }

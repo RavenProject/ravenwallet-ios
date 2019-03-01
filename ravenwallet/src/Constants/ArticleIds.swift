@@ -24,7 +24,7 @@ enum ArticleIds {
     static let walletDisabled = "wallet-disabled"
     static let resetPinWithPaperKey = "reset-pin-paper-key"
     static let setPin = "security/pin.html"
-    static let importWallet = "Miscellaneous/import-paper.html"
+    static let importWallet = "miscellaneous/import-paper.html"
     static let writePhrase = "security/down-paper-key.html"
     static let confirmPhrase = "security/confirm-key.html"
     static let startView = "start-view"

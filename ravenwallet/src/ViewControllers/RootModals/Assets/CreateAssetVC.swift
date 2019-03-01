@@ -21,7 +21,7 @@ enum NameStatus {
 }
 
 
-class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK - Public
     var presentScan: PresentScan?
@@ -508,7 +508,6 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
         
         sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
                     rate: rate,
-                    comment: "",
                     feePerKb: feePerKb,
                     verifyPinFunction: { [weak self] pinValidationCallback in
                         self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in
@@ -526,14 +525,11 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable 
                         }
                         myself.onPublishSuccess?(myself.sender.transaction!.txHash.description)
                     })
-                    self?.saveEvent("\(self!.operationType).success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("\(self!.operationType).publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("\(self!.operationType).publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })

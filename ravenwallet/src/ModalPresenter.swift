@@ -9,17 +9,15 @@
 import UIKit
 import LocalAuthentication
 
-class ModalPresenter : Subscriber, Trackable {
+class ModalPresenter : Subscriber {
 
     //MARK: - Public
-    let primaryWalletManager: WalletManager
-    let walletManagers: [String: WalletManager]
+    let walletManager: WalletManager
     let supportCenter = SupportWebViewController()
     
-    init(walletManagers: [String: WalletManager], window: UIWindow, apiClient: BRAPIClient) {
+    init(walletManager: WalletManager, window: UIWindow, apiClient: BRAPIClient) {
         self.window = window
-        self.walletManagers = walletManagers
-        self.primaryWalletManager = walletManagers[Currencies.rvn.code]!
+        self.walletManager = walletManager
         self.modalTransitionDelegate = ModalTransitionDelegate(type: .regular)
         self.wipeNavigationDelegate = StartNavigationDelegate()
         self.noAuthApiClient = apiClient
@@ -80,11 +78,10 @@ class ModalPresenter : Subscriber, Trackable {
             }
         })
         
-        for walletManager in walletManagers.values {
-            Store.subscribe(self, name: .recommendRescan(walletManager.currency), callback: { [weak self] _ in
-                self?.presentRescan(currency: walletManager.currency)
-            })
-        }
+        Store.subscribe(self, name: .recommendRescan(walletManager.currency), callback: { [weak self] _ in
+            guard let myself = self else { return }
+            self?.presentRescan(currency: myself.walletManager.currency)
+        })
         
         Store.subscribe(self, name: .recommendRescanAsset, callback: { [weak self] _ in
             self?.presentRescanAsset()
@@ -251,7 +248,7 @@ class ModalPresenter : Subscriber, Trackable {
         case .loginAddress:
             return receiveView(currency: Currencies.rvn, isRequestAmountVisible: false)
         case .requestAmount(let currency):
-            guard let wallet = walletManagers[currency.code]?.wallet else { return nil }
+            guard let wallet = walletManager.wallet else { return nil }
             let requestVc = RequestAmountViewController(currency: currency, wallet: wallet)
             requestVc.presentEmail = { [weak self] bitcoinURL, image in
                 self?.messagePresenter.presenter = self?.topViewController
@@ -273,8 +270,7 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[currency.code] else { return nil }
-        let sendVC = SendViewController(sender: Sender(walletManager: walletManager/*, kvStore: kvStore*/, currency: currency),
+        let sendVC = SendViewController(sender: Sender(walletManager: walletManager, currency: currency),
                                         walletManager: walletManager,
                                         initialAddress: initialAddress,//BMEX
                                         initialRequest: currentRequest,
@@ -289,8 +285,7 @@ class ModalPresenter : Subscriber, Trackable {
         sendVC.presentScan = presentScan(parent: root, currency: currency)
         sendVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -311,7 +306,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let transferAssetVC = TransferAssetVC(asset: asset, walletManager: walletManager, initialAddress: initialAddress, initialRequest: currentRequest)
         currentRequest = nil
         
@@ -323,8 +317,7 @@ class ModalPresenter : Subscriber, Trackable {
         transferAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
         transferAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -332,8 +325,9 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         transferAssetVC.onPublishSuccess = { [weak self] in
+            guard let myself = self else { return }
             self?.presentAlert(.sendAssetSuccess, completion: {
-                if let allAssetVC = self!.topViewController as? AllAssetVC {
+                if let allAssetVC = myself.topViewController as? AllAssetVC {
                     self?.pushAccountView(currency: Currencies.rvn, animated: true, nc: allAssetVC.navigationController!)
                 }
                 else {
@@ -351,7 +345,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let createAssetVC = CreateAssetVC(walletManager: walletManager, initialAddress: initialAddress, initialRequest: currentRequest)
         currentRequest = nil
         
@@ -363,8 +356,7 @@ class ModalPresenter : Subscriber, Trackable {
         createAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
         createAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -388,7 +380,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let createAssetVC = CreateSubAssetVC(walletManager: walletManager, rootAssetName: rootAssetName, initialAddress: initialAddress, initialRequest: currentRequest)
         currentRequest = nil
         
@@ -400,8 +391,7 @@ class ModalPresenter : Subscriber, Trackable {
         createAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
         createAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -426,7 +416,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let createAssetVC = CreateUniqueAssetVC(walletManager: walletManager, rootAssetName: rootAssetName, initialAddress: initialAddress, initialRequest: currentRequest)
         currentRequest = nil
         
@@ -438,8 +427,7 @@ class ModalPresenter : Subscriber, Trackable {
         createAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
         createAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -463,7 +451,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let manageOwnedAssetVC = ManageOwnedAssetVC(asset: asset, walletManager: walletManager, initialAddress: initialAddress, initialRequest: currentRequest)
         currentRequest = nil
         
@@ -475,8 +462,7 @@ class ModalPresenter : Subscriber, Trackable {
         manageOwnedAssetVC.presentScan = presentScan(parent: root, currency: Currencies.rvn)
         manageOwnedAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.transitioningDelegate = self?.verifyPinTransitionDelegate
             vc.modalPresentationStyle = .overFullScreen
             vc.modalPresentationCapturesStatusBarAppearance = true
@@ -496,7 +482,6 @@ class ModalPresenter : Subscriber, Trackable {
             topViewController?.present(alert, animated: true, completion: nil)
             return nil
         }
-        guard let walletManager = walletManagers[Currencies.rvn.code] else { return nil }
         let burnAssetVC = BurnAssetVC(asset: asset, walletManager: walletManager)
         currentRequest = nil
         
@@ -507,8 +492,7 @@ class ModalPresenter : Subscriber, Trackable {
         let root = ModalViewController(childViewController: burnAssetVC)
         burnAssetVC.presentVerifyPin = { [weak self, weak root] bodyText, success in
             guard let myself = self else { return }
-            let walletManager = myself.primaryWalletManager
-            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: walletManager, success: success)
+            let vc = VerifyPinViewController(bodyText: bodyText, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: success)
             vc.didCancel = {
                 DispatchQueue.main.async {
                     burnAssetVC.dismiss(animated: true, completion: nil)
@@ -521,8 +505,9 @@ class ModalPresenter : Subscriber, Trackable {
             root?.present(vc, animated: true, completion: nil)
         }
         burnAssetVC.onPublishSuccess = { [weak self] in
+            guard let myself = self else { return }
             self?.presentAlert(.burnAssetSuccess, completion: {
-                if let allAssetVC = self!.topViewController as? AllAssetVC {
+                if let allAssetVC = myself.topViewController as? AllAssetVC {
                     self?.pushAccountView(currency: Currencies.rvn, animated: true, nc: allAssetVC.navigationController!)
                 }
                 else {
@@ -550,7 +535,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
     
     private func selectAssetView(asset: Asset) -> UIViewController? {
-        let assetPopUpVC = AssetPopUpVC(walletManager: primaryWalletManager, asset: asset)
+        let assetPopUpVC = AssetPopUpVC(walletManager: walletManager, asset: asset)
         let root = ModalViewController(childViewController: assetPopUpVC)
         assetPopUpVC.parentVC = root
         assetPopUpVC.modalPresenter = self
@@ -578,7 +563,6 @@ class ModalPresenter : Subscriber, Trackable {
     
     func presentSettings() {
         guard let top = topViewController else { return }
-        let walletManager = primaryWalletManager
         let settingsNav = UINavigationController()
         settingsNav.setGrayStyle()
         let sections: [SettingsSections] = [.wallet, .preferences, .currencies, .assets, .other]
@@ -592,7 +576,8 @@ class ModalPresenter : Subscriber, Trackable {
                     nc.setWhiteStyle()
                     nc.delegate = self.wipeNavigationDelegate
                     let start = StartWipeWalletViewController { [weak self] in
-                        let recover = EnterPhraseViewController(walletManager: walletManager, reason: .validateForWipingWallet( {
+                        guard let myself = self else { return }
+                        let recover = EnterPhraseViewController(walletManager: myself.walletManager, reason: .validateForWipingWallet( {
                             self?.wipeWallet()
                         }))
                         nc.pushViewController(recover, animated: true)
@@ -611,13 +596,13 @@ class ModalPresenter : Subscriber, Trackable {
             SettingsSections.preferences: [
                 Setting(title: LAContext.biometricType() == .face ? S.Settings.faceIdLimit : S.Settings.touchIdLimit, accessoryText: {
                     guard let rate = Currencies.rvn.state.currentRate else { return "" }
-                    let amount = Amount(amount: walletManager.spendingLimit, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
+                    let amount = Amount(amount: self.walletManager.spendingLimit, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
                     return amount.localCurrency
                 }, callback: { [weak self] in
                     self?.pushBiometricsSpendingLimit(onNc: settingsNav)
                 }),
                 Setting(title: S.UpdatePin.updateTitle, callback: strongify(self) { myself in
-                    let updatePin = UpdatePinViewController(walletManager: walletManager, type: .update)
+                    let updatePin = UpdatePinViewController(walletManager: self.walletManager, type: .update)
                     settingsNav.pushViewController(updatePin, animated: true)
                 }),
                 Setting(title: S.Settings.currency, accessoryText: {
@@ -626,13 +611,14 @@ class ModalPresenter : Subscriber, Trackable {
                     let identifier = Locale.identifier(fromComponents: components)
                     return Locale(identifier: identifier).currencyCode ?? ""
                 }, callback: {
-                    settingsNav.pushViewController(DefaultCurrencyViewController(walletManager: walletManager), animated: true)
+                    settingsNav.pushViewController(DefaultCurrencyViewController(walletManager: self.walletManager), animated: true)
                 }),
             ],
             SettingsSections.currencies: [
                 Setting(title: S.Settings.importTile, callback: {
                     settingsNav.dismiss(animated: true, completion: { [weak self] in
-                        self?.presentKeyImport(walletManager: walletManager)
+                        guard let myself = self else { return }
+                        self?.presentKeyImport(walletManager: myself.walletManager)
                     })
                 }),
                 Setting(title: S.Settings.sync, callback: {
@@ -681,7 +667,7 @@ class ModalPresenter : Subscriber, Trackable {
                     var advancedSettings = [
                         SettingsSections.network: [
                             Setting(title: S.NodeSelector.title, callback: {
-                                let nodeSelector = NodeSelectorViewController(walletManager: walletManager)
+                                let nodeSelector = NodeSelectorViewController(walletManager: self.walletManager)
                                 settingsNav.pushViewController(nodeSelector, animated: true)
                             }),
                             Setting(title: S.Settings.usedAddresses, isHidden: !UserDefaults.hasActivatedExpertMode, callback: { [weak self] in
@@ -690,7 +676,7 @@ class ModalPresenter : Subscriber, Trackable {
                                 nc.setClearNavbar()
                                 nc.setWhiteStyle()
                                 nc.delegate = self.wipeNavigationDelegate
-                                let start = AllAddressesVC(walletManager: walletManager)
+                                let start = AllAddressesVC(walletManager: self.walletManager)
                                 start.addCloseNavigationItem(tintColor: .white)
                                 start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding]
                                 nc.viewControllers = [start]
@@ -732,7 +718,6 @@ class ModalPresenter : Subscriber, Trackable {
     private func presentScan(parent: UIViewController, currency: CurrencyDef) -> PresentScan {
         return { [weak parent] scanCompletion in
             guard ScanViewController.isCameraAllowed else {
-                self.saveEvent("scan.cameraDenied")
                 if let parent = parent {
                     ScanViewController.presentCameraUnavailableAlert(fromRoot: parent)
                 }
@@ -748,17 +733,17 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     func presentSecurityCenter() {
-        let securityCenter = SecurityCenterViewController(walletManager: primaryWalletManager)
+        let securityCenter = SecurityCenterViewController(walletManager: walletManager)
         let nc = ModalNavigationController(rootViewController: securityCenter)
         nc.setDefaultStyle()
         nc.isNavigationBarHidden = true
         nc.delegate = securityCenterNavigationDelegate
         securityCenter.didTapPin = {
-            let updatePin = UpdatePinViewController(walletManager: self.primaryWalletManager, type: .update)
+            let updatePin = UpdatePinViewController(walletManager: self.walletManager, type: .update)
             nc.pushViewController(updatePin, animated: true)
         }
         securityCenter.didTapBiometrics = strongify(self) { myself in
-            let biometricsSettings = BiometricsSettingsViewController(walletManager: self.primaryWalletManager)
+            let biometricsSettings = BiometricsSettingsViewController(walletManager: self.walletManager)
             biometricsSettings.presentSpendingLimit = {
                 myself.pushBiometricsSpendingLimit(onNc: nc)
             }
@@ -772,7 +757,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
     
     func presentAddressBook(type: AddressBookType? = .normal, callback: ((String) -> Void)? = nil) {
-        let addressBookVC = AddressBookVC(walletManager: primaryWalletManager, addressBookType: type, callback: callback)
+        let addressBookVC = AddressBookVC(walletManager: walletManager, addressBookType: type, callback: callback)
         let nc = ModalNavigationController(rootViewController: addressBookVC)
         nc.setClearNavbar()
         addressBookVC.addCloseNavigationItem(tintColor: .white)
@@ -789,8 +774,8 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func pushBiometricsSpendingLimit(onNc: UINavigationController) {
-        let verify = VerifyPinViewController(bodyText: S.VerifyPin.continueBody, pinLength: Store.state.pinLength, walletManager: primaryWalletManager, success: { pin in
-            let spendingLimit = BiometricsSpendingLimitViewController(walletManager: self.primaryWalletManager)
+        let verify = VerifyPinViewController(bodyText: S.VerifyPin.continueBody, pinLength: Store.state.pinLength, walletManager: walletManager, success: { pin in
+            let spendingLimit = BiometricsSpendingLimitViewController(walletManager: self.walletManager)
             onNc.pushViewController(spendingLimit, animated: true)
         })
         verify.transitioningDelegate = verifyPinTransitionDelegate
@@ -806,7 +791,7 @@ class ModalPresenter : Subscriber, Trackable {
         paperPhraseNavigationController.modalPresentationStyle = .overFullScreen
         let start = StartPaperPhraseViewController(callback: { [weak self] in
             guard let `self` = self else { return }
-            let verify = VerifyPinViewController(bodyText: S.VerifyPin.continueBody, pinLength: Store.state.pinLength, walletManager: self.primaryWalletManager, success: { pin in
+            let verify = VerifyPinViewController(bodyText: S.VerifyPin.continueBody, pinLength: Store.state.pinLength, walletManager: self.walletManager, success: { pin in
                 self.pushWritePaperPhrase(navigationController: paperPhraseNavigationController, pin: pin)
             })
             verify.transitioningDelegate = self.verifyPinTransitionDelegate
@@ -824,11 +809,10 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func pushWritePaperPhrase(navigationController: UINavigationController, pin: String) {
-        let walletManager = primaryWalletManager
         var writeViewController: WritePaperPhraseViewController?
         writeViewController = WritePaperPhraseViewController(walletManager: walletManager, pin: pin, callback: {
             var confirm: ConfirmPaperPhraseViewController?
-            confirm = ConfirmPaperPhraseViewController(walletManager: walletManager, pin: pin, callback: {
+            confirm = ConfirmPaperPhraseViewController(walletManager: self.walletManager, pin: pin, callback: {
                 confirm?.dismiss(animated: true, completion: {
                     Store.perform(action: Alert.Show(.paperKeySet(callback: {
                         Store.perform(action: HideStartFlow())
@@ -847,12 +831,11 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func presentBuyController(_ mountPoint: String) {
-        let walletManager = primaryWalletManager
         let vc: BRWebViewController
         #if Debug || Testflight
             vc = BRWebViewController(bundleName: "bread-frontend-staging", mountPoint: mountPoint, walletManager: walletManager)
         #else
-            vc = BRWebViewController(bundleName: "bread-frontend", mountPoint: mountPoint, walletManager: walletManager)
+            vc = BRWebViewController(bundleName: "bread-frontend", mountPoint: mountPoint, walletManager: walletManagerOne)
         #endif
         vc.startServer()
         vc.preload()
@@ -890,10 +873,10 @@ class ModalPresenter : Subscriber, Trackable {
         let activity = BRActivityViewController(message: S.WipeWallet.wiping)
         self.topViewController?.present(activity, animated: true, completion: nil)
         DispatchQueue.walletQueue.async {
-            self.walletManagers.values.forEach({ $0.peerManager?.disconnect() })
+            self.walletManager.peerManager?.disconnect()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
                 activity.dismiss(animated: true, completion: {
-                    if self.primaryWalletManager.wipeWallet(pin: "forceWipe") {
+                    if self.walletManager.wipeWallet(pin: "forceWipe") {
                         Store.trigger(name: .reinitWalletManager({}))
                     } else {
                         let failure = UIAlertController(title: S.WipeWallet.failedTitle, message: S.WipeWallet.failedMessage, preferredStyle: .alert)
@@ -921,7 +904,6 @@ class ModalPresenter : Subscriber, Trackable {
 
     //MARK: - Prompts
     func presentBiometricsSetting() {
-        let walletManager = primaryWalletManager
         let biometricsSettings = BiometricsSettingsViewController(walletManager: walletManager)
         biometricsSettings.addCloseNavigationItem(tintColor: .white)
         let nc = ModalNavigationController(rootViewController: biometricsSettings)
@@ -950,7 +932,6 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     func presentUpgradePin() {
-        let walletManager = primaryWalletManager
         let updatePin = UpdatePinViewController(walletManager: walletManager, type: .update)
         let nc = ModalNavigationController(rootViewController: updatePin)
         nc.setDefaultStyle()
@@ -1023,13 +1004,11 @@ class ModalPresenter : Subscriber, Trackable {
     func showAccountView(currency: CurrencyDef, animated: Bool) {
         guard let nc = topViewController?.navigationController as? RootNavigationController,
             nc.viewControllers.count == 1 else { return }
-        guard let walletManager = self.walletManagers[currency.code] else { return }
         let accountViewController = AccountViewController(walletManager: walletManager)
         nc.pushViewController(accountViewController, animated: animated)
     }
     
     func pushAccountView(currency: CurrencyDef, animated: Bool, nc:UINavigationController) {
-        guard let walletManager = self.walletManagers[currency.code] else { return }
         let accountViewController = AccountViewController(walletManager: walletManager)
         nc.pushViewController(accountViewController, animated: animated)
     }
@@ -1048,11 +1027,11 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func handleCopyAddresses(success: String?, error: String?) {
-        let walletManager = primaryWalletManager
         let alert = UIAlertController(title: S.URLHandling.addressListAlertTitle, message: S.URLHandling.addressListAlertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: S.URLHandling.copy, style: .default, handler: { [weak self] _ in
-            let verify = VerifyPinViewController(bodyText: S.URLHandling.addressListVerifyPrompt, pinLength: Store.state.pinLength, walletManager: walletManager, success: { [weak self] pin in
+            guard let myself = self else { return }
+            let verify = VerifyPinViewController(bodyText: S.URLHandling.addressListVerifyPrompt, pinLength: Store.state.pinLength, walletManager: myself.walletManager, success: { [weak self] pin in
                 self?.copyAllAddressesToClipboard()
                 Store.perform(action: Alert.Show(.addressesCopied))
                 if let success = success, let url = URL(string: success) {
@@ -1069,7 +1048,7 @@ class ModalPresenter : Subscriber, Trackable {
 
     private func authenticateForBitId(prompt: String, callback: @escaping (BitIdAuthResult) -> Void) {
         if UserDefaults.isBiometricsEnabled {
-            primaryWalletManager.authenticate(biometricsPrompt: prompt, completion: { result in
+            walletManager.authenticate(biometricsPrompt: prompt, completion: { result in
                 switch result {
                 case .success:
                     return callback(.success)
@@ -1087,7 +1066,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func verifyPinForBitId(prompt: String, callback: @escaping (BitIdAuthResult) -> Void) {
-        let verify = VerifyPinViewController(bodyText: prompt, pinLength: Store.state.pinLength, walletManager: primaryWalletManager, success: { pin in
+        let verify = VerifyPinViewController(bodyText: prompt, pinLength: Store.state.pinLength, walletManager: walletManager, success: { pin in
                 callback(.success)
         })
         verify.didCancel = { callback(.cancelled) }
@@ -1098,7 +1077,7 @@ class ModalPresenter : Subscriber, Trackable {
     }
 
     private func copyAllAddressesToClipboard() {
-        guard let wallet = primaryWalletManager.wallet else { return }
+        guard let wallet = walletManager.wallet else { return }
         let addresses = wallet.allAddresses.filter({wallet.addressIsUsed($0)})
         UIPasteboard.general.string = addresses.joined(separator: "\n")
     }

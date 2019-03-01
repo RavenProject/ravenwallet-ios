@@ -62,7 +62,6 @@ enum TriggerName {
     case showAlert(UIAlertController?)
     case reinitWalletManager((()->Void)?)
     case didUpgradePin
-    case txMemoUpdated(String)
     case promptShareData
     case didEnableShareData
     case didWritePaperKey
@@ -128,8 +127,6 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
     case (.reinitWalletManager(_), .reinitWalletManager(_)):
         return true
     case (.didUpgradePin, .didUpgradePin):
-        return true
-    case (.txMemoUpdated(_), .txMemoUpdated(_)):
         return true
     case (.promptShareData, .promptShareData):
         return true

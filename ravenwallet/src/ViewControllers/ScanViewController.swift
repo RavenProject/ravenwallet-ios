@@ -12,7 +12,7 @@ import AVFoundation
 typealias ScanCompletion = (PaymentRequest?) -> Void
 typealias KeyScanCompletion = (String) -> Void
 
-class ScanViewController : UIViewController, Trackable {
+class ScanViewController : UIViewController {
 
     static func presentCameraUnavailableAlert(fromRoot: UIViewController) {
         let alertController = UIAlertController(title: S.Send.cameraUnavailableTitle, message: S.Send.cameraUnavailableMessage, preferredStyle: .alert)
@@ -108,7 +108,6 @@ class ScanViewController : UIViewController, Trackable {
         guide.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
 
         close.tap = { [weak self] in
-            self?.saveEvent("scan.dismiss")
             self?.dismiss(animated: true, completion: {
                 self?.completion?(nil)
             })
@@ -154,11 +153,6 @@ class ScanViewController : UIViewController, Trackable {
                     try device.lockForConfiguration()
                     device.torchMode = device.torchMode == .on ? .off : .on
                     device.unlockForConfiguration()
-                    if device.torchMode == .on {
-                        self?.saveEvent("scan.torchOn")
-                    } else {
-                        self?.saveEvent("scan.torchOn")
-                    }
                 } catch let error {
                     print("Camera Torch error: \(error)")
                 }
@@ -197,7 +191,6 @@ extension ScanViewController : AVCaptureMetadataOutputObjectsDelegate {
         if self.currentUri != uri {
             self.currentUri = uri
             if let request = PaymentRequest(string: uri, currency: currency) {
-                saveEvent("scan.bitcoinUri")
                 createPaymentRequestSuccess(request: request)
             } else {
                 guide.state = .negative
@@ -217,7 +210,6 @@ extension ScanViewController : AVCaptureMetadataOutputObjectsDelegate {
 
     func handleKey(_ address: String) {
         if isValidURI(address) {
-            saveEvent("scan.privateKey")
             guide.state = .positive
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                 self.dismiss(animated: true, completion: {

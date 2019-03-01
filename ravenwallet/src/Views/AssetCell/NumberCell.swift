@@ -13,7 +13,7 @@ enum NumberDigit {
     case one
 }
 
-class NumberCell : UIViewController, Trackable {
+class NumberCell : UIViewController {
     
 
     init(placeholder: String, keyboardType: KeyboardType = .pinPad, maxDigits: Int = 0, numberDigit:NumberDigit = .many, isPinPadExpandedAtLaunch: Bool = false, isEnabled: Bool = true) {

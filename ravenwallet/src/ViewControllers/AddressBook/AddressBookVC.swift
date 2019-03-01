@@ -35,6 +35,9 @@ class AddressBookVC : UIViewController, Subscriber {
             Store.perform(action: RootModalActions.Present(modal: .addressBook(currency: walletManager.currency, initialAddress: nil, type: .add, callback: {
             self.adressBookTableVC.setupData()
         }))) }
+        footerView.receiveCallback  = {
+            Store.perform(action: RootModalActions.Present(modal: .receive(currency: walletManager.currency, isRequestAmountVisible: true, initialAddress: nil)))
+        }
     }
 
     //MARK: - Private

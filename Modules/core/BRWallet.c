@@ -1268,7 +1268,7 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput out
 // forkId is 0 for bitcoin, 0x40 for b-cash
 // seed is the master private key (wallet seed) corresponding to the master public key given when the wallet was created
 // returns true if all inputs were signed, or false if there was an error or not all inputs were able to be signed
-int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, const void *seed, size_t seedLen) {
+int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, const void *seed, size_t seedLen) {
     uint32_t j, internalIdx[tx->inCount], externalIdx[tx->inCount];
     size_t i, internalCount = 0, externalCount = 0;
     int r = 0;
@@ -1296,7 +1296,7 @@ int BRWalletSignTransaction(BRWallet *wallet, BRTransaction *tx, int forkId, con
         BRBIP44PrivKeyList(&keys[internalCount], externalCount, seed, seedLen, 175, 0, SEQUENCE_EXTERNAL_CHAIN, externalIdx);
         // TODO: XXX wipe seed callback
         seed = NULL;
-        if (tx) r = BRTransactionSign(tx, forkId, keys, internalCount + externalCount);
+        if (tx) r = BRTransactionSign(tx, keys, internalCount + externalCount);
         for (i = 0; i < internalCount + externalCount; i++) BRKeyClean(&keys[i]);
     } else r = -1; // user canceled authentication
 

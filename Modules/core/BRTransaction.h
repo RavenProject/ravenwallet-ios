@@ -34,7 +34,7 @@
 extern "C" {
 #endif
     
-#define TX_FEE_PER_KB        1000ULL     // standard tx fee per kb of tx size, rounded up to nearest kb
+#define TX_FEE_PER_KB        1000000ULL     // standard tx fee per kb of tx size, rounded up to nearest kb
 #define TX_OUTPUT_SIZE       34          // estimated size for a typical transaction output
 #define TX_INPUT_SIZE        148         // estimated size for a typical compact pubkey transaction input
 #define TX_MIN_OUTPUT_AMOUNT (TX_FEE_PER_KB*3*(TX_OUTPUT_SIZE + TX_INPUT_SIZE)/1000) //no txout can be below this amount
@@ -169,7 +169,7 @@ extern "C" {
     // adds signatures to any inputs with NULL signatures that can be signed with any keys
     // forkId is 0 for bitcoin, 0x40 for b-cash
     // returns true if tx is signed
-    int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCount);
+    int BRTransactionSign(BRTransaction *tx, BRKey *keys, size_t keysCount);
     
     // true if tx meets IsStandard() rules: https://bitcoin.org/en/developer-guide#standard-transactions
     int BRTransactionIsStandard(const BRTransaction *tx);

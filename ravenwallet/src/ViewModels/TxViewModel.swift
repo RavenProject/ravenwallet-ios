@@ -17,7 +17,6 @@ protocol TxViewModel {
     var status: TransactionStatus { get }
     var direction: TransactionDirection { get }
     var displayAddress: String { get }
-    var comment: String? { get }
     var isValid: Bool { get }
     var shouldDisplayAvailableToSpend: Bool { get }
 }
@@ -29,7 +28,6 @@ extension TxViewModel {
     var status: TransactionStatus { return tx.status }
     var direction: TransactionDirection { return tx.direction }
     var isValid: Bool { return tx.isValid }
-    var comment: String? { return tx.comment }
     
     var displayAddress: String {
 

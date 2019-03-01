@@ -9,7 +9,7 @@
 import UIKit
 import SafariServices
 
-class TransactionsTableViewController : UITableViewController, Subscriber, Trackable {
+class TransactionsTableViewController : UITableViewController, Subscriber {
 
     //MARK: - Public
     init(walletManager: WalletManager, didSelectTransaction: @escaping ([Transaction], Int) -> Void) {
@@ -101,14 +101,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber, Track
         
         Store.subscribe(self, selector: { $0[self.currency].recommendRescan != $1[self.currency].recommendRescan }, callback: { _ in
         })
-        
-        Store.subscribe(self, name: .txMemoUpdated(""), callback: {
-            guard let trigger = $0 else { return }
-            if case .txMemoUpdated(let txHash) = trigger {
-                self.reload(txHash: txHash)
-            }
-        })
-        
+                
         Store.subscribe(self, selector: {
             $0[self.currency].transactions != $1[self.currency].transactions
         },

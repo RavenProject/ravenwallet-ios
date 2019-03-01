@@ -12,7 +12,7 @@ import LocalAuthentication
 private let biometricsSize: CGFloat = 32.0
 private let topControlHeight: CGFloat = 32.0
 
-class LoginViewController : UIViewController, Subscriber, Trackable {
+class LoginViewController : UIViewController, Subscriber {
 
     //MARK: - Public
     var walletManager: WalletManager? {
@@ -258,7 +258,6 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     }
 
     private func authenticationSucceded() {
-        saveEvent("login.success")
         let label = UILabel(font: subheader.font)
         label.textColor = .white
         label.text = S.UnlockScreen.unlocked
@@ -296,7 +295,6 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     }
 
     private func authenticationFailed() {
-        saveEvent("login.failed")
         guard let pinView = pinView else { return }
         pinPad.view.isUserInteractionEnabled = false
         pinView.shake { [weak self] in
@@ -341,7 +339,6 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
             }
             return
         }
-        saveEvent("login.locked")
         let disabledUntil = walletManager.walletDisabledUntil
         let disabledUntilDate = Date(timeIntervalSince1970: disabledUntil)
         let unlockInterval = disabledUntil - Date().timeIntervalSince1970
@@ -369,7 +366,6 @@ class LoginViewController : UIViewController, Subscriber, Trackable {
     }
 
     @objc private func unlock() {
-        saveEvent("login.unlocked")
         subheader.pushNewText(S.UnlockScreen.subheader)
         pinPad.view.isUserInteractionEnabled = true
         unlockTimer = nil

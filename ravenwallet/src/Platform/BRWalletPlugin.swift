@@ -32,7 +32,7 @@ enum BitIdAuthResult {
     case failed
 }
 
-class BRWalletPlugin: BRHTTPRouterPlugin, BRWebSocketClient, Trackable {
+class BRWalletPlugin: BRHTTPRouterPlugin, BRWebSocketClient {
     var sockets = [String: BRWebSocket]()
     let walletManager: WalletManager
     var tempBitIDKeys = [String: BRKey]() // this should only ever be mutated from the main thread
@@ -226,12 +226,10 @@ class BRWalletPlugin: BRHTTPRouterPlugin, BRWebSocketClient, Trackable {
             let name = nameArray[0]
             if let body = req.body(), body.count > 0 {
                 if let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String: String] {
-                    self.saveEvent(name, attributes: json ?? [:])
                 } else {
                     return BRHTTPResponse(request: req, code: 400)
                 }
             } else {
-                self.saveEvent(name)
             }
             return BRHTTPResponse(request: req, code: 200)
         }

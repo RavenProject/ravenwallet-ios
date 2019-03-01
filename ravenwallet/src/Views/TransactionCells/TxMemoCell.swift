@@ -53,15 +53,12 @@ class TxMemoCell: TxDetailRowCell {
     func set(viewModel: TxDetailViewModel, tableView: UITableView) {
         self.tableView = tableView
         self.viewModel = viewModel
-        textView.text = viewModel.comment
     }
     
     fileprivate func saveComment(comment: String) {
         guard let tx = viewModel.tx as? RvnTransaction,
             let rate = Store.state[tx.currency].currentRate else { return }
-        
-        tx.saveComment(comment: comment, rate: rate)
-        
+                
         Store.trigger(name: .txMemoUpdated(tx.hash))
     }
 }

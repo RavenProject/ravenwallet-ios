@@ -137,6 +137,7 @@ class TxListCell: UITableViewCell {
         failedIndicator.setTitleColor(.white, for: .normal)
         failedIndicator.backgroundColor = .sentRed
         failedIndicator.layer.cornerRadius = 3
+        failedIndicator.isHidden = true
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -11,7 +11,7 @@ import UIKit
 private let countToShowMore:Int = 3
 
 class AssetListTableView: UITableViewController, Subscriber {
-
+    
     var didSelectCurrency: ((CurrencyDef) -> Void)?
     var didSelectAsset: ((Asset) -> Void)?
     var didSelectShowMoreAsset: (() -> Void)?
@@ -21,7 +21,7 @@ class AssetListTableView: UITableViewController, Subscriber {
     var didTapCreateAsset: (() -> Void)?
     var didTapAddressBook: ((CurrencyDef) -> Void)?
     var didTapTutorial: (() -> Void)?
-
+    
     // MARK: - Init
     
     init() {
@@ -101,7 +101,7 @@ class AssetListTableView: UITableViewController, Subscriber {
         case security
         case support
         case tutorial
-
+        
         var content: (String, UIImage) {
             switch self {
             case .createAsset:
@@ -115,17 +115,17 @@ class AssetListTableView: UITableViewController, Subscriber {
             case .support:
                 return (S.MenuButton.support, #imageLiteral(resourceName: "Faq"))
             case .tutorial:
-                return (S.MenuButton.tutorial, #imageLiteral(resourceName: "Faq"))
+                return (S.MenuButton.tutorial, #imageLiteral(resourceName: "Tutorial"))
             }
         }
         
         static let allItems: [Menu] = [ .createAsset, .settings, .security, .support, .addressBook, .tutorial]
     }
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 3
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let section = Section(rawValue: section) else { return 0 }
         
@@ -141,7 +141,7 @@ class AssetListTableView: UITableViewController, Subscriber {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let section = Section(rawValue: indexPath.section) else { return 0 }
-
+        
         switch section {
         case .wallet:
             return E.isIPhoneXOrLater ? 260.0 : 260.0
@@ -151,7 +151,7 @@ class AssetListTableView: UITableViewController, Subscriber {
             return 53.0
         }
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
         
@@ -195,7 +195,7 @@ class AssetListTableView: UITableViewController, Subscriber {
             return C.padding[1]
         }
     }
-
+    
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let section = Section(rawValue: section) else { return nil }
         switch section {
@@ -205,7 +205,7 @@ class AssetListTableView: UITableViewController, Subscriber {
             return S.HomeScreen.asset
         case .menu:
             return S.HomeScreen.admin
-        
+            
         }
     }
     
@@ -250,7 +250,7 @@ class AssetListTableView: UITableViewController, Subscriber {
                 didTapTutorial?()
             }
             
-        
+            
         }
     }
 }

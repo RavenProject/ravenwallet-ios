@@ -537,7 +537,7 @@ int BRTransactionIsSigned(const BRTransaction *tx) {
 // adds signatures to any inputs with NULL signatures that can be signed with any keys
 // forkId is 0 for Ravencoin, 0x40 for b-cash
 // returns true if tx is signed
-int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCount) {
+int BRTransactionSign(BRTransaction *tx, BRKey *keys, size_t keysCount) {
     BRAddress addrs[keysCount], address;
     size_t i, j;
     
@@ -567,23 +567,23 @@ int BRTransactionSign(BRTransaction *tx, int forkId, BRKey *keys, size_t keysCou
 #warning TODO: OP_EQUALVERIFY condition doesn't trigger for assets input
         if (elemsCount >= 2 && (*elems[elemsCount - 2] == OP_EQUALVERIFY || *elems[elemsCount - 5] == OP_EQUALVERIFY)) { // pay-to-pubkey-hash
             //        if (elemsCount >= 2 /*&& *elems[elemsCount - 2] == OP_EQUALVERIFY*/) { // pay-to-pubkey-hash
-            uint8_t data[_TransactionData(tx, NULL, 0, i, forkId | SIGHASH_ALL)];
-            size_t dataLen = _TransactionData(tx, data, sizeof(data), i, forkId | SIGHASH_ALL);
+            uint8_t data[_TransactionData(tx, NULL, 0, i, 0 | SIGHASH_ALL)];
+            size_t dataLen = _TransactionData(tx, data, sizeof(data), i, 0 | SIGHASH_ALL);
             
             SHA256_2(&md, data, dataLen);
             sigLen = BRKeySign(&keys[j], sig, sizeof(sig) - 1, md);
-            sig[sigLen++] = forkId | SIGHASH_ALL;
+            sig[sigLen++] = 0 | SIGHASH_ALL;
             scriptLen = BRScriptPushData(script, sizeof(script), sig, sigLen);
             scriptLen += BRScriptPushData(&script[scriptLen], sizeof(script) - scriptLen, pubKey, pkLen);
             BRTxInputSetSignature(input, script, scriptLen);
             
         } else { // pay-to-pubkey
-            uint8_t data[_TransactionData(tx, NULL, 0, i, forkId | SIGHASH_ALL)];
-            size_t dataLen = _TransactionData(tx, data, sizeof(data), i, forkId | SIGHASH_ALL);
+            uint8_t data[_TransactionData(tx, NULL, 0, i, 0 | SIGHASH_ALL)];
+            size_t dataLen = _TransactionData(tx, data, sizeof(data), i, 0 | SIGHASH_ALL);
             
             SHA256_2(&md, data, dataLen);
             sigLen = BRKeySign(&keys[j], sig, sizeof(sig) - 1, md);
-            sig[sigLen++] = forkId | SIGHASH_ALL;
+            sig[sigLen++] = 0 | SIGHASH_ALL;
             scriptLen = BRScriptPushData(script, sizeof(script), sig, sigLen);
             BRTxInputSetSignature(input, script, scriptLen);
         }

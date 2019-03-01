@@ -17,7 +17,7 @@ enum PhraseEntryReason {
 
 typealias EnterPhraseCallback = (String) -> Void
 
-class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, CustomTitleView, Trackable {
+class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, CustomTitleView {
 
     init(walletManager: WalletManager, reason: PhraseEntryReason) {
         self.walletManager = walletManager
@@ -133,12 +133,10 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
 
         switch reason {
         case .setSeed(_):
-            saveEvent("enterPhrase.setSeed")
             titleLabel.text = S.RecoverWallet.header
             subheader.text = S.RecoverWallet.subheader
             moreInfoButton.isHidden = true
         case .validateForResettingPin(_):
-            saveEvent("enterPhrase.resettingPin")
             titleLabel.text = S.RecoverWallet.headerResetPin
             subheader.text = S.RecoverWallet.subheaderResetPin
             instruction.isHidden = true
@@ -148,11 +146,9 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             }
             faq.isHidden = true
         case .validateForWipingWallet(_):
-            saveEvent("enterPhrase.wipeWallet")
             titleLabel.text = S.WipeWallet.title
             subheader.text = S.WipeWallet.instruction
         case .validateForOneTimeWipingWallet(_):
-            saveEvent("enterPhrase.oneTimeWipeWallet")
             titleLabel.text = S.OneTimeWipe.title
             subheader.text = S.OneTimeWipe.instruction
             faq.isHidden = true
@@ -164,11 +160,9 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
 
     private func validatePhrase(_ phrase: String) {
         guard walletManager.isPhraseValid(phrase) else {
-            saveEvent("enterPhrase.invalid")
             errorLabel.isHidden = false
             return
         }
-        saveEvent("enterPhrase.valid")
         errorLabel.isHidden = true
 
         switch reason {

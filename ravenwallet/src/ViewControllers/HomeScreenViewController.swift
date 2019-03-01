@@ -8,9 +8,9 @@
 
 import UIKit
 
-class HomeScreenViewController : UIViewController, Subscriber, Trackable {
+class HomeScreenViewController : UIViewController, Subscriber {
     
-    var primaryWalletManager: WalletManager? {
+    var walletManager: WalletManager? {
         didSet {
             setInitialData()
             setupSubscriptions()
@@ -44,8 +44,8 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     
     // MARK: -
     
-    init(primaryWalletManager: WalletManager?) {
-        self.primaryWalletManager = primaryWalletManager
+    init(walletManager: WalletManager?) {
+        self.walletManager = walletManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -176,7 +176,6 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
             let rate = Store.state[$0].currentRate?.rate ?? 0
             return Double(balance)/$0.baseUnit * rate * 0.001
             }.reduce(0.0, +)
-        
         let format = NumberFormatter()
         format.isLenient = true
         format.numberStyle = .currency
@@ -289,15 +288,13 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
     }
     
     private func attemptShowPrompt() {
-        guard let walletManager = primaryWalletManager else {
+        guard let walletManager = walletManager else {
             currentPrompt = nil
             return
         }
         if let type = PromptType.nextPrompt(walletManager: walletManager) {
-            self.saveEvent("prompt.\(type.name).displayed")
             currentPrompt = Prompt(type: type)
             currentPrompt!.dismissButton.tap = { [unowned self] in
-                self.saveEvent("prompt.\(type.name).dismissed")
                 self.currentPrompt = nil
                 UserDefaults.hasDismissedPrompt = true
             }
@@ -305,7 +302,6 @@ class HomeScreenViewController : UIViewController, Subscriber, Trackable {
                 if let trigger = type.trigger(currency: Currencies.rvn) {
                     Store.trigger(name: trigger)
                 }
-                self.saveEvent("prompt.\(type.name).trigger")
                 self.currentPrompt = nil
             }
             if type == .biometrics {

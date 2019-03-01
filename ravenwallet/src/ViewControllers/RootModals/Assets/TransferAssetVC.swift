@@ -12,7 +12,7 @@ import Core
 
 private let buttonSize = CGSize(width: 52.0, height: 32.0)
 
-class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class TransferAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK - Public
     var presentScan: PresentScan?
@@ -61,6 +61,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
     private var feeType: Fee?
     private let currency: CurrencyDef = Currencies.rvn //BMEX
     private var transferOwnerShipHeight: NSLayoutConstraint?
+    private let checkBoxNameCell = CheckBoxCell(labelCheckBox: S.Send.saveInAddresBook, placeholder: S.AddressBook.nameAddressLabel)
 
     override func viewDidLoad() {
         addSubviews()
@@ -75,6 +76,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         view.addSubview(addressCell)
         view.addSubview(transferOwnerShip)
         view.addSubview(transferButton)
+        view.addSubview(checkBoxNameCell)
         transferOwnerShip.clipsToBounds = true
 
     }
@@ -103,10 +105,19 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                 feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
         })
         
+        checkBoxNameCell.constrain([
+            checkBoxNameCell.widthAnchor.constraint(equalTo: feeView.view.widthAnchor),
+            checkBoxNameCell.topAnchor.constraint(equalTo: feeView.view.bottomAnchor),
+            checkBoxNameCell.leadingAnchor.constraint(equalTo: feeView.view.leadingAnchor),
+            checkBoxNameCell.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2]) ])
+        
+        checkBoxNameCell.accessoryView.constrain([
+            checkBoxNameCell.accessoryView.constraint(.width, constant: 0.0) ])
+        
         transferButton.constrain([
             transferButton.constraint(.leading, toView: view, constant: C.padding[2]),
             transferButton.constraint(.trailing, toView: view, constant: -C.padding[2]),
-            transferButton.constraint(toBottom: feeView.view, constant: verticalButtonPadding),
+            transferButton.constraint(toBottom: checkBoxNameCell, constant: verticalButtonPadding),
             transferButton.constraint(.height, constant: C.Sizes.buttonHeight),
             transferButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: E.isIPhoneXOrLater ? -C.padding[5] : -C.padding[2]) ])
     }
@@ -212,6 +223,21 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             self.addressCell.setContent(address)
         })))
     }
+    
+    func saveNewAddressBook() {
+        if checkBoxNameCell.btnCheckBox.isSelected {
+            guard !(checkBoxNameCell.textField.text?.isEmpty)! else {
+                return showAlert(title: S.Alert.error, message: S.AddressBook.noNameAddress, buttonLabel: S.Button.ok)
+            }
+            let newAddress = AddressBook(name: checkBoxNameCell.textField.text!, address: addressCell.address!)
+            let addressBookManager = AddressBookManager()
+            addressBookManager.addAddressBook(newAddress: newAddress, successCallBack: {
+                Store.perform(action: Alert.Show(.addressAdded(callback: nil)))
+            }, faillerCallBack: {
+                //if already existe dont show error
+            })
+        }
+    }
 
     @objc private func sendTapped() {
         if addressCell.textField.isFirstResponder {
@@ -259,7 +285,11 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
             guard feeAmount <= balance else {
                 return showAlert(title: S.Alert.error, message: S.Send.insufficientFunds, buttonLabel: S.Button.ok)
             }
-            //sender
+            
+            //BMEX save AddressBook
+            saveNewAddressBook()
+            
+            //sender Asset
             let assetToSend: BRAssetRef = BRAsset.createAssetRef(asset: asset, type: TRANSFER, amount: amount)
             guard sender.createAssetTransaction(amount: 0, to: address, asset: assetToSend) else {
                 return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
@@ -291,7 +321,6 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
         
         sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
                     rate: rate,
-                    comment: "",
                     feePerKb: feePerKb,
                     verifyPinFunction: { [weak self] pinValidationCallback in
                         self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in
@@ -309,14 +338,11 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable, Trackabl
                         }
                         myself.onPublishSuccess?()
                     })
-                    self?.saveEvent("send.success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("send.publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("send.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })

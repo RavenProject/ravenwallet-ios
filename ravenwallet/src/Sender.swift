@@ -30,7 +30,6 @@ class Sender {
     var transaction: BRTxRef?
     var protocolRequest: PaymentProtocolRequest?
     var rate: Rate?
-    var comment: String?
     var feePerKb: UInt64?
 
     func createTransaction(amount: UInt64, to: String) -> Bool {
@@ -59,17 +58,16 @@ class Sender {
     }
 
     //Amount in bits
-    func send(biometricsMessage: String, rate: Rate?, comment: String?, feePerKb: UInt64, verifyPinFunction: @escaping (@escaping(String) -> Void) -> Void, completion:@escaping (SendResult) -> Void) {
+    func send(biometricsMessage: String, rate: Rate?, feePerKb: UInt64, verifyPinFunction: @escaping (@escaping(String) -> Void) -> Void, completion:@escaping (SendResult) -> Void) {
         guard let tx = transaction else { return completion(.creationError(S.Send.createTransactionError)) }
 
         self.rate = rate
-        self.comment = comment
         self.feePerKb = feePerKb
 
         if UserDefaults.isBiometricsEnabled && walletManager.canUseBiometrics(forTx:tx) {
             DispatchQueue.walletQueue.async { [weak self] in
                 guard let myself = self else { return }
-                myself.walletManager.signTransaction(tx, forkId: (myself.currency as! Raven).forkId, biometricsPrompt: biometricsMessage, completion: { result in
+                myself.walletManager.signTransaction(tx, biometricsPrompt: biometricsMessage, completion: { result in
                     if result == .success {
                         myself.publish(completion: completion)
                     } else {
@@ -89,7 +87,7 @@ class Sender {
                            completion:@escaping (SendResult) -> Void) {
         verifyPinFunction({ pin in
             DispatchQueue.walletQueue.async {
-                if self.walletManager.signTransaction(tx, forkId: (self.currency as! Raven).forkId, pin: pin) {
+                if self.walletManager.signTransaction(tx, pin: pin) {
                     self.publish(completion: completion)
                 } else {
                     DispatchQueue.main.async {
@@ -109,24 +107,12 @@ class Sender {
                     if let error = error {
                         completion(.publishFailure(error))
                     } else {
-                        myself.setMetaData()
                         completion(.success)
                         myself.postProtocolPaymentIfNeeded()
                     }
                 }
             })
         }
-    }
-
-    private func setMetaData() {
-        guard let rate = rate, let tx = transaction, let feePerKb = feePerKb else { print("Incomplete tx metadata"); return }
-        let metaData = TxMetaData(transaction: tx.pointee,
-                                  exchangeRate: rate.rate,
-                                  exchangeRateCurrency: rate.code,
-                                  feeRate: Double(feePerKb),
-                                  deviceId: UserDefaults.standard.deviceID,
-                                  comment: comment)
-        Store.trigger(name: .txMemoUpdated(tx.pointee.txHash.description))
     }
 
     private func postProtocolPaymentIfNeeded() {

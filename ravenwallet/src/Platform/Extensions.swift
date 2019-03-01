@@ -370,21 +370,6 @@ public extension Data {
         }
     }
     
-    public func chacha20Poly1305AEADDecrypt(key: BRKey) throws -> Data {
-        let data = [UInt8](self)
-        guard data.count > 12 else { throw BRReplicatedKVStoreError.malformedData }
-        let nonce = Array(data[data.startIndex...data.startIndex.advanced(by: 12)])
-        let inData = Array(data[data.startIndex.advanced(by: 12)...(data.endIndex-1)])
-        var null =  CChar(0)
-        var sk = key.secret
-        return withUnsafePointer(to: &sk) {
-            let outSize = Chacha20Poly1305AEADDecrypt(nil, 0, $0, nonce, inData, inData.count, &null, 0)
-            var outData = [UInt8](repeating: 0, count: outSize)
-            Chacha20Poly1305AEADDecrypt(&outData, outSize, $0, nonce, inData, inData.count, &null, 0)
-            return Data(outData)
-        }
-    }
-    
     var masterPubKey: BRMasterPubKey? {
         guard self.count >= (4 + 32 + 33) else { return nil }
         var mpk = BRMasterPubKey()

@@ -57,7 +57,7 @@ struct RootModalActions {
 }
 
 //MARK: - Wallet State
-struct WalletChange: Trackable {
+struct WalletChange {
     struct WalletAction: Action {
         let reduce: Reducer
     }
@@ -105,13 +105,11 @@ struct WalletChange: Trackable {
     }
     
     func setRecommendScan(_ recommendRescan: Bool) -> WalletAction {
-        saveEvent("event.recommendRescan")
         return WalletAction(reduce: { $0.mutate(walletState: $0[self.currency].mutate(recommendRescan: recommendRescan)) })
     }
 
     func setMaxDigits(_ maxDigits: Int) -> WalletAction {
         UserDefaults.maxDigits = maxDigits
-        saveEvent("maxDigits.set", attributes: ["maxDigits": "\(maxDigits)"])
         return WalletAction(reduce: { $0.mutate(walletState: $0[self.currency].mutate(maxDigits: maxDigits)) })
     }
     
@@ -154,23 +152,21 @@ enum Alert {
 }
 
 enum Biometrics {
-    struct setIsEnabled : Action, Trackable {
+    struct setIsEnabled : Action {
         let reduce: Reducer
         init(_ isBiometricsEnabled: Bool) {
             UserDefaults.isBiometricsEnabled = isBiometricsEnabled
             reduce = { $0.mutate(isBiometricsEnabled: isBiometricsEnabled) }
-            saveEvent("event.enableBiometrics", attributes: ["isEnabled": "\(isBiometricsEnabled)"])
         }
     }
 }
 
 enum DefaultCurrency {
-    struct setDefault : Action, Trackable {
+    struct setDefault : Action {
         let reduce: Reducer
         init(_ defaultCurrencyCode: String) {
             UserDefaults.defaultCurrencyCode = defaultCurrencyCode
             reduce = { $0.mutate(defaultCurrencyCode: defaultCurrencyCode) }
-            saveEvent("event.setDefaultCurrency", attributes: ["code": defaultCurrencyCode])
         }
     }
 }

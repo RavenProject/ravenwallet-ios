@@ -11,7 +11,7 @@ import UIKit
 private let currencyHeight: CGFloat = 80.0
 private let feeHeight: CGFloat = 130.0
 
-class AmountViewController : UIViewController, Trackable {
+class AmountViewController : UIViewController {
     
     private let currency: CurrencyDef
 
@@ -214,7 +214,6 @@ class AmountViewController : UIViewController, Trackable {
     }
 
     private func toggleCurrency() {
-        saveEvent("amount.swapCurrency")
         selectedRate = selectedRate == nil ? currency.state.currentRate : nil
         updateCurrencyToggleTitle()
     }

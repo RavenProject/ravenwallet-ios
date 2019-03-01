@@ -10,7 +10,7 @@ import UIKit
 
 enum AlertType {
     case pinSet(callback: () -> Void)
-    case addressAdded(callback: () -> Void)
+    case addressAdded(callback: (() -> Void)?)
     case addressUpdated
     case addressDeleted
     case paperKeySet(callback: () -> Void)

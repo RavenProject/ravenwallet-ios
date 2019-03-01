@@ -10,7 +10,7 @@ import UIKit
 import SafariServices
 import SwipeCellKit
 
-class AdressBookTableVC : UITableViewController, Subscriber, Trackable, SwipeTableViewCellDelegate {
+class AdressBookTableVC : UITableViewController, Subscriber, SwipeTableViewCellDelegate {
     
     //MARK: - Public
     init(addressBookType: AddressBookType? = .normal, didSelectAddress: @escaping ([AddressBook], Int) -> Void, didEditAddress: @escaping (AddressBook) -> Void) {

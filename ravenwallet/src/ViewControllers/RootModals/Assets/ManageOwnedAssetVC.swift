@@ -12,7 +12,7 @@ import Core
 
 private let manageAddressHeight: CGFloat = 110.0
 
-class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Trackable {
+class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK - Public
     var presentScan: PresentScan?
@@ -328,8 +328,14 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
             return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
         }
         
-        let totalAmount = amount.rawValue + (qtAmountAsset != nil ? qtAmountAsset!.rawValue : 0)
-        guard totalAmount <= C.maxAsset else {
+        let currentTotalAmount = (qtAmountAsset != nil ? qtAmountAsset!.rawValue : 0)
+        if currentTotalAmount < C.maxAsset {
+            guard amount != Satoshis.zero else {
+                return showAlert(title: S.Alert.error, message: S.Asset.noQuanityToManage, buttonLabel: S.Button.ok)
+            }
+        }
+        let newTotalAmount = amount.rawValue + currentTotalAmount
+        guard newTotalAmount <= C.maxAsset else {
             return showAlert(title: S.Alert.error, message: S.Asset.maxQuanityToManage, buttonLabel: S.Button.ok)
         }
         
@@ -386,7 +392,6 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
         
         sender.send(biometricsMessage: S.VerifyPin.touchIdMessage,
                     rate: rate,
-                    comment: "",
                     feePerKb: feePerKb,
                     verifyPinFunction: { [weak self] pinValidationCallback in
                         self?.presentVerifyPin?(S.VerifyPin.authorize) { [weak self] pin in
@@ -404,14 +409,11 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable, Track
                         }
                         myself.onPublishSuccess?()
                     })
-                    self?.saveEvent("manage.success")
                 case .creationError(let message):
                     self?.showAlert(title: S.Send.createTransactionError, message: message, buttonLabel: S.Button.ok)
-                    self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": message])
                 case .publishFailure(let error):
                     if case .posixError(let code, let description) = error {
                         self?.showAlert(title: S.Alerts.sendFailure, message: "\(description) (\(code))", buttonLabel: S.Button.ok)
-                        self?.saveEvent("manage.publishFailed", attributes: ["errorMessage": "\(description) (\(code))"])
                     }
                 }
         })

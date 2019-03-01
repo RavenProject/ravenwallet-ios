@@ -11,7 +11,14 @@ import UIKit
 class StartNavigationDelegate : NSObject, UINavigationControllerDelegate {
 
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-
+        updateNavigationBarStyle(navigationController: navigationController, viewController: viewController)
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        updateNavigationBarStyle(navigationController: navigationController, viewController: viewController)
+    }
+    
+    func updateNavigationBarStyle(navigationController: UINavigationController, viewController: UIViewController) {
         if viewController is RecoverWalletIntroViewController {
             navigationController.navigationBar.tintColor = .white
             navigationController.navigationBar.titleTextAttributes = [
@@ -49,6 +56,11 @@ class StartNavigationDelegate : NSObject, UINavigationControllerDelegate {
         }
 
         if viewController is StartWipeWalletViewController {
+            navigationController.setClearNavbar()
+            navigationController.setWhiteStyle()
+        }
+        
+        if viewController is BiometricsSettingsViewController {
             navigationController.setClearNavbar()
             navigationController.setWhiteStyle()
         }

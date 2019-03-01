@@ -522,13 +522,13 @@ size_t BRTxOutputSetNewAssetScript(uint8_t *script, size_t scriptLen, BRAsset *a
     UInt64SetLE(&script[off], asset->amount);
     off += sizeof(uint64_t);
     
-    script[off] = (int) (asset->unit - '0');
+    script[off] = (int) (asset->unit);
     off += sizeof(uint8_t);
     
-    script[off] = (int) (asset->reissuable - '0');
+    script[off] = (int) (asset->reissuable);
     off += sizeof(uint8_t);
     
-    script[off] = (int) (asset->hasIPFS - '0');
+    script[off] = (int) (asset->hasIPFS);
     off += sizeof(uint8_t);
 
     if(asset->hasIPFS == 1) {
@@ -773,7 +773,7 @@ void AssetFree(BRAsset *asset) {
 }
 
 void showAsset(BRAsset* asset){
-    printf("/nBMEX asset: Name %s, amount %llu unit %d, reissu %d, hasIpfs %d\n ", asset->name, asset->amount, asset->unit, asset->reissuable, asset->hasIPFS);
+    printf("BMEX2: asset: Name %s, amount %llu unit %d, reissu %d, hasIpfs %d\n ", asset->name, asset->amount, asset->unit, asset->reissuable, asset->hasIPFS);
 }
 
 void CopyAsset(BRAsset *asst, BRTransaction *tx) {

@@ -120,6 +120,7 @@ extension CheckBoxCell : UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
         didReturn?(textField)
         return true;
     }
