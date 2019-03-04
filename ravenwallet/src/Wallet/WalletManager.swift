@@ -398,13 +398,13 @@ extension WalletManager : BRWalletListener {
         }
     }
     
-    private func requestTxUpdate() {
+    func requestTxUpdate() {
         if updateTimer == nil {
             updateTimer = Timer.scheduledTimer(timeInterval: updateDebounceInterval, target: self, selector: #selector(updateTransactions), userInfo: nil, repeats: false)
         }
     }
     
-    @objc func updateTransactions() {
+    @objc private func updateTransactions() {
         updateTimer?.invalidate()
         updateTimer = nil
         DispatchQueue.global(qos: .utility).async { [weak self] in
