@@ -404,7 +404,7 @@ extension WalletManager : BRWalletListener {
         }
     }
     
-    @objc private func updateTransactions() {
+    @objc func updateTransactions() {
         updateTimer?.invalidate()
         updateTimer = nil
         DispatchQueue.global(qos: .utility).async { [weak self] in
