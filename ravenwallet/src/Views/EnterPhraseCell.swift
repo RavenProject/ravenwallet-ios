@@ -139,11 +139,22 @@ class EnterPhraseCell : UICollectionViewCell {
 }
 
 extension EnterPhraseCell : UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.isSecureTextEntry = false
+    }
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
         setColors(textField: textField)
+        if hasDisplayedInvalidState {
+            textField.isSecureTextEntry = false
+        }
+        else{
+            textField.isSecureTextEntry = true
+        }
     }
 
     @objc func textChanged(textField: UITextField) {
+        hasDisplayedInvalidState = false
         if let text = textField.text {
             if text.last == " " {
                 textField.text = text.replacingOccurrences(of: " ", with: "")

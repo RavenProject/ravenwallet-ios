@@ -60,8 +60,9 @@ class ModalHeaderView : UIView {
         addSubview(titleLabel)
         addSubview(close)
         addSubview(border)
-        
+        titleLabel.textAlignment = .center
         titleLabel.constrain([
+            titleLabel.constraint(.width, toView: self, constant: -65.0),
             titleLabel.constraint(.centerX, toView: self, constant: 0.0),
             titleLabel.constraint(.centerY, toView: self, constant: 0.0) ])
         border.constrainBottomCorners(height: 1.0)

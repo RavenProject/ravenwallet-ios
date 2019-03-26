@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Core
 
 class HomeScreenViewController : UIViewController, Subscriber {
     
@@ -108,6 +109,9 @@ class HomeScreenViewController : UIViewController, Subscriber {
             logo.trailingAnchor.constraint(equalTo: subHeaderView.trailingAnchor, constant: -C.padding[2]),
             logo.leadingAnchor.constraint(equalTo: subHeaderView.leadingAnchor, constant: C.padding[2]),
             yConstraint])
+        if E.isIPad {
+            logo.addConstraint(logo.widthAnchor.constraint(equalTo: logo.heightAnchor, multiplier: 10.15))
+        }
         
         totalHeader.constrain([
             totalHeader.trailingAnchor.constraint(equalTo: total.trailingAnchor),
@@ -162,6 +166,16 @@ class HomeScreenViewController : UIViewController, Subscriber {
         title = ""
         
         updateTotalAssets()
+        //Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(refreshPeerManagerConnect), userInfo: nil, repeats: true)
+    }
+    
+    @objc func refreshPeerManagerConnect() {
+        if walletManager!.peerManager?.connectionStatus != BRPeerStatusConnected {
+            DispatchQueue.walletQueue.async { [weak self] in
+                self?.walletManager!.peerManager?.disconnect()
+                self?.walletManager!.peerManager?.connect()
+            }
+        }
     }
     
     @objc private func longPressed(sender:UILongPressGestureRecognizer) {

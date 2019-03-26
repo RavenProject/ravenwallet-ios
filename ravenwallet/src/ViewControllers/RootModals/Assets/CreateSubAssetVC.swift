@@ -24,16 +24,14 @@ import Core
     
     override func setInitialData() {
         super.setInitialData()
-        nameCell.content = rootAssetName + "/"
+        prefixName = rootAssetName + "/"
+        nameCell.rootAssetName = prefixName
     }
     
     override func addButtonActions() {
         super.addButtonActions()
         nameCell.didChange = { text in
             self.nameStatus = .notVerified
-            if !text.hasPrefix(self.rootAssetName + "/") {
-                self.nameCell.textField.text = self.rootAssetName + "/"
-            }
         }
     }
     

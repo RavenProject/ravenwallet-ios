@@ -24,7 +24,8 @@ import Core
     
     override func setInitialData() {
         super.setInitialData()
-        nameCell.content = rootAssetName + "#"
+        prefixName = rootAssetName + "#"
+        nameCell.rootAssetName = prefixName
     }
     
     override func addSubviews() {
@@ -73,9 +74,6 @@ import Core
         super.addButtonActions()
         nameCell.didChange = { text in
             self.nameStatus = .notVerified
-            if !text.hasPrefix(self.rootAssetName + "#") {
-                self.nameCell.textField.text = self.rootAssetName + "#"
-            }
         }
     }
     
@@ -92,7 +90,7 @@ import Core
             return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
         }
         
-        guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: .UNIQUE) else {
+        guard AssetValidator.shared.validateName(name: self.nameCell.getContent(), forType: .UNIQUE) else {
             return showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
         }
         
@@ -131,7 +129,7 @@ import Core
         if nameStatus == .notVerified {
             createButton.label.text = S.Asset.availability
             activityView.startAnimating()
-            getAssetData(assetName: self.nameCell.textField.text!) { nameStatus in
+            getAssetData(assetName: self.nameCell.getContent()) { nameStatus in
                 DispatchQueue.main.async {
                     self.activityView.stopAnimating()
                     self.createButton.label.text = S.Asset.create

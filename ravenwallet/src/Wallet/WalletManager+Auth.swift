@@ -66,7 +66,7 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             print("upgrading to authenticated keychain scheme")
             BRBIP39DeriveKey(&seed, seedPhrase, nil)
-//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
             let mpk = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
@@ -236,7 +236,7 @@ extension WalletManager : WalletAuthenticator {
                 else { return false }
             CFStringNormalize(nfkdPhrase, .KD)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
             let mpk = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
@@ -340,7 +340,7 @@ extension WalletManager : WalletAuthenticator {
             var seed = UInt512()
             try setKeychainItem(key: KeychainKey.mnemonic, item: nfkdPhrase as String?, authenticated: true)
             BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
-//            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+            //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
             let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
             self.masterPubKey = BRBIP44MasterPubKey(&seed, MemoryLayout<UInt512>.size, 175, 0, Int32(type))
             seed = UInt512() // clear seed
@@ -356,7 +356,7 @@ extension WalletManager : WalletAuthenticator {
     func setRandomSeedPhrase() -> String? {
         guard noWallet else { return nil }
         guard var words = rawWordList else { return nil }
-
+        
         // forceBip44 through the wallet
         let isforced = self.forceBip44DevPath(stage: "creation", activate: true)
         if (isforced) { print("success") }
@@ -383,7 +383,7 @@ extension WalletManager : WalletAuthenticator {
             var phraseData = CFDataCreateMutable(secureAllocator, phraseLen) as Data
             phraseData.count = phraseLen
             guard phraseData.withUnsafeMutableBytes({
-//                BRBIP39Encode($0, phraseLen, &words, entropyRef, MemoryLayout<UInt128>.size)
+                //                BRBIP39Encode($0, phraseLen, &words, entropyRef, MemoryLayout<UInt128>.size)
                 BRBIP39Encode($0, phraseLen, &words, entropyRef, MemoryLayout<UInt128>.size)
             }) == phraseData.count else { return nil }
             entropy = UInt128()
@@ -392,6 +392,44 @@ extension WalletManager : WalletAuthenticator {
             guard setSeedPhrase(phrase) else { return nil }
             return phrase
         }
+    }
+    
+    // generate private key with index from an existing wallet using 12 word wallet recovery phrase
+    func generatePrevKey(_ phrase: String, index:Int, chain:Int32) -> BRKey? {
+        let keys = generatePrivateKeys(phrase, from: index, to: (index+1), chain: chain)
+        return keys?.first
+    }
+    
+    // generate private keys from an existing wallet using 12 word wallet recovery phrase
+    func generatePrivateKeys(_ phrase: String, from:Int, to:Int, chain:Int32) -> [BRKey]? {
+        guard let nfkdPhrase = CFStringCreateMutableCopy(secureAllocator, 0, phrase as CFString)
+            else { return nil }
+        CFStringNormalize(nfkdPhrase, .KD)
+        var seed = UInt512()
+        BRBIP39DeriveKey(&seed, nfkdPhrase as String, nil)
+        //            let walletType = UserDefaults.standard.bool(forKey: "Bip44") ? 44 : 0
+        //let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0 //Todo : check wallet type
+        let length = to - from
+        var indexes: [UInt32] = [UInt32]()
+        for i in from..<(from + length)  {
+            indexes.append(UInt32(i))
+        }
+        let indexesListPointer:UnsafeMutablePointer<UInt32>! = UnsafeMutablePointer<UInt32>.allocate(capacity: length)
+        indexesListPointer.initialize(from: &indexes, count: length)
+        let keysListPointer:UnsafeMutablePointer<BRKey>! = UnsafeMutablePointer<BRKey>.allocate(capacity: length)
+        BRBIP44PrivKeyList(keysListPointer, length, &seed, MemoryLayout<UInt512>.size, 175, 0, UInt32(chain), indexesListPointer)
+        let keysList = [BRKey](UnsafeBufferPointer<BRKey>(start: keysListPointer, count: length))
+        return keysList
+    }
+    
+    func generateAddresses(_ phrase: String, from:Int, to:Int) -> ([String], [BRKey]) {
+        var keys = generatePrivateKeys(phrase, from: from, to: to, chain: 0)
+        var addresses: [String] = [String]()
+        for i in 0 ..< (keys?.count)! {
+            var key = keys![i]
+            addresses.append(key.address()!)
+        }
+        return (addresses, keys!)
     }
     
     // change wallet authentication pin
@@ -439,7 +477,7 @@ extension WalletManager : WalletAuthenticator {
     func forceBip44DevPath(stage: String, activate: Bool) -> Bool {
         do {
             try setKeychainItem(key: KeychainKey.walletType , item: Int64(44))
-                return true
+            return true
         } catch { return false }
     }
     
@@ -566,7 +604,7 @@ extension WalletManager : WalletAuthenticator {
                 guard let wallet = wallet else { return false }
                 guard let phrase: String = try keychainItem(key: KeychainKey.mnemonic) else { return false }
                 BRBIP39DeriveKey(&seed, phrase, nil)
-//                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
+                //                let type: Int64 = try! keychainItem(key: KeychainKey.walletType) ?? 0
                 return wallet.signTransaction(tx, seed: &seed)
             }
             catch {

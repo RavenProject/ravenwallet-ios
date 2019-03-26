@@ -25,7 +25,8 @@ class StartImportViewController : UIViewController {
     private let message = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let warning = UILabel.wrapping(font: .customBody(size: 16.0), color: .darkText)
     private let assetWarning = UILabel.wrapping(font: .customBody(size: 16.0), color: .sentRed)
-    private let button = ShadowButton(title: S.Import.scan, type: .primary)
+    private let buttonScan = ShadowButton(title: S.Import.scan, type: .primary)
+    private let buttonSeed = ShadowButton(title: S.Import.enterSeed, type: .primary)
     private let bulletWarning = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
     private let bulletAssetWarning = UIImageView(image: #imageLiteral(resourceName: "deletecircle"))
     private let leftCaption = UILabel.wrapping(font: .customMedium(size: 13.0), color: .white)
@@ -33,6 +34,9 @@ class StartImportViewController : UIViewController {
     private let balanceActivity = BRActivityViewController(message: S.Import.checking)
     private let importingActivity = BRActivityViewController(message: S.Import.importing)
     private let unlockingActivity = BRActivityViewController(message: S.Import.unlockingActivity)
+    private var utxos:[[String: Any]] = []
+    private var countSFail:Int = 0
+    private var chain:Int32 = SEQUENCE_EXTERNAL_CHAIN
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +60,8 @@ class StartImportViewController : UIViewController {
         header.addSubview(leftCaption)
         header.addSubview(rightCaption)
         view.addSubview(message)
-        view.addSubview(button)
+        view.addSubview(buttonScan)
+        view.addSubview(buttonSeed)
         view.addSubview(bulletWarning)
         view.addSubview(bulletAssetWarning)
         view.addSubview(warning)
@@ -102,11 +107,17 @@ class StartImportViewController : UIViewController {
             assetWarning.leadingAnchor.constraint(equalTo: warning.leadingAnchor),
             assetWarning.topAnchor.constraint(equalTo: warning.bottomAnchor, constant: C.padding[2]),
             assetWarning.trailingAnchor.constraint(equalTo: warning.trailingAnchor) ])
-        button.constrain([
-            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[3]),
-            button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[4]),
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[3]),
-            button.constraint(.height, constant: C.Sizes.buttonHeight) ])
+        buttonScan.constrain([
+            buttonScan.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[3]),
+            buttonScan.bottomAnchor.constraint(equalTo: buttonSeed.topAnchor, constant: -C.padding[2]),
+            buttonScan.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[3]),
+            buttonScan.constraint(.height, constant: C.Sizes.buttonHeight) ])
+        buttonSeed.constrain([
+            buttonSeed.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[3]),
+            buttonSeed.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -C.padding[4]),
+            buttonSeed.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -C.padding[3]),
+            buttonSeed.constraint(.height, constant: C.Sizes.buttonHeight) ])
+        
     }
 
     private func setInitialData() {
@@ -120,13 +131,26 @@ class StartImportViewController : UIViewController {
         warning.text = S.Import.importWarning
         assetWarning.text = S.Import.importAssettWarning
 
-        button.tap = strongify(self) { myself in
+        buttonScan.tap = strongify(self) { myself in
             let scan = ScanViewController(scanKeyCompletion: { address in
                 myself.didReceiveAddress(address)
             }, isValidURI: { (string) -> Bool in
                 return string.isValidPrivateKey || string.isValidBip38Key
             })
             myself.parent?.present(scan, animated: true, completion: nil)
+        }
+        
+        buttonSeed.tap = strongify(self) { myself in
+            let recoverWalletViewController = EnterPhraseViewController(walletManager: myself.walletManager, reason: .importUtxoFromServer({ phrase in
+                myself.present(myself.balanceActivity, animated: true, completion: {
+                    self.utxos.removeAll()
+                    self.chain = SEQUENCE_EXTERNAL_CHAIN
+                    self.recursiveFetchUTXOS(index: 0, phrase: phrase, completion: { prevKey in
+                        myself.handleData(data: myself.utxos, key: prevKey)
+                    })
+                })
+            }))
+            myself.navigationController?.pushViewController(recoverWalletViewController, animated: true)
         }
     }
 
@@ -167,12 +191,65 @@ class StartImportViewController : UIViewController {
         }))
         present(alert, animated: true, completion: nil)
     }
+    
+    func recursiveFetchUTXOS(index:Int, phrase:String, completion: @escaping (BRKey)->Void) {
+        var privKey = self.walletManager.generatePrevKey(phrase, index: index, chain: chain)
+        if countSFail > 20 {
+            countSFail = 0
+            completion(privKey!)
+            return
+        }
+        let address = privKey?.address()
+        self.walletManager.apiClient?.isAddressUsed(address: address!, completion: { isUsed in
+            if(isUsed){
+                self.countSFail = 0
+                self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: false, completion:{ data in
+                    self.utxos.append(contentsOf: data!)
+                    self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+                    let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+                    self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+                })
+            }
+            else{
+                self.countSFail = self.countSFail + 1
+                self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+                let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+                self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+            }
+        })
+        //Todo : for Asset, should update asset api to add this
+//        self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: false, completion:{ data in
+//            self.addUtxos(data: data, isAsset: false)
+//            print("BMEX index RVN ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
+////            self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: true, completion: { data in
+////                self.addUtxos(data: data, isAsset: true)
+////                print("BMEX index Asset ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
+////                self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+////                let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+////                self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+////            })
+//            self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+//            let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+//            self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+//        })
+    }
+    
+    private func addUtxos(data:[[String: Any]]?, isAsset:Bool){
+        if(data?.count != 0){
+            self.countSFail = 0
+            if(!isAsset){
+                self.utxos.append(contentsOf: data!)
+            }
+        }else {
+            self.countSFail = self.countSFail + 1
+        }
+    }
 
     private func checkBalance(key: BRKey) {
         present(balanceActivity, animated: true, completion: {
             var key = key
             guard let address = key.address() else { return }
-            self.walletManager.apiClient?.fetchUTXOS(address: address, currency: self.currency, completion: { data in
+            self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: false, completion: { data in
                 guard let data = data else { return }
                 self.handleData(data: data, key: key)
             })

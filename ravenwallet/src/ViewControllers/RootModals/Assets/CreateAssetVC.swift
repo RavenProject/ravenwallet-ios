@@ -56,6 +56,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     let cPtr: OpaquePointer
     internal var operationType: OperationType
     internal var asset: Asset?
+    internal var prefixName:String?
     internal var sender: SenderAsset
     internal let walletManager: WalletManager
     internal let nameCell = NameAssetCell(placeholder: S.AddressBook.nameAddressLabel)
@@ -81,6 +82,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     internal var nameStatus: NameStatus = .notVerified
     internal let activityView = UIActivityIndicatorView(style: .white)
     private var origineParentFrame:CGRect?
+    
     override func viewDidLoad() {
         addSubviews()
         addConstraints()
@@ -210,8 +212,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         
         nameCell.didReturn = { textField in
             textField.resignFirstResponder()
-            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.textField.text!)
-            guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
+            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.getContent())
+            guard AssetValidator.shared.validateName(name: self.nameCell.getContent(), forType: assetType) else {
                 return self.showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
             }
         }
@@ -226,8 +228,8 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         }
         
         nameCell.didVerifyTapped = { assetName in
-            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.textField.text!)
-            guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
+            let assetType:AssetType = AssetValidator.shared.getAssetType(operationType: self.operationType, nameAsset: self.nameCell.getContent())
+            guard AssetValidator.shared.validateName(name: self.nameCell.getContent(), forType: assetType) else {
                 DispatchQueue.main.async {
                     self.nameCell.activityView.stopAnimating()
                     self.nameCell.verify.label.isHidden = false
@@ -391,14 +393,14 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
             return showAlert(title: S.Alert.error, message: S.Asset.noName, buttonLabel: S.Button.ok)
         }
         var assetType:AssetType = .ROOT
-        if (AssetValidator.shared.IsAssetNameAnOwner(name: self.nameCell.textField.text!)) {
+        if (AssetValidator.shared.IsAssetNameAnOwner(name: self.nameCell.getContent())) {
             assetType = .OWNER
         }
         else{
             assetType = operationType == .createAsset ? .ROOT : .SUB
         }
 
-        guard AssetValidator.shared.validateName(name: self.nameCell.textField.text!, forType: assetType) else {
+        guard AssetValidator.shared.validateName(name: self.nameCell.getContent(), forType: assetType) else {
             return showAlert(title: S.Alert.error, message: S.Asset.errorAssetNameMessage, buttonLabel: S.Button.ok)
         }
         
@@ -446,7 +448,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         if nameStatus == .notVerified {
             createButton.label.text = S.Asset.availability
             activityView.startAnimating()
-            getAssetData(assetName: self.nameCell.textField.text!) {nameStatus in
+            getAssetData(assetName: self.nameCell.getContent()) {nameStatus in
                 DispatchQueue.main.async {
                     self.activityView.stopAnimating()
                     self.createButton.label.text = S.Asset.create
@@ -477,7 +479,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     
     func showConfirmationView(amount:Satoshis, address:String, units:UInt8, reissubale:UInt8) {
         //sender
-        asset = Asset.init(idAsset: -1, name: self.nameCell.textField.text!, amount: amount, units: units, reissubale: reissubale, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
+        asset = Asset.init(idAsset: -1, name: self.nameCell.getContent(), amount: amount, units: units, reissubale: reissubale, hasIpfs: ipfsCell.hasIpfs ? 1 : 0, ipfsHash: ipfsCell.ipfsHash!, ownerShip: -1, hidden: -1, sort: -1)
         
         let (assetToSend, rootAsset) = createAsset(amount: amount)
         guard sender.createAssetTransaction(to: address, asset: assetToSend, rootAsset: rootAsset) else {

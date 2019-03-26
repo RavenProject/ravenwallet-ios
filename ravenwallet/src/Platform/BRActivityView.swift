@@ -83,7 +83,7 @@ class BRActivityViewController: UIViewController {
         boundingBoxView.frame.origin.y = ceil((bounds.height / 2.0) - (boundingBoxView.frame.height / 2.0))
         
         activityIndicatorView.frame.origin.x = ceil((bounds.width / 2.0) - (activityIndicatorView.frame.width / 2.0))
-        activityIndicatorView.frame.origin.y = ceil((bounds.height / 2.0) - (activityIndicatorView.frame.height / 2.0))
+        activityIndicatorView.frame.origin.y = ceil((boundingBoxView.frame.origin.y + (boundingBoxView.frame.size.height / 3)) - (activityIndicatorView.frame.height / 2.0))
         
         let messageLabelSize = messageLabel.sizeThatFits(CGSize(width: 160.0 - 20.0 * 2.0, height: CGFloat.greatestFiniteMagnitude))
         messageLabel.frame.size.width = messageLabelSize.width

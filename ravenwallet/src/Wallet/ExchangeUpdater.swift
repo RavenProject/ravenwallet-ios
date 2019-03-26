@@ -31,7 +31,14 @@ class ExchangeUpdater : Subscriber {
             self.walletManager.apiClient?.exchangeRates(code: self.currency.code, isFallback: false, ratio_to_btc, { rates,
                 ratio_to_btc, error in
                 
-                guard let currentRate = rates.first( where: { $0.code == Store.state.defaultCurrencyCode }) else { completion(); return }
+                guard let currentRate = rates.first( where: { $0.code == Store.state.defaultCurrencyCode })
+                    else {
+                        //Todo: should find a soulution to separate RVN and Rate
+                        let aRate = Rate(code: "USD", name: "US Dollar", rate: 0);
+                        Store.perform(action: WalletChange(self.currency).setExchangeRates(currentRate: aRate, rates: rates))
+                        completion();
+                        return
+                }
                 let aRate = Rate(code: currentRate.code, name: currentRate.name, rate: currentRate.rate * ratio_to_btc);
                 
                 Store.perform(action: WalletChange(self.currency).setExchangeRates(currentRate: aRate, rates: rates))

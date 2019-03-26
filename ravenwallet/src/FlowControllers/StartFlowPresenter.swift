@@ -30,9 +30,7 @@ class StartFlowPresenter : Subscriber {
         let button = UIButton.close
         button.tintColor = .white
         button.tap = {
-            //BMEX not hide star flow befor user confirm terms of use
-            //Store.perform(action: HideStartFlow())
-            Store.trigger(name: .showTermsOfUse())
+            Store.perform(action: HideStartFlow())
         }
         return button
     }
@@ -55,7 +53,9 @@ class StartFlowPresenter : Subscriber {
     }
     
     func showTermsOfUse() {
-        let termsUseVC = ConfirmationTermsUseVC()
+        let termsUseVC = ConfirmationTermsUseVC(didConfirmTaped: {
+            self.pushPinCreationViewControllerForNewWallet()
+        })
         self.navigationController?.setWhiteStyle()
         self.navigationController?.pushViewController(termsUseVC, animated: true)
     }
@@ -149,7 +149,7 @@ class StartFlowPresenter : Subscriber {
     
     private func pushTutorialVC() {
         let tutorialVC = TutorialVC {
-            self.pushPinCreationViewControllerForNewWallet()
+            Store.trigger(name: .showTermsOfUse())
         }
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.setClearNavbar()
@@ -193,7 +193,7 @@ class StartFlowPresenter : Subscriber {
     private func pushConfirmPaperPhraseViewController(pin: String) {
         let confirmViewController = ConfirmPaperPhraseViewController(walletManager: walletManager, pin: pin, callback: {
             Store.perform(action: Alert.Show(.paperKeySet(callback: {
-                Store.trigger(name: .showTermsOfUse())
+                Store.perform(action: HideStartFlow())
             })))
         })
         confirmViewController.title = S.SecurityCenter.Cells.paperKeyTitle

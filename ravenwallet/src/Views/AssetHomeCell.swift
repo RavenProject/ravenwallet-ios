@@ -29,7 +29,9 @@ class AssetHomeCell : UITableViewCell, Subscriber {
     
     static let cellIdentifier = "AssetHomeCell"
 
+    private let assetRootName = UILabel(font: .customMedium(size: 10.0), color: .white)
     private let assetName = UILabel(font: .customMedium(size: 18.0), color: .white)
+    private var verticalStack:UIStackView?
     private let assetAmount = UILabel(font: .customMedium(size: 18.0), color: .transparentWhiteText)
     private let imgAsset = UIImageView(image: #imageLiteral(resourceName: "owned"))
     private let container = BackgroundAsset()
@@ -38,19 +40,27 @@ class AssetHomeCell : UITableViewCell, Subscriber {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.verticalStack = UIStackView(arrangedSubviews: [assetRootName, assetName])
         setupViews()
     }
 
     func set(viewModel: AssetListViewModel) {
         container.ownerShip = viewModel.asset.isOwnerShip
-        assetName.text = viewModel.asset.name
+        assetRootName.text = viewModel.assetRootName
+        assetName.text = viewModel.assetName
         assetAmount.text = viewModel.assetAmount
+        verticalStack?.removeArrangedSubview(assetRootName)
+        if !viewModel.assetRootName.isEmpty {
+            verticalStack?.insertArrangedSubview(assetRootName, at: 0)
+        }
         if viewModel.asset.isOwnerShip {
             imgAssetWidth?.constant = 24.0
         }
         else{
             imgAssetWidth?.constant = 0.0
         }
+        verticalStack?.updateConstraints()
+        verticalStack?.setNeedsLayout()
         container.setNeedsDisplay()
     }
 
@@ -62,7 +72,7 @@ class AssetHomeCell : UITableViewCell, Subscriber {
 
     private func addSubviews() {
         contentView.addSubview(container)
-        container.addSubview(assetName)
+        container.addSubview(verticalStack!)
         container.addSubview(assetAmount)
         container.addSubview(imgAsset)
         container.addSubview(arrow)
@@ -79,9 +89,10 @@ class AssetHomeCell : UITableViewCell, Subscriber {
             imgAsset.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             imgAssetWidth
             ])
-        assetName.constrain([
-            assetName.leadingAnchor.constraint(equalTo: imgAsset.trailingAnchor, constant: C.padding[1]),
-            assetName.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+        verticalStack!.constrain([
+            verticalStack!.heightAnchor.constraint(equalTo: container.heightAnchor),
+            verticalStack!.leadingAnchor.constraint(equalTo: imgAsset.trailingAnchor, constant: C.padding[1]),
+            verticalStack!.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: -C.padding[0])
             ])
         assetAmount.constrain([
             assetAmount.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -C.padding[2]),
@@ -102,6 +113,10 @@ class AssetHomeCell : UITableViewCell, Subscriber {
         imgAsset.contentMode = .scaleAspectFit
         container.backgroundColor = .white
         arrow.tintColor = .white
+        verticalStack!.axis = .vertical
+        verticalStack!.distribution = .fillEqually
+        verticalStack!.alignment = .fill
+        verticalStack!.spacing = -10
     }
     
     override func prepareForReuse() {
