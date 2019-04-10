@@ -1821,7 +1821,7 @@ static const char *BIP39WordsEn[BIP39_WORDLIST_COUNT] = {
     "tent",
     "term",
     "test",
-    "address",
+    "text",
     "thank",
     "that",
     "theme",

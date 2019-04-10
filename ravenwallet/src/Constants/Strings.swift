@@ -323,8 +323,8 @@ enum S {
     
     enum ImportUtxos {
         static let header = NSLocalizedString("ImportUtxos.header", value:"Import UTXOS", comment: "Import utxos header")
-        static let title = NSLocalizedString("ImportUtxos.title", value: "Import Wallet / Enter your 12 words", comment: "Import UTXOS navigation item title.")
-        static let instruction = NSLocalizedString("ImportUtxos.instruction", value:"Enter your 12 words (only iOS version can work)", comment: "Enter paper key instruction")
+        static let title = NSLocalizedString("ImportUtxos.title", value: "Import UTXOS for BIP44 Migration", comment: "Import UTXOS navigation item title.")
+        static let instruction = NSLocalizedString("ImportUtxos.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
     }
     
     enum OneTimeWipe {
@@ -408,7 +408,7 @@ enum S {
         static let expertMode = NSLocalizedString("Settings.expertMode", value: "Expert Mode", comment: "Expert Mode settings header")
         static let usedAddresses = NSLocalizedString("Settings.usedAddresses", value: "Used Addresses", comment: "Used Addresses settings header")
         static let currencyPageTitle = NSLocalizedString("Settings.currencyPageTitle", value: "%1$@ Settings", comment: "Ravencoin Settings page title")
-        static let importTile = NSLocalizedString("Settings.importTitle", value:"Redeem Private Key / 12 Words", comment: "Import wallet label")
+        static let importTile = NSLocalizedString("Settings.importTitle", value:"Redeem Wallet / Private Key", comment: "Import wallet label")
         static let notifications = NSLocalizedString("Settings.notifications", value:"Notifications", comment: "Notifications label")
         static let touchIdLimit = NSLocalizedString("Settings.touchIdLimit", value:"Touch ID Spending Limit", comment: "Touch ID spending limit label")
         static let currency = NSLocalizedString("Settings.currency", value:"Display Currency", comment: "Default currency label")
@@ -679,7 +679,7 @@ enum S {
         static let importWarning = NSLocalizedString("Import.warning", value: "Importing a wallet does not include transaction history or other details.", comment: "Import wallet intro warning message")
         static let importAssettWarning = NSLocalizedString("Import.assettWarning", value: "Assets will not be swept from private. If you have assets in the address, keep your private key.", comment: "Import wallet second warning message")
         static let scan = NSLocalizedString("Import.scan", value: "Scan Private Key", comment: "Scan Private key button label")
-        static let enterSeed = NSLocalizedString("Import.enterSeed", value: "Scan 12 words", comment: "Scan 12 words button label")
+        static let enterSeed = NSLocalizedString("Import.enterSeed", value: "Enter 12 recovery words", comment: "Scan 12 words button label")
         static let title = NSLocalizedString("Import.title", value: "Import Wallet", comment: "Import Wallet screen title")
         static let importing = NSLocalizedString("Import.importing", value: "Importing Wallet", comment: "Importing wallet progress view label")
         static let confirm = NSLocalizedString("Import.confirm", value: "Send %1$@ from this private key into your wallet? The Ravencoin network will receive a fee of %2$@.", comment: "Sweep private key confirmation message")

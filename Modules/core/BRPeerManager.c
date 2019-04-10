@@ -28,10 +28,14 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 //        {      0, "000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a", 1537466400, 0x1e00ffff },
 //        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
 //        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
-//        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
-//        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
-//        {  150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
-        {  160000, "000000ce693ba2f21eff6b38270b6eab8bf442adb25252b9e8d4a7ab43709b10", 1547998364, 0x1e01c59a }
+        {  15237, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
+        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
+        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
+        { 150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
+        { 160000, "000000ce693ba2f21eff6b38270b6eab8bf442adb25252b9e8d4a7ab43709b10", 1547998364, 0x1e01c59a },
+        { 200000, "00000006580060522a1361e79685fe2a85e917de1089fe5743ab1ee35407d789", 1550634944, 0x1d0d67c7 },
+        { 259397, "000000a482784b0aee50194bea15a6586d6cb5c727085b35dbbced677dce6d83", 1554414563, 0x1e018aeb }
+
     }; // New testnet, port:18770 useragent:"/Ravencoin2.2.0/"
 
 static const char *dns_seeds[] = {
@@ -44,28 +48,30 @@ static const char *dns_seeds[] = {
 // blockchain checkpoints - these are also used as starting points for partial chain downloads, so they need to be at
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
-        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
-        {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
-        {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
-        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
-        {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
-        {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
-        {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
-        { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
-        { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
-        { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
-        { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
-        { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
-        { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
-        { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
-        { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
-        { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
-        { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
-        { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
-        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
-        { 334656, "0000000000017b8112fb5e67c807d2962c98cef80ef3ed9c2d9503dfef219b3e", 1535026940, 0x1b069a70 },
-        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
-        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+//        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
+//        {   2016, "0000003e7c74d91113e9f8b203673bc77474112a3811f4fc25f577e5d4228035", 1515022405, 0x1d3fffc0 },
+//        {   4032, "0000000e7029625c8ceb5e42f2a84c15e1c4326ea91c3369d49d64655560c9c3", 1515034394, 0x1d0ffff0 },
+//        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
+//        {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
+//        {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
+//        {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
+//        { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
+//        { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
+//        { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
+//        { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
+//        { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
+//        { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
+//        { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
+//        { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
+//        { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
+//        { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
+//        { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
+//        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
+//        { 334656, "0000000000017b8112fb5e67c807d2962c98cef80ef3ed9c2d9503dfef219b3e", 1535026940, 0x1b069a70 },
+//        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
+//        { 341086, "000000000001c72e3613de62be33974f69993bf16f10d117d14321afa4259a0e", 1535734416, 0x1b0203f4 },
+        //First iOS Wallet / Bip44 was used in the network. October 1st 2018
+        { 385862, "0000000000013f1ec2804a41d84a1deaba62a89e3521435f42daf2c6e372c8a9", 1538438293,  0x1b01f836},
         { 479587, "000000000000a96ff81c3958712f24895a6084e39c33da258a84b82d550e233b", 1544094174, 0x1b00f00d },
         { 556081, "000000000000dc88e8b366a5bec1f2365a93d86a254f24a7e610ea291874590a", 1548715428, 0x1b012026 }
     
@@ -1829,6 +1835,23 @@ void BRPeerManagerDisconnect(BRPeerManager *manager) {
     }
 }
 
+static int _BRPeerManagerRescan(BRPeerManager *manager, BRMerkleBlock *newLastBlock) {
+    if (NULL == newLastBlock) return 0;
+    
+    manager->lastBlock = newLastBlock;
+    
+    if (manager->downloadPeer) { // disconnect the current download peer so a new random one will be selected
+        for (size_t i = array_count(manager->peers); i > 0; i--) {
+            if (BRPeerEq(&manager->peers[i - 1], manager->downloadPeer)) array_rm(manager->peers, i - 1);
+        }
+        
+        BRPeerDisconnect(manager->downloadPeer);
+    }
+    
+    manager->syncStartHeight = 0; // a syncStartHeight of 0 indicates that syncing hasn't started yet
+    return 1;
+}
+
 // rescans blocks and transactions after earliestKeyTime (a new random download peer is also selected due to the
 // possibility that a malicious node might lie by omitting transactions that match the bloom filter)
 void BRPeerManagerRescan(BRPeerManager *manager) {
@@ -1860,6 +1883,72 @@ void BRPeerManagerRescan(BRPeerManager *manager) {
         pthread_mutex_unlock(&manager->lock);
         BRPeerManagerConnect(manager);
     } else pthread_mutex_unlock(&manager->lock);
+}
+
+// rescans blocks and transactions after the last hardcoded checkpoint
+void BRPeerManagerRescanFromLastHardcodedCheckpoint(BRPeerManager *manager)
+{
+    assert(manager != NULL);
+    pthread_mutex_lock(&manager->lock);
+    
+    int needConnect = 0;
+    if (manager->isConnected) {
+        size_t i = manager->params->checkpointsCount;
+        if (i > 0) {
+            UInt256 hash = UInt256Reverse(manager->params->checkpoints[i - 1].hash);
+            needConnect = _BRPeerManagerRescan(manager, BRSetGet (manager->blocks, &hash));
+        }
+    }
+    pthread_mutex_unlock(&manager->lock);
+    if (needConnect) BRPeerManagerConnect(manager);
+}
+
+static BRMerkleBlock *_BRPeerManagerLookupBlockFromBlockNumber(BRPeerManager *manager, uint32_t blockNumber)
+{
+    BRMerkleBlock *block = manager->lastBlock;
+    
+    // walk the chain, looking for blockNumber
+    while (block) {
+        if (block->height == blockNumber) return block;
+        block = BRSetGet (manager->blocks, &block->prevBlock);
+    }
+    
+    // blockNumber not in the (abbreviated) chain - look through checkpoints
+    for (int i = 0; i < manager->params->checkpointsCount; i++)
+        if (manager->params->checkpoints[i].height == blockNumber) {
+            UInt256 hash = UInt256Reverse(manager->params->checkpoints[i].hash);
+            return BRSetGet(manager->blocks, &hash);
+        }
+    
+    return NULL;
+}
+
+// rescans blocks and transactions from after the blockNumber.  If blockNumber is not known, then
+// rescan from the just prior checkpoint.
+void BRPeerManagerRescanFromBlockNumber(BRPeerManager *manager, uint32_t blockNumber)
+{
+    assert(manager != NULL);
+    pthread_mutex_lock(&manager->lock);
+    
+    int needConnect = 0;
+    if (manager->isConnected) {
+        BRMerkleBlock *block = _BRPeerManagerLookupBlockFromBlockNumber(manager, blockNumber);
+        
+        // If there was no block, find the preceeding hardcoded checkpoint.
+        if (NULL == block) {
+            for (size_t i = manager->params->checkpointsCount; i > 0; i--) {
+                if (i - 1 == 0 || manager->params->checkpoints[i - 1].height < blockNumber) {
+                    UInt256 hash = UInt256Reverse(manager->params->checkpoints[i - 1].hash);
+                    block = BRSetGet(manager->blocks, &hash);
+                    break;
+                }
+            }
+        }
+        
+        needConnect = _BRPeerManagerRescan(manager, block);
+    }
+    pthread_mutex_unlock(&manager->lock);
+    if (needConnect) BRPeerManagerConnect(manager);
 }
 
 // the (unverified) best block height reported by connected peers
