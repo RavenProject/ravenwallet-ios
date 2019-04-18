@@ -42,11 +42,10 @@ class UnitsCell : NumberCell {
         unitsLabel.constrain([
             unitsLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
             unitsLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 0)])
-        amountLabel.constrain([
-            amountLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
-            amountLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: C.padding[6]),
-            amountLabel.heightAnchor.constraint(equalToConstant: 55.0)])
-        placeHolderHeightAnchor?.constant = 0
+        textField.constrain([
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
+            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: C.padding[6]),
+            textField.heightAnchor.constraint(equalTo: view.heightAnchor)])
     }
     
     override func setInitialData() {
@@ -55,5 +54,10 @@ class UnitsCell : NumberCell {
         amount = Satoshis(0)
     }
     
-    
+    override func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if (string == "9") {
+            return false
+        }
+        return true
+    }
 }

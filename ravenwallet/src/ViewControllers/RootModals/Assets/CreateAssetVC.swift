@@ -13,6 +13,7 @@ import Core
 internal let verticalButtonPadding: CGFloat = 32.0
 internal let createAddressHeight: CGFloat = 110.0
 internal let createNameAssetHeight: CGFloat = 77.0
+var keyboardShowed: Bool = false
 
 enum NameStatus {
     case notVerified
@@ -43,8 +44,6 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         self.feeView = FeeAmountVC(walletManager: self.walletManager, sender: self.sender, operationType: self.operationType)
         self.cPtr = (walletManager.peerManager?.cPtr)!
         super.init(nibName: nil, bundle: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
     //MARK - Private
@@ -81,7 +80,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     internal let currency: CurrencyDef = Currencies.rvn //BMEX
     internal var nameStatus: NameStatus = .notVerified
     internal let activityView = UIActivityIndicatorView(style: .white)
-    private var origineParentFrame:CGRect?
+    internal var origineParentFrame:CGRect?
     
     override func viewDidLoad() {
         addSubviews()
@@ -94,14 +93,25 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         origineParentFrame = self.parentView?.frame
+        makeKeyBoardToolBar()
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     internal func addSubviews() {
         view.backgroundColor = .white
         view.addSubview(nameCell)
         view.addSubview(addressCell)
+        addChildVC(quantityView)
+        addChildVC(unitsCell)
         view.addSubview(reissubaleCell)
         view.addSubview(ipfsCell)
+        addChildVC(feeView)
         view.addSubview(createButton)
         createButton.addSubview(activityView)
     }
@@ -114,19 +124,21 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
             addressCell.leadingAnchor.constraint(equalTo: nameCell.leadingAnchor),
             addressCell.heightAnchor.constraint(equalToConstant: !UserDefaults.hasActivatedExpertMode ? 0.0 : createAddressHeight) ])
         
-        addChild(quantityView, layout: {
+        //addChild(quantityView, layout: {
             quantityView.view.constrain([
                 quantityView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 quantityView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
-                quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+                quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                quantityView.view.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2])])
+        //})
         
-        addChild(unitsCell, layout: {
+        //addChild(unitsCell, layout: {
             unitsCell.view.constrain([
                 unitsCell.view.widthAnchor.constraint(equalTo: quantityView.view.widthAnchor),
                 unitsCell.view.topAnchor.constraint(equalTo: quantityView.view.bottomAnchor),
-                unitsCell.view.leadingAnchor.constraint(equalTo: quantityView.view.leadingAnchor) ])
-        })
+                unitsCell.view.leadingAnchor.constraint(equalTo: quantityView.view.leadingAnchor),
+                unitsCell.view.heightAnchor.constraint(equalTo: quantityView.view.heightAnchor)])
+        //})
         
         reissubaleCell.constrain([
             reissubaleCell.widthAnchor.constraint(equalTo: unitsCell.view.widthAnchor),
@@ -140,12 +152,12 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
             ipfsCell.leadingAnchor.constraint(equalTo: reissubaleCell.leadingAnchor),
             ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
         
-        addChild(feeView, layout: {
+        //addChild(feeView, layout: {
             feeView.view.constrain([
                 feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 feeView.view.topAnchor.constraint(equalTo: ipfsCell.bottomAnchor),
                 feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+        //})
         
         createButton.constrain([
             createButton.constraint(.leading, toView: view, constant: C.padding[2]),
@@ -160,6 +172,7 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
     }
     
     internal func setInitialData() {
+        keyboardShowed = false
         nameCell.textField.autocapitalizationType = .allCharacters
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
@@ -268,7 +281,6 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         }
         
         quantityView.didReturn = { [weak self] in
-            self?.parentView?.frame = self!.origineParentFrame!
         }
         
         quantityView.didUpdateAmount = { [weak self] amount in
@@ -292,7 +304,6 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
         }
         
         unitsCell.didReturn = { [weak self] in
-            self?.parentView?.frame = self!.origineParentFrame!
         }
         
         feeView.didUpdateAssetFee = { [weak self] feeAmount in
@@ -548,26 +559,29 @@ class CreateAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK: - Keyboard Notifications
     @objc private func keyboardWillShow(notification: Notification) {
-        copyKeyboardChangeAnimation(notification: notification)
+        if !keyboardShowed {
+            keyboardShowed = true
+            copyKeyboardChangeAnimation(notification: notification)
+        }
     }
 
     @objc private func keyboardWillHide(notification: Notification) {
-        if parentView!.frame.origin.y >= (origineParentFrame?.origin.y)!  {
-            return
-        }
+        keyboardShowed = false
         copyKeyboardChangeAnimation(notification: notification)
     }
 
     //TODO - maybe put this in ModalPresentable?
-    private func copyKeyboardChangeAnimation(notification: Notification) {
+    func copyKeyboardChangeAnimation(notification: Notification) {
         guard let info = KeyboardNotificationInfo(notification.userInfo) else { return }
         UIView.animate(withDuration: info.animationDuration, delay: 0, options: info.animationOptions, animations: {
             guard let parentView = self.parentView else { return }
-            var diff:CGFloat = info.deltaY
-            if(self.nameCell.textField.isFirstResponder){
-                diff = info.deltaY + (notification.name.rawValue == UIResponder.keyboardWillShowNotification.rawValue ? createAddressHeight : -createAddressHeight)
+            let diff:CGFloat = info.deltaY + createAddressHeight
+            if keyboardShowed {
+                parentView.frame = parentView.frame.offsetBy(dx: 0, dy: diff)
             }
-            parentView.frame = parentView.frame.offsetBy(dx: 0, dy: diff)
+            else{
+                parentView.frame = self.origineParentFrame!
+            }
         }, completion: nil)
     }
 

@@ -110,6 +110,34 @@ public extension String {
     var cStr: UnsafePointer<CChar>? {
         return (self as NSString).utf8String
     }
+    
+    func isValidDouble(maxDecimalPlaces: Int) -> Bool {
+        let formatter = NumberFormatter()
+        formatter.allowsFloats = true // Default is true, be explicit anyways
+        let decimalSeparator = formatter.decimalSeparator ?? "."  // Gets the locale specific decimal separator. If for some reason there is none we assume "." is used as separator.
+        if formatter.number(from: self) != nil {
+            // Split our string at the decimal separator
+            let split = self.components(separatedBy: decimalSeparator)
+            // Depending on whether there was a decimalSeparator we may have one
+            // or two parts now. If it is two then the second part is the one after
+            // the separator, aka the digits we care about.
+            // If there was no separator then the user hasn't entered a decimal
+            // number yet and we treat the string as empty, succeeding the check
+            let digits = split.count == 2 ? split.last ?? "" : ""
+            // Finally check if we're <= the allowed digits
+            return digits.characters.count <= maxDecimalPlaces    // TODO: Swift 4.0 replace with digits.count, YAY!
+        }
+        return false // couldn't turn string into a valid number
+    }
+}
+
+extension UITextField {
+    func removeLast() {
+        guard let text = text else { return}
+        if text.utf8.count > 0 {
+            self.text = String(text[..<text.index(text.startIndex, offsetBy: text.utf8.count - 1)])
+        }
+    }
 }
 
 extension UserDefaults {
@@ -570,5 +598,179 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: Any {
             return "null"
         }
         return jstring
+    }
+}
+
+extension UIView {
+    
+    // go thru this view's subviews and look for the current first responder
+    func findFirstResponder() -> UIResponder? {
+        // if self is the first responder, return it
+        // (this is from the recursion below)
+        if isFirstResponder {
+            return self
+        }
+        
+        let tt = subviews
+        for v in subviews {
+            if v.isFirstResponder == true {
+                return v
+            }
+            if let fr = v.findFirstResponder() { // recursive
+                return fr
+            }
+        }
+        
+        // no first responder
+        return nil
+    }
+}
+
+var tbKeyboard : UIToolbar?
+var tfLast : UITextField?
+var textFieldsList: [UITextField]?
+
+extension UIViewController : UITextFieldDelegate {
+    
+    // make the first UITextField (tag=0) the first responder
+    // if no view is passed in, start w/ the self.view
+    func firstTFBecomeFirstResponder(view : UIView? = nil) {
+        for v in view?.subviews ?? self.view.subviews {
+            if v is UITextField, v.tag == 0 {
+                (v as! UITextField).becomeFirstResponder()
+            }
+            else if v.subviews.count > 0 { // recursive
+                firstTFBecomeFirstResponder(view: v)
+            }
+        }
+    }
+    
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        // set the tool bar as this text field's input accessory view
+        textField.inputAccessoryView = tbKeyboard
+        return true
+    }
+    
+    func makeKeyBoardToolBar() {
+        if tbKeyboard == nil {
+            // if there's no tool bar, create it
+            tbKeyboard = UIToolbar.init(frame: CGRect.init(x: 0, y: 0,
+                                                           width: self.view.frame.size.width, height: 44))
+            let bbiPrev = UIBarButtonItem.init(title: "<",
+                                               style: .plain, target: self, action: #selector(doBtnPrev))
+            let bbiNext = UIBarButtonItem.init(title: ">", style: .plain,
+                                               target: self, action: #selector(doBtnNext))
+            let bbiSpacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
+                                            target: nil, action: nil)
+            let bbiSubmit = UIBarButtonItem.init(title: "Done", style: .plain,
+                                                 target: self, action: #selector(doBtnSubmit))
+            tbKeyboard?.items = [bbiPrev, bbiNext, bbiSpacer, bbiSubmit]
+        }
+        //init textfields Tag
+        textFieldsList = []
+        initTextFieldTag(inViewsSubviewsOf: self.view/*, fromTag: 0*/)
+        var tag:Int = 0
+        for textField in textFieldsList! {
+            textField.tag = tag
+            tag = tag + 1
+        }
+    }
+    
+    func initTextFieldTag(inViewsSubviewsOf view : UIView? = nil/*, fromTag:Int*/) {
+        //var tag:Int = fromTag
+        for v in view?.subviews ?? self.view.subviews {
+            
+            // found a match? return it
+            if v is UITextField {
+                textFieldsList?.append(v as! UITextField)
+                //v.tag = tag
+                //tag = tag + 1
+            }
+            else if v.subviews.count > 0 { // recursive
+                initTextFieldTag(inViewsSubviewsOf: v/*, fromTag: tag*/)
+            }
+        }
+    }
+    
+    // search view's subviews
+    // if no view is passed in, start w/ the self.view
+    func findTextField(withTag tag : Int,
+                       inViewsSubviewsOf view : UIView? = nil, next : Bool) -> UITextField? {
+        var i:Int = 0
+        var newTag = tag
+        while i < (textFieldsList?.count)! {
+            let textField = next ? textFieldsList![i] : textFieldsList!.reversed()[i]
+            if textField.tag == newTag {
+                let superView = textField.superview
+                if !textField.isHidden && (superView?.frame.size.height)! > CGFloat(0) {
+                    return textField
+                }
+                else {
+                    newTag = tag + (next ? 1 : -1)
+                }
+            }
+            i = i + 1
+        }
+
+//        for v in view?.subviews ?? self.view.subviews {
+//
+//            // found a match? return it
+//            if v is UITextField, v.tag == tag, !v.isHidden {
+//                return (v as! UITextField)
+//            }
+//            else if v.subviews.count > 0 { // recursive
+//                if let tf = findTextField(withTag: tag, inViewsSubviewsOf: v) {
+//                    return tf
+//                }
+//            }
+//        }
+        return nil // not found
+    }
+    
+    func findFirstResponder() -> UITextField?{
+        for textField in textFieldsList! {
+            if textField.isFirstResponder {
+                return textField
+            }
+        }
+        return nil
+    }
+    
+    // make the next (or previous if next=false) text field the first responder
+    func makeTFFirstResponder(next : Bool) -> Bool {
+        
+        // find the current first responder (text field)
+        if let fr = self.findFirstResponder() as? UITextField {
+            
+            // find the next (or previous) text field based on the tag
+            if let tf = findTextField(withTag: fr.tag + (next ? 1 : -1), next: next) {
+                tf.becomeFirstResponder()
+                return true
+            }
+        }
+        return false
+    }
+    
+    @objc func doBtnPrev(_ sender: Any) {
+        let _ = makeTFFirstResponder(next: false)
+    }
+    
+    @objc func doBtnNext(_ sender: Any) {
+        guard makeTFFirstResponder(next: true) else {
+            doBtnSubmit(tbKeyboard?.items?.first as Any)
+            return
+        }
+    }
+    
+    @objc func doBtnSubmit(_ sender: Any) {
+        submitForm()
+    }
+    
+    @objc func submitForm() {
+        self.view.endEditing(true)
+        for textField in textFieldsList! {
+            textField.resignFirstResponder()
+        }
+        // override me
     }
 }

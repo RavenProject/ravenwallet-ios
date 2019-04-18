@@ -89,4 +89,11 @@ extension NameAddressCell : UITextFieldDelegate {
         let count = text.count + string.count - range.length
         return count <= C.MAX_ADDRESSBOOK_NAME_LENGTH
     }
+    
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        
+        // set the tool bar as this text field's input accessory view
+        textField.inputAccessoryView = tbKeyboard
+        return true
+    }
 }

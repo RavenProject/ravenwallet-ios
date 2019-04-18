@@ -33,6 +33,7 @@ import Core
         view.addSubview(nameCell)
         view.addSubview(addressCell)
         view.addSubview(ipfsCell)
+        addChildVC(feeView)
         view.addSubview(createButton)
         createButton.addSubview(activityView)
     }
@@ -51,12 +52,10 @@ import Core
             ipfsCell.leadingAnchor.constraint(equalTo: addressCell.leadingAnchor),
             ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
         
-        addChild(feeView, layout: {
-            feeView.view.constrain([
-                feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                feeView.view.topAnchor.constraint(equalTo: ipfsCell.bottomAnchor),
-                feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+        feeView.view.constrain([
+            feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            feeView.view.topAnchor.constraint(equalTo: ipfsCell.bottomAnchor),
+            feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
         
         createButton.constrain([
             createButton.constraint(.leading, toView: view, constant: C.padding[2]),
@@ -163,6 +162,15 @@ import Core
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    //TODO - maybe put this in ModalPresentable?
+    override func copyKeyboardChangeAnimation(notification: Notification) {
+        guard let info = KeyboardNotificationInfo(notification.userInfo) else { return }
+        UIView.animate(withDuration: info.animationDuration, delay: 0, options: info.animationOptions, animations: {
+            guard let parentView = self.parentView else { return }
+            parentView.frame = parentView.frame.offsetBy(dx: 0, dy: info.deltaY)
+        }, completion: nil)
     }
 }
 

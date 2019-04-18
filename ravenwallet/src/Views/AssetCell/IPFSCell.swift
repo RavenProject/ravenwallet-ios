@@ -116,6 +116,13 @@ class IPFSCell : SendCell {
 }
 
 extension IPFSCell : UITextFieldDelegate {
+    
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        // set the tool bar as this text field's input accessory view
+        textField.inputAccessoryView = tbKeyboard
+        return true
+    }
+    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         didBeginEditing?()
     }
