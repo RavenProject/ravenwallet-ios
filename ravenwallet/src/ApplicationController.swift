@@ -69,6 +69,7 @@ class ApplicationController : NSObject, Subscriber {
                 dispatchGroup.leave()
                 return
             }
+            self.walletManager?.requestTxUpdate()//BMEX: show transaction list befor peerManager connect
             self.walletManager!.initPeerManager {
                 self.walletManager!.peerManager?.connect()
                 dispatchGroup.leave()

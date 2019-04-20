@@ -111,18 +111,17 @@ class ManageWalletViewController : UIViewController, ModalPresentable, Subscribe
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-extension ManageWalletViewController : UITextFieldDelegate {
+    
+    //MARK: - Keyboard delegate
     func textFieldDidEndEditing(_ textField: UITextField) {
         saveWalletName()
     }
-
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
-
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
         if text.utf8.count + string.utf8.count > maxWalletNameLength {

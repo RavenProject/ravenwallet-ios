@@ -54,20 +54,17 @@ class QuantityCell : NumberCell {
         super.addConstraints()
         guard asset == nil else {
             balanceLabel.constrain([
-                balanceLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: -C.padding[2]),
+                balanceLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: -C.padding[2]),
                 balanceLabel.leadingAnchor.constraint(equalTo: placeholder.leadingAnchor),
-                balanceLabel.trailingAnchor.constraint(equalTo: amountLabel.trailingAnchor)
+                balanceLabel.trailingAnchor.constraint(equalTo: textField.trailingAnchor)
                 ])
-            borderTopAnchor?.constant = balanceLabel.frame.height + 5
-            bottomBorderTopAnchor?.constant = balanceLabel.frame.height + 5
             return
         }
     }
     
-    override func togglePinPad() {
-        super.togglePinPad()
-        let isCollapsed: Bool = pinPadHeight?.constant == 0.0
-        balanceLabel.isHidden = isCollapsed
+    override func togglePinPad(isCollapsed: Bool){
+        super.togglePinPad(isCollapsed: isCollapsed)
+        balanceLabel.isHidden = !isCollapsed
     }
     
     func updateBalanceLabel() {

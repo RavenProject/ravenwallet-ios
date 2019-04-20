@@ -140,6 +140,7 @@ enum S {
         static let messagingUnavailableTitle = NSLocalizedString("ErrorMessages.messagingUnavailableTitle", value:"Messaging Unavailable", comment: "Messaging unavailable alert title")
         static let messagingUnavailableMessage = NSLocalizedString("ErrorMessages.messagingUnavailableMessage", value:"This device isn't configured to send messages.", comment: "Messaging unavailable alert title")
         static let noLogsFound = NSLocalizedString("Settings.noLogsFound", value: "No Log files found. Please try again later.", comment: "No log files found error message")
+        static let noRates = NSLocalizedString("Rate.noRates", value: "Cannot get rate", comment: "Problem to get rate from server error message")
     }
     
     enum UnlockScreen {
@@ -320,6 +321,12 @@ enum S {
         static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
     }
     
+    enum ImportUtxos {
+        static let header = NSLocalizedString("ImportUtxos.header", value:"Import UTXOS", comment: "Import utxos header")
+        static let title = NSLocalizedString("ImportUtxos.title", value: "Import UTXOS for BIP44 Migration", comment: "Import UTXOS navigation item title.")
+        static let instruction = NSLocalizedString("ImportUtxos.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
+    }
+    
     enum OneTimeWipe {
         static let next = NSLocalizedString("OneTimeWipe.next", value:"Start Wipping Process", comment: "Next button label")
         static let intro = NSLocalizedString("OneTimeWipe.intro", value:"Recover your RVN Wallet with your paper key.", comment: "Recover wallet intro")
@@ -401,7 +408,7 @@ enum S {
         static let expertMode = NSLocalizedString("Settings.expertMode", value: "Expert Mode", comment: "Expert Mode settings header")
         static let usedAddresses = NSLocalizedString("Settings.usedAddresses", value: "Used Addresses", comment: "Used Addresses settings header")
         static let currencyPageTitle = NSLocalizedString("Settings.currencyPageTitle", value: "%1$@ Settings", comment: "Ravencoin Settings page title")
-        static let importTile = NSLocalizedString("Settings.importTitle", value:"Redeem Private Key", comment: "Import wallet label")
+        static let importTile = NSLocalizedString("Settings.importTitle", value:"Redeem Wallet / Private Key", comment: "Import wallet label")
         static let notifications = NSLocalizedString("Settings.notifications", value:"Notifications", comment: "Notifications label")
         static let touchIdLimit = NSLocalizedString("Settings.touchIdLimit", value:"Touch ID Spending Limit", comment: "Touch ID spending limit label")
         static let currency = NSLocalizedString("Settings.currency", value:"Display Currency", comment: "Default currency label")
@@ -672,6 +679,7 @@ enum S {
         static let importWarning = NSLocalizedString("Import.warning", value: "Importing a wallet does not include transaction history or other details.", comment: "Import wallet intro warning message")
         static let importAssettWarning = NSLocalizedString("Import.assettWarning", value: "Assets will not be swept from private. If you have assets in the address, keep your private key.", comment: "Import wallet second warning message")
         static let scan = NSLocalizedString("Import.scan", value: "Scan Private Key", comment: "Scan Private key button label")
+        static let enterSeed = NSLocalizedString("Import.enterSeed", value: "Enter 12 recovery words", comment: "Scan 12 words button label")
         static let title = NSLocalizedString("Import.title", value: "Import Wallet", comment: "Import Wallet screen title")
         static let importing = NSLocalizedString("Import.importing", value: "Importing Wallet", comment: "Importing wallet progress view label")
         static let confirm = NSLocalizedString("Import.confirm", value: "Send %1$@ from this private key into your wallet? The Ravencoin network will receive a fee of %2$@.", comment: "Sweep private key confirmation message")

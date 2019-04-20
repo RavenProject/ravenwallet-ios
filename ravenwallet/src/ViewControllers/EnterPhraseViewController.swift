@@ -13,6 +13,7 @@ enum PhraseEntryReason {
     case validateForResettingPin(EnterPhraseCallback)
     case validateForWipingWallet(()->Void)
     case validateForOneTimeWipingWallet(EnterPhraseCallback)
+    case importUtxoFromServer(EnterPhraseCallback)
 }
 
 typealias EnterPhraseCallback = (String) -> Void
@@ -34,6 +35,8 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             self.customTitle = S.WipeWallet.title
         case .validateForOneTimeWipingWallet(_):
             self.customTitle = S.OneTimeWipe.title
+        case .importUtxoFromServer(_):
+            self.customTitle = S.ImportUtxos.header
         }
 
         super.init(nibName: nil, bundle: nil)
@@ -152,6 +155,10 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             titleLabel.text = S.OneTimeWipe.title
             subheader.text = S.OneTimeWipe.instruction
             faq.isHidden = true
+        case .importUtxoFromServer(_):
+            titleLabel.text = S.ImportUtxos.title
+            subheader.text = S.ImportUtxos.instruction
+            faq.isHidden = true
         }
 
         scrollView.delegate = self
@@ -182,6 +189,9 @@ class EnterPhraseViewController : UIViewController, UIScrollViewDelegate, Custom
             return callback()
         case .validateForOneTimeWipingWallet(let callback):
             guard self.walletManager.authenticate(phrase: phrase) else { errorLabel.isHidden = false; return }
+            return callback(phrase)
+        case .importUtxoFromServer(let callback):
+            self.navigationController?.popViewController(animated: true)
             return callback(phrase)
         }
     }

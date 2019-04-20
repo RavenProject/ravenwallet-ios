@@ -125,6 +125,16 @@ class HomeScreenCell : UITableViewCell, Subscriber {
                         callback: { state in
                             self.syncIndicator.progress = CGFloat(state[self.container.currency!].syncProgress)
         })
+        
+        Store.subscribe(self,
+                        selector: { $0[self.container.currency!].currentRate != $1[self.container.currency!].currentRate},
+                        callback: {
+                            self.price.textColor = .transparentWhiteText
+                            let rate = $0[self.container.currency!].currentRate
+                            if(rate?.rate == 0){
+                                self.price.textColor = .sentRed
+                            }
+        })
     }
 
     private func addSubviews() {

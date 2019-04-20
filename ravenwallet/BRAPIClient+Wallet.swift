@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import Core
 
 private let fallbackRatesURL = "https://bitpay.com/api/rates"
 private let ravenMultiplierURL = "https://api.coinmarketcap.com/v1/ticker/ravencoin/"
 
 extension BRAPIClient {
-
+    
     func me() {
         let req = URLRequest(url: url("/me"))
         let task = dataTaskWithRequest(req, authenticated: true, handler: { data, response, err in
@@ -22,36 +23,36 @@ extension BRAPIClient {
         })
         task.resume()
     }
-
-//    func feePerKb(code: String, _ handler: @escaping (_ fees: Fees, _ error: String?) -> Void) {
-//        let param = ""
-//        let req = URLRequest(url: url("/fee-per-kb\(param)"))
-//        let task = self.dataTaskWithRequest(req) { (data, response, err) -> Void in
-//            var regularFeePerKb: uint_fast64_t = 0
-//            var economyFeePerKb: uint_fast64_t = 0
-//            var errStr: String? = nil
-//            if err == nil {
-//                do {
-//                    let parsedObject: Any? = try JSONSerialization.jsonObject(
-//                        with: data!, options: JSONSerialization.ReadingOptions.allowFragments)
-//                    if let top = parsedObject as? NSDictionary, let regular = top["fee_per_kb"] as? NSNumber, let economy = top["fee_per_kb_economy"] as? NSNumber {
-//                        regularFeePerKb = regular.uint64Value
-//                        economyFeePerKb = economy.uint64Value
-//                    }
-//                } catch (let e) {
-//                    self.log("fee-per-kb: error parsing json \(e)")
-//                }
-//                if regularFeePerKb == 0 || economyFeePerKb == 0 {
-//                    errStr = "invalid json"
-//                }
-//            } else {
-//                self.log("fee-per-kb network error: \(String(describing: err))")
-//                errStr = "bad network connection"
-//            }
-//            handler(Fees(regular: regularFeePerKb, economy: economyFeePerKb, timestamp: Date().timeIntervalSince1970), errStr)
-//        }
-//        task.resume()
-//    }
+    
+    //    func feePerKb(code: String, _ handler: @escaping (_ fees: Fees, _ error: String?) -> Void) {
+    //        let param = ""
+    //        let req = URLRequest(url: url("/fee-per-kb\(param)"))
+    //        let task = self.dataTaskWithRequest(req) { (data, response, err) -> Void in
+    //            var regularFeePerKb: uint_fast64_t = 0
+    //            var economyFeePerKb: uint_fast64_t = 0
+    //            var errStr: String? = nil
+    //            if err == nil {
+    //                do {
+    //                    let parsedObject: Any? = try JSONSerialization.jsonObject(
+    //                        with: data!, options: JSONSerialization.ReadingOptions.allowFragments)
+    //                    if let top = parsedObject as? NSDictionary, let regular = top["fee_per_kb"] as? NSNumber, let economy = top["fee_per_kb_economy"] as? NSNumber {
+    //                        regularFeePerKb = regular.uint64Value
+    //                        economyFeePerKb = economy.uint64Value
+    //                    }
+    //                } catch (let e) {
+    //                    self.log("fee-per-kb: error parsing json \(e)")
+    //                }
+    //                if regularFeePerKb == 0 || economyFeePerKb == 0 {
+    //                    errStr = "invalid json"
+    //                }
+    //            } else {
+    //                self.log("fee-per-kb network error: \(String(describing: err))")
+    //                errStr = "bad network connection"
+    //            }
+    //            handler(Fees(regular: regularFeePerKb, economy: economyFeePerKb, timestamp: Date().timeIntervalSince1970), errStr)
+    //        }
+    //        task.resume()
+    //    }
     
     func ravenMultiplier(_ handler: @escaping (_ mult: Double, _ error: String?) -> Void) {
         let request = URLRequest(url: URL(string: ravenMultiplierURL)!)
@@ -131,9 +132,9 @@ extension BRAPIClient {
         dataTaskWithRequest(req as URLRequest, authenticated: true, retryCount: 0) { (dat, resp, er) in
             let dat2 = String(data: dat ?? Data(), encoding: .utf8)
             self.log("save push token resp: \(String(describing: resp)) data: \(String(describing: dat2))")
-        }.resume()
+            }.resume()
     }
-
+    
     func deletePushNotificationToken(_ token: Data) {
         var req = URLRequest(url: url("/me/push-devices/apns/\(token.hexString)"))
         req.httpMethod = "DELETE"
@@ -145,24 +146,51 @@ extension BRAPIClient {
                     self.log("deleted old token")
                 }
             }
-        }.resume()
+            }.resume()
     }
-
-//    private let mainURL = "https://ravencoin.network/api/addrs/utxo"
-//    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
-    func fetchUTXOS(address: String, currency: CurrencyDef, completion: @escaping ([[String: Any]]?)->Void) {
-        let path = "https://ravencoin.network/api/addrs/utxo"
+    
+    //    private let mainURL = "https://ravencoin.network/api/addrs/utxo"
+    //    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
+    func fetchUTXOS(address: String, isAsset:Bool, completion: @escaping ([[String: Any]]?)->Void) {
+        let path = isAsset ? String(format: C.fetchAssetUtxosPath, address) : String(format: C.fetchRvnUtxosPath, address)
         // TODO: take testnet in consideration
-//        let path = "https://network.ravencoin.network/api/addrs/utxo"
+        //        let path = "http://vinx.mediciventures.com/api/addrs/utxo"
         var req = URLRequest(url: URL(string: path)!)
-        req.httpMethod = "POST"
-        req.httpBody = "addrs=\(address)".data(using: .utf8)
+        req.httpMethod = "GET"
+        //req.httpBody = "addrs=\(address)".data(using: .utf8)
         dataTaskWithRequest(req, handler: { data, resp, error in
             guard error == nil else { completion(nil); return }
             guard let data = data,
                 let jsonData = try? JSONSerialization.jsonObject(with: data, options: []),
-                let json = jsonData as? [[String: Any]] else { completion(nil); return }
-                completion(json)
+                let json = jsonData as? [[String: Any]]
+                else {
+                    completion(nil);
+                    return
+            }
+            completion(json)
+        }).resume()
+    }
+    
+    func isAddressUsed(address: String, completion: @escaping (Bool)->Void) {
+        let path = String(format: C.fetchTxsPath, address)
+        var req = URLRequest(url: URL(string: path)!)
+        req.httpMethod = "GET"
+        //req.httpBody = "addrs=\(address)".data(using: .utf8)
+        dataTaskWithRequest(req, handler: { data, resp, error in
+            guard error == nil else { completion(false); return }
+            guard let data = data,
+                let jsonData = try? JSONSerialization.jsonObject(with: data, options: []),
+                let json = jsonData as? [String: Any]
+                else {
+                    completion(false);
+                    return
+            }
+            let txList:Array = json["transactions"] as! [String]
+            if(txList.count != 0){
+                completion(true);
+            }else {
+                completion(false);
+            }
         }).resume()
     }
 }

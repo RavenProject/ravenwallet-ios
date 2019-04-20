@@ -15,153 +15,118 @@ enum NumberDigit {
 
 class NumberCell : UIViewController {
     
-
+    
     init(placeholder: String, keyboardType: KeyboardType = .pinPad, maxDigits: Int = 0, numberDigit:NumberDigit = .many, isPinPadExpandedAtLaunch: Bool = false, isEnabled: Bool = true) {
         self.placeHolderString = placeholder
         self.placeholder.text = placeHolderString
         self.isPinPadExpandedAtLaunch = isPinPadExpandedAtLaunch
-        self.pinPad = PinPadViewController(style: .white, keyboardType: keyboardType, maxDigits: maxDigits)
+        self.keyboardType = keyboardType
         self.numberDigit = numberDigit
         self.isEnabled = isEnabled
+        self.maxDigits = maxDigits
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     var didChangeFirstResponder: ((Bool) -> Void)?
     var didUpdateAmount: ((Satoshis?) -> Void)?
     var didReturn: (() -> Void)?
-
     /*var currentOutput: String {
-        return amountLabel.text ?? ""
-    }*/
-
-    func expandPinPad() {
-        if pinPadHeight?.constant == 0.0 {
-            togglePinPad()
-        }
-    }
-
+     return amountLabel.text ?? ""
+     }*/
+    
     private let isPinPadExpandedAtLaunch: Bool
     var minimumFractionDigits = 0
     private var hasTrailingDecimal = false
-    var pinPadHeight: NSLayoutConstraint?
-    var borderTopAnchor: NSLayoutConstraint?
-    var bottomBorderTopAnchor: NSLayoutConstraint?
-    var placeHolderHeightAnchor: NSLayoutConstraint?
     let placeHolderString: String
     let placeholder = UILabel(font: .customBody(size: 16.0), color: .grayTextTint)
-    let amountLabel = UILabel(font: .customBody(size: 26.0), color: .darkText)
-    let pinPad: PinPadViewController
+    let textField = UITextField()
+    let tapView = UIView()
     let border = UIView(color: .secondaryShadow)
-    let bottomBorder = UIView(color: .secondaryShadow)
     var isEnabled : Bool = true {
         didSet {
             tapView.isUserInteractionEnabled = isEnabled
-            //amount = nil
             closePinPad()
         }
     }
-    private let tapView = UIView()
     private let numberDigit:NumberDigit
-    
+    let keyboardType: KeyboardType
+    private let maxDigits: Int
+
     var amount: Satoshis? {
         didSet {
             updateAmountLabel()
         }
     }
-
+    
     override func viewDidLoad() {
         addSubviews()
         addConstraints()
         setInitialData()
     }
-
+    
     func addSubviews() {
-        view.addSubview(amountLabel)
-        view.addSubview(placeholder)
         view.addSubview(border)
+        view.addSubview(textField)
         view.addSubview(tapView)
-        view.addSubview(bottomBorder)
+        textField.addSubview(placeholder)
     }
-
+    
     func addConstraints() {
-        amountLabel.constrain([
-            amountLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: C.padding[2]),
-            amountLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            amountLabel.heightAnchor.constraint(equalToConstant: 55.0)])
-        placeHolderHeightAnchor = placeholder.heightAnchor.constraint(equalToConstant: 55.0)
+        textField.constrain([
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 11.0),
+            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+            textField.heightAnchor.constraint(equalTo: view.heightAnchor)])
         placeholder.constrain([
-            placeholder.leadingAnchor.constraint(equalTo: amountLabel.leadingAnchor, constant: 2.0),
-            placeholder.centerYAnchor.constraint(equalTo: amountLabel.centerYAnchor),
-            placeHolderHeightAnchor])
-        borderTopAnchor = border.topAnchor.constraint(equalTo: amountLabel.bottomAnchor)
+            placeholder.centerYAnchor.constraint(equalTo: textField.centerYAnchor),
+            placeholder.leadingAnchor.constraint(equalTo: textField.leadingAnchor, constant: 5.0) ])
         border.constrain([
             border.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             border.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             border.heightAnchor.constraint(equalToConstant: 1.0),
-            borderTopAnchor])
-        pinPadHeight = pinPad.view.heightAnchor.constraint(equalToConstant: 0.0)
-        addChild(pinPad, layout: {
-            pinPad.view.constrain([
-                pinPad.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                pinPad.view.topAnchor.constraint(equalTo: border.bottomAnchor),
-                pinPad.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                pinPad.view.bottomAnchor.constraint(equalTo: bottomBorder.topAnchor),
-                pinPadHeight ])
-        })
-        bottomBorderTopAnchor = bottomBorder.topAnchor.constraint(greaterThanOrEqualTo: amountLabel.bottomAnchor, constant: 0)
-        bottomBorder.constrain([
-            bottomBorder.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            bottomBorder.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            bottomBorder.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bottomBorder.heightAnchor.constraint(equalToConstant: 1.0),
-            bottomBorderTopAnchor])
-
+            border.topAnchor.constraint(equalTo: textField.bottomAnchor)])
         tapView.constrain([
             tapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tapView.topAnchor.constraint(equalTo: view.topAnchor),
-            tapView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 4.0),
-            tapView.bottomAnchor.constraint(equalTo: amountLabel.bottomAnchor) ])
-        preventAmountOverflow()
+            tapView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tapView.bottomAnchor.constraint(equalTo: view.bottomAnchor) ])
     }
-
+    
     func setInitialData() {
-        amountLabel.text = ""
-        bottomBorder.isHidden = true
-        pinPad.ouputDidUpdate = { [weak self] output in
-            self?.handlePinPadUpdate(output: output)
+        textField.font = .customBody(size: 26.0)
+        textField.textColor = .darkText
+        textField.text = ""
+        textField.delegate = self
+        textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        //KeyWordType
+        switch keyboardType {
+        case .decimalPad:
+            textField.keyboardType = .decimalPad
+        case .pinPad:
+            textField.keyboardType = .numberPad
+        case .unitsPad, .quantityPad:
+            textField.keyboardType = .numberPad
         }
+        //tapView
+        let gr = UITapGestureRecognizer(target: self, action: #selector(didTap))
+        tapView.addGestureRecognizer(gr)
         if isEnabled {
-            let gr = UITapGestureRecognizer(target: self, action: #selector(didTap))
-            tapView.addGestureRecognizer(gr)
             tapView.isUserInteractionEnabled = true
-            
-            if isPinPadExpandedAtLaunch {
-                didTap()
+        }
+    }
+    
+    @objc private func didTap() {
+        UIView.spring(C.animationDuration, animations: {
+            if self.textField.isFirstResponder {
+                self.textField.resignFirstResponder()
+                self.togglePinPad(isCollapsed: false)
             }
-        }
-
-    }
-
-    private func preventAmountOverflow() {
-        amountLabel.constrain([
-            amountLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -C.padding[2]) ])
-        amountLabel.minimumScaleFactor = 0.5
-        amountLabel.adjustsFontSizeToFitWidth = true
-        amountLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
-    }
-
-    private func handlePinPadUpdate(output: String) {
-        placeholder.isHidden = output.utf8.count > 0 ? true : false
-        var newOutput = ""
-        
-        switch numberDigit {
-        case .many:
-            newOutput = output
-        case .one:
-            newOutput = output.utf8.count > 0 ? String(output.last!) : output
-            pinPad.currentOutput = ""
-        }
-        handleAmountUpdate(output: newOutput)
+            else {
+                self.textField.becomeFirstResponder()
+                self.togglePinPad(isCollapsed: true)
+            }
+            self.parent?.parent?.view.layoutIfNeeded()
+        }, completion: { completed in })
     }
     
     func handleAmountUpdate(output: String) {
@@ -179,12 +144,12 @@ class NumberCell : UIViewController {
             let locationValue = output.distance(from: output.endIndex, to: decimalLocation)
             minimumFractionDigits = abs(locationValue)
         }
-
+        
         
         var newAmount: Satoshis?
         if let outputAmount = NumberFormatter().number(from: output)?.doubleValue {//BMEX TODO : need optimisation
             if(Double(outputAmount) > Double(C.maxMoney/C.oneAsset)){
-                pinPad.removeLast()
+                textField.removeLast()
                 return
             }
             newAmount = Satoshis(value: outputAmount)
@@ -192,7 +157,7 @@ class NumberCell : UIViewController {
         
         if let newAmount = newAmount {
             if newAmount > C.maxAsset {//never happend for units (.one)
-                pinPad.removeLast()
+                textField.removeLast()
             } else {
                 amount = newAmount
             }
@@ -203,9 +168,9 @@ class NumberCell : UIViewController {
     
     func updateAmountLabel() {
         guard let amount = amount else {
-            amountLabel.text = "";
-            pinPad.clear()
-            placeholder.isHidden = false
+            //textField.text = "";
+            //pinPad.clear()
+            //placeholder.isHidden = false
             return
         }
         placeholder.isHidden = true
@@ -213,30 +178,62 @@ class NumberCell : UIViewController {
         if hasTrailingDecimal {
             output = output.appending(NumberFormatter().currencyDecimalSeparator)
         }
-        amountLabel.text = output
+        textField.text = output
     }
-
-    @objc private func didTap() {
-        UIView.spring(C.animationDuration, animations: {
-            self.togglePinPad()
-            self.parent?.parent?.view.layoutIfNeeded()
-        }, completion: { completed in })
-    }
-
+    
     func closePinPad() {
-        pinPadHeight?.constant = 0.0
-        bottomBorder.isHidden = true
+        textField.resignFirstResponder()
         didReturn?()
     }
 
-    func togglePinPad() {
-        let isCollapsed: Bool = pinPadHeight?.constant == 0.0
-        pinPadHeight?.constant = isCollapsed ? pinPad.height : 0.0
-        bottomBorder.isHidden = isCollapsed ? false : true
+    func togglePinPad(isCollapsed:Bool) {
         didChangeFirstResponder?(isCollapsed)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - Keyboard delegate
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        togglePinPad(isCollapsed: true)
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        placeholder.isHidden = (textField.text?.utf8.count)! > 0
+        if let text = textField.text {
+            placeholder.isHidden = text.utf8.count > 0 ? true : false
+            var newOutput = ""
+            
+            switch numberDigit {
+            case .many:
+                newOutput = textField.text!
+            case .one:
+                newOutput = text.utf8.count > 0 ? String(text.last!) : text
+            }
+            handleAmountUpdate(output: newOutput)
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // when user taps Return, make the next text field first responder
+        if makeTFFirstResponder(next: true) == false {
+            // if it fails (last text field), submit the form
+            submitForm()
+        }
+        
+        return false
+    }
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        togglePinPad(isCollapsed: false)
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if string.isEmpty { return true }
+        let currentText = textField.text ?? ""
+        let replacementText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        return replacementText.isValidDouble(maxDecimalPlaces: maxDigits)
     }
 }

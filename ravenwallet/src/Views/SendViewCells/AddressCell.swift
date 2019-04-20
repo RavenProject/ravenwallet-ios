@@ -124,7 +124,7 @@ class AddressCell : UIView {
         label.text = (addressCellType == .send) ? S.Send.toLabel : S.AddressBook.addressLabel
         textField.font = contentLabel.font
         textField.textColor = contentLabel.textColor
-        textField.isHidden = true
+        //textField.isHidden = true
         textField.returnKeyType = .done
         textField.delegate = self
         textField.clearButtonMode = .whileEditing
@@ -146,7 +146,7 @@ class AddressCell : UIView {
     @objc private func didTap() {
         textField.becomeFirstResponder()
         contentLabel.isHidden = true
-        textField.isHidden = false
+        //textField.isHidden = false
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -155,6 +155,13 @@ class AddressCell : UIView {
 }
 
 extension AddressCell : UITextFieldDelegate {
+    
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        // set the tool bar as this text field's input accessory view
+        textField.inputAccessoryView = tbKeyboard
+        return true
+    }
+    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         didBeginEditing?()
         contentLabel.isHidden = true
@@ -164,7 +171,7 @@ extension AddressCell : UITextFieldDelegate {
 
     func textFieldDidEndEditing(_ textField: UITextField) {
         contentLabel.isHidden = false
-        textField.isHidden = true
+        //textField.isHidden = true
         gr.isEnabled = true
         tapView.isUserInteractionEnabled = true
         contentLabel.text = textField.text

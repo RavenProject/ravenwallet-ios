@@ -74,20 +74,21 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable {
     func addSubviews() {
         view.backgroundColor = .white
         view.addSubview(addressCell)
+        addChildVC(quantityView)
         view.addSubview(transferOwnerShip)
         view.addSubview(transferButton)
+        addChildVC(feeView)
         view.addSubview(checkBoxNameCell)
         transferOwnerShip.clipsToBounds = true
 
     }
     private func addConstraints() {
         addressCell.constrainTopCorners(height: SendCell.defaultHeight)
-        addChild(quantityView, layout: {
-            quantityView.view.constrain([
-                quantityView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                quantityView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
-                quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+        quantityView.view.constrain([
+            quantityView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            quantityView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
+            quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            quantityView.view.heightAnchor.constraint(equalTo: addressCell.heightAnchor, constant: -C.padding[2])])
         
         transferOwnerShipHeight = transferOwnerShip.heightAnchor.constraint(equalToConstant: 0)
         transferOwnerShip.constrain([
@@ -98,12 +99,10 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable {
             transferOwnerShipHeight
             ])
         
-        addChild(feeView, layout: {
-            feeView.view.constrain([
-                feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                feeView.view.topAnchor.constraint(equalTo: transferOwnerShip.bottomAnchor),
-                feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+        feeView.view.constrain([
+            feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            feeView.view.topAnchor.constraint(equalTo: transferOwnerShip.bottomAnchor),
+            feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
         
         checkBoxNameCell.constrain([
             checkBoxNameCell.widthAnchor.constraint(equalTo: feeView.view.widthAnchor),
@@ -194,6 +193,7 @@ class TransferAssetVC : UIViewController, Subscriber, ModalPresentable {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        makeKeyBoardToolBar()
     }
 
 

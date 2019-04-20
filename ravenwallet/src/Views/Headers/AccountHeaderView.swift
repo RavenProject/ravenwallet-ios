@@ -65,6 +65,8 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         didSet {
             DispatchQueue.main.async {
                 self.setBalances()
+                self.setNeedsLayout()
+                self.setNeedsDisplay()
             }
         }
     }
@@ -299,8 +301,16 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
         guard let rate = exchangeRate else { return }
         let exchangeRateAmount = Amount(amount: 0, rate: rate, maxDigits: 4, currency: currency)
         let exchangeRateString = exchangeRateAmount.homeScreenFormat.string(from: NSNumber(value: rate.rate)) ?? ""
-
-        exchangeRateLabel.text = "\(exchangeRateString)\(S.AccountHeader.exchangeRateSeparator)\(currency.code)"
+        if rate.rate != 0 {
+            exchangeRateLabel.textColor = .transparentWhiteText
+            exchangeRateLabel.text = "\(exchangeRateString)\(S.AccountHeader.exchangeRateSeparator)\(currency.code)"
+            self.exchangeRateLabel.font = .customBody(size: 14.0)
+        }
+        else{
+            exchangeRateLabel.textColor = .white
+            exchangeRateLabel.text = S.ErrorMessages.noRates
+            self.exchangeRateLabel.font = .customBody(size: 18.0)
+        }
         
         let maxDigits = currency.state.maxDigits
         let amount = Amount(amount: balance, rate: rate, maxDigits: maxDigits, currency: currency)
@@ -341,7 +351,16 @@ class AccountHeaderView : UIView, GradientDrawable, Subscriber {
     }
 
     override func draw(_ rect: CGRect) {
-        drawGradient(start: currency.colors.0, end: currency.colors.1, rect)
+        guard let rate = exchangeRate else {
+            drawGradient(start: currency.colors.0, end: currency.colors.1, rect)
+            return
+        }
+        if rate.rate != 0 {
+            drawGradient(start: currency.colors.0, end: currency.colors.1, frame)
+        }
+        else{
+            drawGradient(start: .sentRed, end: .sentRed, frame)
+        }
     }
 
     @objc private func currencySwitchTapped() {

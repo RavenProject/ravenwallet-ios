@@ -17,7 +17,8 @@ class BlueGradiantScroll : UIScrollView, GradientDrawable {
 
 class ConfirmationTermsUseVC : UIViewController, Subscriber {
     
-    init() {
+    init(didConfirmTaped: @escaping () -> Void) {
+        self.didConfirmTaped = didConfirmTaped
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,6 +32,7 @@ class ConfirmationTermsUseVC : UIViewController, Subscriber {
     private let container = UIView()
     private let confirmBtn = ShadowButton(title: S.TermsOfUse.confirmButton, type: .primary)
     var didSelectCallback: ((Bool) -> Void)?
+    private let didConfirmTaped: () -> Void
 
     fileprivate var didViewAppear = false
     
@@ -145,7 +147,7 @@ class ConfirmationTermsUseVC : UIViewController, Subscriber {
     }
     
     @objc func confirmTaped() {
-        Store.perform(action: HideStartFlow())
+        didConfirmTaped()
     }
     
     required init?(coder aDecoder: NSCoder) {

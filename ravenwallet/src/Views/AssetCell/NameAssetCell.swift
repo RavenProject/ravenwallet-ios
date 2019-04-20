@@ -16,6 +16,24 @@ class NameAssetCell : NameAddressCell {
     let activityView = UIActivityIndicatorView(style: .white)
     let verifyResult = UILabel(font: UIFont.customBody(size: 14.0))
     let msgLabel = UILabel.init(font: .customBody(size: 12.0), color: .cameraGuideNegative)
+    var rootAssetName:String? {
+        didSet{
+            DispatchQueue.main.async {
+                let rootAssetLabel = UILabel(font: .customBody(size: 12.0), color: .darkText)
+                rootAssetLabel.text = self.rootAssetName
+                self.addSubview(rootAssetLabel)
+                rootAssetLabel.constrain([
+                    rootAssetLabel.leadingAnchor.constraint(equalTo: self.textField.leadingAnchor, constant: 0.0),
+                    rootAssetLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: C.padding[1]),
+                    rootAssetLabel.trailingAnchor.constraint(equalTo: self.textField.trailingAnchor, constant: 0.0)
+                    ])
+            }
+        }
+    }
+    
+    func getContent() -> String {
+        return (rootAssetName != nil) ? (rootAssetName! + self.textField.text!) : (self.textField.text!)
+    }
 
     override func setupViews() {
         addSubviews()
@@ -92,7 +110,7 @@ class NameAssetCell : NameAddressCell {
         verifyResult.attributedText = NSAttributedString(string: "")
         verify.isEnabled = false
         msgLabel.isHidden = true
-        self.didVerifyTapped!(self.textField.text)
+        self.didVerifyTapped!(getContent())
     }
     
     func checkAvailabilityResult(nameStatus:NameStatus) {

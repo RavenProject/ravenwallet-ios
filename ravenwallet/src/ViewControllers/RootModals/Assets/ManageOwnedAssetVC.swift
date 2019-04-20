@@ -66,6 +66,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
     private let confirmTransitioningDelegate = PinTransitioningDelegate()
     private var feeType: Fee?
     private let currency: CurrencyDef = Currencies.rvn //BMEX
+    internal var origineParentFrame:CGRect?
 
     override func viewDidLoad() {
         addSubviews()
@@ -77,13 +78,18 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        origineParentFrame = self.parentView?.frame
+        makeKeyBoardToolBar()
     }
     
     private func addSubviews() {
         view.backgroundColor = .white
         view.addSubview(addressCell)
+        addChildVC(quantityView)
+        addChildVC(unitsCell)
         view.addSubview(reissubaleCell)
         view.addSubview(ipfsCell)
+        addChildVC(feeView)
         view.addSubview(createButton)
     }
     
@@ -94,20 +100,17 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
             addressCell.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             addressCell.heightAnchor.constraint(equalToConstant: !UserDefaults.hasActivatedExpertMode ? 0.0 : manageAddressHeight) ])
 
+        quantityView.view.constrain([
+            quantityView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            quantityView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
+            quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            quantityView.view.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2])])
         
-        addChild(quantityView, layout: {
-            quantityView.view.constrain([
-                quantityView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                quantityView.view.topAnchor.constraint(equalTo: addressCell.bottomAnchor),
-                quantityView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
-        
-        addChild(unitsCell, layout: {
-            unitsCell.view.constrain([
-                unitsCell.view.widthAnchor.constraint(equalTo: quantityView.view.widthAnchor),
-                unitsCell.view.topAnchor.constraint(equalTo: quantityView.view.bottomAnchor),
-                unitsCell.view.leadingAnchor.constraint(equalTo: quantityView.view.leadingAnchor) ])
-        })
+        unitsCell.view.constrain([
+            unitsCell.view.widthAnchor.constraint(equalTo: quantityView.view.widthAnchor),
+            unitsCell.view.topAnchor.constraint(equalTo: quantityView.view.bottomAnchor),
+            unitsCell.view.leadingAnchor.constraint(equalTo: quantityView.view.leadingAnchor),
+            unitsCell.view.heightAnchor.constraint(equalTo: quantityView.view.heightAnchor)])
         
         reissubaleCell.constrain([
             reissubaleCell.widthAnchor.constraint(equalTo: unitsCell.view.widthAnchor),
@@ -121,12 +124,10 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
             ipfsCell.leadingAnchor.constraint(equalTo: reissubaleCell.leadingAnchor),
             ipfsCell.heightAnchor.constraint(equalToConstant: SendCell.defaultHeight - C.padding[2]) ])
 
-        addChild(feeView, layout: {
-            feeView.view.constrain([
-                feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                feeView.view.topAnchor.constraint(equalTo: ipfsCell.bottomAnchor),
-                feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
-        })
+        feeView.view.constrain([
+            feeView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            feeView.view.topAnchor.constraint(equalTo: ipfsCell.bottomAnchor),
+            feeView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor) ])
         
         createButton.constrain([
             createButton.constraint(.leading, toView: view, constant: C.padding[2]),
@@ -137,6 +138,7 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
     }
     
     private func setInitialData() {
+        keyboardShowed = false
         if initialAddress != nil {
             addressCell.setContent(initialAddress)
         }
@@ -430,10 +432,13 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
 
     //MARK: - Keyboard Notifications
     @objc private func keyboardWillShow(notification: Notification) {
-        copyKeyboardChangeAnimation(notification: notification)
-    }
+        if !keyboardShowed {
+            keyboardShowed = true
+            copyKeyboardChangeAnimation(notification: notification)
+        }    }
 
     @objc private func keyboardWillHide(notification: Notification) {
+        keyboardShowed = false
         copyKeyboardChangeAnimation(notification: notification)
     }
 
@@ -442,7 +447,13 @@ class ManageOwnedAssetVC : UIViewController, Subscriber, ModalPresentable {
         guard let info = KeyboardNotificationInfo(notification.userInfo) else { return }
         UIView.animate(withDuration: info.animationDuration, delay: 0, options: info.animationOptions, animations: {
             guard let parentView = self.parentView else { return }
-            parentView.frame = parentView.frame.offsetBy(dx: 0, dy: info.deltaY)
+            let diff:CGFloat = info.deltaY + createAddressHeight
+            if keyboardShowed {
+                parentView.frame = parentView.frame.offsetBy(dx: 0, dy: diff)
+            }
+            else{
+                parentView.frame = self.origineParentFrame!
+            }
         }, completion: nil)
     }
 
