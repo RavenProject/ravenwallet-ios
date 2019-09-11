@@ -34,7 +34,7 @@ class RequestAmountViewController : UIViewController {
     private let address = UILabel(font: .customBody(size: 14.0))
     private let addressPopout = InViewAlert(type: .primary)
     private let share = ShadowButton(title: S.Receive.share, type: .tertiary, image: #imageLiteral(resourceName: "Share"))
-    private let sharePopout = InViewAlert(type: .secondary)
+    private let sharePopout = ShareInViewAlert(type: .secondary)
     private let border = UIView()
     private var topSharePopoutConstraint: NSLayoutConstraint?
     private let wallet: BRWallet
@@ -94,7 +94,7 @@ class RequestAmountViewController : UIViewController {
             share.constraint(.centerX, toView: view),
             share.constraint(.width, constant: qrSize.width),
             share.constraint(.height, constant: smallButtonHeight) ])
-        sharePopout.heightConstraint = sharePopout.constraint(.height, constant: 0.0)
+        sharePopout.heightConstraint = sharePopout.constraint(.height, constant: 0)
         topSharePopoutConstraint = sharePopout.constraint(toBottom: share, constant: largeSharePadding)
         sharePopout.constrain([
             topSharePopoutConstraint,
@@ -161,17 +161,19 @@ class RequestAmountViewController : UIViewController {
         email.constrain([
             email.constraint(.leading, toView: container, constant: C.padding[2]),
             email.constraint(.top, toView: container, constant: buttonPadding),
-            email.constraint(.bottom, toView: container, constant: -buttonPadding),
-            email.trailingAnchor.constraint(equalTo: container.centerXAnchor, constant: -C.padding[1]) ])
+            email.trailingAnchor.constraint(equalTo: container.centerXAnchor, constant: -C.padding[1])
+        ])
+        
         text.constrain([
             text.constraint(.trailing, toView: container, constant: -C.padding[2]),
             text.constraint(.top, toView: container, constant: buttonPadding),
-            text.constraint(.bottom, toView: container, constant: -buttonPadding),
-            text.leadingAnchor.constraint(equalTo: container.centerXAnchor, constant: C.padding[1]) ])
+            text.leadingAnchor.constraint(equalTo: container.centerXAnchor, constant: C.padding[1])
+        ])
+        
         cr.constrain([
-            text.constraint(.bottom, toView: container, constant: 0.0)])
-        cr.translatesAutoresizingMaskIntoConstraints = false
-        cr.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
+            cr.topAnchor.constraint(equalTo: text.bottomAnchor, constant: buttonPadding),
+            cr.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+        ])
 
         sharePopout.contentView = container
         email.addTarget(self, action: #selector(RequestAmountViewController.emailTapped), for: .touchUpInside)
