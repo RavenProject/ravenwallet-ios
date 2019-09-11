@@ -95,6 +95,7 @@ enum S {
         static let title = NSLocalizedString("Receive.title", value:"Receive", comment: "Receive modal title")
         static let emailButton = NSLocalizedString("Receive.emailButton", value:"Email", comment: "Share via email button label")
         static let textButton = NSLocalizedString("Receive.textButton", value:"Text Message", comment: "Share via text message (SMS)")
+        static let crButton = NSLocalizedString("Receive.crButton", value:"Share via CoinRequest", comment: "Share via CoinRequest")
         static let copied = NSLocalizedString("Receive.copied", value:"Copied to clipboard.", comment: "Address copied message.")
         static let share = NSLocalizedString("Receive.share", value:"Share", comment: "Share button label")
         static let request = NSLocalizedString("Receive.request", value:"Request an Amount", comment: "Request button label")

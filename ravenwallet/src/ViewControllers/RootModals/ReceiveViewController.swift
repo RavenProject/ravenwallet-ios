@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 private let qrSize: CGFloat = 186.0
 private let smallButtonHeight: CGFloat = 32.0
@@ -28,6 +29,7 @@ class ReceiveViewController : UIViewController, Subscriber {
     //MARK - Public
     var presentEmail: PresentShare?
     var presentText: PresentShare?
+    var presentCR: PresentShare?
     var initialAddress: String?
 
     //MARK - Private
@@ -181,8 +183,10 @@ class ReceiveViewController : UIViewController, Subscriber {
         container.translatesAutoresizingMaskIntoConstraints = false
         let email = ShadowButton(title: S.Receive.emailButton, type: .tertiary)
         let text = ShadowButton(title: S.Receive.textButton, type: .tertiary)
+        let cr = ShadowButton(title: S.Receive.crButton, type: .tertiary)
         container.addSubview(email)
         container.addSubview(text)
+        container.addSubview(cr)
         email.constrain([
             email.constraint(.leading, toView: container, constant: C.padding[2]),
             email.constraint(.top, toView: container, constant: buttonPadding),
@@ -193,9 +197,14 @@ class ReceiveViewController : UIViewController, Subscriber {
             text.constraint(.top, toView: container, constant: buttonPadding),
             text.constraint(.bottom, toView: container, constant: -buttonPadding),
             text.leadingAnchor.constraint(equalTo: container.centerXAnchor, constant: C.padding[1]) ])
+        cr.constrain([
+            text.constraint(.bottom, toView: container, constant: 0.0)])
+        cr.translatesAutoresizingMaskIntoConstraints = false
+        cr.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
         sharePopout.contentView = container
         email.addTarget(self, action: #selector(ReceiveViewController.emailTapped), for: .touchUpInside)
         text.addTarget(self, action: #selector(ReceiveViewController.textTapped), for: .touchUpInside)
+        cr.addTarget(self, action: #selector(ReceiveViewController.crTapped), for: .touchUpInside)
     }
 
     @objc private func shareTapped() {
@@ -220,6 +229,17 @@ class ReceiveViewController : UIViewController, Subscriber {
 
     @objc private func textTapped() {
         presentText?(address.text!, qrCode.image!)
+    }
+    
+    @objc private func crTapped() {
+        if(address.text == nil){
+            return;
+        }
+        
+        let location = "https://coinrequest.io/create?coin=ravencoin&wallet=ravenwallet&amount=0&address="+address.text!
+        let url = URL(string: location)
+        let vc = SFSafariViewController(url:url!)
+        present(vc, animated:true, completion:nil)
     }
 
     private func toggle(alertView: InViewAlert, shouldAdjustPadding: Bool, shouldShrinkAfter: Bool = false) {
