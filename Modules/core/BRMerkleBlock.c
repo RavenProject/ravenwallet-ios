@@ -141,7 +141,12 @@ BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen) {
         }
 
 /*SHA256_2(&block->blockHash, buf, 80);*/
-        X16R(&block->blockHash, buf, 80);
+        if(block->timestamp >= X16RV2ActivationTime) {
+            X16Rv2(&block->blockHash, buf, 80);
+        }
+        else {
+            X16R(&block->blockHash, buf, 80);
+        }
     }
 
     return block;

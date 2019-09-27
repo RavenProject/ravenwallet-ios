@@ -42,6 +42,7 @@ void SHA256(void *md32, const void *data, size_t len);
 void SHA224(void *md28, const void *data, size_t len);
 
 void X16R(void *md32, const void *data, size_t len);
+void X16Rv2(void *md32, const void *data, size_t len);
 
 // double-sha-256 = sha-256(sha-256(x))
 void SHA256_2(void *md32, const void *data, size_t len);

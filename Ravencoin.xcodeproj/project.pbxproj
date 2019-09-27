@@ -144,6 +144,7 @@
 		41F3804A217F12E300D6634C /* IPFSCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F38049217F12E300D6634C /* IPFSCell.swift */; };
 		41F78B972204BC3F007678FF /* SyncingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F78B962204BC3E007678FF /* SyncingHeaderView.swift */; };
 		41FB22462211F0AC00C072A5 /* TransferAssetTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */; };
+		4CBE7CD7233D16810016B220 /* tiger.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CBE7CD5233D16800016B220 /* tiger.c */; };
 		7503773D1DF57428005EB8AE /* WalletManager+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */; };
 		751734B91DAC941E00193C87 /* sec-sub-1.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD8BE1DAA16820075898E /* sec-sub-1.c */; };
 		752438751DAAC50800844BEC /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD6761DAA0E400075898E /* alloc.c */; };
@@ -890,6 +891,8 @@
 		41F38049217F12E300D6634C /* IPFSCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IPFSCell.swift; sourceTree = "<group>"; };
 		41F78B962204BC3E007678FF /* SyncingHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncingHeaderView.swift; path = src/Views/SyncingHeaderView.swift; sourceTree = "<group>"; };
 		41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferAssetTest.swift; sourceTree = "<group>"; };
+		4CBE7CD5233D16800016B220 /* tiger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tiger.c; sourceTree = "<group>"; };
+		4CBE7CD6233D16810016B220 /* sph_tiger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_tiger.h; sourceTree = "<group>"; };
 		7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WalletManager+Auth.swift"; sourceTree = "<group>"; };
 		7528D2971ECF655500925DBC /* PaymentProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaymentProtocol.swift; path = src/PaymentProtocol.swift; sourceTree = "<group>"; };
 		752FB03B1DF8BE4B009086FB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3347,6 +3350,8 @@
 		8B137E4F20F90D11006DEB3A /* crypto */ = {
 			isa = PBXGroup;
 			children = (
+				4CBE7CD6233D16810016B220 /* sph_tiger.h */,
+				4CBE7CD5233D16800016B220 /* tiger.c */,
 				8B137E5020F90D11006DEB3A /* keccak.c */,
 				8B137E5120F90D11006DEB3A /* sph_bmw.h */,
 				8B137E5220F90D11006DEB3A /* sph_sha2.c */,
@@ -4678,6 +4683,7 @@
 				CEE6282A1EA98B6D001035AA /* DispatchQueue+Additions.swift in Sources */,
 				CEC6AA3D1DEE687000EE5AFD /* RadialGradientView.swift in Sources */,
 				CEEC70921E95DA4400EF788E /* GradientSwitch.swift in Sources */,
+				4CBE7CD7233D16810016B220 /* tiger.c in Sources */,
 				CE0CD1591DBFBCF5004023DA /* ModalPresenter.swift in Sources */,
 				CEE20C2F1EA3E5820086F724 /* BlinkingView.swift in Sources */,
 				8B137EA020F90EE7006DEB3A /* sph_whirlpool.c in Sources */,
@@ -5531,6 +5537,7 @@
 			buildSettings = {
 				CLANG_WARN_COMMA = NO;
 				DEVELOPMENT_TEAM = 4R7S6N88W9;
+				GCC_PREPROCESSOR_DEFINITIONS = "DISABLE_PUSH_NOTIFICATION=1";
 				HEADER_SEARCH_PATHS = (
 					"${SRCROOT}/Modules/core",
 					"${SRCROOT}/Modules/core/secp256k1",
@@ -5791,6 +5798,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				"MTL_ENABLE_DEBUG_INFO[arch=*]" = NO;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
