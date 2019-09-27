@@ -125,7 +125,7 @@ public extension String {
             // number yet and we treat the string as empty, succeeding the check
             let digits = split.count == 2 ? split.last ?? "" : ""
             // Finally check if we're <= the allowed digits
-            return digits.characters.count <= maxDecimalPlaces    // TODO: Swift 4.0 replace with digits.count, YAY!
+            return digits.count <= maxDecimalPlaces    // TODO: Swift 4.0 replace with digits.count, YAY!
         }
         return false // couldn't turn string into a valid number
     }
@@ -656,9 +656,9 @@ extension UIViewController : UITextFieldDelegate {
             // if there's no tool bar, create it
             tbKeyboard = UIToolbar.init(frame: CGRect.init(x: 0, y: 0,
                                                            width: self.view.frame.size.width, height: 44))
-            let bbiPrev = UIBarButtonItem.init(title: "<",
+            let bbiPrev = UIBarButtonItem.init(title: S.WritePaperPhrase.previous,
                                                style: .plain, target: self, action: #selector(doBtnPrev))
-            let bbiNext = UIBarButtonItem.init(title: ">", style: .plain,
+            let bbiNext = UIBarButtonItem.init(title: S.WritePaperPhrase.next, style: .plain,
                                                target: self, action: #selector(doBtnNext))
             let bbiSpacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
                                             target: nil, action: nil)

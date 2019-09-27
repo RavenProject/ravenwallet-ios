@@ -36,6 +36,7 @@ class StartImportViewController : UIViewController {
     private let unlockingActivity = BRActivityViewController(message: S.Import.unlockingActivity)
     private var utxos:[[String: Any]] = []
     private var countSFail:Int = 0
+    private var priveKeys:[BRKey] = []
     private var chain:Int32 = SEQUENCE_EXTERNAL_CHAIN
 
     override func viewDidLoad() {
@@ -144,9 +145,10 @@ class StartImportViewController : UIViewController {
             let recoverWalletViewController = EnterPhraseViewController(walletManager: myself.walletManager, reason: .importUtxoFromServer({ phrase in
                 myself.present(myself.balanceActivity, animated: true, completion: {
                     self.utxos.removeAll()
+                    self.priveKeys.removeAll()
                     self.chain = SEQUENCE_EXTERNAL_CHAIN
                     self.recursiveFetchUTXOS(index: 0, phrase: phrase, completion: { prevKey in
-                        myself.handleData(data: myself.utxos, key: prevKey)
+                        myself.handleData(data: myself.utxos, keys: prevKey)
                     })
                 })
             }))
@@ -192,11 +194,11 @@ class StartImportViewController : UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func recursiveFetchUTXOS(index:Int, phrase:String, completion: @escaping (BRKey)->Void) {
+    func recursiveFetchUTXOS(index:Int, phrase:String, completion: @escaping ([BRKey])->Void) {
         var privKey = self.walletManager.generatePrevKey(phrase, index: index, chain: chain)
         if countSFail > 20 {
             countSFail = 0
-            completion(privKey!)
+            completion(self.priveKeys)
             return
         }
         let address = privKey?.address()
@@ -205,6 +207,7 @@ class StartImportViewController : UIViewController {
                 self.countSFail = 0
                 self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: false, completion:{ data in
                     self.utxos.append(contentsOf: data!)
+                    self.priveKeys.append(privKey!)
                     self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
                     let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
                     self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
@@ -247,20 +250,22 @@ class StartImportViewController : UIViewController {
 
     private func checkBalance(key: BRKey) {
         present(balanceActivity, animated: true, completion: {
+            let keys = [key]
             var key = key
             guard let address = key.address() else { return }
             self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: false, completion: { data in
                 guard let data = data else { return }
-                self.handleData(data: data, key: key)
+                self.handleData(data: data, keys: keys)
             })
         })
     }
 
-    private func handleData(data: [[String: Any]], key: BRKey) {
-        var key = key
+    private func handleData(data: [[String: Any]], keys: [BRKey]) {
+        var keys = keys
+        var key = keys.first //Todo : why just first one
         guard let tx = UnsafeMutablePointer<BRTransaction>() else { return }
-        guard let wallet = walletManager.wallet else { return }
-        guard let address = key.address() else { return }
+        guard let wallet = walletManager.wallet else { return } //Todo : why just first one
+        guard let address = key?.address() else { return }
         guard let fees = Currencies.rvn.state.fees else { return }
         guard !wallet.containsAddress(address) else {
             return showErrorMessage(S.Import.Error.duplicate)
@@ -271,7 +276,7 @@ class StartImportViewController : UIViewController {
             tx.addInput(txHash: output.hash, index: output.index, amount: output.satoshis, script: output.script)
         }
 
-        let pubKeyLength = key.pubKey()?.count ?? 0
+        let pubKeyLength = key!.pubKey()?.count ?? 0 //Todo : why just first one
         walletManager.wallet?.feePerKb = fees.regular
         let fee = wallet.feeForTxSize(tx.size + 34 + (pubKeyLength - 34)*tx.inputs.count)
         balanceActivity.dismiss(animated: true, completion: {
@@ -290,19 +295,19 @@ class StartImportViewController : UIViewController {
             let alert = UIAlertController(title: S.Import.title, message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: S.Import.importButton, style: .default, handler: { _ in
-                self.publish(tx: tx, balance: balance, fee: fee, key: key)
+                self.publish(tx: tx, balance: balance, fee: fee, keys: keys)
             }))
             self.present(alert, animated: true, completion: nil)
         })
     }
 
-    private func publish(tx: UnsafeMutablePointer<BRTransaction>, balance: UInt64, fee: UInt64, key: BRKey) {
+    private func publish(tx: UnsafeMutablePointer<BRTransaction>, balance: UInt64, fee: UInt64, keys: [BRKey]) {
         guard let wallet = walletManager.wallet else { return }
         guard let script = BRAddress(string: wallet.receiveAddress)?.scriptPubKey else { return }
         guard walletManager.peerManager?.connectionStatus != BRPeerStatusDisconnected else { return }
         present(importingActivity, animated: true, completion: {
             tx.addOutput(amount: balance - fee, script: script)
-            var keys = [key]
+            var keys = keys
             let _ = tx.sign(keys: &keys)
                 guard tx.isSigned else {
                     self.importingActivity.dismiss(animated: true, completion: {
