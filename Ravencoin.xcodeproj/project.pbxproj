@@ -144,6 +144,7 @@
 		41F3804A217F12E300D6634C /* IPFSCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F38049217F12E300D6634C /* IPFSCell.swift */; };
 		41F78B972204BC3F007678FF /* SyncingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F78B962204BC3E007678FF /* SyncingHeaderView.swift */; };
 		41FB22462211F0AC00C072A5 /* TransferAssetTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */; };
+		4C9FFDC2233E67EA0057E34E /* ShareInViewAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9FFDC1233E67EA0057E34E /* ShareInViewAlert.swift */; };
 		4CBE7CD7233D16810016B220 /* tiger.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CBE7CD5233D16800016B220 /* tiger.c */; };
 		7503773D1DF57428005EB8AE /* WalletManager+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */; };
 		751734B91DAC941E00193C87 /* sec-sub-1.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD8BE1DAA16820075898E /* sec-sub-1.c */; };
@@ -891,6 +892,7 @@
 		41F38049217F12E300D6634C /* IPFSCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IPFSCell.swift; sourceTree = "<group>"; };
 		41F78B962204BC3E007678FF /* SyncingHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncingHeaderView.swift; path = src/Views/SyncingHeaderView.swift; sourceTree = "<group>"; };
 		41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferAssetTest.swift; sourceTree = "<group>"; };
+		4C9FFDC1233E67EA0057E34E /* ShareInViewAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShareInViewAlert.swift; path = src/Views/ShareInViewAlert.swift; sourceTree = "<group>"; };
 		4CBE7CD5233D16800016B220 /* tiger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tiger.c; sourceTree = "<group>"; };
 		4CBE7CD6233D16810016B220 /* sph_tiger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_tiger.h; sourceTree = "<group>"; };
 		7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WalletManager+Auth.swift"; sourceTree = "<group>"; };
@@ -3534,6 +3536,7 @@
 		CE20C90F1DBE5B5100C8397A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				4C9FFDC1233E67EA0057E34E /* ShareInViewAlert.swift */,
 				41EA80E1217B7B6B00B67A78 /* ShowMoreCell.swift */,
 				417C680E216B51E00090710E /* AddressBookListCell.swift */,
 				412CAB5421EFBA26000C393D /* AllAddressesListCell.swift */,
@@ -4720,6 +4723,7 @@
 				CE1280F61EEA855C00D27649 /* Date+Additions.swift in Sources */,
 				8B137EA920F90F3C006DEB3A /* sph_hamsi_helper.c in Sources */,
 				CED82D4E1E575A5500507A9B /* main.swift in Sources */,
+				4C9FFDC2233E67EA0057E34E /* ShareInViewAlert.swift in Sources */,
 				CEEC708E1E954AAB00EF788E /* AboutCell.swift in Sources */,
 				8B137EAE20F90F4C006DEB3A /* hmac_sha512.cpp in Sources */,
 				22A9A9461DF61945000F0016 /* BRAPIClient.swift in Sources */,
