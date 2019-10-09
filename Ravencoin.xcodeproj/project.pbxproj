@@ -92,32 +92,6 @@
 		41797A2121957ED700E7F3D4 /* BRBIP44Sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = 41797A1B21957ED600E7F3D4 /* BRBIP44Sequence.c */; };
 		41797A2221957ED700E7F3D4 /* BRScript.c in Sources */ = {isa = PBXBuildFile; fileRef = 41797A1F21957ED700E7F3D4 /* BRScript.c */; };
 		417C680F216B51E10090710E /* AddressBookListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C680E216B51E00090710E /* AddressBookListCell.swift */; };
-		417C68AF216E0BC10090710E /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 417C68AD216E0BC10090710E /* SwipeCellKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		417C68B2216E0BC10090710E /* SwipeCellKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 417C68AB216E0BC10090710E /* SwipeCellKit.framework */; };
-		417C68B3216E0BC10090710E /* SwipeCellKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 417C68AB216E0BC10090710E /* SwipeCellKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		417C68E9216E0DF00090710E /* SwipeExpanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D1216E0DEC0090710E /* SwipeExpanding.swift */; };
-		417C68EA216E0DF00090710E /* SwipeActionTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */; };
-		417C68EB216E0DF00090710E /* SwipeAccessibilityCustomAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */; };
-		417C68EC216E0DF00090710E /* SwipeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D4216E0DED0090710E /* SwipeController.swift */; };
-		417C68ED216E0DF00090710E /* SwipeFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D5216E0DED0090710E /* SwipeFeedback.swift */; };
-		417C68EE216E0DF00090710E /* SwipeTableViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */; };
-		417C68EF216E0DF00090710E /* SwipeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */; };
-		417C68F0216E0DF00090710E /* SwipeCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */; };
-		417C68F2216E0DF00090710E /* SwipeActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DA216E0DEE0090710E /* SwipeActionsView.swift */; };
-		417C68F3216E0DF00090710E /* SwipeCollectionViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */; };
-		417C68F4216E0DF00090710E /* SwipeExpansionStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */; };
-		417C68F5216E0DF00090710E /* SwipeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DD216E0DEE0090710E /* SwipeAction.swift */; };
-		417C68F6216E0DF00090710E /* SwipeOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DE216E0DEF0090710E /* SwipeOptions.swift */; };
-		417C68F7216E0DF00090710E /* SwipeActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68DF216E0DEF0090710E /* SwipeActionButton.swift */; };
-		417C68F8216E0DF00090710E /* SwipeTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */; };
-		417C68F9216E0DF00090710E /* SwipeTransitionLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */; };
-		417C68FA216E0DF00090710E /* ExtensionsSwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */; };
-		417C68FB216E0DF00090710E /* SwipeCollectionViewCell+Accessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */; };
-		417C68FC216E0DF00090710E /* SwipeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */; };
-		417C68FD216E0DF00090710E /* SwipeCellKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 417C68E5216E0DF00090710E /* SwipeCellKit.h */; };
-		417C68FE216E0DF00090710E /* SwipeTableViewCell+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */; };
-		417C68FF216E0DF00090710E /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E7216E0DF00090710E /* SwipeAnimator.swift */; };
-		417C6900216E0DF00090710E /* Swipeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417C68E8216E0DF00090710E /* Swipeable.swift */; };
 		4187C2EA2173AFAB00092067 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4187C2E92173AFAB00092067 /* Asset.swift */; };
 		419BD11621B6DDE60070B2C8 /* AAOptionsConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419BD11021B6DDE60070B2C8 /* AAOptionsConstructor.swift */; };
 		419BD11721B6DDE60070B2C8 /* AAChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419BD11121B6DDE60070B2C8 /* AAChartView.swift */; };
@@ -146,6 +120,8 @@
 		41FB22462211F0AC00C072A5 /* TransferAssetTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */; };
 		4C9FFDC2233E67EA0057E34E /* ShareInViewAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9FFDC1233E67EA0057E34E /* ShareInViewAlert.swift */; };
 		4CBE7CD7233D16810016B220 /* tiger.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CBE7CD5233D16800016B220 /* tiger.c */; };
+		5A5DD215234D4764009C16B4 /* SwipeCellKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AEA5B39234D3B0A000F014D /* SwipeCellKit.framework */; };
+		64C9615982B0D2475DE46831 /* Pods_Ravencoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1750231ACFECFEA3E57ACF /* Pods_Ravencoin.framework */; };
 		7503773D1DF57428005EB8AE /* WalletManager+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */; };
 		751734B91DAC941E00193C87 /* sec-sub-1.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD8BE1DAA16820075898E /* sec-sub-1.c */; };
 		752438751DAAC50800844BEC /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 755CD6761DAA0E400075898E /* alloc.c */; };
@@ -566,13 +542,6 @@
 			remoteGlobalIDString = 22A9A9951DF63426000F0016;
 			remoteInfo = libbz2;
 		};
-		417C68B0216E0BC10090710E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 75A2A7881DA5934300A983D8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 417C68AA216E0BC10090710E;
-			remoteInfo = SwipeCellKit;
-		};
 		752FB04E1DF8BF5C009086FB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 75A2A7881DA5934300A983D8 /* Project object */;
@@ -666,7 +635,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				417C68B3216E0BC10090710E /* SwipeCellKit.framework in Embed Frameworks */,
 				754AE0B71DFCA870007FD001 /* libbz2.framework in Embed Frameworks */,
 				754AE0B81DFCA870007FD001 /* sqlite3.framework in Embed Frameworks */,
 			);
@@ -839,33 +807,6 @@
 		41797A1F21957ED700E7F3D4 /* BRScript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BRScript.c; sourceTree = "<group>"; };
 		417C680E216B51E00090710E /* AddressBookListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookListCell.swift; path = src/Views/AddressBookListCell.swift; sourceTree = "<group>"; };
 		417C686E216CE7810090710E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		417C68AB216E0BC10090710E /* SwipeCellKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwipeCellKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		417C68AD216E0BC10090710E /* SwipeCellKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
-		417C68AE216E0BC10090710E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		417C68D1216E0DEC0090710E /* SwipeExpanding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpanding.swift; sourceTree = "<group>"; };
-		417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionTransitioning.swift; sourceTree = "<group>"; };
-		417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAccessibilityCustomAction.swift; sourceTree = "<group>"; };
-		417C68D4216E0DED0090710E /* SwipeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeController.swift; sourceTree = "<group>"; };
-		417C68D5216E0DED0090710E /* SwipeFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeFeedback.swift; sourceTree = "<group>"; };
-		417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Accessibility.swift"; sourceTree = "<group>"; };
-		417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCell.swift; sourceTree = "<group>"; };
-		417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCollectionViewCellDelegate.swift; sourceTree = "<group>"; };
-		417C68D9216E0DEE0090710E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		417C68DA216E0DEE0090710E /* SwipeActionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionsView.swift; sourceTree = "<group>"; };
-		417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Display.swift"; sourceTree = "<group>"; };
-		417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeExpansionStyle.swift; sourceTree = "<group>"; };
-		417C68DD216E0DEE0090710E /* SwipeAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAction.swift; sourceTree = "<group>"; };
-		417C68DE216E0DEF0090710E /* SwipeOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeOptions.swift; sourceTree = "<group>"; };
-		417C68DF216E0DEF0090710E /* SwipeActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeActionButton.swift; sourceTree = "<group>"; };
-		417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCellDelegate.swift; sourceTree = "<group>"; };
-		417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTransitionLayout.swift; sourceTree = "<group>"; };
-		417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionsSwipeCell.swift; sourceTree = "<group>"; };
-		417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeCollectionViewCell+Accessibility.swift"; sourceTree = "<group>"; };
-		417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeTableViewCell.swift; sourceTree = "<group>"; };
-		417C68E5216E0DF00090710E /* SwipeCellKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwipeCellKit.h; sourceTree = "<group>"; };
-		417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwipeTableViewCell+Display.swift"; sourceTree = "<group>"; };
-		417C68E7216E0DF00090710E /* SwipeAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAnimator.swift; sourceTree = "<group>"; };
-		417C68E8216E0DF00090710E /* Swipeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Swipeable.swift; sourceTree = "<group>"; };
 		4187C2E92173AFAB00092067 /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		419BD11021B6DDE60070B2C8 /* AAOptionsConstructor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AAOptionsConstructor.swift; sourceTree = "<group>"; };
 		419BD11121B6DDE60070B2C8 /* AAChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AAChartView.swift; sourceTree = "<group>"; };
@@ -895,6 +836,7 @@
 		4C9FFDC1233E67EA0057E34E /* ShareInViewAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShareInViewAlert.swift; path = src/Views/ShareInViewAlert.swift; sourceTree = "<group>"; };
 		4CBE7CD5233D16800016B220 /* tiger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tiger.c; sourceTree = "<group>"; };
 		4CBE7CD6233D16810016B220 /* sph_tiger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_tiger.h; sourceTree = "<group>"; };
+		5AEA5B39234D3B0A000F014D /* SwipeCellKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwipeCellKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7503773C1DF57428005EB8AE /* WalletManager+Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WalletManager+Auth.swift"; sourceTree = "<group>"; };
 		7528D2971ECF655500925DBC /* PaymentProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaymentProtocol.swift; path = src/PaymentProtocol.swift; sourceTree = "<group>"; };
 		752FB03B1DF8BE4B009086FB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1709,6 +1651,11 @@
 		8B69BB6A210A395A00F1FE2D /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		8B69BB6E211113B500F1FE2D /* StartOneTimeWipeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartOneTimeWipeViewController.swift; sourceTree = "<group>"; };
 		8B69BB702114BD2E00F1FE2D /* SupportWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportWebViewController.swift; sourceTree = "<group>"; };
+		9C0F77D2AC9AD6D712613648 /* Pods-Ravencoin.testnet.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ravencoin.testnet.xcconfig"; path = "Target Support Files/Pods-Ravencoin/Pods-Ravencoin.testnet.xcconfig"; sourceTree = "<group>"; };
+		A95B4F33CEA9CFBD31554EEB /* Pods-Ravencoin.screenshots.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ravencoin.screenshots.xcconfig"; path = "Target Support Files/Pods-Ravencoin/Pods-Ravencoin.screenshots.xcconfig"; sourceTree = "<group>"; };
+		AEB3F7B74BFB205AD5E7705A /* Pods-Ravencoin.testflight.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ravencoin.testflight.xcconfig"; path = "Target Support Files/Pods-Ravencoin/Pods-Ravencoin.testflight.xcconfig"; sourceTree = "<group>"; };
+		C3CAA1F30E1897792BB8672C /* Pods-Ravencoin.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ravencoin.release.xcconfig"; path = "Target Support Files/Pods-Ravencoin/Pods-Ravencoin.release.xcconfig"; sourceTree = "<group>"; };
+		CC1750231ACFECFEA3E57ACF /* Pods_Ravencoin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ravencoin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE03EC711EF193800038E3A8 /* String+Keys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Keys.swift"; path = "src/Extensions/String+Keys.swift"; sourceTree = "<group>"; };
 		CE03EC731EF256AC0038E3A8 /* SimpleUTXO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleUTXO.swift; path = src/Models/SimpleUTXO.swift; sourceTree = "<group>"; };
 		CE0822631FCD1BD100EF371D /* HomeScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeScreenViewController.swift; path = src/ViewControllers/HomeScreenViewController.swift; sourceTree = "<group>"; };
@@ -1921,6 +1868,7 @@
 		CEF61B131ED0D10000C7EA6A /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Types.swift; path = src/Models/Types.swift; sourceTree = "<group>"; };
 		CEF61B151ED2056D00C7EA6A /* NumberFormatter+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NumberFormatter+Additions.swift"; path = "src/Extensions/NumberFormatter+Additions.swift"; sourceTree = "<group>"; };
 		CEFFA2D01EB3BD730085C5D1 /* LoadingIndicator.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = LoadingIndicator.xcassets; sourceTree = "<group>"; };
+		D62AB9C3921AEAF17056075D /* Pods-Ravencoin.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ravencoin.debug.xcconfig"; path = "Target Support Files/Pods-Ravencoin/Pods-Ravencoin.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1936,13 +1884,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				22A9A9A31DF63497000F0016 /* libbz2.tbd in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		417C68A7216E0BC10090710E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1972,17 +1913,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				417C68B2216E0BC10090710E /* SwipeCellKit.framework in Frameworks */,
 				4106E6C8220D892200C29B86 /* Fabric.framework in Frameworks */,
 				22A9A9661DF61FEE000F0016 /* WebKit.framework in Frameworks */,
 				22A9A9641DF61FE7000F0016 /* Security.framework in Frameworks */,
 				22A9A9621DF61FE0000F0016 /* SystemConfiguration.framework in Frameworks */,
 				22A9A9601DF61FD8000F0016 /* CoreLocation.framework in Frameworks */,
 				22A9A95E1DF61FD0000F0016 /* PushKit.framework in Frameworks */,
+				5A5DD215234D4764009C16B4 /* SwipeCellKit.framework in Frameworks */,
 				223DB21B1DF69F0F0076A151 /* libbz2.framework in Frameworks */,
 				752FB04D1DF8BF4B009086FB /* sqlite3.framework in Frameworks */,
 				759DA0BE1DAC36A3008CC49B /* libBRCore.a in Frameworks */,
 				4106E6C9220D892200C29B86 /* Crashlytics.framework in Frameworks */,
+				64C9615982B0D2475DE46831 /* Pods_Ravencoin.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2047,6 +1989,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		153919E09FECD0983595DA1B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D62AB9C3921AEAF17056075D /* Pods-Ravencoin.debug.xcconfig */,
+				9C0F77D2AC9AD6D712613648 /* Pods-Ravencoin.testnet.xcconfig */,
+				A95B4F33CEA9CFBD31554EEB /* Pods-Ravencoin.screenshots.xcconfig */,
+				C3CAA1F30E1897792BB8672C /* Pods-Ravencoin.release.xcconfig */,
+				AEB3F7B74BFB205AD5E7705A /* Pods-Ravencoin.testflight.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		22A9A9311DF61930000F0016 /* Platform */ = {
 			isa = PBXGroup;
 			children = (
@@ -2219,49 +2173,8 @@
 				41BD211921FB87800026716A /* AlertVC */,
 				419BD10E21B6DDE60070B2C8 /* AAInfographics */,
 				411DF574216F59D60003A8BA /* Checkbox */,
-				417C6840216CE7610090710E /* SwipeCellKit */,
 			);
 			path = External;
-			sourceTree = "<group>";
-		};
-		417C6840216CE7610090710E /* SwipeCellKit */ = {
-			isa = PBXGroup;
-			children = (
-				417C68E2216E0DEF0090710E /* ExtensionsSwipeCell.swift */,
-				417C68D9216E0DEE0090710E /* Info.plist */,
-				417C68E8216E0DF00090710E /* Swipeable.swift */,
-				417C68D3216E0DED0090710E /* SwipeAccessibilityCustomAction.swift */,
-				417C68DD216E0DEE0090710E /* SwipeAction.swift */,
-				417C68DF216E0DEF0090710E /* SwipeActionButton.swift */,
-				417C68DA216E0DEE0090710E /* SwipeActionsView.swift */,
-				417C68D2216E0DEC0090710E /* SwipeActionTransitioning.swift */,
-				417C68E7216E0DF00090710E /* SwipeAnimator.swift */,
-				417C68E5216E0DF00090710E /* SwipeCellKit.h */,
-				417C68D7216E0DED0090710E /* SwipeCollectionViewCell.swift */,
-				417C68E3216E0DEF0090710E /* SwipeCollectionViewCell+Accessibility.swift */,
-				417C68DB216E0DEE0090710E /* SwipeCollectionViewCell+Display.swift */,
-				417C68D8216E0DED0090710E /* SwipeCollectionViewCellDelegate.swift */,
-				417C68D4216E0DED0090710E /* SwipeController.swift */,
-				417C68D1216E0DEC0090710E /* SwipeExpanding.swift */,
-				417C68DC216E0DEE0090710E /* SwipeExpansionStyle.swift */,
-				417C68D5216E0DED0090710E /* SwipeFeedback.swift */,
-				417C68DE216E0DEF0090710E /* SwipeOptions.swift */,
-				417C68E4216E0DEF0090710E /* SwipeTableViewCell.swift */,
-				417C68D6216E0DED0090710E /* SwipeTableViewCell+Accessibility.swift */,
-				417C68E6216E0DF00090710E /* SwipeTableViewCell+Display.swift */,
-				417C68E0216E0DEF0090710E /* SwipeTableViewCellDelegate.swift */,
-				417C68E1216E0DEF0090710E /* SwipeTransitionLayout.swift */,
-			);
-			path = SwipeCellKit;
-			sourceTree = "<group>";
-		};
-		417C68AC216E0BC10090710E /* SwipeCellKit */ = {
-			isa = PBXGroup;
-			children = (
-				417C68AD216E0BC10090710E /* SwipeCellKit.h */,
-				417C68AE216E0BC10090710E /* Info.plist */,
-			);
-			path = SwipeCellKit;
 			sourceTree = "<group>";
 		};
 		419BD10E21B6DDE60070B2C8 /* AAInfographics */ = {
@@ -3083,9 +2996,9 @@
 				75B6F52F1DA71DCC0031A93F /* Modules */,
 				CEA7E67C1F09A9D2001F8C27 /* Screenshots */,
 				417C6810216CDE4F0090710E /* External */,
-				417C68AC216E0BC10090710E /* SwipeCellKit */,
 				75A2A7F11DA5935F00A983D8 /* Frameworks */,
 				75A2A7911DA5934300A983D8 /* Products */,
+				153919E09FECD0983595DA1B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -3106,7 +3019,6 @@
 				22A9A9961DF63426000F0016 /* libbz2.framework */,
 				752FB04A1DF8BE6B009086FB /* sqlite3.framework */,
 				CEA7E67B1F09A9D2001F8C27 /* Screenshots.xctest */,
-				417C68AB216E0BC10090710E /* SwipeCellKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3225,6 +3137,7 @@
 		75A2A7F11DA5935F00A983D8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5AEA5B39234D3B0A000F014D /* SwipeCellKit.framework */,
 				417C686E216CE7810090710E /* UIKit.framework */,
 				22A9A9671DF61FF8000F0016 /* libbz2.tbd */,
 				22A9A9651DF61FEE000F0016 /* WebKit.framework */,
@@ -3235,6 +3148,7 @@
 				75FEFD1B1DAED56E00203D3A /* libsqlite3.tbd */,
 				75A2A7F21DA5935F00A983D8 /* Messages.framework */,
 				75A2A8091DA5936F00A983D8 /* NotificationCenter.framework */,
+				CC1750231ACFECFEA3E57ACF /* Pods_Ravencoin.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3830,15 +3744,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		417C68A8216E0BC10090710E /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				417C68FD216E0DF00090710E /* SwipeCellKit.h in Headers */,
-				417C68AF216E0BC10090710E /* SwipeCellKit.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		752FB0451DF8BE6B009086FB /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3882,24 +3787,6 @@
 			name = libbz2;
 			productName = libbz2;
 			productReference = 22A9A9961DF63426000F0016 /* libbz2.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		417C68AA216E0BC10090710E /* SwipeCellKit */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 417C68B4216E0BC10090710E /* Build configuration list for PBXNativeTarget "SwipeCellKit" */;
-			buildPhases = (
-				417C68A6216E0BC10090710E /* Sources */,
-				417C68A7216E0BC10090710E /* Frameworks */,
-				417C68A8216E0BC10090710E /* Headers */,
-				417C68A9216E0BC10090710E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SwipeCellKit;
-			productName = SwipeCellKit;
-			productReference = 417C68AB216E0BC10090710E /* SwipeCellKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		752FB0411DF8BE6B009086FB /* sqlite3 */ = {
@@ -3960,6 +3847,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 75A2A7E31DA5934400A983D8 /* Build configuration list for PBXNativeTarget "Ravencoin" */;
 			buildPhases = (
+				77AA51B163DC9DBC369CB7AD /* [CP] Check Pods Manifest.lock */,
 				75A2A78C1DA5934300A983D8 /* Sources */,
 				75A2A78D1DA5934300A983D8 /* Frameworks */,
 				75A2A78E1DA5934300A983D8 /* Resources */,
@@ -3967,6 +3855,7 @@
 				75A2A8031DA5935F00A983D8 /* Embed App Extensions */,
 				22A9A9831DF63288000F0016 /* Embed Frameworks */,
 				4106E6CA220D896D00C29B86 /* ShellScript */,
+				02800E71EEC9AEEE2B659EB4 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3977,7 +3866,6 @@
 				75A2A8221DA5938500A983D8 /* PBXTargetDependency */,
 				22A9A99C1DF63426000F0016 /* PBXTargetDependency */,
 				752FB04F1DF8BF5C009086FB /* PBXTargetDependency */,
-				417C68B1216E0BC10090710E /* PBXTargetDependency */,
 			);
 			name = Ravencoin;
 			productName = breadwallet;
@@ -4158,11 +4046,6 @@
 						CreatedOnToolsVersion = 8.1;
 						ProvisioningStyle = Automatic;
 					};
-					417C68AA216E0BC10090710E = {
-						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 0940;
-						ProvisioningStyle = Automatic;
-					};
 					752FB0411DF8BE6B009086FB = {
 						ProvisioningStyle = Automatic;
 					};
@@ -4253,6 +4136,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				fr,
@@ -4267,6 +4151,12 @@
 				pt,
 				ko,
 				"zh-Hant",
+				sv,
+				nb,
+				pl,
+				tr,
+				hu,
+				el,
 			);
 			mainGroup = 75A2A7871DA5934300A983D8;
 			productRefGroup = 75A2A7911DA5934300A983D8 /* Products */;
@@ -4288,20 +4178,12 @@
 				22A9A9951DF63426000F0016 /* libbz2 */,
 				752FB0411DF8BE6B009086FB /* sqlite3 */,
 				CEA7E67A1F09A9D2001F8C27 /* Screenshots */,
-				417C68AA216E0BC10090710E /* SwipeCellKit */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		22A9A9941DF63426000F0016 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		417C68A9216E0BC10090710E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4408,6 +4290,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		02800E71EEC9AEEE2B659EB4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Ravencoin/Pods-Ravencoin-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/SwipeCellKit/SwipeCellKit.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwipeCellKit.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Ravencoin/Pods-Ravencoin-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		4106E6CA220D896D00C29B86 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
@@ -4426,6 +4326,28 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PROJECT_DIR}/External/Crashlytics/Fabric.framework/run\" dbf6fef7bb2fb1c0c7ce1def9fb3db9e942fedf2 14f34cbec0f7d725a62a167e3ea29413eaa2f660d3730f1079241d6c4c49abf6\n";
 		};
+		77AA51B163DC9DBC369CB7AD /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Ravencoin-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -4433,35 +4355,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		417C68A6216E0BC10090710E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				417C68F2216E0DF00090710E /* SwipeActionsView.swift in Sources */,
-				417C68EF216E0DF00090710E /* SwipeCollectionViewCell.swift in Sources */,
-				417C68F5216E0DF00090710E /* SwipeAction.swift in Sources */,
-				417C68FA216E0DF00090710E /* ExtensionsSwipeCell.swift in Sources */,
-				417C68F4216E0DF00090710E /* SwipeExpansionStyle.swift in Sources */,
-				417C68F7216E0DF00090710E /* SwipeActionButton.swift in Sources */,
-				417C68EC216E0DF00090710E /* SwipeController.swift in Sources */,
-				417C68F0216E0DF00090710E /* SwipeCollectionViewCellDelegate.swift in Sources */,
-				417C68F9216E0DF00090710E /* SwipeTransitionLayout.swift in Sources */,
-				417C68F8216E0DF00090710E /* SwipeTableViewCellDelegate.swift in Sources */,
-				417C68FB216E0DF00090710E /* SwipeCollectionViewCell+Accessibility.swift in Sources */,
-				417C68F3216E0DF00090710E /* SwipeCollectionViewCell+Display.swift in Sources */,
-				417C68EA216E0DF00090710E /* SwipeActionTransitioning.swift in Sources */,
-				417C68FC216E0DF00090710E /* SwipeTableViewCell.swift in Sources */,
-				417C68E9216E0DF00090710E /* SwipeExpanding.swift in Sources */,
-				417C68FF216E0DF00090710E /* SwipeAnimator.swift in Sources */,
-				417C68EB216E0DF00090710E /* SwipeAccessibilityCustomAction.swift in Sources */,
-				417C68F6216E0DF00090710E /* SwipeOptions.swift in Sources */,
-				417C6900216E0DF00090710E /* Swipeable.swift in Sources */,
-				417C68ED216E0DF00090710E /* SwipeFeedback.swift in Sources */,
-				417C68FE216E0DF00090710E /* SwipeTableViewCell+Display.swift in Sources */,
-				417C68EE216E0DF00090710E /* SwipeTableViewCell+Accessibility.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5033,11 +4926,6 @@
 			target = 22A9A9951DF63426000F0016 /* libbz2 */;
 			targetProxy = 22A9A99B1DF63426000F0016 /* PBXContainerItemProxy */;
 		};
-		417C68B1216E0BC10090710E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 417C68AA216E0BC10090710E /* SwipeCellKit */;
-			targetProxy = 417C68B0216E0BC10090710E /* PBXContainerItemProxy */;
-		};
 		752FB04F1DF8BF5C009086FB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 752FB0411DF8BE6B009086FB /* sqlite3 */;
@@ -5272,173 +5160,6 @@
 			};
 			name = Release;
 		};
-		417C68B5216E0BC10090710E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = J245WAM2JG;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/External/SwipeCellKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bmed.SwipeCellKit;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		417C68B6216E0BC10090710E /* Testnet */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = J245WAM2JG;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/External/SwipeCellKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bmed.SwipeCellKit;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Testnet;
-		};
-		417C68B7216E0BC10090710E /* Screenshots */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = J245WAM2JG;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/External/SwipeCellKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bmed.SwipeCellKit;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Screenshots;
-		};
-		417C68B8216E0BC10090710E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = J245WAM2JG;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/External/SwipeCellKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bmed.SwipeCellKit;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		417C68B9216E0BC10090710E /* Testflight */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = J245WAM2JG;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/External/SwipeCellKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bmed.SwipeCellKit;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Testflight;
-		};
 		752FB0481DF8BE6B009086FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5612,6 +5333,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -5622,6 +5344,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -5672,6 +5395,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
@@ -5680,6 +5404,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -5758,8 +5483,9 @@
 		};
 		75A2A7E41DA5934400A983D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D62AB9C3921AEAF17056075D /* Pods-Ravencoin.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
@@ -5768,13 +5494,13 @@
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
-					"$(PROJECT_DIR)/External/SwipeCellKit",
 					"$(PROJECT_DIR)/External/Crashlytics",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-DDebug ";
+				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug ";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5786,8 +5512,9 @@
 		};
 		75A2A7E51DA5934400A983D8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C3CAA1F30E1897792BB8672C /* Pods-Ravencoin.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
@@ -5796,14 +5523,14 @@
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
-					"$(PROJECT_DIR)/External/SwipeCellKit",
 					"$(PROJECT_DIR)/External/Crashlytics",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				"MTL_ENABLE_DEBUG_INFO[arch=*]" = NO;
-				OTHER_SWIFT_FLAGS = "";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6078,6 +5805,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -6088,13 +5816,15 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Screenshots;
 		};
 		CEA7E6891F09AC6A001F8C27 /* Screenshots */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A95B4F33CEA9CFBD31554EEB /* Pods-Ravencoin.screenshots.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
@@ -6103,13 +5833,13 @@
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
-					"$(PROJECT_DIR)/External/SwipeCellKit",
 					"$(PROJECT_DIR)/External/Crashlytics",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-DDebug -DScreenshots -DTestnet";
+				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug -DScreenshots -DTestnet";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6394,6 +6124,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -6404,13 +6135,15 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Testnet;
 		};
 		CEA7E69C1F0AAA84001F8C27 /* Testnet */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9C0F77D2AC9AD6D712613648 /* Pods-Ravencoin.testnet.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
@@ -6419,13 +6152,13 @@
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
-					"$(PROJECT_DIR)/External/SwipeCellKit",
 					"$(PROJECT_DIR)/External/Crashlytics",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-DDebug -DTestnet";
+				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug -DTestnet";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6708,6 +6441,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
@@ -6716,14 +6450,16 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Testflight;
 		};
 		CEE0EF551EBF8D7F0018DB36 /* Testflight */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AEB3F7B74BFB205AD5E7705A /* Pods-Ravencoin.testflight.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ravenwallet/ravenwallet.entitlements;
@@ -6732,13 +6468,13 @@
 				DEVELOPMENT_TEAM = J245WAM2JG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/**",
-					"$(PROJECT_DIR)/External/SwipeCellKit",
 					"$(PROJECT_DIR)/External/Crashlytics",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-DTestflight -DDebug";
+				OTHER_SWIFT_FLAGS = "$(inherited) -DTestflight -DDebug";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6964,18 +6700,6 @@
 				CEA7E6951F09AC6A001F8C27 /* Screenshots */,
 				22A9A9A11DF63426000F0016 /* Release */,
 				CEE0EF611EBF8D7F0018DB36 /* Testflight */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		417C68B4216E0BC10090710E /* Build configuration list for PBXNativeTarget "SwipeCellKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				417C68B5216E0BC10090710E /* Debug */,
-				417C68B6216E0BC10090710E /* Testnet */,
-				417C68B7216E0BC10090710E /* Screenshots */,
-				417C68B8216E0BC10090710E /* Release */,
-				417C68B9216E0BC10090710E /* Testflight */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
