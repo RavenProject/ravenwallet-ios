@@ -47,7 +47,7 @@ class StartFlowPresenter : Subscriber {
             self.presentLoginFlow(isPresentedForLock: true)
         })
         //Terms of use
-        Store.subscribe(self, name: .showTermsOfUse(), callback: { _ in
+        Store.subscribe(self, name: .showTermsOfUse, callback: { _ in
             self.showTermsOfUse()
         })
     }
@@ -149,7 +149,7 @@ class StartFlowPresenter : Subscriber {
     
     private func pushTutorialVC() {
         let tutorialVC = TutorialVC {
-            Store.trigger(name: .showTermsOfUse())
+            Store.trigger(name: .showTermsOfUse)
         }
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.setClearNavbar()

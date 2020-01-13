@@ -125,7 +125,7 @@ public extension String {
             // number yet and we treat the string as empty, succeeding the check
             let digits = split.count == 2 ? split.last ?? "" : ""
             // Finally check if we're <= the allowed digits
-            return digits.characters.count <= maxDecimalPlaces    // TODO: Swift 4.0 replace with digits.count, YAY!
+            return digits.count <= maxDecimalPlaces    // TODO: Swift 4.0 replace with digits.count, YAY!
         }
         return false // couldn't turn string into a valid number
     }

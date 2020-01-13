@@ -74,7 +74,7 @@ class TxDetailDataSource: NSObject {
             }
         }
         
-        if viewModel.status == .complete, let index = fields.index(of: .status) {
+        if viewModel.status == .complete, let index = fields.firstIndex(of: .status) {
             fields.remove(at: index)
         }
     }

@@ -532,7 +532,7 @@ extension WalletManager : WalletAuthenticator {
     var apiAuthKey: String? {
         return autoreleasepool {
             do {
-                if let apiKey: String? = try? keychainItem(key: KeychainKey.apiAuthKey) {
+                if let apiKey: String? = ((try? keychainItem(key: KeychainKey.apiAuthKey)) as String??) {
                     if apiKey != nil {
                         return apiKey
                     }
