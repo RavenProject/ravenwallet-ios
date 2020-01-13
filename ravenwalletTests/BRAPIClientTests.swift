@@ -11,13 +11,13 @@ import XCTest
 import Core
 
 class FakeAuthenticator: WalletAuthenticator {
-    let secret: UInt256
+    var secret: UInt256
     let key: BRKey
     var userAccount: [AnyHashable: Any]? = nil
     
     init() {
         var keyData = Data(count: 32)
-        var localkeyData = keyData
+        let localkeyData = keyData
         let result = keyData.withUnsafeMutableBytes {
             SecRandomCopyBytes(kSecRandomDefault, localkeyData.count, $0)
         }

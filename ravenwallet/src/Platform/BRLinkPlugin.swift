@@ -116,7 +116,7 @@ class BRLinkPlugin: NSObject, BRHTTPRouterPlugin, SFSafariViewControllerDelegate
                 print("[BRLinkPlugin] POST /_browser error reading body")
                 return BRHTTPResponse(request: request, code: 400)
             }
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String: Any] else {
+            guard let json = ((try? JSONSerialization.jsonObject(with: body, options: []) as? [String: Any]) as [String : Any]??) else {
                 print("[BRLinkPlugin] POST /_browser could not deserialize json object")
                 return BRHTTPResponse(request: request, code: 400)
             }

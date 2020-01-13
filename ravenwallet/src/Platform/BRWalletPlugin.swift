@@ -225,7 +225,7 @@ class BRWalletPlugin: BRHTTPRouterPlugin, BRWebSocketClient {
             }
             let name = nameArray[0]
             if let body = req.body(), body.count > 0 {
-                if let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String: String] {
+                if let json = ((try? JSONSerialization.jsonObject(with: body, options: []) as? [String: String]) as [String : String]??) {
                 } else {
                     return BRHTTPResponse(request: req, code: 400)
                 }

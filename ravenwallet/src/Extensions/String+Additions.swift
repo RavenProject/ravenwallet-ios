@@ -20,7 +20,7 @@ extension String {
     }
 
     func ltrim(_ chars: Set<Character>) -> String {
-        if let index = self.index(where: {!chars.contains($0)}) {
+        if let index = self.firstIndex(where: {!chars.contains($0)}) {
             return String(self[index..<self.endIndex])
         } else {
             return ""
@@ -28,7 +28,7 @@ extension String {
     }
     
     func rtrim(_ chars: Set<Character>) -> String {
-        if let index = self.reversed().index(where: {!chars.contains($0)}) {
+        if let index = self.reversed().firstIndex(where: {!chars.contains($0)}) {
             return String(self[self.startIndex...self.index(before: index.base)])
         } else {
             return ""

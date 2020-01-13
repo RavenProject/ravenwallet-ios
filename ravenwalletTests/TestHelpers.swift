@@ -42,6 +42,6 @@ func initWallet(walletManager: WalletManager) {
     }
     while !didInitWallet {
         //This Can't use a semaphore because the initWallet callback gets called on the main thread
-        RunLoop.current.run(mode: .defaultRunLoopMode, before: .distantFuture)
+        RunLoop.current.run(mode: RunLoop.Mode.default, before: .distantFuture)
     }
 }

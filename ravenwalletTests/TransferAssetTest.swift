@@ -35,7 +35,7 @@ class TransferAssetTest: XCTestCase {
             print("createAssetTransaction error")
         }
         
-        walletManager!.signTransaction(sender.transaction!, forkId: (walletManager?.currency as! Raven).forkId, biometricsPrompt: S.VerifyPin.touchIdMessage, completion: { result in
+        walletManager!.signTransaction(sender.transaction!, biometricsPrompt: S.VerifyPin.touchIdMessage, completion: { result in
             if result == .success {
                 self.walletManager!.peerManager?.publishTx(sender.transaction!, completion: { success, error in
                     if error != nil {
