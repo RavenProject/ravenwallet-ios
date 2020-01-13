@@ -68,7 +68,7 @@ enum TriggerName {
     case didRescanBlockChain
     case wipeWalletNoPrompt
     case didUpdateFeatureFlags
-    case showTermsOfUse()
+    case showTermsOfUse
     case reloadSettings
     case playGif(String)
     case selectAddressBook( AddressBookType?, ((String)->Void)?)
@@ -140,7 +140,7 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return true
     case (.didUpdateFeatureFlags, .didUpdateFeatureFlags):
         return true
-    case (.showTermsOfUse(_), .showTermsOfUse(_)):
+    case (.showTermsOfUse, .showTermsOfUse):
         return true
     case (.reloadSettings, .reloadSettings):
         return true
