@@ -49,4 +49,9 @@ extension UIViewController {
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: close), UIBarButtonItem.negativePadding]
         }
     }
+    
+    func presentFullScreen(_ viewControllerToPresent: UIViewController, animated:Bool, completion:(() -> Void)?) {
+        viewControllerToPresent.modalPresentationStyle = .fullScreen
+        self.present(viewControllerToPresent, animated: animated, completion: completion)
+    }
 }

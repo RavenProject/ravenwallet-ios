@@ -34,6 +34,7 @@ private let hasSetSelectedCurrencyKey = "hasSetSelectedCurrencyKey"
 private let hasBchConnectedKey = "hasBchConnectedKey"
 private let shouldReloadChartKey = "shouldReloadChartKey"
 private let rescanStateKeyPrefix = "lastRescan" // append uppercased currency code for key
+private let ipfsUrlKey = "ipfsUrlKey"
 
 extension UserDefaults {
 
@@ -279,6 +280,16 @@ extension UserDefaults {
     static var hasBchConnected: Bool {
         get { return defaults.bool(forKey: hasBchConnectedKey) }
         set { defaults.set(newValue, forKey: hasBchConnectedKey) }
+    }
+    
+    static var ipfsUrl: String {
+        get {
+            guard defaults.object(forKey: ipfsUrlKey) != nil else {
+                return C.ipfsHost
+            }
+            return defaults.string(forKey: ipfsUrlKey)!
+        }
+        set { defaults.set(newValue, forKey: ipfsUrlKey) }
     }
 }
 

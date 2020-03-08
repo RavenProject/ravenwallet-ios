@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import QuartzCore
 
 class Background : UIView, GradientDrawable {
 
@@ -84,22 +85,30 @@ class HomeScreenCell : UITableViewCell, Subscriber {
             let prices = elements.map { ($0 as! NSDictionary).object(forKey: "C") }
             let dates = elements.map { (($0 as! NSDictionary).object(forKey: "T") as! String).replacingOccurrences(of: "T00:00:00", with: "") }
             self.aaChartModel = AAChartModel()
-                .chartType(.areaSpline)//Can be any of the chart types listed under `AAChartType`.
-                .animationType(.easeInSine)
+                .chartType(.area)//Can be any of the chart types listed under `AAChartType`.
+                .animationType(.easeOutSine)
                 .title("")//The chart title
                 .subtitle("")//The chart subtitle
+                .xAxisVisible(false)
+                .yAxisVisible(false)
                 .legendEnabled(false)
-                .dataLabelEnabled(false)
+                .dataLabelsEnabled(false)
                 .backgroundColor("transparent")
-                .axisColor("white")
                 .colorsTheme(["#ffffff"])
                 .markerRadius(0)
                 .categories(dates)
+                .marginLeft(-1)
+                .marginRight(-1)
+                .marginBottom(-1)
+                .yAxisMin((prices as! [NSNumber]).map{$0.floatValue}.min() ?? 0)
+                .yAxisMax((prices as! [NSNumber]).map{$0.floatValue}.max() ?? 0)
                 .series([
                     AASeriesElement()
                         .name("RVN")
                         .data(prices)
-                        .toDic()!])
+                        .color("white")
+                        .fillColor(AAGradientColor.linearGradient(direction: .toBottom, startColor: AAColor.rgbaColor(255,255,255,0.5), endColor: AAColor.rgbaColor(255,255,255,0)))
+                        .lineWidth(1)])
             DispatchQueue.main.async {
                 self.aaChartView.aa_drawChartWithChartModel(self.aaChartModel)
             }
@@ -202,7 +211,7 @@ class HomeScreenCell : UITableViewCell, Subscriber {
             aaChartView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: C.padding[2]),
             aaChartView.topAnchor.constraint(equalTo: chartTitle.bottomAnchor, constant: C.padding[0]),
             aaChartView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: -C.padding[2]),
-            aaChartView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: C.padding[2])
+            aaChartView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: C.padding[0])
             ])
     }
 

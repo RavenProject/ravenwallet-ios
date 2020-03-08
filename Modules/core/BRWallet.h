@@ -1,42 +1,23 @@
 //
-//  Wallet.h
+//  BRWallet.h
 //
 //  Created by Aaron Voisine on 9/1/15.
 //  Copyright (c) 2015 breadwallet LLC
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
-
-
-#ifndef Wallet_h
-#define Wallet_h
+#ifndef BRWallet_h
+#define BRWallet_h
 
 #include "BRTransaction.h"
 #include "BRAddress.h"
 #include "BRBIP44Sequence.h"
 #include "BRInt.h"
+#include "BRSet.h"
 #include <string.h>
 #include <stdbool.h>
-#include "BRSet.h"
 #include <pthread.h>
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,10 +73,10 @@ size_t BRWalletUnusedAddrs(BRWallet *wallet, BRAddress *addrs, uint32_t gapLimit
 
 // returns the first unused external address
 BRAddress BRWalletReceiveAddress(BRWallet *wallet);
-    
+
 size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs);
 
-// writes all addresses previously genereated with WalletUnusedAddrs() to addrs
+// writes all addresses previously generated with WalletUnusedAddrs() to addrs
 // returns the number addresses written, or total number available if addrs is NULL
 size_t BRWalletAllAddrs(BRWallet *wallet, BRAddress *addrs, size_t addrsCount);
 
@@ -117,10 +98,10 @@ size_t BRWalletTxUnconfirmedBefore(BRWallet *wallet, BRTransaction **transaction
 // current wallet balance, not including transactions known to be invalid
 uint64_t BRWalletBalance(BRWallet *wallet);
 
-// total amount spent from the wallet (exluding change)
+// total amount spent from the wallet (excluding change)
 uint64_t BRWalletTotalSent(BRWallet *wallet);
 
-// total amount received by the wallet (exluding change)
+// total amount received by the wallet (excluding change)
 uint64_t BRWalletTotalReceived(BRWallet *wallet);
 
 // writes unspent outputs to utxos and returns the number of outputs written, or number available if utxos is NULL
@@ -128,6 +109,7 @@ size_t BRWalletUTXOs(BRWallet *wallet, UTXO *utxos, size_t utxosCount);
 
 // fee-per-kb of transaction size to use when creating a transaction
 uint64_t BRWalletFeePerKb(BRWallet *wallet);
+
 void BRWalletSetFeePerKb(BRWallet *wallet, uint64_t feePerKb);
 
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
@@ -140,12 +122,14 @@ BRTransaction *BRWalletCreateTransaction(BRWallet *wallet, uint64_t amount, cons
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
 
+void BRWalletAddFeeToTransaction(BRWallet *wallet, BRTransaction *transaction);
+
 //
 //
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst);
-    
+
 //
 //
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
@@ -157,7 +141,7 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst);
-    
+
 //
 //
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
@@ -180,7 +164,7 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asset);
 // returns an unsigned transaction that satisifes the given transaction outputs
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput *outputs, size_t outCount);
-    
+
 // signs any inputs in tx that can be signed using private keys from the wallet
 // forkId is 0 for bitcoin, 0x40 for b-cash
 // seed is the master private key (wallet seed) corresponding to the master public key given when the wallet was created
@@ -221,8 +205,8 @@ uint64_t BRWalletAmountReceivedFromTx(BRWallet *wallet, const BRTransaction *tx)
 
 // writes the assets contained in the transaction and return the asset object count.
 size_t BRWalletAssetsReceivedFromTx(BRWallet *wallet, const BRTransaction *tx, BRAsset *asset, size_t asstCount);
-    
-// returns the amount sent from the wallet by the trasaction (total wallet outputs consumed, change and fee included)
+
+// returns the amount sent from the wallet by the transaction (total wallet outputs consumed, change and fee included)
 uint64_t BRWalletAmountSentByTx(BRWallet *wallet, const BRTransaction *tx);
 
 // returns the fee for the given transaction if all its inputs are from wallet transactions, UINT64_MAX otherwise

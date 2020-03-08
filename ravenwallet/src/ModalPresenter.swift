@@ -142,6 +142,14 @@ class ModalPresenter : Subscriber {
                 self?.presentAddressBook(type: addressBookType, callback: callback)
             }
         })
+        
+        Store.subscribe(self, name: .haptic(.light)) { [unowned self] in
+            guard let trigger = $0 else { return }
+            if case let .haptic(style) = trigger {
+                let impact = UIImpactFeedbackGenerator(style: style)
+                impact.impactOccurred()
+            }
+        }
     }
 
     private func presentModal(_ type: RootModal, configuration: ((UIViewController) -> Void)? = nil) {
@@ -213,7 +221,7 @@ class ModalPresenter : Subscriber {
         let url = articleId == nil ? "/support?" : "/support/\(articleId!)"
 
         supportCenter.navigate(to: url)
-        topViewController?.present(supportCenter, animated: true, completion: {})
+        topViewController?.presentFullScreen(supportCenter, animated: true, completion: {})
     }
 
     private func rootModalViewController(_ type: RootModal) -> UIViewController? {
@@ -259,8 +267,17 @@ class ModalPresenter : Subscriber {
                 self?.messagePresenter.presentMessageCompose(bitcoinURL: bitcoinURL, image: image)
             }
             return ModalViewController(childViewController: requestVc)
+        case .updateIpfs:
+            return showUpdateIpfs()
         }
         
+    }
+    
+    private func showUpdateIpfs() -> UIViewController?{
+        let updateIpfs = UpdateIPFSUrlVC()
+        let root = ModalViewController(childViewController: updateIpfs)
+        updateIpfs.parentView = root.view
+        return root
     }
 
     private func makeSendView(currency: CurrencyDef, initialAddress: String? = nil) -> UIViewController? {
@@ -589,7 +606,7 @@ class ModalPresenter : Subscriber {
                     start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
                     nc.viewControllers = [start]
                     settingsNav.dismiss(animated: true, completion: { [weak self] in
-                        self?.topViewController?.present(nc, animated: true, completion: nil)
+                        self?.topViewController?.presentFullScreen(nc, animated: true, completion: nil)
                     })
                 })
             ],
@@ -637,7 +654,7 @@ class ModalPresenter : Subscriber {
                     start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding]
                     nc.viewControllers = [start]
                     settingsNav.dismiss(animated: true, completion: { [weak self] in
-                        self?.topViewController?.present(nc, animated: true, completion: nil)
+                        self?.topViewController?.presentFullScreen(nc, animated: true, completion: nil)
                     })
                 }),
             ],
@@ -662,6 +679,9 @@ class ModalPresenter : Subscriber {
                 Setting(title: S.Settings.about, callback: {
                     settingsNav.pushViewController(AboutViewController(), animated: true)
                 }),
+                Setting(title: "Update Ipfs Url", callback: {
+                    Store.perform(action: RootModalActions.Present(modal: .updateIpfs))
+                }),
                 Setting(title: S.Settings.advanced, callback: {
                     var sections = [SettingsSections.network]
                     var advancedSettings = [
@@ -681,7 +701,7 @@ class ModalPresenter : Subscriber {
                                 start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding]
                                 nc.viewControllers = [start]
                                 settingsNav.dismiss(animated: true, completion: { [weak self] in
-                                    self?.topViewController?.present(nc, animated: true, completion: nil)
+                                    self?.topViewController?.presentFullScreen(nc, animated: true, completion: nil)
                                 })
                             }),
                             Setting(title: S.WipeSetting.title, isHidden: !UserDefaults.hasActivatedExpertMode, callback: {
@@ -712,7 +732,7 @@ class ModalPresenter : Subscriber {
         let settings = SettingsViewController(sections: sections, rows: rows)
         settings.addCloseNavigationItem(tintColor: .mediumGray, side: .right)
         settingsNav.viewControllers = [settings]
-        top.present(settingsNav, animated: true, completion: nil)
+        top.presentFullScreen(settingsNav, animated: true, completion: nil)
     }
         
     private func presentScan(parent: UIViewController, currency: CurrencyDef) -> PresentScan {
@@ -728,7 +748,7 @@ class ModalPresenter : Subscriber {
                 parent?.view.isFrameChangeBlocked = false
             })
             parent?.view.isFrameChangeBlocked = true
-            parent?.present(vc, animated: true, completion: {})
+            parent?.presentFullScreen(vc, animated: true, completion: {})
         }
     }
 
@@ -753,7 +773,7 @@ class ModalPresenter : Subscriber {
             self?.presentWritePaperKey(fromViewController: nc)
         }
 
-        window.rootViewController?.present(nc, animated: true, completion: nil)
+        window.rootViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
     
     func presentAddressBook(type: AddressBookType? = .normal, callback: ((String) -> Void)? = nil) {
@@ -761,7 +781,7 @@ class ModalPresenter : Subscriber {
         let nc = ModalNavigationController(rootViewController: addressBookVC)
         nc.setClearNavbar()
         addressBookVC.addCloseNavigationItem(tintColor: .white)
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
     
     func presentTutorial() {
@@ -781,7 +801,7 @@ class ModalPresenter : Subscriber {
         verify.transitioningDelegate = verifyPinTransitionDelegate
         verify.modalPresentationStyle = .overFullScreen
         verify.modalPresentationCapturesStatusBarAppearance = true
-        onNc.present(verify, animated: true, completion: nil)
+        onNc.presentFullScreen(verify, animated: true, completion: nil)
     }
 
     private func presentWritePaperKey(fromViewController vc: UIViewController) {
@@ -797,7 +817,7 @@ class ModalPresenter : Subscriber {
             verify.transitioningDelegate = self.verifyPinTransitionDelegate
             verify.modalPresentationStyle = .overFullScreen
             verify.modalPresentationCapturesStatusBarAppearance = true
-            paperPhraseNavigationController.present(verify, animated: true, completion: nil)
+            paperPhraseNavigationController.presentFullScreen(verify, animated: true, completion: nil)
         })
         start.addCloseNavigationItem(tintColor: .white)
         start.navigationItem.title = S.SecurityCenter.Cells.paperKeyTitle
@@ -805,7 +825,7 @@ class ModalPresenter : Subscriber {
         faqButton.tintColor = .white
         start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
         paperPhraseNavigationController.viewControllers = [start]
-        vc.present(paperPhraseNavigationController, animated: true, completion: nil)
+        vc.presentFullScreen(paperPhraseNavigationController, animated: true, completion: nil)
     }
 
     private func pushWritePaperPhrase(navigationController: UINavigationController, pin: String) {
@@ -839,7 +859,7 @@ class ModalPresenter : Subscriber {
         #endif
         vc.startServer()
         vc.preload()
-        self.topViewController?.present(vc, animated: true, completion: nil)
+        self.topViewController?.presentFullScreen(vc, animated: true, completion: nil)
     }
 
     private func presentRescan(currency: CurrencyDef) {
@@ -847,7 +867,7 @@ class ModalPresenter : Subscriber {
         let nc = UINavigationController(rootViewController: vc)
         nc.setClearNavbar()
         vc.addCloseNavigationItem()
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
     
     private func presentRescanAsset() {
@@ -855,7 +875,7 @@ class ModalPresenter : Subscriber {
         let nc = UINavigationController(rootViewController: vc)
         nc.setClearNavbar()
         vc.addCloseNavigationItem()
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
     public func wipeWallet() {
@@ -871,7 +891,7 @@ class ModalPresenter : Subscriber {
 
     public func wipeWalletNoPrompt() {
         let activity = BRActivityViewController(message: S.WipeWallet.wiping)
-        self.topViewController?.present(activity, animated: true, completion: nil)
+        self.topViewController?.presentFullScreen(activity, animated: true, completion: nil)
         DispatchQueue.walletQueue.async {
             self.walletManager.peerManager?.disconnect()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
@@ -899,7 +919,7 @@ class ModalPresenter : Subscriber {
         faqButton.tintColor = .white
         start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
         nc.viewControllers = [start]
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
     //MARK: - Prompts
@@ -913,7 +933,7 @@ class ModalPresenter : Subscriber {
         nc.setDefaultStyle()
         nc.isNavigationBarHidden = true
         nc.delegate = securityCenterNavigationDelegate
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
     private func promptShareData() {
@@ -923,7 +943,7 @@ class ModalPresenter : Subscriber {
         nc.isNavigationBarHidden = true
         nc.delegate = securityCenterNavigationDelegate
         shareData.addCloseNavigationItem()
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
     func presentWritePaperKey() {
@@ -938,41 +958,13 @@ class ModalPresenter : Subscriber {
         nc.isNavigationBarHidden = true
         nc.delegate = securityCenterNavigationDelegate
         updatePin.addCloseNavigationItem()
-        topViewController?.present(nc, animated: true, completion: nil)
+        topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
     private func handleFile(_ file: Data) {
-        if let request = PaymentProtocolRequest(data: file) {
-            if let topVC = topViewController as? ModalViewController {
-                let attemptConfirmRequest: () -> Bool = {
-                    if let send = topVC.childViewController as? SendViewController {
-                        send.confirmProtocolRequest(protoReq: request)
-                        return true
-                    }
-                    return false
-                }
-                if !attemptConfirmRequest() {
-                    modalTransitionDelegate.reset()
-                    topVC.dismiss(animated: true, completion: {
-                        Store.perform(action: RootModalActions.Present(modal: .send(currency: Currencies.rvn)))
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { //This is a hack because present has no callback
-                            let _ = attemptConfirmRequest()
-                        })
-                    })
-                }
-            }
-        } else if let ack = PaymentProtocolACK(data: file) {
-            if let memo = ack.memo {
-                let alert = UIAlertController(title: "", message: memo, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
-                topViewController?.present(alert, animated: true, completion: nil)
-            }
-        //TODO - handle payment type
-        } else {
-            let alert = UIAlertController(title: S.Alert.error, message: S.PaymentProtocol.Errors.corruptedDocument, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
-            topViewController?.present(alert, animated: true, completion: nil)
-        }
+        let alert = UIAlertController(title: S.Alert.error, message: S.PaymentProtocol.Errors.corruptedDocument, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: S.Button.ok, style: .cancel, handler: nil))
+        topViewController?.present(alert, animated: true, completion: nil)
     }
 
     private func handlePaymentRequest(request: PaymentRequest) {
@@ -1041,7 +1033,7 @@ class ModalPresenter : Subscriber {
             verify.transitioningDelegate = self?.verifyPinTransitionDelegate
             verify.modalPresentationStyle = .overFullScreen
             verify.modalPresentationCapturesStatusBarAppearance = true
-            self?.topViewController?.present(verify, animated: true, completion: nil)
+            self?.topViewController?.presentFullScreen(verify, animated: true, completion: nil)
         }))
         topViewController?.present(alert, animated: true, completion: nil)
     }
@@ -1073,7 +1065,7 @@ class ModalPresenter : Subscriber {
         verify.transitioningDelegate = verifyPinTransitionDelegate
         verify.modalPresentationStyle = .overFullScreen
         verify.modalPresentationCapturesStatusBarAppearance = true
-        topViewController?.present(verify, animated: true, completion: nil)
+        topViewController?.presentFullScreen(verify, animated: true, completion: nil)
     }
 
     private func copyAllAddressesToClipboard() {

@@ -119,5 +119,13 @@ struct C {
     static var fetchTxsPath:String {
         return E.isTestnet ? "https://vinx.mediciventures.com/api/addr/%@" : "https://api.ravencoin.com/api/addr/%@"
     }
-    
+}
+
+enum Haptic {
+    static var style:UIImpactFeedbackGenerator.FeedbackStyle {
+        if #available(iOS 13.0, *) {
+            return .soft
+        }
+        return .medium
+    }
 }

@@ -1,34 +1,16 @@
 //
-//  Peer.c
+//  BRPeer.c
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #include "BRPeer.h"
-#include "BRMerkleBlock.h"
-#include "BRAddress.h"
-#include "BRSet.h"
 #include "BRArray.h"
-#include "BRCrypto.h"
-#include "BRInt.h"
+#include "BRScript.h"
+#include "BRAssets.h"
 #include <stdlib.h>
 #include <float.h>
 #include <inttypes.h>
@@ -37,28 +19,16 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <netdb.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "BRScript.h"
-#include "BRAssets.h"
-#include "BRPeerManager.h"
-
-#if TESTNET
-#define MAGIC_NUMBER 0x544e5652  //RVNT - Reverse from chainparams.cpp
-#elif REGTEST
-#define MAGIC_NUMBER 0x574f5243
-#else
-#define MAGIC_NUMBER 0x4e564152  //RAVN - Reverse from chainparams.cpp
-#endif
 
 #define HEADER_LENGTH      24
 #define MAX_MSG_LENGTH     0x02000000
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0ULL  // we don't provide full blocks to remote nodes
-#define PROTOCOL_VERSION   70025
+#define PROTOCOL_VERSION   70026
 #define MIN_PROTO_VERSION  70017 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
 #define LOCAL_HOST         ((UInt128) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0x7f, 0x00, 0x00, 0x01 })
 #define CONNECT_TIMEOUT    3.0
@@ -100,7 +70,8 @@ typedef enum {
 } inv_type;
 
 typedef struct {
-    BRPeer peer; // superstruct on top of Peer
+    BRPeer peer; // superstruct on top of Peerk
+    uint32_t magicNumber;
     char host[INET6_ADDRSTRLEN];
     BRPeerStatus status;
     int waitingForNetwork;
@@ -330,11 +301,10 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         peer_log(peer, "dropping assets message, %zu is too many assets, max is 512", count);
     } else {
         peer_log(peer, "got asset with %zu data", count);
-        
+
         BRAsset *asset = NewAsset();
 
         asset->nameLen = count;
-        
         asset->name = malloc(count + 1);
         memcpy(asset->name, msg + off, count);
         off += count;
@@ -347,7 +317,7 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
             ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, NULL);
             return r;
         }
-        
+
         asset->amount = (off + sizeof(uint64_t) <= msgLen) ? UInt64GetLE(&msg[off]) : 0;
         off += sizeof(uint64_t);
         
@@ -366,9 +336,9 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         
         // Check the end of the script
         if (asset->hasIPFS != 0 || IPFS_length != 0) {
-            
+
             uint8_t IPFS_hash[IPFS_length];
-            
+
             if (off <= msgLen + IPFS_length) {
                 memcpy(&IPFS_hash, msg + off, IPFS_length);
                 off += IPFS_length;
@@ -377,7 +347,7 @@ static int _PeerAcceptAssetMessage(BRPeer *peer, const uint8_t *msg, size_t msgL
         }
         
         // TODO: parse Block Height, if hasn't IPFS make sure to ignore the 00 size of IPFH Hash.
-        
+
             ((BRPeerContext *) peer)->receiveAssetData(peer->assetCallbackInfo, asset);
     }
     
@@ -587,11 +557,19 @@ static int _PeerAcceptTxMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen)
             }
         }
 
-        if(tx->asset) {
-            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetScriptType(tx->asset->type), tx->asset->amount / COIN,
-                    tx->asset->nameLen, tx->asset->name);
+        // Console Debug Display
+#ifdef DEBUG
+        peer_log(peer, "got tx with %ld Asset Output.", tx->asstCount);
+        BRAsset *asset;
+        for (int i = 0; i < tx->asstCount; i++) {
+
+            asset = &tx->asset[i];
+            peer_log(peer, "got tx with %s Asset: %lld x %ld[%s]", GetAssetScriptType(asset->type),
+                         asset->amount / COIN,
+                         asset->nameLen, asset->name);
         }
     }
+#endif
 
     return r;
 }
@@ -617,7 +595,7 @@ static int _PeerAcceptHeadersMessage(BRPeer *peer, const uint8_t *msg, size_t ms
             size_t last = 0;
             time_t now = time(NULL);
             UInt256 locators[2];
-            
+
             if(timestamp >= X16RV2ActivationTime) {
                 X16Rv2(&locators[0], &msg[off + 81 * (count - 1)], 80);
                 X16Rv2(&locators[1], &msg[off], 80);
@@ -640,7 +618,7 @@ static int _PeerAcceptHeadersMessage(BRPeer *peer, const uint8_t *msg, size_t ms
                 else {
                     X16R(&locators[0], &msg[off + 81 * (last - 1)], 80);
                 }
-                
+
                 BRPeerSendGetblocks(peer, locators, 2, UINT256_ZERO);
             } else BRPeerSendGetheaders(peer, locators, 2, UINT256_ZERO);
 
@@ -979,7 +957,7 @@ static int _PeerAcceptMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, c
     else if (strncmp(MSG_PING, type, 12) == 0) r = _PeerAcceptPingMessage(peer, msg, msgLen);
     else if (strncmp(MSG_PONG, type, 12) == 0) r = _PeerAcceptPongMessage(peer, msg, msgLen);
     else if (strncmp(MSG_MERKLEBLOCK, type, 12) == 0) r = _PeerAcceptMerkleblockMessage(peer, msg, msgLen);
-    else if (strncmp(MSG_REJECT, type, 12) == 0)r = _PeerAcceptRejectMessage(peer, msg, msgLen);
+    else if (strncmp(MSG_REJECT, type, 12) == 0) r = _PeerAcceptRejectMessage(peer, msg, msgLen);
     else if (strncmp(MSG_FEEFILTER, type, 12) == 0) r = _PeerAcceptFeeFilterMessage(peer, msg, msgLen);
     else if (strncmp(MSG_ASSETDATA, type, 12) == 0) r = _PeerAcceptAssetMessage(peer, msg, msgLen);
 //    else if (strncmp(MSG_ASSETNOTFOUND, type, 12) == 0) r = _PeerAssetNotFoundMessage(peer, msg, msgLen);
@@ -1099,7 +1077,7 @@ static void *_peerThreadRoutine(void *arg) {
                         ctx->mempoolTime = DBL_MAX;
                     }
 
-                    while (sizeof(uint32_t) <= len && UInt32GetLE(header) != MAGIC_NUMBER) {
+                    while (sizeof(uint32_t) <= len && UInt32GetLE(header) != ctx->magicNumber) {
                         memmove(header, &header[1], --len); // consume one byte at a time until we find the magic number
                     }
 
@@ -1187,10 +1165,11 @@ static void _dummyThreadCleanup(void *info) {
 }
 
 // returns a newly allocated Peer struct that must be freed by calling BRPeerFree()
-BRPeer *BRPeerNew(void) {
+BRPeer *BRPeerNew(uint32_t magicNumber) {
     BRPeerContext *ctx = calloc(1, sizeof(*ctx));
 
     assert(ctx != NULL);
+    ctx->magicNumber = magicNumber;
     array_new(ctx->useragent, 40);
     array_new(ctx->knownBlockHashes, 10);
     array_new(ctx->currentBlockTxHashes, 10);
@@ -1380,7 +1359,7 @@ void BRPeerSendMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen, const ch
         struct timeval tv;
         int socket, error = 0;
 
-        UInt32SetLE(&buf[off], MAGIC_NUMBER);
+        UInt32SetLE(&buf[off], ctx->magicNumber);
         off += sizeof(uint32_t);
         strncpy((char *) &buf[off], type, 12);
         off += 12;
@@ -1432,7 +1411,7 @@ void PeerSendVersionMessage(BRPeer *peer) {
     off += sizeof(uint64_t);
     UInt128Set(&msg[off], LOCAL_HOST); // IPv4 mapped IPv6 header
     off += sizeof(UInt128);
-    UInt16SetBE(&msg[off], STANDARD_PORT);
+    UInt16SetBE(&msg[off], peer->port);
     off += sizeof(uint16_t);
     ctx->nonce = ((uint64_t) BRRand(0) << 32) | (uint64_t) BRRand(0); // random nonce
     UInt64SetLE(&msg[off], ctx->nonce);

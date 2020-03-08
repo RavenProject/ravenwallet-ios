@@ -29,7 +29,6 @@ class SenderAsset {
     private let walletManager: WalletManager
     private let currency: CurrencyDef
     var transaction: BRTxRef?
-    var protocolRequest: PaymentProtocolRequest?
     var rate: Rate?
     var feePerKb: UInt64?
     var operationType: OperationType
@@ -62,11 +61,6 @@ class SenderAsset {
             break
         }
         return transaction != nil
-    }
-
-    func createTransaction(forPaymentProtocol: PaymentProtocolRequest) {
-        protocolRequest = forPaymentProtocol
-        transaction = walletManager.wallet?.createTxForOutputs(forPaymentProtocol.details.outputs)
     }
 
     var fee: UInt64 {

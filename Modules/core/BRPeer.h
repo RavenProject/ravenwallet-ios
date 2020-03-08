@@ -1,26 +1,11 @@
 //
-//  Peer.h
+//  BRPeer.h
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #ifndef BRPeer_h
 #define BRPeer_h
@@ -28,7 +13,6 @@
 #include "BRTransaction.h"
 #include "BRMerkleBlock.h"
 #include "BRAddress.h"
-#include "BRInt.h"
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -42,7 +26,7 @@ d#include <Foundation/Foundation.h>
 #define _peer_log(...) NSLog(__VA_ARGS__)
 #elif defined(__ANDROID__)
 #include <android/log.h>
-#define _peer_log(...) __android_log_print(ANDROID_LOG_INFO, "bread", __VA_ARGS__)
+#define _peer_log(...) __android_log_print(ANDROID_LOG_INFO, "raven", __VA_ARGS__)
 #else
 #include <stdio.h>
 #define _peer_log(...) printf(__VA_ARGS__)
@@ -52,20 +36,12 @@ d#include <Foundation/Foundation.h>
 extern "C" {
 #endif
 
-#if TESTNET
-#define STANDARD_PORT 18770
-#elif REGTEST
-#define STANDARD_PORT 18444
-#else
-#define STANDARD_PORT 8767
-#endif
-
 #define SERVICES_NODE_NETWORK 0x01 // services value indicating a node carries full blocks, not just headers
 #define SERVICES_NODE_BLOOM   0x04 // BIP111: https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki
 
-#define VERSION "0.1.0"
+#define VERSION "0.1.1"
 #define USER_AGENT "/rvnwallet:" VERSION "/"
-        
+
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification
 #define MSG_VERSION     "version"
 #define MSG_VERACK      "verack"
@@ -89,7 +65,6 @@ extern "C" {
 #define MSG_ALERT       "alert"
 #define MSG_REJECT      "reject"   // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
 #define MSG_FEEFILTER   "feefilter"// described in BIP133 https://github.com/bitcoin/bips/blob/master/bip-0133.mediawiki
-
 #define MSG_GETASSETDATA "getassetdata"
 #define MSG_ASSETDATA    "assetdata"
 #define MSG_ASSETNOTFOUND "asstnotfound"
@@ -120,7 +95,7 @@ typedef struct {
 // NOTE: Peer functions are not thread-safe
 
 // returns a newly allocated Peer struct that must be freed by calling BRPeerFree()
-BRPeer *BRPeerNew(void);
+BRPeer *BRPeerNew(uint32_t magicNumber);
 
 // info is a void pointer that will be passed along with each callback call
 // void connected(void *) - called when peer handshake completes successfully

@@ -22,7 +22,7 @@ class ChartModel {
         if !UserDefaults.shouldReloadChart && UserDefaults.isChartDrawed {
             return
         }
-        let url = URL(string: "https://international.bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=BTC-RVN&tickInterval=day")
+        let url = URL(string: "https://bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=BTC-RVN&tickInterval=day")
         let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 20)
 
         request.httpMethod = "GET"
@@ -38,7 +38,8 @@ class ChartModel {
                             UserDefaults.shouldReloadChart = false
                             UserDefaults.isChartDrawed = true
                             let elements:NSArray = convertedJsonIntoDict.object(forKey: "result") as! NSArray
-                            self.callback(Array(elements) as NSArray)
+                            let lentgh = elements.count >= 60 ? 60 : (elements.count - 2)
+                            self.callback(Array(elements.suffix(lentgh)) as NSArray)
                         }
                     }
                     else {

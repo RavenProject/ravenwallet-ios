@@ -1,26 +1,11 @@
 //
-//  Crypto.c
+//  BRCrypto.c
 //
 //  Created by Aaron Voisine on 8/8/15.
 //  Copyright (c) 2015 breadwallet LLC
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #include "BRCrypto.h"
 #include <stdlib.h>
@@ -42,11 +27,8 @@
 #include "crypto/sph_fugue.h"
 #include "crypto/sph_shabal.h"
 #include "crypto/sph_whirlpool.h"
-#include "crypto/sph_tiger.h"
-//extern "C" {
 #include "crypto/sph_sha2.h"
-//}
-
+#include "crypto/sph_tiger.h"
 
 // endian swapping
 #if __BIG_ENDIAN__ || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
@@ -379,9 +361,9 @@ void X16Rv2(void *md32, const void *data, size_t len)
 {
     assert(md32 != NULL);
     assert(data != NULL || len == 0);
-    
+
     int hashSelection;
-    
+
     sph_blake512_context     ctx_blake;      //0
     sph_bmw512_context       ctx_bmw;        //1
     sph_groestl512_context   ctx_groestl;    //2
@@ -398,13 +380,13 @@ void X16Rv2(void *md32, const void *data, size_t len)
     sph_shabal512_context    ctx_shabal;     //D
     sph_whirlpool_context    ctx_whirlpool;  //E
     sph_sha512_context       ctx_sha512;     //F
-    
+
     sph_tiger_context        ctx_tiger;
-    
+
     uint8_t *PrevBlockHash = (uint8_t*) &(data[4]);
-    
+
     uint8_t hash_temp[64];
-    
+
     for (int i=0;i<16;i++)
     {
         const void *toHash;
@@ -416,9 +398,9 @@ void X16Rv2(void *md32, const void *data, size_t len)
             toHash = hash_temp;
             lenToHash = 64;
         }
-        
+
         hashSelection = GetHashSelection(PrevBlockHash, i);
-        
+
         switch(hashSelection) {
             case 0:
                 sph_blake512_init(&ctx_blake);
@@ -514,10 +496,9 @@ void X16Rv2(void *md32, const void *data, size_t len)
                 break;
         }
     }
-    
+
     trim512to256(hash_temp, md32);
 }
-
 
 // bitwise right rotation
 #define ror64(a, b) (((a) >> (b)) | ((a) << (64 - (b))))

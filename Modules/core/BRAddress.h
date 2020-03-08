@@ -1,29 +1,14 @@
 //
-//  Address.h
+//  BRAddress.h
 //
 //  Created by Aaron Voisine on 9/18/15.
 //  Copyright (c) 2015 breadwallet LLC
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
-#ifndef Address_h
-#define Address_h
+#ifndef BRAddress_h
+#define BRAddress_h
 
 #include "BRCrypto.h"
 #include "BRScript.h"
@@ -54,17 +39,6 @@ extern "C" {
 #define RAVENCOIN_PUBKEY_ADDRESS_REGTEST  111
 #define RAVENCOIN_SCRIPT_ADDRESS_REGTEST  196
 
-// script opcodes: https://en.bitcoin.it/wiki/Script#Constants
-//#define OP_0           0x00
-//#define OP_PUSHDATA1   0x4c
-//#define OP_PUSHDATA2   0x4d
-//#define OP_PUSHDATA4   0x4e
-//#define OP_DUP         0x76
-//#define OP_EQUAL       0x87
-//#define OP_EQUALVERIFY 0x88
-//#define OP_HASH160     0xa9
-//#define OP_CHECKSIG    0xac
-
 // reads a varint from buf and stores its length in intLen if intLen is non-NULL
 // returns the varint value
 uint64_t BRVarInt(const uint8_t *buf, size_t bufLen, size_t *intLen);
@@ -90,7 +64,7 @@ typedef struct {
     char s[36];
 } BRAddress;
 
-#define ADDRESS_NONE ((const BRAddress) { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" })
+#define ADDRESS_NONE ((BRAddress) { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" })
 
 // writes the ravencoin address for a scriptPubKey to addr
 // returns the number of bytes written, or addrLen needed if addr is NULL
@@ -127,4 +101,4 @@ inline static int BRAddressEq(const void *addr, const void *otherAddr)
 }
 #endif
 
-#endif // Address_h
+#endif // BRAddress_h
