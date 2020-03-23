@@ -10,7 +10,7 @@ import Foundation
 import Core
 
 private let fallbackRatesURL = "https://bitpay.com/api/rates"
-private let ravenMultiplierURL = "https://api.coinmarketcap.com/v1/ticker/ravencoin/"
+private let ravenMultiplierURL = "https://api.bittrex.com/v3/markets/RVN-BTC/ticker"
 
 extension BRAPIClient {
     
@@ -55,27 +55,28 @@ extension BRAPIClient {
     //    }
     
     func ravenMultiplier(_ handler: @escaping (_ mult: Double, _ error: String?) -> Void) {
+        print("Getting rate from ravenMultiplierURL")
         let request = URLRequest(url: URL(string: ravenMultiplierURL)!)
         let task = dataTaskWithRequest(request) { (data, response, error) in
             do {
-                
-                if error == nil, let data = data,
-                    let parsedData = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String:Any]] {
-                    guard let arr = parsedData.first else {
-                        return handler(0.00, "\(self.ravenMultiplier) didn't return an array")
+                if error == nil,
+                    let data = data,
+                    let parsedData = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any]  {
+                    let lastTradeRate = parsedData["lastTradeRate"] as! String
+                    //print("lastTradeRate \(lastTradeRate)")
+                    guard let ratio : Double = Double(lastTradeRate) else {
+                        return handler(0.00, "Error getting RVN rate in BTC")
                     }
-                    guard let ratio : Double = Double(arr["price_btc"] as! String) else {
-                        return handler(0.00, "Error getting from arr")
-                    }
-                    print("BMEX Ratio \(ratio)");
+
+                    print("Bittrex Ratio of BTC to RVN\(ratio)");
                     return handler(ratio, nil)
                 } else {
-                    return handler(0.00, "BMEX Ratio Error fetching from Raven multiplier url")
+                    return handler(0.00, "Error fetching Ravencoin BTC price from Bittrex.")
                 }
                 
                 
             } catch let error {
-                return handler(0.00, "BMEX Ratio price_btc data error caught \(error)");
+                return handler(0.00, "Bittrex Ravencoin BTC price error caught \(error)");
             }
         }
         task.resume()
