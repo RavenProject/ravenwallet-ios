@@ -5458,7 +5458,7 @@
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -5478,7 +5478,7 @@
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -5508,7 +5508,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = "2.1.1 ";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug ";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5539,7 +5539,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = "2.1.1 ";
 				"MTL_ENABLE_DEBUG_INFO[arch=*]" = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
@@ -5851,7 +5851,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = "2.1.1 ";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug -DScreenshots -DTestnet";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5902,7 +5902,7 @@
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6176,7 +6176,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = "2.1.1 ";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DDebug -DTestnet";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6227,7 +6227,7 @@
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6498,7 +6498,7 @@
 				INFOPLIST_FILE = ravenwallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = "2.1.1 ";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTestflight -DDebug";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6548,7 +6548,7 @@
 				ENABLE_BITCODE = YES;
 				IBSC_MODULE = ravenwallet_WatchKit_Extension;
 				INFOPLIST_FILE = "ravenwallet WatchKit App/Info.plist";
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediciventures.ravenwallet.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
