@@ -1,17 +1,20 @@
 //
-// Created by ROSHii on 8/11/18.
+//  BRAssets.h
+//
+//  Created by ROSHii on 8/11/18.
+//  Copyright (c) 2018 Ravencoin core team
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
 
 #ifndef BRASSETS_H
 #define BRASSETS_H
 
-
-#include <string.h>
-#include "BRTransaction.h"
+#include "BRWallet.h"
+#include "BRChainParams.h"
 #include "BRScript.h"
 #include <stdbool.h>
-#include "BRWallet.h"
-#include "ChainParams.h"
+#include <string.h>
 
 #ifdef TESTNET
 #define ASSET_ACTIVATION        6048

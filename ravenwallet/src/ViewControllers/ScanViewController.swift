@@ -171,6 +171,7 @@ class ScanViewController : UIViewController {
 
 extension ScanViewController : AVCaptureMetadataOutputObjectsDelegate {
     func metadataOutput(_ captureOutput: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        self.requestCaptureSessionStopRunning()
         if let data = metadataObjects as? [AVMetadataMachineReadableCodeObject] {
             if data.count == 0 {
                 guide.state = .normal
@@ -218,6 +219,28 @@ extension ScanViewController : AVCaptureMetadataOutputObjectsDelegate {
             })
         } else {
             guide.state = .negative
+        }
+    }
+    
+    public func requestCaptureSessionStartRunning()
+    {
+        self.toggleCaptureSessionRunningState()
+    }
+    
+    public func requestCaptureSessionStopRunning()
+    {
+        self.toggleCaptureSessionRunningState()
+    }
+    
+    private func toggleCaptureSessionRunningState() {
+        
+        if !session.isRunning
+        {
+            session.startRunning()
+        }
+        else
+        {
+            session.stopRunning()
         }
     }
 }

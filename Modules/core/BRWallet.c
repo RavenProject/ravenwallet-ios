@@ -1,26 +1,11 @@
 //
-//  Wallet.c
+//  BRWallet.c
 //
 //  Created by Aaron Voisine on 9/1/15.
 //  Copyright (c) 2015 breadwallet LLC
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #include "BRWallet.h"
 #include "BRAddress.h"
@@ -193,7 +178,6 @@ static void _BRWalletUpdateBalance(BRWallet *wallet) {
                     tx->lockTime < TX_MAX_LOCK_HEIGHT &&
                     tx->lockTime > wallet->blockHeight - 180)
                             isPending = 1; // future lockTime
-                
                 if (tx->inputs[j].sequence < UINT32_MAX && tx->lockTime > now) isPending = 1; // future lockTime
                 if (BRSetContains(wallet->pendingTx, &tx->inputs[j].txHash)) isPending = 1; // check for pending inputs
                  // TODO: XXX handle BIP68 check lock time verify rules
@@ -207,6 +191,8 @@ static void _BRWalletUpdateBalance(BRWallet *wallet) {
         }
 
         // add outputs to UTXO set
+        // TODO: don't add outputs below TX_MIN_OUTPUT_AMOUNT
+        // TODO: don't add coin generation outputs < 100 blocks deep
         // NOTE: balance/UTXOs will then need to be recalculated when last block changes
         for (j = 0; j < tx->outCount; j++) {
             if (tx->outputs[j].address[0] != '\0') {
@@ -428,7 +414,7 @@ size_t BRWalletTxUnconfirmedBefore(BRWallet *wallet, BRTransaction **transaction
     return txCount;
 }
 
-// total amount spent from the wallet (exluding change)
+// total amount spent from the wallet (excluding change)
 uint64_t BRWalletTotalSent(BRWallet *wallet) {
     uint64_t totalSent;
 
@@ -439,7 +425,7 @@ uint64_t BRWalletTotalSent(BRWallet *wallet) {
     return totalSent;
 }
 
-// total amount received by the wallet (exluding change)
+// total amount received by the wallet (excluding change)
 uint64_t BRWalletTotalReceived(BRWallet *wallet) {
     uint64_t totalReceived;
 
@@ -479,10 +465,10 @@ BRAddress BRWalletReceiveAddress(BRWallet *wallet) {
 // returns all used addresses
 size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs) {
     size_t i, externalCount = 0;
-    
+
     assert(wallet != NULL);
     pthread_mutex_lock(&wallet->lock);
-    
+
     for (i = 0; i < array_count(wallet->externalChain); i++) {
         if(BRSetContains(wallet->usedAddrs, wallet->externalChain[i].s)) {
             externalCount++;
@@ -490,7 +476,7 @@ size_t BRWalletUsedAddresses(BRWallet *wallet, BRAddress *addrs) {
                 addrs[i] = wallet->externalChain[i];
         }
     }
-    
+
     pthread_mutex_unlock(&wallet->lock);
     return externalCount;
 }
@@ -557,6 +543,75 @@ BRTransaction *BRWalletCreateTransaction(BRWallet *wallet, uint64_t amount, cons
     return BRWalletCreateTxForOutputs(wallet, &o, 1);
 }
 
+void BRWalletAddFeeToTransaction(BRWallet *wallet, BRTransaction *transaction) {
+
+    BRTransaction *tx;
+    uint64_t feeAmount, balance = 0, minAmount;
+    size_t i, j, cpfpSize = 0;
+    UTXO *o;
+    BRAddress addr = ADDRESS_NONE;
+    size_t outCount = 1;
+    const BRTxOutput *outputs;
+
+    assert(wallet != NULL);
+    assert(transaction != NULL);
+
+    minAmount = BRWalletMinOutputAmount(wallet);
+    pthread_mutex_lock(&wallet->lock);
+    feeAmount = _txFee(wallet->feePerKb, BRTransactionSize(transaction) + TX_OUTPUT_SIZE);
+
+    for (i = 0; i < array_count(wallet->utxos); i++) {
+        o = &wallet->utxos[i];
+        tx = BRSetGet(wallet->allTx, o);
+
+        if (!tx || tx->outputs[o->n].amount == 0 || o->n >= tx->outCount) continue;
+        BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
+                              tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
+
+        if (BRTransactionSize(transaction) + TX_OUTPUT_SIZE > TX_MAX_SIZE) { // transaction size-in-bytes too large
+            BRTransactionFree(transaction);
+            transaction = NULL;
+
+            // check for sufficient total funds before building a smaller transaction
+            if (wallet->balance < _txFee(wallet->feePerKb, 10 + array_count(wallet->utxos)*TX_INPUT_SIZE +
+                                                                    (outCount + 1)*TX_OUTPUT_SIZE + cpfpSize)) break;
+            pthread_mutex_unlock(&wallet->lock);
+
+            transaction = BRWalletCreateTxForOutputs(wallet, outputs, outCount - 1); // remove last output
+
+            balance = feeAmount = 0;
+            pthread_mutex_lock(&wallet->lock);
+            break;
+        }
+
+        balance += tx->outputs[o->n].amount;
+
+        // fee amount after adding a change output
+        feeAmount = _txFee(wallet->feePerKb, BRTransactionSize(transaction) + TX_OUTPUT_SIZE + cpfpSize);
+
+        // increase fee to round off remaining wallet balance to nearest 100 satoshi
+        if (wallet->balance > feeAmount) feeAmount += (wallet->balance - feeAmount) % 100;
+
+        if (balance == feeAmount || balance >= feeAmount + minAmount) break;
+    }
+
+    pthread_mutex_unlock(&wallet->lock);
+
+    if (transaction && (outCount < 1 || balance < feeAmount)) { // no outputs/insufficient funds
+        BRTransactionFree(transaction);
+        transaction = NULL;
+    } else if (transaction && balance - feeAmount > minAmount) { // add change output
+        BRWalletUnusedAddrs(wallet, &addr, 1, 1);
+        uint8_t script[BRAddressScriptPubKey(NULL, 0, addr.s)];
+        size_t scriptLen = BRAddressScriptPubKey(script, sizeof(script), addr.s);
+
+        BRTransactionAddOutput(transaction, balance - feeAmount, script, scriptLen);
+        BRTransactionShuffleOutputs(transaction);
+    }
+
+}
+
+
 // returns an unsigned transaction that sends the specified amount from the wallet to the given address
 // one asset output is added + network fees and change if any
 // result must be freed by calling TransactionFree()
@@ -587,7 +642,7 @@ BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t a
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         o = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, o);
-        
+
         BRAsset *temp = calloc(1, sizeof(*asst));
 
 #warning find better way to do this.
@@ -595,41 +650,41 @@ BRTransaction *BRWalletCreateTxForRootAssetTransfer(BRWallet *wallet, uint64_t a
             free(temp);
             temp = NULL;
         }
-        
+
         if (!tx || !temp || o->n >= tx->outCount) {
             free(temp);
             continue;
         }
-        
+
         if (strcmp(temp->name, asst->name) != 0) {
             free(temp);
             continue;
         }
-        
+
         BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
                               tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
-        
+
         asst_balance += temp->amount;
         free(temp);
         if(asst->amount < asst_balance) {
             // add Change
             BRWalletUnusedAddrs(wallet, &address, 1, 1);
-            
+
             BRTxOutput output_change = TX_OUTPUT_NONE;
             output_change.amount = 0;
-            
+
             strncpy(output_change.address, address.s, sizeof(output_change.address) - 1);
             output_change.scriptLen = BRTxOutputSetTransferAssetScript(NULL, 0, asst);
             array_new(output_change.script, output_change.scriptLen);
             array_set_count(output_change.script, output_change.scriptLen);
             BRAddressScriptPubKey(output_change.script, output_change.scriptLen, address.s);
-            
+
             BRAsset asst_change = *asst;
             asst_change.amount = asst_balance - transaction->asset->amount;
             output_change.scriptLen = BRTxOutputSetTransferAssetScript(output_change.script, output_change.scriptLen, &asst_change);
-            
+
             BRTransactionAddOutput(transaction, output_change.amount, output_change.script, output_change.scriptLen);
-            
+
             break;
         } else if(transaction->asset->amount > asst_balance) continue;
         else break;
@@ -646,17 +701,17 @@ BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, u
     assert(wallet != NULL);
     assert(amount == 0);
     assert(addr != NULL && BRAddressIsValid(addr));
-    
+
     output.amount = amount;
-    
+
     strncpy(output.address, addr, sizeof(output.address) - 1); //TODO: Strlen?
     output.scriptLen = BRTxOutputSetTransferOwnerAssetScript(NULL, 0, asst);
     array_new(output.script, output.scriptLen);
     array_set_count(output.script, output.scriptLen);
     BRAddressScriptPubKey(output.script, output.scriptLen, addr);
-    
+
     BRTxOutputSetTransferOwnerAssetScript(output.script, output.scriptLen, asst);
-    
+
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, &output, 1);
 
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
@@ -666,14 +721,14 @@ BRTransaction *BRWalletCreateTxForRootAssetTransferOwnership(BRWallet *wallet, u
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         utxo = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, utxo);
-        
+
         tx->asset = calloc(1, sizeof(*asst));
         if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, tx->asset))
             tx->asset = NULL;
 
-        
+
         if (!tx || !tx->asset || utxo->n >= tx->outCount) continue;
-        
+
         if (strcmp(tx->asset->name, asst->name) != 0) continue;
 
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
@@ -714,37 +769,37 @@ BRTransaction *BRWalletCreateTxForRootAssetCreation(BRWallet *wallet, uint64_t a
     //strIssueAssetBurnAddressMainNet
     BRTxOutputSetAddress(&outputs[off], strIssueAssetBurnAddressMainNet);
 #endif
-    
+
     BRTransaction *tx = BRWalletCreateTxForOutputs(wallet, outputs, 1);
     off++;
-    
+
     // The order is important here: Ownership script before NewAsset script
      //Add new asset Ownership Output
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asset);
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
-    
+
     BRTxOutputSetOwnerAssetScript(outputs[off].script, outputs[off].scriptLen, asset);
     BRTransactionAddOutput(tx, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
 
     // Add new asset output
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asset);
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
-    
+
     BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asset);
     BRTransactionAddOutput(tx, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
-    
+
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asset, tx);
 
@@ -760,15 +815,15 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
 
     size_t asstCount = 4, off = 0;
     BRTxOutput outputs[asstCount];
-    
+
     for (size_t i = 0; i < asstCount; i++) {
         outputs[i] = TX_OUTPUT_NONE;
     }
-    
+
     assert(wallet != NULL);
     assert(amount == IssueSubAssetBurnAmount);
     assert(addr != NULL && BRAddressIsValid(addr));
-    
+
     // Add burn output
     outputs[off].amount = amount;
 #if TESTNET
@@ -781,13 +836,13 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
     //RXissueSubAssetXXXXXXXXXXXXXWcwhwL
     BRTxOutputSetAddress(&outputs[off], strIssueSubAssetBurnAddressMainNet);
 #endif
-    
+
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, outputs, 1);
     off++;
 
     /* Move Ownership Output + Input */
     BRAddress address = ADDRESS_NONE;
-    
+
     outputs[off].amount = 0;
     pthread_mutex_unlock(&wallet->lock); // TODO: remove!
     BRWalletUnusedAddrs(wallet, &address, 1, 1);
@@ -796,32 +851,32 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, address.s);
-    
+
 #warning TODO: change asstWithOwner to char array !!
     char *asstWithOwner;
     asstWithOwner = malloc(rootAsst->nameLen + OWNER_LENGTH);
     strcpy(asstWithOwner, rootAsst->name);
     strcat(asstWithOwner, OWNER_TAG);
-    
+
     BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[off].script, outputs[off].scriptLen, rootAsst);
-    
+
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
-    
+
     //    pthread_mutex_lock(&wallet->lock); // not tested // tested crashes in BRWalletFees!!
-    
+
     BRTransaction *tx; UTXO *utxo;
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         utxo = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, utxo);
-        
+
         BRAsset *temp = calloc(1, sizeof(*asst));
         if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp))
             temp = NULL;
-        
+
         if (!tx || !temp || utxo->n >= tx->outCount) continue;
-        
+
         if (strcmp(temp->name, asstWithOwner) != 0) continue;
-        
+
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
                               tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
         free(temp);
@@ -829,34 +884,34 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
     }
     free(asstWithOwner);
     off++;
-    
+
     // The order is important here: Ownership script before NewAsset script
     //Add new asset ownership output
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetOwnerAssetScript(NULL, 0, asst);
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
-    
+
     BRTxOutputSetOwnerAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
-    
+
     // Add new asset output
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
-    
+
     BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
-    
+
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asst, transaction);
 
@@ -869,18 +924,18 @@ BRTransaction *BRWalletCreateTxForSubAssetCreation(BRWallet *wallet, uint64_t am
 // Outupts order is imporatant, Shuffled(Burn + change) TRANSFER! NEW -UNIQUE-ASSET
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst, BRAsset *rootAsst) {
-    
+
     size_t asstCount = 3, off = 0;
     BRTxOutput outputs[asstCount];
-    
+
     for (size_t i = 0; i < asstCount; i++) {
         outputs[i] = TX_OUTPUT_NONE;
     }
-    
+
     assert(wallet != NULL);
     assert(amount == IssueUniqueAssetBurnAmount);
     assert(addr != NULL && BRAddressIsValid(addr));
-    
+
     // Add burn output
     outputs[off].amount = amount;
 #if TESTNET
@@ -893,13 +948,13 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
     //RXissueUniqueAssetXXXXXXXXXXWEAe58
     BRTxOutputSetAddress(&outputs[off], strIssueUniqueAssetBurnAddressMainNet);
 #endif
-    
+
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, outputs, 1);
     off++;
-    
+
     /* Move Ownership Output + Input */
     BRAddress address = ADDRESS_NONE;
-    
+
     outputs[off].amount = 0;
     pthread_mutex_unlock(&wallet->lock); // TODO: remove
     BRWalletUnusedAddrs(wallet, &address, 1, 1);
@@ -913,34 +968,34 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
     asstWithOwner = malloc(rootAsst->nameLen + OWNER_LENGTH);
     strcpy(asstWithOwner, rootAsst->name);
     strcat(asstWithOwner, OWNER_TAG);
-    
+
     BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[off].script, outputs[off].scriptLen, rootAsst);
-    
+
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
-    
+
     //    pthread_mutex_lock(&wallet->lock); // not tested // tested crashes in BRWalletFees!!
     
     BRTransaction *tx; UTXO *utxo;
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         utxo = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, utxo);
-        
+
         BRAsset *temp = calloc(1, sizeof(*asst));
         if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) {
             free(temp);
             temp = NULL;
         }
-        
+
         if (!tx || !temp || utxo->n >= tx->outCount) {
             free(temp);
             continue;
         }
-        
+
         if (strcmp(temp->name, asstWithOwner) != 0) {
             free(temp);
             continue;
         }
-        
+
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
                               tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
         free(temp);
@@ -966,7 +1021,7 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
 //
     // Add new asset output
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetNewAssetScript(NULL, 0, asst);
     array_new(outputs[off].script, outputs[off].scriptLen);
@@ -976,10 +1031,10 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
     BRTxOutputSetNewAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
-    
+
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
     CopyAsset(asst, transaction);
-    
+
     return transaction;
 }
 
@@ -989,7 +1044,7 @@ BRTransaction *BRWalletCreateTxForUniqueAssetCreation(BRWallet *wallet, uint64_t
 // Outupts order is imporatant, Shuffled(Burn + change) TRANSFER! NEW -SUB-ASSET then OWNER
 // result must be freed by calling TransactionFree()
 BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amount, const char *addr, BRAsset *asst) {
-    
+
     size_t asstCount = 3, off = 0;
     BRTxOutput outputs[asstCount];
 
@@ -1013,7 +1068,7 @@ BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amoun
     //strReissueAssetBurnAddressMainNet
     BRTxOutputSetAddress(&outputs[off], strReissueAssetBurnAddressMainNet);
 #endif
-    
+
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, &outputs[off], 1);
     off++;
 
@@ -1031,40 +1086,40 @@ BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amoun
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, address.s);
-    
+
     #warning TODO: change asstWithOwner to char array !!
     char *asstWithOwner;
     asstWithOwner = malloc(asst->nameLen + OWNER_LENGTH);
     strcpy(asstWithOwner, asst->name);
     strcat(asstWithOwner, OWNER_TAG);
-    
+
     BRTxOutputSetTransferOwnerAssetScriptWithoutTag(outputs[off].script, outputs[off].scriptLen, asst);
-    
+
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
-    
+
     //    pthread_mutex_lock(&wallet->lock); // not tested // tested crashes in BRWalletFees!!
-    
+
     BRTransaction *tx; UTXO *utxo;
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         utxo = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, utxo);
-        
+
         BRAsset *temp = calloc(1, sizeof(*asst));
         if(!GetAssetData(tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, temp)) {
             free(temp);
             temp = NULL;
         }
-        
+
         if (!tx || !temp || utxo->n >= tx->outCount) {
             free(temp);
             continue;
         }
-        
+
         if (strcmp(temp->name, asstWithOwner) != 0) {
             free(temp);
             continue;
         }
-        
+
         BRTransactionAddInput(transaction, tx->txHash, utxo->n, tx->outputs[utxo->n].amount,
                               tx->outputs[utxo->n].script, tx->outputs[utxo->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
         free(temp);
@@ -1072,20 +1127,20 @@ BRTransaction *BRWalletCreateTxForAssetsReissue(BRWallet *wallet, uint64_t amoun
     }
     free(asstWithOwner);
     off++;
-    
+
     /* Reissue Asset Output / No Input needed */
     outputs[off].amount = 0;
-    
+
     strncpy(outputs[off].address, addr, sizeof(outputs[off].address) - 1);
     outputs[off].scriptLen = BRTxOutputSetReissueAssetScript(NULL, 0, asst);
     array_new(outputs[off].script, outputs[off].scriptLen);
     array_set_count(outputs[off].script, outputs[off].scriptLen);
     BRAddressScriptPubKey(outputs[off].script, outputs[off].scriptLen, addr);
-    
+
     outputs[off].scriptLen = BRTxOutputSetReissueAssetScript(outputs[off].script, outputs[off].scriptLen, asst);
     BRTransactionAddOutput(transaction, outputs[off].amount, outputs[off].script, outputs[off].scriptLen);
     off++;
-    
+
     return transaction;
 }
 
@@ -1114,7 +1169,7 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
     BRAddressScriptPubKey(output.script, output.scriptLen, addr);
 
     BRTxOutputSetTransferAssetScript(output.script, output.scriptLen, asst);
-    
+
     BRTransaction *transaction = BRWalletCreateTxForOutputs(wallet, &output, 1);
 
     //N.B. asset is created using an UnSafePointer that gets destroyed with thread, copying value to tx instead of pointing to it.
@@ -1126,36 +1181,36 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
     for (int i = 0; i < array_count(wallet->utxos); i++) {
         o = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, o);
-                
+
         BRAsset *temp = calloc(1, sizeof(*asst));
         if(!GetAssetData(tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, temp)) {
             free(temp);
             temp = NULL;
         }
-        
+
         if (!tx || !temp || o->n >= tx->outCount) {
             free(temp);
             continue;
         }
-        
+
         if (strcmp(temp->name, asst->name) != 0) {
             free(temp);
             continue;
         }
-        
+
         BRTransactionAddInput(transaction, tx->txHash, o->n, tx->outputs[o->n].amount,
                               tx->outputs[o->n].script, tx->outputs[o->n].scriptLen, NULL, 0, TXIN_SEQUENCE);
-        
+
         asst_balance += temp->amount;
         free(temp);
         if(asst->amount < asst_balance) {
             // add change for Asset if any
             pthread_mutex_unlock(&wallet->lock);
             BRWalletUnusedAddrs(wallet, &address, 1, 1);
-            
+
             BRTxOutput output_change = TX_OUTPUT_NONE;
             output_change.amount = 0;
-            
+
             strncpy(output_change.address, address.s, sizeof(output_change.address) - 1);
             output_change.scriptLen = BRTxOutputSetTransferAssetScript(NULL, 0, asst);
             array_new(output_change.script, output_change.scriptLen);
@@ -1165,9 +1220,9 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
             BRAsset asst_change = *asst;
             asst_change.amount = asst_balance - transaction->asset->amount;
             output_change.scriptLen = BRTxOutputSetTransferAssetScript(output_change.script, output_change.scriptLen, &asst_change);
-            
+
             BRTransactionAddOutput(transaction, output_change.amount, output_change.script, output_change.scriptLen);
-            
+
             break;
         } else if(transaction->asset->amount > asst_balance) continue;
         else break;
@@ -1175,7 +1230,7 @@ BRTransaction *BRWalletBurnRootAsset(BRWallet *wallet, BRAsset *asst) {
     return transaction;
 }
 
-// returns an unsigned transaction that satisifes the given transaction outputs
+// returns an unsigned transaction that satisfies the given transaction outputs
 // result must be freed using TransactionFree()
 BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput outputs[], size_t outCount)
 {
@@ -1184,10 +1239,10 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput out
     size_t i, j, cpfpSize = 0;
     UTXO *o;
     BRAddress addr = ADDRESS_NONE;
-    
+
     assert(wallet != NULL);
     assert(outputs != NULL && outCount > 0);
-    
+
     for (i = 0; outputs && i < outCount; i++) {
         assert(outputs[i].script != NULL && outputs[i].scriptLen > 0);
         BRTransactionAddOutput(transaction, outputs[i].amount, outputs[i].script, outputs[i].scriptLen);
@@ -1197,11 +1252,11 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput out
     minAmount = BRWalletMinOutputAmount(wallet);
     pthread_mutex_lock(&wallet->lock);
     feeAmount = _txFee(wallet->feePerKb, BRTransactionSize(transaction) + TX_OUTPUT_SIZE);
-    
+
     for (i = 0; i < array_count(wallet->utxos); i++) {
         o = &wallet->utxos[i];
         tx = BRSetGet(wallet->allTx, o);
-        
+
         if (!tx || tx->outputs[o->n].amount == 0 || o->n >= tx->outCount) continue;
         // if(NULL != tx->asset) continue; // ignore Assets UTXO // Doesn't work don't do THIS!!!
         // don't remove this comment! I keep coming back to this solution and spend hours debugging for error!
@@ -1212,55 +1267,54 @@ BRTransaction *BRWalletCreateTxForOutputs(BRWallet *wallet, const BRTxOutput out
         if (BRTransactionSize(transaction) + TX_OUTPUT_SIZE > TX_MAX_SIZE) { // transaction size-in-bytes too large
             BRTransactionFree(transaction);
             transaction = NULL;
-            
+
             // check for sufficient total funds before building a smaller transaction
             if (wallet->balance < amount + _txFee(wallet->feePerKb, 10 + array_count(wallet->utxos)*TX_INPUT_SIZE +
                                                   (outCount + 1)*TX_OUTPUT_SIZE + cpfpSize)) break;
             pthread_mutex_unlock(&wallet->lock);
-            
+
             if (outputs[outCount - 1].amount > amount + feeAmount + minAmount - balance) {
                 BRTxOutput newOutputs[outCount];
-                
+
                 for (j = 0; j < outCount; j++) {
                     newOutputs[j] = outputs[j];
                 }
-                
+
                 newOutputs[outCount - 1].amount -= amount + feeAmount - balance; // reduce last output amount
                 transaction = BRWalletCreateTxForOutputs(wallet, newOutputs, outCount);
             }
             else transaction = BRWalletCreateTxForOutputs(wallet, outputs, outCount - 1); // remove last output
-            
+
             balance = amount = feeAmount = 0;
             pthread_mutex_lock(&wallet->lock);
             break;
         }
-        
+
         balance += tx->outputs[o->n].amount;
-        
+
         // fee amount after adding a change output
         feeAmount = _txFee(wallet->feePerKb, BRTransactionSize(transaction) + TX_OUTPUT_SIZE + cpfpSize);
-        
+
         // increase fee to round off remaining wallet balance to nearest 100 satoshi
         if (wallet->balance > amount + feeAmount) feeAmount += (wallet->balance - (amount + feeAmount)) % 100;
-        
+
         if (balance == amount + feeAmount || balance >= amount + feeAmount + minAmount) break;
     }
-    
+
     pthread_mutex_unlock(&wallet->lock);
-    
+
     if (transaction && (outCount < 1 || balance < amount + feeAmount)) { // no outputs/insufficient funds
         BRTransactionFree(transaction);
         transaction = NULL;
-    }
-    else if (transaction && balance - (amount + feeAmount) > minAmount) { // add change output
+    } else if (transaction && balance - (amount + feeAmount) > minAmount) { // add change output
         BRWalletUnusedAddrs(wallet, &addr, 1, 1);
         uint8_t script[BRAddressScriptPubKey(NULL, 0, addr.s)];
         size_t scriptLen = BRAddressScriptPubKey(script, sizeof(script), addr.s);
-        
+
         BRTransactionAddOutput(transaction, balance - (amount + feeAmount), script, scriptLen);
         BRTransactionShuffleOutputs(transaction);
     }
-    
+
     return transaction;
 }
 
@@ -1603,11 +1657,11 @@ uint64_t BRWalletAmountReceivedFromTx(BRWallet *wallet, const BRTransaction *tx)
 // used in Creation and Reissue assets transaction // Transfer and Ownership Transfers aren't counted.
 size_t BRWalletAssetsReceivedFromTx(BRWallet *wallet, const BRTransaction *tx, BRAsset *asset, size_t asstCount) {
     size_t count = 0;
-    
+
     assert(wallet != NULL);
     assert(tx != NULL);
     pthread_mutex_lock(&wallet->lock);
-    
+
     if(!asset && asstCount == 0) {
         for (size_t i = 0; tx && i < tx->outCount; i++)
             if (tx->outputs[i].amount == 0 &&
@@ -1622,7 +1676,7 @@ size_t BRWalletAssetsReceivedFromTx(BRWallet *wallet, const BRTransaction *tx, B
                 count++;
             }
     }
-    
+
     pthread_mutex_unlock(&wallet->lock);
     return count;
 }
@@ -1829,20 +1883,20 @@ int64_t RavencoinAmount(int64_t localAmount, double price) {
 // decompose a Creation asset or Reissue asset Transaction to burn + assets txs
 // returns the txscCount a transaction can be decomposed to when txDecomposed is NULL and txsCount is 0
 size_t BRTransactionDecompose(BRWallet *wallet, const BRTransaction *tx, BRTransaction *txDecomposed, size_t txsCount) {
-    
+
     assert(tx != NULL);
-    
+
     size_t count = 0;
     bool burn = false;
-    
+
     if (BRWalletAmountSentByTx(wallet, tx) > 0 && BRWalletTransactionIsValid(wallet, tx))
         burn = true;
-    
+
     size_t asstCount = BRWalletAssetsReceivedFromTx(wallet, tx, NULL, 0);
-    
+
     if(!txDecomposed || txsCount == 0)
         return (burn ? asstCount + 1 : asstCount);
-    
+
     // allocation is done in SWIFT, UnSafePointer is freed by garbage collector.
     //    txDecomposed = BRTransactionNew(burn ? asstCount + 1 : asstCount);
 
@@ -1850,14 +1904,14 @@ size_t BRTransactionDecompose(BRWallet *wallet, const BRTransaction *tx, BRTrans
     BRTxOutput *outputs = txDecomposed[count].outputs;
 
     if(burn) {
-        
+
         txDecomposed[count] = *tx;
         txDecomposed[count].inputs = inputs;
         txDecomposed[count].outputs = outputs;
         txDecomposed[count].inCount = txDecomposed[count].outCount = 0;
 
         txDecomposed[count].asset = NULL;
-        
+
         for (size_t j = 0; j < tx->inCount; j++) {
             if(!IsScriptAsset(tx->outputs[tx->inputs[j].index].script,
                               tx->outputs[tx->inputs[j].index].scriptLen))
@@ -1869,33 +1923,33 @@ size_t BRTransactionDecompose(BRWallet *wallet, const BRTransaction *tx, BRTrans
             if(!IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen))
                 BRTransactionAddOutput(&txDecomposed[count], tx->outputs[j].amount, tx->outputs[j].script, tx->outputs[j].scriptLen);
         }
-        
+
         count++;
     }
-    
+
     // used only for Creation and Reissue, Transfer outputs aren't needed here, until a better way to spot a change Output is found
     for (size_t j = 0; j < tx->outCount; j++) {
         if(IsScriptAsset(tx->outputs[j].script, tx->outputs[j].scriptLen) &&
            !IsScriptTransferAsset(tx->outputs[j].script, tx->outputs[j].scriptLen) &&
            BRSetContains(wallet->allAddrs, tx->outputs[j].address)) {
-            
+
             inputs = txDecomposed[count].inputs;
             outputs = txDecomposed[count].outputs;
-            
+
             txDecomposed[count] = *tx;
             txDecomposed[count].inputs = inputs;
             txDecomposed[count].outputs = outputs;
             txDecomposed[count].inCount = txDecomposed[count].outCount = 0;
 
             txDecomposed[count].asset = NewAsset();
-            
+
             BRTransactionAddOutput(&txDecomposed[count], tx->outputs[j].amount, tx->outputs[j].script,
                                        tx->outputs[j].scriptLen);
             GetAssetData(tx->outputs[j].script, tx->outputs[j].scriptLen, txDecomposed[count].asset);
-            
+
             count++;
         }
     }
-    
+
     return count;
 }

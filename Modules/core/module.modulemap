@@ -14,11 +14,11 @@ module Core [system] [extern_c] {
     header "BRBIP39Mnemonic.h"
     header "BRBIP44Sequence.h"
     header "BRTransaction.h"
-    header "BRPaymentProtocol.h"
     header "BRAddress.h"
     header "BRWallet.h"
     header "BRPeerManager.h"
     header "BRScript.h"
     header "BRAssets.h"
+    header "BRChainParams.h"
     export *
 }

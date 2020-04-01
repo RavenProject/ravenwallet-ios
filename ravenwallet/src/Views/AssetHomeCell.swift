@@ -110,6 +110,7 @@ class AssetHomeCell : UITableViewCell, Subscriber {
     private func setupStyle() {
         selectionStyle = .none
         backgroundColor = .clear
+        assetName.adjustsFontSizeToFitWidth = true
         imgAsset.contentMode = .scaleAspectFit
         container.backgroundColor = .white
         arrow.tintColor = .white

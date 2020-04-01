@@ -1,26 +1,11 @@
 //
-//  PeerManager.h
+//  BRPeerManager.h
 //
 //  Created by Aaron Voisine on 9/2/15.
 //  Copyright (c) 2015 breadwallet LLC.
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
 
 #ifndef BRPeerManager_h
 #define BRPeerManager_h
@@ -29,9 +14,9 @@
 #include "BRMerkleBlock.h"
 #include "BRTransaction.h"
 #include "BRWallet.h"
-#include "ChainParams.h"
 #include <stddef.h>
 #include <inttypes.h>
+#include "BRChainParams.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,11 +24,11 @@ extern "C" {
 
 #define PEER_MAX_CONNECTIONS 6
 
-typedef struct PeerManagerStruct BRPeerManager;
+typedef struct BRPeerManagerStruct BRPeerManager;
 
 // returns a newly allocated PeerManager struct that must be freed by calling PeerManagerFree()
-BRPeerManager *BRPeerManagerNew(BRWallet *wallet, uint32_t earliestKeyTime, BRMerkleBlock **blocks, size_t blocksCount,
-                                const BRPeer *peers, size_t peersCount);
+BRPeerManager *BRPeerManagerNew(const BRChainParams *params, BRWallet *wallet, uint32_t earliestKeyTime,
+                                BRMerkleBlock *blocks[], size_t blocksCount, const BRPeer peers[], size_t peersCount);
 
 // not thread-safe, set callbacks once before calling PeerManagerConnect()
 // info is a void pointer that will be passed along with each callback call
@@ -87,7 +72,7 @@ void BRPeerManagerRescan(BRPeerManager *manager);
 
 // rescans blocks and transactions after the last hardcoded checkpoint (uses a new random download peer, see above comment)
 void BRPeerManagerRescanFromLastHardcodedCheckpoint(BRPeerManager *manager);
-    
+
 // rescans blocks and transactions from after the blockNumber.  If blockNumber is not known, then
 // rescan from the just prior checkpoint (uses a new random download peer, see above comment).
 void BRPeerManagerRescanFromBlockNumber(BRPeerManager *manager, uint32_t blockNumber);
@@ -119,7 +104,7 @@ void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *inf
 size_t BRPeerManagerRelayCount(BRPeerManager *manager, UInt256 txHash);
 
 // return the ChainParams used to create this peer manager
-const ChainParams *BRPeerManagerChainParams(BRPeerManager *manager);
+const BRChainParams *BRPeerManagerChainParams(BRPeerManager *manager);
 
 void PeerManagerGetAssetData(BRPeerManager *manager, void *infoManager, char *assetName, size_t nameLen,
                              void (*receivedAssetData)(void *info, BRAsset *asset));

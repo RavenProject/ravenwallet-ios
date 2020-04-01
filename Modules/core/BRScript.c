@@ -1,6 +1,16 @@
+//
+// BRScript.c
+//
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2017 The Raven Core developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+//
 
 #include "BRScript.h"
 
+// script opcodes: https://en.bitcoin.it/wiki/Script#Constants
 
 const char *GetOpName(enum OPCODETYPE opcode) {
     switch (opcode) {
@@ -206,7 +216,7 @@ bool IsScriptTransferAsset(const uint8_t *script, size_t scriptLen) {
 }
 
 //bool IsScriptOwnershipTransferAsset(const uint8_t *script, size_t scriptLen) {
-//    
+//
 //    bool helper = (scriptLen > 30 &&
 //                   script[25] == OP_RVN_ASSET &&
 //                   script[27] == RVN_R &&
@@ -228,30 +238,30 @@ bool IsScriptAsset(const uint8_t *script, size_t scriptLen) {
 }
 
 bool IsAssetNameRootAsset(const BRAsset *asst) {
-    
+
     assert(asst != NULL);
     assert(asst->name != NULL);
-    
+
     if(strstr(asst->name, "/") || strstr(asst->name, "#"))
         return false;
     else return true;
 }
 
 bool IsAssetNameSubAsset(const BRAsset *asst) {
-    
+
     assert(asst != NULL);
     assert(asst->name != NULL);
-    
+
     if(strstr(asst->name, "/"))
         return true;
     else return false;
 }
 
 bool IsAssetNameUniqueAsset(const BRAsset *asst) {
-    
+
     assert(asst != NULL);
     assert(asst->name != NULL);
-    
+
     if(strstr(asst->name, "#"))
         return true;
     else return false;

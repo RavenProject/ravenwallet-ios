@@ -403,6 +403,18 @@ extension UnsafeMutablePointer where Pointee == BRTransaction {
         BRTransactionAddOutput(self, amount, script, script.count)
     }
     
+    func addAssetOutput(amount: UInt64, assetName:String, script: [UInt8]) -> [UInt8]{
+        //size_t BRTxOutputSetTransferAssetScript(uint8_t *script, size_t scriptLen, BRAsset *asset);
+        let asset = Asset.init(idAsset: -1, name: assetName, amount: Satoshis(rawValue: amount), units: 0, reissubale: 0, hasIpfs: 0, ipfsHash: "", ownerShip: -1, hidden: -1, sort: -1)
+        let assetRef = BRAsset.createAssetRef(asset: asset, type: TRANSFER, amount: Satoshis(rawValue: amount))
+        //var newScript = UnsafeMutablePointer<UInt8>(bytes: script)
+        let scriptRef = UnsafeMutablePointer<UInt8>.allocate(capacity: script.count)
+        scriptRef.initialize(from: UnsafeRawPointer([script]).assumingMemoryBound(to: UInt8.self), count: script.count)
+        let size = BRTxOutputSetTransferAssetScript(scriptRef, script.count, assetRef)
+        let newScript = Array(UnsafeBufferPointer(start: scriptRef, count: size))
+        return newScript
+    }
+    
     // shuffles order of tx outputs
     func shuffleOutputs() {
         BRTransactionShuffleOutputs(self)
@@ -623,6 +635,11 @@ class BRWallet {
         return BRWalletFeeForTxSize(cPtr, size)
     }
     
+    //add fee to transaction created for swipe asset
+    func addFeeToTx(_ tx:BRTxRef){
+        return BRWalletAddFeeToTransaction(cPtr, tx)
+    }
+    
     // outputs below this amount are uneconomical due to fees (TX_MIN_OUTPUT_AMOUNT is the absolute min output amount)
     var minOutputAmount: UInt64 {
         return BRWalletMinOutputAmount(cPtr)
@@ -670,11 +687,13 @@ class BRPeerManager {
     let cPtr: OpaquePointer
     let listener: BRPeerManagerListener
     let currency: CurrencyDef
+    let mainNetParams = BRMainNetParams
+    let testNetParams = BRTestNetParams
 
     init?(currency: CurrencyDef, wallet: BRWallet, earliestKeyTime: TimeInterval, blocks: [BRBlockRef?], peers: [BRPeer],
           listener: BRPeerManagerListener) {
         var blockRefs = blocks
-        guard let cPtr = BRPeerManagerNew(wallet.cPtr, UInt32(earliestKeyTime + NSTimeIntervalSince1970),
+        guard let cPtr = BRPeerManagerNew(E.isTestnet ? testNetParams: mainNetParams, wallet.cPtr, UInt32(earliestKeyTime + NSTimeIntervalSince1970),
                                           &blockRefs, blockRefs.count, peers, peers.count) else { return nil }
         self.listener = listener
         self.cPtr = cPtr

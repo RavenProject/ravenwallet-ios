@@ -596,7 +596,7 @@ extension WalletManager : WalletAuthenticator {
         public static let pinUnlockTime = "PIN_UNLOCK_TIME"
     }
     
-    private func signTx(_ tx: BRTxRef) -> Bool {
+    func signTx(_ tx: BRTxRef) -> Bool {
         return autoreleasepool {
             do {
                 var seed = UInt512()

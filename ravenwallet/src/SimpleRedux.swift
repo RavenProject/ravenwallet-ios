@@ -72,6 +72,7 @@ enum TriggerName {
     case reloadSettings
     case playGif(String)
     case selectAddressBook( AddressBookType?, ((String)->Void)?)
+    case haptic(UIImpactFeedbackGenerator.FeedbackStyle)
 } //NB : remember to add to triggers to == fuction below
 
 extension TriggerName : Equatable {}
@@ -147,6 +148,8 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
     case (.playGif(_), .playGif(_)):
         return true
     case (.selectAddressBook(_, _), .selectAddressBook(_, _)):
+        return true
+    case (.haptic, .haptic):
         return true
     default:
         return false

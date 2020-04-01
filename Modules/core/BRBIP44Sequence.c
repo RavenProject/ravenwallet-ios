@@ -1,10 +1,11 @@
 //
-//  BRBIP32Sequence.c
+//  BRBIP44Sequence.c
 //
 //  Created by Aaron Voisine on 8/19/15.
 //  Copyright (c) 2015 breadwallet LLC
+//  Update by Roshii on 4/1/18.
+//  Copyright (c) 2018 ravencoin core team
 //
-
 
 #include "BRBIP44Sequence.h"
 #include "BRCrypto.h"
@@ -292,17 +293,17 @@ size_t BRBIP32SerializeMasterPrivKey(char *str, size_t strLen, const void *seed,
     BRKey key;
 
     assert(seed != NULL || seedLen == 0);
-    
+
 
     if (seed || seedLen == 0) {
         HMAC(&I, SHA512, sizeof(UInt512), BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed, seedLen);
-        
+
         secret = *(UInt256 *)&I;
         chain = *(UInt256 *)&I.u8[sizeof(UInt256)]; //We don't need the chain code.
         var_clean(&I);
         size_t keyCount = BRKeySetSecret(&key, &secret, 1);
     }
-    
+
     // TODO: XXX implement
     return 0;
 }

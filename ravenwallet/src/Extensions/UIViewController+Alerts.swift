@@ -10,9 +10,11 @@ import UIKit
 
 extension UIViewController {
 
-    func showErrorMessage(_ message: String) {
+    func showErrorMessage(_ message: String, callBack: (() -> Void)? = nil) {
         let alert = UIAlertController(title: S.Alert.error, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: S.Button.ok, style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: S.Button.ok, style: .default, handler: {_ in
+            callBack?()
+        }))
         present(alert, animated: true, completion: nil)
     }
 

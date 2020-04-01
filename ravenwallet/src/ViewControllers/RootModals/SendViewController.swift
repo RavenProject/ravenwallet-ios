@@ -319,11 +319,7 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable {
             request.fetchRemoteRequest(completion: { [weak self] request in
                 DispatchQueue.main.async {
                     loadingView.dismiss(animated: true, completion: {
-                        if let paymentProtocolRequest = request?.paymentProtoclRequest {
-                            self?.confirmProtocolRequest(protoReq: paymentProtocolRequest)
-                        } else {
-                            self?.showErrorMessage(S.Send.remoteRequestError)
-                        }
+                        self?.showErrorMessage(S.Send.remoteRequestError)
                     })
                 }
             })
@@ -373,69 +369,6 @@ class SendViewController : UIViewController, Subscriber, ModalPresentable {
                     }
                 }
         })
-    }
-
-    func confirmProtocolRequest(protoReq: PaymentProtocolRequest) {
-        guard let firstOutput = protoReq.details.outputs.first else { return }
-        guard let wallet = walletManager.wallet else { return }
-
-        let address = firstOutput.swiftAddress
-        let isValid = protoReq.isValid()
-        var isOutputTooSmall = false
-
-        if let errorMessage = protoReq.errorMessage, errorMessage == S.PaymentProtocol.Errors.requestExpired, !isValid {
-            return showAlert(title: S.PaymentProtocol.Errors.badPaymentRequest, message: errorMessage, buttonLabel: S.Button.ok)
-        }
-
-        //TODO: check for duplicates of already paid requests
-        var requestAmount = Satoshis(0)
-        protoReq.details.outputs.forEach { output in
-            if output.amount > 0 && output.amount < wallet.minOutputAmount {
-                isOutputTooSmall = true
-            }
-            requestAmount += output.amount
-        }
-
-        if wallet.containsAddress(address) {
-            return showAlert(title: S.Alert.warning, message: S.Send.containsAddress, buttonLabel: S.Button.ok)
-        } else if wallet.addressIsUsed(address) && !didIgnoreUsedAddressWarning {
-            let message = "\(S.Send.UsedAddress.title)\n\n\(S.Send.UsedAddress.firstLine)\n\n\(S.Send.UsedAddress.secondLine)"
-            return showError(title: S.Alert.warning, message: message, ignore: { [weak self] in
-                self?.didIgnoreUsedAddressWarning = true
-                self?.confirmProtocolRequest(protoReq: protoReq)
-            })
-        } else if let message = protoReq.errorMessage, message.utf8.count > 0 && (protoReq.commonName?.utf8.count)! > 0 && !didIgnoreIdentityNotCertified {
-            return showError(title: S.Send.identityNotCertified, message: message, ignore: { [weak self] in
-                self?.didIgnoreIdentityNotCertified = true
-                self?.confirmProtocolRequest(protoReq: protoReq)
-            })
-        } else if requestAmount < wallet.minOutputAmount {
-            let amount = Amount(amount: wallet.minOutputAmount, rate: Rate.empty, maxDigits: currency.state.maxDigits, currency: currency)
-            let message = String(format: S.PaymentProtocol.Errors.smallPayment, amount.bits)
-            return showAlert(title: S.PaymentProtocol.Errors.smallOutputErrorTitle, message: message, buttonLabel: S.Button.ok)
-        } else if isOutputTooSmall {
-            let amount = Amount(amount: wallet.minOutputAmount, rate: Rate.empty, maxDigits: currency.state.maxDigits, currency: currency)
-            let message = String(format: S.PaymentProtocol.Errors.smallTransaction, amount.bits)
-            return showAlert(title: S.PaymentProtocol.Errors.smallOutputErrorTitle, message: message, buttonLabel: S.Button.ok)
-        }
-
-        if let name = protoReq.commonName {
-            addressCell.setContent(protoReq.pkiType != "none" ? "\(S.Symbols.lock) \(name.sanitized)" : name.sanitized)
-        }
-
-        if requestAmount > 0 {
-            amountView.forceUpdateAmount(amount: requestAmount)
-        }
-        if requestAmount == 0 {
-            if let amount = amount {
-                guard sender.createTransaction(amount: amount.rawValue, to: address) else {
-                    return showAlert(title: S.Alert.error, message: S.Send.createTransactionError, buttonLabel: S.Button.ok)
-                }
-            }
-        } else {
-            addressCell.isEditable = false
-            sender.createTransaction(forPaymentProtocol: protoReq)
-        }
     }
 
     private func showError(title: String, message: String, ignore: @escaping () -> Void) {

@@ -78,7 +78,6 @@ struct PaymentRequest {
 
     init?(data: Data, currency: CurrencyDef) {
         self.currency = currency
-        self.paymentProtoclRequest = PaymentProtocolRequest(data: data)
         type = .local
     }
 
@@ -130,7 +129,6 @@ struct PaymentRequest {
     var label: String?
     var message: String?
     var remoteRequest: NSURL?
-    var paymentProtoclRequest: PaymentProtocolRequest?
     var r: URL?
     var warningMessage: String? //Displayed to the user before the send view fields are populated
 }

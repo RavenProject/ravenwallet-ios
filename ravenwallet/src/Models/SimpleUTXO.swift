@@ -15,6 +15,7 @@ struct SimpleUTXO {
     let index: UInt32
     let script: [UInt8]
     let satoshis: UInt64
+    let assetName: String? //if utxo is an asset
 
     init?(json: [String: Any]) {
         guard let txid = json["txid"] as? String,
@@ -28,5 +29,7 @@ struct SimpleUTXO {
         self.index = UInt32(vout)
         self.script = [UInt8](scriptData)
         self.satoshis = satoshis
+        self.assetName = json["assetName"] as? String
+
     }
 }

@@ -131,6 +131,7 @@ class PinPadViewController : UICollectionViewController {
 
     //MARK: - UICollectionViewDelegate
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        Store.trigger(name: .haptic(Haptic.style))
         let item = items[indexPath.row]
         if item == "del" {
             if currentOutput.count > 0 {
@@ -145,7 +146,6 @@ class PinPadViewController : UICollectionViewController {
                 currentOutput = currentOutput + item
             }
         }
-
         ouputDidUpdate?(currentOutput)
     }
 

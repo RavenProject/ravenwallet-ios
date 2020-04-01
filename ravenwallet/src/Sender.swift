@@ -28,7 +28,6 @@ class Sender {
     private let walletManager: WalletManager
     private let currency: CurrencyDef
     var transaction: BRTxRef?
-    var protocolRequest: PaymentProtocolRequest?
     var rate: Rate?
     var feePerKb: UInt64?
 
@@ -36,12 +35,7 @@ class Sender {
         transaction = walletManager.wallet?.createTransaction(forAmount: amount, toAddress: to)
         return transaction != nil
     }
-
-    func createTransaction(forPaymentProtocol: PaymentProtocolRequest) {
-        protocolRequest = forPaymentProtocol
-        transaction = walletManager.wallet?.createTxForOutputs(forPaymentProtocol.details.outputs)
-    }
-
+    
     var fee: UInt64 {
         guard let tx = transaction else { return 0 }
         return walletManager.wallet?.feeForTx(tx) ?? 0
@@ -108,45 +102,10 @@ class Sender {
                         completion(.publishFailure(error))
                     } else {
                         completion(.success)
-                        myself.postProtocolPaymentIfNeeded()
                     }
                 }
             })
         }
     }
 
-    private func postProtocolPaymentIfNeeded() {
-        guard let protoReq = protocolRequest else { return }
-        guard let wallet = walletManager.wallet else { return }
-        let amount = protoReq.details.outputs.map { $0.amount }.reduce(0, +)
-        let payment = PaymentProtocolPayment(merchantData: protoReq.details.merchantData,
-                                             transactions: [transaction],
-                                             refundTo: [(address: wallet.receiveAddress, amount: amount)])
-        guard let urlString = protoReq.details.paymentURL else { return }
-        guard let url = URL(string: urlString) else { return }
-
-        let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: protocolPaymentTimeout)
-
-        request.setValue("application/ravencoin-payment", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/ravencoin-paymentack", forHTTPHeaderField: "Accept")
-        request.httpMethod = "POST"
-        request.httpBody = Data(bytes: payment!.bytes)
-
-        URLSession.shared.dataTask(with: request as URLRequest) { data, response, error in
-            guard error == nil else { print("payment error: \(error!)"); return }
-            guard let response = response, let data = data else { print("no response or data"); return }
-            if response.mimeType == "application/bitcoin-paymentack" && data.count <= 50000 {
-                if let ack = PaymentProtocolACK(data: data) {
-                    print("received ack: \(ack)") //TODO - show memo to user
-                } else {
-                    print("ack failed to deserialize")
-                }
-            } else {
-                print("invalid data")
-            }
-
-            print("finished!!")
-        }.resume()
-
-    }
 }

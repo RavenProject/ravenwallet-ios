@@ -1,15 +1,17 @@
+//
+// BRScript.h
+//
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
 // Copyright (c) 2017 The Raven Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+//
 
-#ifndef SCRIPT_H
-#define SCRIPT_H
+#ifndef BRSCRIPT_H
+#define BRSCRIPT_H
 
-//#include "crypto/common.h"
-//#include "assets/Assets.h"
-
+#include "BRTransaction.h"
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
@@ -194,4 +196,4 @@ bool IsAssetNameSubAsset(const BRAsset *asst);
 bool IsAssetNameUniqueAsset(const BRAsset *asst);
 
 
-#endif // SCRIPT_H
+#endif // BRSCRIPT_H

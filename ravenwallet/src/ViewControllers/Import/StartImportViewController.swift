@@ -9,15 +9,15 @@
 import UIKit
 import Core
 
-class StartImportViewController : UIViewController {
-
+class StartImportViewController : UIViewController, Subscriber {
+    
     init(walletManager: WalletManager) {
         self.walletManager = walletManager
         self.currency = walletManager.currency
         assert(walletManager.currency is Raven, "Importing only supports Ravencoin")
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     private let walletManager: WalletManager
     private let currency: CurrencyDef
     private let header = BlueGradiantCenterHeader()
@@ -37,11 +37,13 @@ class StartImportViewController : UIViewController {
     private var utxos:[[String: Any]] = []
     private var countSFail:Int = 0
     private var chain:Int32 = SEQUENCE_EXTERNAL_CHAIN
-
+    private var walletBalance:UInt64 = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addSubviews()
         addConstraints()
+        addSubscriptions()
         setInitialData()
     }
     
@@ -53,7 +55,7 @@ class StartImportViewController : UIViewController {
             }
         }
     }
-
+    
     private func addSubviews() {
         view.addSubview(header)
         header.addSubview(illustration)
@@ -67,7 +69,7 @@ class StartImportViewController : UIViewController {
         view.addSubview(warning)
         view.addSubview(assetWarning)
     }
-
+    
     private func addConstraints() {
         header.constrainTopCorners(sidePadding: 0, topPadding: 0)
         header.constrain([
@@ -119,7 +121,16 @@ class StartImportViewController : UIViewController {
             buttonSeed.constraint(.height, constant: C.Sizes.buttonHeight) ])
         
     }
-
+    
+    private func addSubscriptions() {
+        Store.subscribe(self, selector: { $0[self.currency].balance != $1[self.currency].balance },
+                        callback: { [unowned self] in
+                            if let balance = $0[self.currency].balance {
+                                self.walletBalance = balance
+                            }
+        })
+    }
+    
     private func setInitialData() {
         view.backgroundColor = .white
         illustration.contentMode = .scaleAspectFill
@@ -130,7 +141,7 @@ class StartImportViewController : UIViewController {
         rightCaption.textAlignment = .center
         warning.text = S.Import.importWarning
         assetWarning.text = S.Import.importAssettWarning
-
+        
         buttonScan.tap = strongify(self) { myself in
             let scan = ScanViewController(scanKeyCompletion: { address in
                 myself.didReceiveAddress(address)
@@ -146,14 +157,14 @@ class StartImportViewController : UIViewController {
                     self.utxos.removeAll()
                     self.chain = SEQUENCE_EXTERNAL_CHAIN
                     self.recursiveFetchUTXOS(index: 0, phrase: phrase, completion: { prevKey in
-                        myself.handleData(data: myself.utxos, key: prevKey)
+                        myself.handleData(data: myself.utxos, key: prevKey, isAsset: false)
                     })
                 })
             }))
             myself.navigationController?.pushViewController(recoverWalletViewController, animated: true)
         }
     }
-
+    
     private func didReceiveAddress(_ address: String) {
         if address.isValidPrivateKey {
             if let key = BRKey(privKey: address) {
@@ -165,7 +176,7 @@ class StartImportViewController : UIViewController {
             })
         }
     }
-
+    
     private func unlock(address: String, callback: @escaping (BRKey) -> Void) {
         let alert = UIAlertController(title: S.Import.title, message: S.Import.password, preferredStyle: .alert)
         alert.addTextField(configurationHandler: { textField in
@@ -218,20 +229,20 @@ class StartImportViewController : UIViewController {
             }
         })
         //Todo : for Asset, should update asset api to add this
-//        self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: false, completion:{ data in
-//            self.addUtxos(data: data, isAsset: false)
-//            print("BMEX index RVN ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
-////            self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: true, completion: { data in
-////                self.addUtxos(data: data, isAsset: true)
-////                print("BMEX index Asset ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
-////                self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
-////                let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
-////                self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
-////            })
-//            self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
-//            let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
-//            self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
-//        })
+        //        self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: false, completion:{ data in
+        //            self.addUtxos(data: data, isAsset: false)
+        //            print("BMEX index RVN ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
+        ////            self.walletManager.apiClient?.fetchUTXOS(address: address!, isAsset: true, completion: { data in
+        ////                self.addUtxos(data: data, isAsset: true)
+        ////                print("BMEX index Asset ", index, ", chain : ", self.chain, ", address :", address!, " data : ", data?.count)
+        ////                self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+        ////                let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+        ////                self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+        ////            })
+        //            self.chain = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? SEQUENCE_INTERNAL_CHAIN : SEQUENCE_EXTERNAL_CHAIN
+        //            let nextIndex = (self.chain == SEQUENCE_EXTERNAL_CHAIN) ? (index+1) : index
+        //            self.recursiveFetchUTXOS(index: nextIndex, phrase: phrase, completion: completion)
+        //        })
     }
     
     private func addUtxos(data:[[String: Any]]?, isAsset:Bool){
@@ -244,19 +255,25 @@ class StartImportViewController : UIViewController {
             self.countSFail = self.countSFail + 1
         }
     }
-
+    
     private func checkBalance(key: BRKey) {
+        var key = key
+        guard let address = key.address() else { return }
+        self.fetchUTXOS(address: address, isAsset: false, key: key, callBack: {
+            self.fetchUTXOS(address: address, isAsset: true, key: key)
+        })
+    }
+    
+    func fetchUTXOS(address: String, isAsset:Bool, key: BRKey, callBack:(()->Void)? = nil) {
         present(balanceActivity, animated: true, completion: {
-            var key = key
-            guard let address = key.address() else { return }
-            self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: false, completion: { data in
+            self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: isAsset, completion: { data in
                 guard let data = data else { return }
-                self.handleData(data: data, key: key)
+                self.handleData(data: data, key: key, isAsset: isAsset, callBack: callBack)
             })
         })
     }
-
-    private func handleData(data: [[String: Any]], key: BRKey) {
+    
+    private func handleData(data: [[String: Any]], key: BRKey, isAsset:Bool, callBack:(()->Void)? = nil) {
         var key = key
         guard let tx = UnsafeMutablePointer<BRTransaction>() else { return }
         guard let wallet = walletManager.wallet else { return }
@@ -270,72 +287,118 @@ class StartImportViewController : UIViewController {
         outputs.forEach { output in
             tx.addInput(txHash: output.hash, index: output.index, amount: output.satoshis, script: output.script)
         }
-
+        
         let pubKeyLength = key.pubKey()?.count ?? 0
         walletManager.wallet?.feePerKb = fees.regular
         let fee = wallet.feeForTxSize(tx.size + 34 + (pubKeyLength - 34)*tx.inputs.count)
         balanceActivity.dismiss(animated: true, completion: {
             guard outputs.count > 0 && balance > 0 else {
-                return self.showErrorMessage(S.Import.Error.empty)
+                return self.showErrorMessage(S.Import.Error.empty, callBack: callBack)
             }
-            guard fee + wallet.minOutputAmount <= balance else {
-                return self.showErrorMessage(S.Import.Error.highFees)
+            if isAsset {
+                guard fee + wallet.minOutputAmount <= self.walletBalance else {
+                    return self.showErrorMessage(S.Send.nilFeeError)
+                }
+            }
+            else {
+                guard fee + wallet.minOutputAmount <= balance else {
+                    return self.showErrorMessage(S.Import.Error.highFees)
+                }
             }
             guard let rate = Currencies.rvn.state.currentRate else { return }
-            let balanceAmount = Amount(amount: balance, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
             let feeAmount = Amount(amount: fee, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
-            let balanceText = Store.state.isSwapped ? balanceAmount.localCurrency : balanceAmount.bits
+            let balanceText = self.getBalanceMessage(outputs: outputs, isAsset: isAsset, rate: rate)
             let feeText = Store.state.isSwapped ? feeAmount.localCurrency : feeAmount.bits
             let message = String(format: S.Import.confirm, balanceText, feeText)
             let alert = UIAlertController(title: S.Import.title, message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: {_ in
+                callBack?()
+            }))
             alert.addAction(UIAlertAction(title: S.Import.importButton, style: .default, handler: { _ in
-                self.publish(tx: tx, balance: balance, fee: fee, key: key)
+                self.publish(tx: tx, balance: balance, fee: fee, key: key, isAsset: isAsset, outputs: outputs, callBack:callBack)
             }))
             self.present(alert, animated: true, completion: nil)
         })
     }
-
-    private func publish(tx: UnsafeMutablePointer<BRTransaction>, balance: UInt64, fee: UInt64, key: BRKey) {
+    
+    func getBalanceMessage(outputs:[SimpleUTXO], isAsset:Bool, rate:Rate) -> String {
+        if isAsset {
+            var balanceMessage = ""
+            var index = 0
+            outputs.forEach { output in
+                let plus:String = (index > 0) ? " + " : ""
+                balanceMessage = balanceMessage + plus
+                balanceMessage = balanceMessage + String(output.satoshis) + " " + output.assetName!
+                index = index + 1
+            }
+            return balanceMessage
+        }
+        else {
+            let balance = outputs.map { $0.satoshis }.reduce(0, +)
+            let balanceAmount = Amount(amount: balance, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
+            let balanceText = Store.state.isSwapped ? balanceAmount.localCurrency : balanceAmount.bits
+            return balanceText
+        }
+    }
+    
+    private func publish(tx: UnsafeMutablePointer<BRTransaction>, balance: UInt64, fee: UInt64, key: BRKey, isAsset:Bool, outputs:[SimpleUTXO], callBack:(()->Void)? = nil) {
         guard let wallet = walletManager.wallet else { return }
-        guard let script = BRAddress(string: wallet.receiveAddress)?.scriptPubKey else { return }
+        guard var script = BRAddress(string: wallet.receiveAddress)?.scriptPubKey else { return }
         guard walletManager.peerManager?.connectionStatus != BRPeerStatusDisconnected else { return }
         present(importingActivity, animated: true, completion: {
-            tx.addOutput(amount: balance - fee, script: script)
+            if isAsset {
+                outputs.forEach { output in
+                    let newScript = tx.addAssetOutput(amount: output.satoshis, assetName: output.assetName!, script: script)
+                    script = newScript
+                    tx.addOutput(amount:0, script: script)
+                    wallet.addFeeToTx(tx)
+                    self.walletManager.signTx(tx)
+                }
+            }
+            else{
+                tx.addOutput(amount: balance - fee, script: script)
+            }
             var keys = [key]
             let _ = tx.sign(keys: &keys)
-                guard tx.isSigned else {
-                    self.importingActivity.dismiss(animated: true, completion: {
-                        self.showErrorMessage(S.Import.Error.signing)
-                    })
-                    return
-                }
-                self.walletManager.peerManager?.publishTx(tx, completion: { [weak self] success, error in
-                    guard let myself = self else { return }
+            guard tx.isSigned else {
+                self.importingActivity.dismiss(animated: true, completion: {
+                    self.showErrorMessage(S.Import.Error.signing)
+                })
+                return
+            }
+            self.walletManager.peerManager?.publishTx(tx, completion: { [weak self] success, error in
+                guard let myself = self else { return }
+                DispatchQueue.main.async {
                     myself.importingActivity.dismiss(animated: true, completion: {
                         DispatchQueue.main.async {
                             if let error = error {
                                 myself.showErrorMessage(error.localizedDescription)
                                 return
                             }
-                            myself.showSuccess()
+                            myself.showSuccess(callBack: callBack)
                         }
                     })
-                })
+                }
+            })
         })
+        
     }
-
-    private func showSuccess() {
+    
+    private func showSuccess(callBack:(()->Void)? = nil) {
         Store.perform(action: Alert.Show(.sweepSuccess(callback: { [weak self] in
             guard let myself = self else { return }
-            myself.dismiss(animated: true, completion: nil)
+            guard let callBack = callBack else {
+                myself.dismiss(animated: true, completion: nil)
+                return
+            }
+            callBack()
         })))
     }
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

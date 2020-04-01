@@ -38,7 +38,8 @@ class ChartModel {
                             UserDefaults.shouldReloadChart = false
                             UserDefaults.isChartDrawed = true
                             let elements:NSArray = convertedJsonIntoDict.object(forKey: "result") as! NSArray
-                            self.callback(Array(elements) as NSArray)
+                            let lentgh = elements.count >= 60 ? 60 : (elements.count - 2)
+                            self.callback(Array(elements.suffix(lentgh)) as NSArray)
                         }
                     }
                     else {
