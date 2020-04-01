@@ -28,7 +28,13 @@ extension Satoshis {
     }
 
     init(value: Double, rate: Rate) {
-        rawValue = UInt64((value / rate.rate * Double(C.satoshis)).rounded(.toNearestOrEven))
+        if (rate.rate > 0) {
+            rawValue = UInt64((value / rate.rate * Double(C.satoshis)).rounded(.toNearestOrEven))
+        }
+        else  //Gracefully handle scenario where we can't get a rate or rate is 0.  Set to 1 RVN
+        {
+            rawValue = 100000000  // 1 RVN (in sats)
+        }
     }
     
     init(value: Double) {
