@@ -22,7 +22,7 @@ class ChartModel {
         if !UserDefaults.shouldReloadChart && UserDefaults.isChartDrawed {
             return
         }
-        let url = URL(string: "https://international.bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=BTC-RVN&tickInterval=day")
+        let url = URL(string: "https://bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=BTC-RVN&tickInterval=day")
         let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 20)
 
         request.httpMethod = "GET"
