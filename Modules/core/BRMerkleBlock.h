@@ -29,27 +29,30 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include "BRSet.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define BLOCK_DIFFICULTY_INTERVAL           2016    // number of blocks between difficulty target adjustments
+
 #define DGW_BLOCK_DIFFICULTY_INTERVAL       1       // number of blocks between difficulty target adjustments after DGW3
 #define BLOCK_UNKNOWN_HEIGHT                INT32_MAX
 #define BLOCK_MAX_TIME_DRIFT                (2*60*60) // the furthest in the future a block is allowed to be timestamped
-
 #define DGW_PAST_BLOCKS                     180
 
 #ifdef TESTNET
 #define DGW_START_BLOCK         6048
-#define X16RV2ActivationTime 1567533600 //Tue Sep 03 2019 18:00:00 UTC
+#define X16RV2ActivationTime 1567533600 // Tue Sep 03 2019 18:00:00 UTC
+#define KAWPOW_ActivationTime   1585159200 // Wed Mar 25 2020 18:00:00 UTC
 #elif REGTEST
 #define DGW_START_BLOCK         0
 #define X16RV2ActivationTime    0 //Change once we have a value
+#define KAWPOW_ActivationTime   0 //Change once we have a value
 #else
 #define DGW_START_BLOCK         338778
-#define X16RV2ActivationTime    1569945600 //Tue Oct 01 2019 16:00:00 UTC
+#define X16RV2ActivationTime    1569945600 // Tue Oct 01 2019 16:00:00 UTC
+#define KAWPOW_ActivationTime   1588788000 // Wed May 06 2020 18:00:00 UTC
+
 #endif
 
 typedef struct {
@@ -60,6 +63,8 @@ typedef struct {
     uint32_t timestamp; // time interval since unix epoch
     uint32_t target;
     uint32_t nonce;
+    uint64_t nonce64;
+    UInt256 mix_hash;
     uint32_t totalTx;
     UInt256 *hashes;
     size_t hashesCount;
@@ -79,7 +84,7 @@ BRMerkleBlock *BRMerkleBlockCopy(const BRMerkleBlock *block);
 
 // buf must contain either a serialized merkleblock or header
 // returns a merkle block struct that must be freed by calling MerkleBlockFree()
-BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen);
+BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen, void* peer);
 
 // returns number of bytes written to buf, or total bufLen needed if buf is NULL (block->height is not serialized)
 size_t BRMerkleBlockSerialize(const BRMerkleBlock *block, uint8_t *buf, size_t bufLen);
