@@ -41,8 +41,8 @@ struct C {
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
-    static let feedbackEmail = "feedback@ravenwallet.org"
-    static let iosEmail = "ios@ravenwallet.org"
+    static let feedbackEmail = "feedback@ravencoin.org"
+    static let iosEmail = "feedback@ravencoin.org"
     static let reviewLink = "https://itunes.apple.com/us/app/rvn-wallet/id1371751946?action=write-review"
     
     static var standardPort: Int {
@@ -108,16 +108,15 @@ struct C {
     
     //fetch Utxos urls
     static var fetchRvnUtxosPath: String {
-        return E.isTestnet ? "https://vinx.mediciventures.com/api/addr/%@/utxo" : "https://api.ravencoin.com/api/addr/%@/utxo"
-        //return E.isTestnet ? "https://testnet.ravencoin.network/api/addrs/utxo" : "https://ravencoin.network/api/addrs/utxo"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/utxo" : "https://api.ravencoin.com/api/addr/%@/utxo"
     }
     
     static var fetchAssetUtxosPath:String {
-        return E.isTestnet ? "https://vinx.mediciventures.com/api/addr/%@/asset/*/utxo" : "https://vinx.mediciventures.com/api/addr/%@/asset/*/utxo"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/asset/*/utxo" : "https://vinx.mediciventures.com/api/addr/%@/asset/*/utxo"
     }
     
     static var fetchTxsPath:String {
-        return E.isTestnet ? "https://vinx.mediciventures.com/api/addr/%@" : "https://api.ravencoin.com/api/addr/%@"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@" : "https://api.ravencoin.com/api/addr/%@"
     }
 }
 
