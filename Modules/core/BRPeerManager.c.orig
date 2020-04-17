@@ -27,9 +27,82 @@
 #define MAX_CONNECT_FAILURES    20 // notify user of network problems after this many connect failures in a row
 #define PEER_FLAG_SYNCED        0x01
 #define PEER_FLAG_NEEDSUPDATE   0x02
+<<<<<<< HEAD
 #define genesis_block_hash(params) UInt256Reverse((params)->checkpoints[0].hash)
-
+=======
 #define OLDEST_INTERVAL         1 * 24 * 60 * 60
+
+#if TESTNET
+
+static const struct {
+    uint32_t height;
+    const char *hash;
+    uint32_t timestamp;
+    uint32_t target;
+} checkpoint_array[] = {
+        {      0, "000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a", 1537466400, 0x1e00ffff },
+        { 200000, "00000193aa316faba95ed25accf8da2c1f3783881e7978ba8674bd4b0a409a05", 1583232224, 0x1e041a01 },
+        { 230000, "00000000ce30881250378687ea468bbcd5f2b599b07f31fce487b9192d00d36b", 1585030961, 0x1d0130d0 },
+        { 240000, "00000000217e2446d26c65e0f28ca721206253301d98b31b5122ed94bf21db74", 1585665582, 0x1c2f4b8d }
+//        {   2016, "00000020fa58add2a48e6c09f36eaf53a269469672ab0cb2af7f84ae63353237", 1537640786, 0x1e00c778 },
+//        {   4032, "0000003d36307d1a7642b5e279ebd4b20ab9141e5bdf16d482468c5d3b667708", 1537763590, 0x1e010db7 },
+//        {  20160, "00000101cabd49350adb830dc9acb7be3f0a00140c5b73f1104bdb762396cfe3", 1538903988, 0x1e0102a7 },
+//        {  40320, "0000004cd1c1f6ba965e085ec0d223caae734353715a348b19614c7b5dced4cc", 1540403853, 0x1e0088a8 },
+//        { 150000, "0000012fe1e1a624374d23c90d20004245647464df442a2fd5e9446a12b08a9d", 1547387344, 0x1e016d27 },
+//        {160000, "000000ce693ba2f21eff6b38270b6eab8bf442adb25252b9e8d4a7ab43709b10", 1547998364, 0x1e01c59a},
+//        {259397, "000000a482784b0aee50194bea15a6586d6cb5c727085b35dbbced677dce6d83", 1554414563, 0x1e018aeb}
+//        { 288680, "0000000142f75c185413618ba0239e069ebd8288ce8ef14ecec88d62c1bbf526", 1556268378, 0x1d07284c }
+}; // New testnet, port:18770 useragent:"/Ravencoin2.2.0/"
+
+static const char *dns_seeds[] = {
+//       "127.0.0.1", NULL
+//        "192.168.86.38", NULL
+        "seed-testnet-raven.ravencoin.org.", "seed-testnet-raven.ravencoin.com.",
+        "seed-testnet-raven.bitactivate.com.", NULL
+};
+
+#else // main net
+
+// blockchain checkpoints - these are also used as starting points for partial chain downloads, so they need to be at
+// difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
+static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
+        {      0, "0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90", 1514999494, 0x1e00ffff },
+        {      1, "00000058bcc33dea08b53691edb9e49a9eb8bac36a0db17eb5a7588860b1f590", 1515015723, 0x1e00ffff },
+        {  20160, "00000000146e792b63f2a18db16f32d2afc9f0b332839eb502cb9c9a8f1bc033", 1515665731, 0x1c53dd22 },
+        {  40320, "00000000085e7d049938d66a08d151891c0087a6b3d78d400f1ca0944991ffde", 1516664426, 0x1c0a0075 },
+        {  60480, "0000000000683f2d1bb44dd545eb4fea28c0f51eb513ea32b4e813f185a1f6ab", 1517740553, 0x1c01b501 },
+        {  80640, "00000000000735f443ea62266bb7799a760c8336da0c7b7a987c895e83c9ea73", 1518771490, 0x1b43e935 },
+        { 100800, "00000000000bf40aa747ca97da99e1e6878efff28f709d1969f0a2d95dda1414", 1519826997, 0x1b0fabc1 },
+        { 120960, "000000000000203f20f1f2fc50546b4f3d0693a53e781b499884661e6762eb05", 1520934202, 0x1b060077 },
+        { 141120, "00000000000367e05ceca64ebf6b72a87510bdcb6252ff071b7f4971661e9acf", 1522092453, 0x1b03cc83 },
+        { 161280, "0000000000024a1d42423dd3e1cde28c78fe34857db63f08d21f11fc13e594c3", 1523259269, 0x1b028d7d },
+        { 181440, "000000000000d202bdeb7993a1de022f82231fdce97e22f054626291eb79f4cb", 1524510281, 0x1b038153 },
+        { 201600, "000000000001a16d8b86e19ac87df227458d29b5fb70dfef7e5b0203df085617", 1525709579, 0x1b0306f4 },
+        { 221760, "000000000002b4a1ef811a31e58489794dba047e4e78e18d5611c94d7fc60174", 1526920402, 0x1b02ff59 },
+        { 241920, "000000000001e64a356c6665afcb2871bc7f18e5609663b5b54a82fa204ee9b1", 1528150015, 0x1b037c77 },
+        { 262080, "0000000000014a11d3aacdc5ee21e69fd8aefe10f0e617508dfb3e78d1ca82be", 1529359488, 0x1b037276 },
+        { 282240, "00000000000182bbfada9dd47003bed09880b7a1025edcb605f9c048f2bad49e", 1530594496, 0x1b042cda },
+        { 302400, "000000000001e9862c28d3359f2b568b03811988f2db2f91ab8b412acac891ed", 1531808927, 0x1b0422c8 },
+        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
+        { 338778, "000000000003198106731cb28fc24e9ace995a37709b026b25dfa905aea54517", 1535599185, 0x1b07cf3a },
+        { 340704, "000000000001c5e10e9e94b761464548efd2bbcf22509ac6bfec35757da58687", 1535711279, 0x1b024145 },
+        { 673344, "00000000000041bbd71687002a65c4dac458cb8a775e7ca094d623ac50300979", 1555813777, 0x1a62c6e4 },
+        { 844704, "0000000000006361abddc32b21bef2bf1df669f731ec18a13adbd426cced17b6", 1566164045, 0x1a78e5ab },
+        { 899136, "00000000000015d1f71d3fac92e98d3a01f7ec310c10e90a966dcf1b64369239", 1569424946, 0x1a379754 },
+        { 322560, "000000000001d50eaf12266c6ecaefec473fecd9daa7993db05b89e6ab381388", 1533209846, 0x1b04cb9e },
+        { 340704, "000000000001c5e10e9e94b761464548efd2bbcf22509ac6bfec35757da58687", 1535711279, 0x1b024145 },
+        { 673344, "00000000000041bbd71687002a65c4dac458cb8a775e7ca094d623ac50300979", 1555813777, 0x1a62c6e4 },
+        { 844704, "0000000000006361abddc32b21bef2bf1df669f731ec18a13adbd426cced17b6", 1566164045, 0x1a78e5ab },
+        { 899136, "00000000000015d1f71d3fac92e98d3a01f7ec310c10e90a966dcf1b64369239", 1569424946, 0x1a379754 }
+};
+
+static const char *dns_seeds[] = {
+//    "127.0.0.1", NULL
+        "seed-raven.ravencoin.com", "seed-raven.ravencoin.org.", "seed-raven.bitactivate.com.", NULL
+};
+
+#endif
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 
 typedef struct {
     BRPeerManager *manager;
@@ -568,7 +641,7 @@ static void _mempoolDone(void *info, int success) {
         }
 
         _PeerManagerRequestUnrelayedTx(manager, peer);
-        BRPeerSendGetaddr(peer); // request a list of other ravencoin peers
+        BRPeerSendGetaddr(peer); // request a list of other ravenwallet peers
         pthread_mutex_unlock(&manager->lock);
         if (manager->txStatusUpdate) manager->txStatusUpdate(manager->info);
         if (syncFinished && manager->syncStopped) manager->syncStopped(manager->info, 0);
@@ -658,19 +731,27 @@ static void *_findPeersThreadRoutine(void *arg) {
     time_t now = time(NULL), age;
 
     pthread_cleanup_push(manager->threadCleanup, manager->info);
-    addrList = _addressLookup(((FindPeersInfo *) arg)->hostname);
-    free(arg);
-    pthread_mutex_lock(&manager->lock);
+        addrList = _addressLookup(((FindPeersInfo *) arg)->hostname);
+        free(arg);
+        pthread_mutex_lock(&manager->lock);
 
+<<<<<<< HEAD
     for (addr = addrList; addr && !UInt128IsZero(*addr); addr++) {
         age = 24 * 60 * 60 + BRRand(2 * 24 * 60 * 60); // add between 1 and 3 days
         array_add(manager->peers, ((const BRPeer) {*addr, manager->params->standardPort, services, now - age, 0}));
     }
+=======
+        for (addr = addrList; addr && !UInt128IsZero(*addr); addr++) {
+            age = 24 * 60 * 60 + BRRand(2 * 24 * 60 * 60); // add between 1 and 3 days
+            array_add(manager->peers,
+                      ((const BRPeer) {*addr, STANDARD_PORT, services, now - age, 0}));
+        }
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 
-    manager->dnsThreadCount--;
-    pthread_mutex_unlock(&manager->lock);
-    if (addrList) free(addrList);
-    pthread_cleanup_pop(1);
+        manager->dnsThreadCount--;
+        pthread_mutex_unlock(&manager->lock);
+        if (addrList) free(addrList);
+            pthread_cleanup_pop(1);
     return NULL;
 }
 
@@ -768,8 +849,8 @@ static void _peerConnected(void *info) {
 
             if (BRPeerConnectStatus(p) != BRPeerStatusConnected) continue;
             if ((BRPeerPingTime(p) < BRPeerPingTime(peer) &&
-                    BRPeerLastBlock(p) >= BRPeerLastBlock(peer)) ||
-                    BRPeerLastBlock(p) > BRPeerLastBlock(peer))
+                 BRPeerLastBlock(p) >= BRPeerLastBlock(peer)) ||
+                BRPeerLastBlock(p) > BRPeerLastBlock(peer))
                 peer = p;
         }
 
@@ -1235,8 +1316,7 @@ static void _peerRelayedBlock(void *info, BRMerkleBlock *block) {
             manager->connectFailureCount = 0; // reset failure count once we know our initial request didn't timeout
         }
     } else if (!prev) { // block is an orphan
-        peer_log(peer, "relayed (by X) Orphan block %s, previous %s, last block is %s, height %"
-                PRIu32,
+        peer_log(peer, "relayed (by X) Orphan block %s, previous %s, last block is %s, height %u",
                  u256_hex_encode(block->blockHash), u256_hex_encode(block->prevBlock),
                  u256_hex_encode(manager->lastBlock->blockHash), manager->lastBlock->height);
 
@@ -1296,8 +1376,7 @@ static void _peerRelayedBlock(void *info, BRMerkleBlock *block) {
     } else if (BRSetContains(manager->blocks,
                              block)) { // we already have the block (or at least the header)
         if ((block->height % 500) == 0 || txCount > 0 || block->height >= BRPeerLastBlock(peer)) {
-            peer_log(peer, "relayed existing block #%"
-                    PRIu32, block->height);
+            peer_log(peer, "relayed existing block #%u",block->height);
         }
 
         b = manager->lastBlock;
@@ -1641,7 +1720,8 @@ static int _PeerManagerRescan(BRPeerManager *manager, BRMerkleBlock *newLastBloc
 
     if (manager->downloadPeer) { // disconnect the current download peer so a new random one will be selected
         for (size_t i = array_count(manager->peers); i > 0; i--) {
-            if (BRPeerEq(&manager->peers[i - 1], manager->downloadPeer)) array_rm(manager->peers, i - 1);
+            if (BRPeerEq(&manager->peers[i - 1], manager->downloadPeer))
+                array_rm(manager->peers, i - 1);
         }
         BRPeerDisconnect(manager->downloadPeer);
     }
@@ -1650,7 +1730,7 @@ static int _PeerManagerRescan(BRPeerManager *manager, BRMerkleBlock *newLastBloc
     return 1;
 }
 
-// specifies a single fixed peer to use when connecting to the ravencoin network
+// specifies a single fixed peer to use when connecting to the ravenwallet network
 // set address to UINT128_ZERO to revert to default behavior
 void BRPeerManagerSetFixedPeer(BRPeerManager *manager, UInt128 address, uint16_t port) {
     assert(manager != NULL);
@@ -1822,11 +1902,19 @@ void BRPeerManagerRescan(BRPeerManager *manager) {
     pthread_mutex_lock(&manager->lock);
 
     if (manager->isConnected) {
+<<<<<<< HEAD
         // start the chain download from the most recent checkpoint that's at least a week older than earliestKeyTime
         for (size_t i = manager->params->checkpointsCount; i > 0; i--) {
             if (i - 1 == 0 ||
                 manager->params->checkpoints[i - 1].timestamp + 7 * 24 * 60 * 60 < manager->earliestKeyTime) {
                 UInt256 hash = UInt256Reverse(manager->params->checkpoints[i - 1].hash);
+=======
+        // start the chain download from the most recent checkpoint that's at least a one day older than earliestKeyTime
+        for (size_t i = CHECKPOINT_COUNT; i > 0; i--) {
+            if (i - 1 == 0 ||
+                checkpoint_array[i - 1].timestamp + OLDEST_INTERVAL < manager->earliestKeyTime) {
+                UInt256 hash = UInt256Reverse(u256_hex_decode(checkpoint_array[i - 1].hash));
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 
                 manager->lastBlock = BRSetGet(manager->blocks, &hash);
                 break;
@@ -2009,7 +2097,7 @@ static void _publishTxInvDone(void *info, int success) {
     pthread_mutex_unlock(&manager->lock);
 }
 
-// publishes tx to ravencoin network (do not call TransactionFree() on tx afterward)
+// publishes tx to ravenwallet network (do not call TransactionFree() on tx afterward)
 void BRPeerManagerPublishTx(BRPeerManager *manager, BRTransaction *tx, void *info,
                             void (*callback)(void *info, int error)) {
     assert(manager != NULL);

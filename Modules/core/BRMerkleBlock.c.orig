@@ -8,11 +8,9 @@
 //
 
 #include "BRMerkleBlock.h"
-#include "BRCrypto.h"
 #include "BRAddress.h"
 #include <stdlib.h>
 #include <inttypes.h>
-#include <limits.h>
 #include <string.h>
 #include <assert.h>
 #include "crypto/ethash/progpow.hpp"
@@ -137,6 +135,9 @@ BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen, void* peer)
             if (block->flags) memcpy(block->flags, &buf[off], len);
         }
 
+<<<<<<< HEAD
+        if(block->timestamp < X16RV2ActivationTime)
+=======
         if (block->timestamp >= KAWPOW_ActivationTime) {
 
             // Create the two objects needed for light_verify function
@@ -173,8 +174,10 @@ BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen, void* peer)
             X16Rv2(&block->blockHash, buf, 80);
         }
         else {
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
             X16R(&block->blockHash, buf, 80);
-        }
+        else
+            X16Rv2(&block->blockHash, buf, 80);
     }
 
     return block;
@@ -390,13 +393,15 @@ int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBloc
     // TODO: implement regtest difficulty rule check
     return r; // don't worry about difficulty on regtest for now
 #endif
+return 1;
                 if (block->height == 338778) r = block->target == 0x1b07cf3a ? 1 : 0;
             } else {
                 r = (abs(diff) < 2) ? 1 : 0;
             }
             pastCount++;
         }
-    }
+    } else return 1;
+
     return r;
 }
 

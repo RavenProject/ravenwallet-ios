@@ -8,12 +8,9 @@
 //
 
 #include "BRPeer.h"
-#include "BRMerkleBlock.h"
-#include "BRAddress.h"
-#include "BRSet.h"
 #include "BRArray.h"
-#include "BRCrypto.h"
-#include "BRInt.h"
+#include "BRScript.h"
+#include "BRAssets.h"
 #include <stdlib.h>
 #include <float.h>
 #include <inttypes.h>
@@ -22,11 +19,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <netdb.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+<<<<<<< HEAD
+=======
 #include "BRScript.h"
 #include "BRAssets.h"
 #include "BRPeerManager.h"
@@ -40,6 +38,7 @@
 #else
 #define MAGIC_NUMBER 0x4e564152  //RAVN - Reverse from chainparams.cpp
 #endif
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 
 #define HEADER_LENGTH      24
 #define MAX_MSG_LENGTH     0x02000000
@@ -675,6 +674,9 @@ static int _PeerAcceptHeadersMessage(BRPeer *peer, const uint8_t *msg, size_t ms
             time_t now = time(NULL);
             UInt256 locators[2];
 
+<<<<<<< HEAD
+            if(timestamp >= X16RV2ActivationTime) {
+=======
             if (timestamp_first >= KAWPOW_ActivationTime && timestamp_last >= KAWPOW_ActivationTime) {
                 // Create the two objects needed for light_verify function
                 union ethash_hash256 header_hash;
@@ -797,6 +799,7 @@ static int _PeerAcceptHeadersMessage(BRPeer *peer, const uint8_t *msg, size_t ms
                 free(hash_temp);
             }
             else if(timestamp >= X16RV2ActivationTime) {
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
                 X16Rv2(&locators[0], &msg[off + 81 * (count - 1)], 80);
                 X16Rv2(&locators[1], &msg[off], 80);
             } else {

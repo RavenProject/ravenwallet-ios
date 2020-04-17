@@ -14,18 +14,37 @@
 #include "BRSet.h"
 #include <stddef.h>
 #include <inttypes.h>
+<<<<<<< HEAD
 
+=======
+#include "BRSet.h"
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define BLOCK_DIFFICULTY_INTERVAL           2016    // number of blocks between difficulty target adjustments
+
 #define DGW_BLOCK_DIFFICULTY_INTERVAL       1       // number of blocks between difficulty target adjustments after DGW3
 #define BLOCK_UNKNOWN_HEIGHT                INT32_MAX
 #define BLOCK_MAX_TIME_DRIFT                (2*60*60) // the furthest in the future a block is allowed to be timestamped
 #define DGW_PAST_BLOCKS                     180
 
 #ifdef TESTNET
+<<<<<<< HEAD
+#define DGW_START_BLOCK             0
+#define X16RV2_START_BLOCK          0 // change once we have a value
+#define X16RV2ActivationTime        1567533600
+#elif REGTEST
+#define DGW_START_BLOCK             0
+#define X16RV2_START_BLOCK          0
+#define X16RV2ActivationTime        0
+
+#else
+#define DGW_START_BLOCK             338778
+#define X16RV2_START_BLOCK          6048
+#define X16RV2ActivationTime        1569945600 //Tue Oct 01 2019 16:00:00 UTC
+=======
 #define DGW_START_BLOCK         6048
 #define X16RV2ActivationTime 1567533600 // Tue Sep 03 2019 18:00:00 UTC
 #define KAWPOW_ActivationTime   1585159200 // Wed Mar 25 2020 18:00:00 UTC
@@ -38,6 +57,7 @@ extern "C" {
 #define X16RV2ActivationTime    1569945600 // Tue Oct 01 2019 16:00:00 UTC
 #define KAWPOW_ActivationTime   1588788000 // Wed May 06 2020 18:00:00 UTC
 
+>>>>>>> f271ec9a350cbf387dad448ee5b587bd65a506e6
 #endif
 
 typedef struct {
