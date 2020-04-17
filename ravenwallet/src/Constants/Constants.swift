@@ -41,8 +41,8 @@ struct C {
     static let rvnCurrencyCode = "RVN"
     static let null = "(null)"
     static let maxMemoLength = 250
-    static let feedbackEmail = "feedback@ravenwallet.org"
-    static let iosEmail = "ios@ravenwallet.org"
+    static let feedbackEmail = "feedback@ravencoin.org"
+    static let iosEmail = "feedback@ravencoin.org"
     static let reviewLink = "https://itunes.apple.com/us/app/rvn-wallet/id1371751946?action=write-review"
     
     static var standardPort: Int {
