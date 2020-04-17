@@ -568,8 +568,9 @@ static int _PeerAcceptTxMessage(BRPeer *peer, const uint8_t *msg, size_t msgLen)
                          asset->amount / COIN,
                          asset->nameLen, asset->name);
         }
-    }
 #endif
+    }
+
 
     return r;
 }
