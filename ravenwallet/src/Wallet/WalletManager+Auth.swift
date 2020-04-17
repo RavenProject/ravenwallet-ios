@@ -586,7 +586,7 @@ extension WalletManager : WalletAuthenticator {
         public static let pinFailCount = "pinfailcount"
         public static let pinFailTime = "pinfailheight"
         public static let apiAuthKey = "authprivkey"
-        public static let userAccount = "https://ravencoin.network/api"
+        public static let userAccount = "https://api.ravencoin.org/api"
         public static let seed = "seed" // deprecated
         public static let walletType = "bip44"
     }

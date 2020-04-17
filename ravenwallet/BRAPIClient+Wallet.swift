@@ -150,12 +150,12 @@ extension BRAPIClient {
             }.resume()
     }
     
-    //    private let mainURL = "https://ravencoin.network/api/addrs/utxo"
-    //    private let fallbackURL = "https://ravencoin.network/api/addrs/utxo"
+    //    private let mainURL = "https://api.ravencoin.org/api/addrs/utxo"
+    //    private let fallbackURL = "https://api.ravencoin.org/api/addrs/utxo"
     func fetchUTXOS(address: String, isAsset:Bool, completion: @escaping ([[String: Any]]?)->Void) {
         let path = isAsset ? String(format: C.fetchAssetUtxosPath, address) : String(format: C.fetchRvnUtxosPath, address)
         // TODO: take testnet in consideration
-        //        let path = "http://vinx.mediciventures.com/api/addrs/utxo"
+        //        let path = "http://api.testnet.ravencoin.org/api/addrs/utxo"
         var req = URLRequest(url: URL(string: path)!)
         req.httpMethod = "GET"
         //req.httpBody = "addrs=\(address)".data(using: .utf8)
