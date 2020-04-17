@@ -67,12 +67,10 @@ static const BRCheckPoint MainNetCheckpoints[] = {
 };
 
 static const BRCheckPoint TestNetCheckpoints[] = {
-        {0,      u256_hex_decode("000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a"), 1533751200, 0x1e00ffff },
-        {2016,  u256_hex_decode("00000003961b4ac0556c9b5487cef5a73fed288a5afed7ff3f6d79ec8cfd63b3"), 1570205903, 0x1d04ab56 },
-        {4032,  u256_hex_decode("00000000054f04d2f2187f474b5df94c99b74c6a8a5f45830c12b8f5129f5b7b"), 1570313108, 0x1c2f9b34 },
-        {20160, u256_hex_decode("0000001c535b965a47922167a9e8720c353d450bd27f36f65c281fe5cafe4f61"), 1571340578, 0x1d2382fe },
-        {40320, u256_hex_decode("000000052ca091fbb7b698cf9a1054982e6ffa7a9a4574d67274486cbefc82ab"), 1572593216, 0x1d077cb8 },
-        {122976, u256_hex_decode("000000903d87f99e5c3f49c3cd6854439adba01516424498a589e09cce2b56cb"), 1535599185, 0x1b07cf3a }
+        {      0, u256_hex_decode("000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a"), 1537466400, 0x1e00ffff },
+        { 200000, u256_hex_decode("00000193aa316faba95ed25accf8da2c1f3783881e7978ba8674bd4b0a409a05"), 1583232224, 0x1e041a01 },
+        { 230000, u256_hex_decode("00000000ce30881250378687ea468bbcd5f2b599b07f31fce487b9192d00d36b"), 1585030961, 0x1d0130d0 },
+        { 240000, u256_hex_decode("00000000217e2446d26c65e0f28ca721206253301d98b31b5122ed94bf21db74"), 1585665582, 0x1c2f4b8d }
 }; // New testnet (7th), port:18770 useragent:"/Ravencoin2.1.1/"
 
 static const BRCheckPoint RegTestCheckpoints[] = {
