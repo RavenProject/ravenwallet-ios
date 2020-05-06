@@ -391,6 +391,8 @@ int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, const BRMerkleBloc
     return r; // don't worry about difficulty on regtest for now
 #endif
                 if (block->height == 338778) r = block->target == 0x1b07cf3a ? 1 : 0;
+            } else if (block->height >= 1219736 && block->height <= 1219916) {
+                return 1;
             } else {
                 r = (abs(diff) < 2) ? 1 : 0;
             }
@@ -416,7 +418,7 @@ int DarkGravityWaveTarget(const BRMerkleBlock *previous, const BRSet *blockSet) 
     }
 
     BRMerkleBlock *currentBlock = previousBlock;
-
+    
     // loop over the past 180 blocks
     for (blockCount = 1; currentBlock && currentBlock->height > 0 && blockCount <= DGW_PAST_BLOCKS; blockCount++) {
 
@@ -441,14 +443,14 @@ int DarkGravityWaveTarget(const BRMerkleBlock *previous, const BRSet *blockSet) 
         }
         // Set lastBlockTime to the block time for the block in current iteration
         lastBlockTime = currentBlock->timestamp;
-
+        
         if (previousBlock == NULL) {
             assert(currentBlock);
             break;
         }
         currentBlock = BRSetGet(blockSet, &currentBlock->prevBlock);
     }
-
+    
     UInt256 blockCount256 = ((UInt256) {.u64 = {blockCount, 0, 0, 0}});
     // darkTarget is the difficulty
     UInt256 darkTarget = divide(sumTargets, blockCount256);
