@@ -232,8 +232,8 @@ class HomeScreenViewController : UIViewController, Subscriber {
                 self.currentPrompt = nil
             }
         })
-        Store.subscribe(self, name: .didWritePaperKey, callback: { _ in
-            if self.currentPrompt?.type == .paperKey {
+        Store.subscribe(self, name: .didWriteRecoveryPhrase, callback: { _ in
+            if self.currentPrompt?.type == .recoveryPhrase {
                 self.currentPrompt = nil
             }
         })

@@ -13,7 +13,7 @@ enum AlertType {
     case addressAdded(callback: (() -> Void)?)
     case addressUpdated
     case addressDeleted
-    case paperKeySet(callback: () -> Void)
+    case recoveryPhraseSet(callback: () -> Void)
     case sendSuccess
     case sendAssetSuccess
     case reissueAssetSuccess
@@ -34,8 +34,8 @@ enum AlertType {
             return S.Alerts.addressUpdated
         case .addressDeleted:
             return S.Alerts.addressDeleted
-        case .paperKeySet:
-            return S.Alerts.paperKeySet
+        case .recoveryPhraseSet:
+            return S.Alerts.recoveryPhraseSet
         case .sendSuccess:
             return S.Alerts.sendSuccess
         case .sendAssetSuccess:
@@ -65,8 +65,8 @@ enum AlertType {
             return ""
         case .addressDeleted:
             return ""
-        case .paperKeySet:
-            return S.Alerts.paperKeySetSubheader
+        case .recoveryPhraseSet:
+            return S.Alerts.recoveryPhraseSetSubheader
         case .sendSuccess:
             return S.Alerts.sendSuccessSubheader
         case .sendAssetSuccess:
@@ -103,7 +103,7 @@ func ==(lhs: AlertType, rhs: AlertType) -> Bool {
         return true
     case (.addressDeleted, .addressDeleted):
         return true
-    case (.paperKeySet(_), .paperKeySet(_)):
+    case (.recoveryPhraseSet(_), .recoveryPhraseSet(_)):
         return true
     case (.sendSuccess, .sendSuccess):
         return true

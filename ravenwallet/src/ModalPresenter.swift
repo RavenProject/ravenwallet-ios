@@ -62,8 +62,8 @@ class ModalPresenter : Subscriber {
         Store.subscribe(self, name: .promptUpgradePin, callback: { [weak self] _ in
             self?.presentUpgradePin()
         })
-        Store.subscribe(self, name: .promptPaperKey, callback: { [weak self] _ in
-            self?.presentWritePaperKey()
+        Store.subscribe(self, name: .promptRecoveryPhrase, callback: { [weak self] _ in
+            self?.presentWriteRecoveryPhrase()
         })
         Store.subscribe(self, name: .promptBiometrics, callback: { [weak self] _ in
             self?.presentBiometricsSetting()
@@ -199,7 +199,7 @@ class ModalPresenter : Subscriber {
                 window.layoutIfNeeded()
             }, completion: { _ in
                 //TODO - Make these callbacks generic
-                if case .paperKeySet(let callback) = type {
+                if case .recoveryPhraseSet(let callback) = type {
                     callback()
                 }
                 if case .pinSet(let callback) = type {
@@ -769,8 +769,8 @@ class ModalPresenter : Subscriber {
             }
             nc.pushViewController(biometricsSettings, animated: true)
         }
-        securityCenter.didTapPaperKey = { [weak self] in
-            self?.presentWritePaperKey(fromViewController: nc)
+        securityCenter.didTapRecoveryPhrase = { [weak self] in
+            self?.presentWriteRecoveryPhrase(fromViewController: nc)
         }
 
         window.rootViewController?.presentFullScreen(nc, animated: true, completion: nil)
@@ -804,7 +804,7 @@ class ModalPresenter : Subscriber {
         onNc.presentFullScreen(verify, animated: true, completion: nil)
     }
 
-    private func presentWritePaperKey(fromViewController vc: UIViewController) {
+    private func presentWriteRecoveryPhrase(fromViewController vc: UIViewController) {
         let paperPhraseNavigationController = UINavigationController()
         paperPhraseNavigationController.setClearNavbar()
         paperPhraseNavigationController.setWhiteStyle()
@@ -820,8 +820,8 @@ class ModalPresenter : Subscriber {
             paperPhraseNavigationController.presentFullScreen(verify, animated: true, completion: nil)
         })
         start.addCloseNavigationItem(tintColor: .white)
-        start.navigationItem.title = S.SecurityCenter.Cells.paperKeyTitle
-        let faqButton = UIButton.buildFaqButton(articleId: ArticleIds.paperKey)
+        start.navigationItem.title = S.SecurityCenter.Cells.recoveryPhraseTitle
+        let faqButton = UIButton.buildFaqButton(articleId: ArticleIds.recoveryPhrase)
         faqButton.tintColor = .white
         start.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
         paperPhraseNavigationController.viewControllers = [start]
@@ -834,18 +834,18 @@ class ModalPresenter : Subscriber {
             var confirm: ConfirmPaperPhraseViewController?
             confirm = ConfirmPaperPhraseViewController(walletManager: self.walletManager, pin: pin, callback: {
                 confirm?.dismiss(animated: true, completion: {
-                    Store.perform(action: Alert.Show(.paperKeySet(callback: {
+                    Store.perform(action: Alert.Show(.recoveryPhraseSet(callback: {
                         Store.perform(action: HideStartFlow())
                     })))
                 })
             })
-            writeViewController?.navigationItem.title = S.SecurityCenter.Cells.paperKeyTitle
+            writeViewController?.navigationItem.title = S.SecurityCenter.Cells.recoveryPhraseTitle
             if let confirm = confirm {
                 navigationController.pushViewController(confirm, animated: true)
             }
         })
         writeViewController?.addCloseNavigationItem(tintColor: .white)
-        writeViewController?.navigationItem.title = S.SecurityCenter.Cells.paperKeyTitle
+        writeViewController?.navigationItem.title = S.SecurityCenter.Cells.recoveryPhraseTitle
         guard let writeVC = writeViewController else { return }
         navigationController.pushViewController(writeVC, animated: true)
     }
@@ -946,9 +946,9 @@ class ModalPresenter : Subscriber {
         topViewController?.presentFullScreen(nc, animated: true, completion: nil)
     }
 
-    func presentWritePaperKey() {
+    func presentWriteRecoveryPhrase() {
         guard let vc = topViewController else { return }
-        presentWritePaperKey(fromViewController: vc)
+        presentWriteRecoveryPhrase(fromViewController: vc)
     }
 
     func presentUpgradePin() {
