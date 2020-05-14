@@ -112,11 +112,11 @@ struct C {
     }
     
     static var fetchAssetUtxosPath:String {
-        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/asset/*/utxo" : "https://vinx.mediciventures.com/api/addr/%@/asset/*/utxo"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/asset/*/utxo" : "https://api.ravencoin.org/api/addr/%@/asset/*/utxo"
     }
     
     static var fetchTxsPath:String {
-        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@" : "https://api.ravencoin.com/api/addr/%@"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@" : "https://api.ravencoin.org/api/addr/%@"
     }
 }
 

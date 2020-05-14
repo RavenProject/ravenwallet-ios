@@ -166,11 +166,11 @@ class StartFlowPresenter : Subscriber {
         let paperPhraseViewController = StartPaperPhraseViewController(callback: { [weak self] in
             self?.pushWritePaperPhraseViewController(pin: pin)
         })
-        paperPhraseViewController.title = S.SecurityCenter.Cells.paperKeyTitle
+        paperPhraseViewController.title = S.SecurityCenter.Cells.recoveryPhraseTitle
         paperPhraseViewController.navigationItem.setHidesBackButton(true, animated: false)
         paperPhraseViewController.navigationItem.leftBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: closeButton)]
 
-        let faqButton = UIButton.buildFaqButton(articleId: ArticleIds.paperKey)
+        let faqButton = UIButton.buildFaqButton(articleId: ArticleIds.recoveryPhrase)
         faqButton.tintColor = .white
         paperPhraseViewController.navigationItem.rightBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: faqButton)]
 
@@ -185,18 +185,18 @@ class StartFlowPresenter : Subscriber {
         let writeViewController = WritePaperPhraseViewController(walletManager: walletManager, pin: pin, callback: { [weak self] in
             self?.pushConfirmPaperPhraseViewController(pin: pin)
         })
-        writeViewController.title = S.SecurityCenter.Cells.paperKeyTitle
+        writeViewController.title = S.SecurityCenter.Cells.recoveryPhraseTitle
         writeViewController.navigationItem.leftBarButtonItems = [UIBarButtonItem.negativePadding, UIBarButtonItem(customView: closeButton)]
         navigationController?.pushViewController(writeViewController, animated: true)
     }
 
     private func pushConfirmPaperPhraseViewController(pin: String) {
         let confirmViewController = ConfirmPaperPhraseViewController(walletManager: walletManager, pin: pin, callback: {
-            Store.perform(action: Alert.Show(.paperKeySet(callback: {
+            Store.perform(action: Alert.Show(.recoveryPhraseSet(callback: {
                 Store.perform(action: HideStartFlow())
             })))
         })
-        confirmViewController.title = S.SecurityCenter.Cells.paperKeyTitle
+        confirmViewController.title = S.SecurityCenter.Cells.recoveryPhraseTitle
         navigationController?.navigationBar.tintColor = .white
         navigationController?.pushViewController(confirmViewController, animated: true)
     }

@@ -129,7 +129,7 @@ class ConfirmPaperPhraseViewController : UIViewController {
     @objc private func checkTextFields() {
         if confirmFirstPhrase.textField.text == words[indices.0] && confirmSecondPhrase.textField.text == words[indices.1] {
             UserDefaults.writePaperPhraseDate = Date()
-            Store.trigger(name: .didWritePaperKey)
+            Store.trigger(name: .didWriteRecoveryPhrase)
             callback()
         } else {
             confirmFirstPhrase.validate()

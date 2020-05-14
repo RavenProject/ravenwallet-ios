@@ -43,7 +43,7 @@ enum TriggerName {
     case rescan(CurrencyDef)
     case lock
     case promptBiometrics
-    case promptPaperKey
+    case promptRecoveryPhrase
     case promptUpgradePin
     case loginFromSend
     case blockModalDismissal
@@ -64,7 +64,7 @@ enum TriggerName {
     case didUpgradePin
     case promptShareData
     case didEnableShareData
-    case didWritePaperKey
+    case didWriteRecoveryPhrase
     case didRescanBlockChain
     case wipeWalletNoPrompt
     case didUpdateFeatureFlags
@@ -91,7 +91,7 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return true
     case (.promptBiometrics, .promptBiometrics):
         return true
-    case (.promptPaperKey, .promptPaperKey):
+    case (.promptRecoveryPhrase, .promptRecoveryPhrase):
         return true
     case (.promptUpgradePin, .promptUpgradePin):
         return true
@@ -133,7 +133,7 @@ func ==(lhs: TriggerName, rhs: TriggerName) -> Bool {
         return true
     case (.didEnableShareData, .didEnableShareData):
         return true
-    case (.didWritePaperKey, .didWritePaperKey):
+    case (.didWriteRecoveryPhrase, .didWriteRecoveryPhrase):
         return true
     case (.didRescanBlockChain, .didRescanBlockChain):
         return true

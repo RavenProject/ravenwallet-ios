@@ -11,14 +11,14 @@ import LocalAuthentication
 
 enum PromptType {
     case biometrics
-    case paperKey
+    case recoveryPhrase
     case rescanBlockChain
     case upgradePin
     case noPasscode
     case shareData
 
     static var defaultOrder: [PromptType] = {
-        return [.upgradePin, .rescanBlockChain, .paperKey, .noPasscode, .biometrics, .shareData]
+        return [.upgradePin, .rescanBlockChain, .recoveryPhrase, .noPasscode, .biometrics, .shareData]
     }()
     
     static func nextPrompt(walletManager: WalletManager) -> PromptType? {
@@ -28,7 +28,7 @@ enum PromptType {
     var title: String {
         switch self {
         case .biometrics: return LAContext.biometricType() == .face ? S.Prompts.FaceId.title : S.Prompts.TouchId.title
-        case .paperKey: return S.Prompts.PaperKey.title
+        case .recoveryPhrase: return S.Prompts.RecoveryPhrase.title
         case .upgradePin: return S.Prompts.UpgradePin.title
         case .noPasscode: return S.Prompts.NoPasscode.title
         case .shareData: return S.Prompts.ShareData.title
@@ -39,7 +39,7 @@ enum PromptType {
     var name: String {
         switch self {
         case .biometrics: return "biometricsPrompt"
-        case .paperKey: return "paperKeyPrompt"
+        case .recoveryPhrase: return "recoveryPhrasePrompt"
         case .upgradePin: return "upgradePinPrompt"
         case .noPasscode: return "noPasscodePrompt"
         case .shareData: return "shareDataPrompt"
@@ -50,7 +50,7 @@ enum PromptType {
     var body: String {
         switch self {
         case .biometrics: return LAContext.biometricType() == .face ? S.Prompts.FaceId.body : S.Prompts.TouchId.body
-        case .paperKey: return S.Prompts.PaperKey.body
+        case .recoveryPhrase: return S.Prompts.RecoveryPhrase.body
         case .upgradePin: return S.Prompts.UpgradePin.body
         case .noPasscode: return S.Prompts.NoPasscode.body
         case .shareData: return S.Prompts.ShareData.body
@@ -62,7 +62,7 @@ enum PromptType {
     func trigger(currency: CurrencyDef) -> TriggerName? {
         switch self {
         case .biometrics: return .promptBiometrics
-        case .paperKey: return .promptPaperKey
+        case .recoveryPhrase: return .promptRecoveryPhrase
         case .upgradePin: return .promptUpgradePin
         case .noPasscode: return nil
         case .shareData: return .promptShareData
@@ -74,7 +74,7 @@ enum PromptType {
         switch self {
         case .biometrics:
             return !UserDefaults.hasPromptedBiometrics && LAContext.canUseBiometrics && !UserDefaults.isBiometricsEnabled
-        case .paperKey:
+        case .recoveryPhrase:
             return UserDefaults.walletRequiresBackup
         case .upgradePin:
             return walletManager.pinLength != 6

@@ -39,8 +39,8 @@ class SecurityCenterViewController : UIViewController, Subscriber {
     var didTapBiometrics: (() -> Void)? {
         didSet { biometricsCell.tap = didTapBiometrics }
     }
-    var didTapPaperKey: (() -> Void)? {
-        didSet { paperKeyCell.tap = didTapPaperKey }
+    var didTapRecoveryPhrase: (() -> Void)? {
+        didSet { recoveryPhraseCell.tap = didTapRecoveryPhrase }
     }
 
     init(walletManager: WalletManager) {
@@ -57,7 +57,7 @@ class SecurityCenterViewController : UIViewController, Subscriber {
     private let info = UILabel(font: .customBody(size: 16.0))
     private let pinCell = SecurityCenterCell(title: S.SecurityCenter.Cells.pinTitle, descriptionText: S.SecurityCenter.Cells.pinDescription)
     private let biometricsCell = SecurityCenterCell(title: LAContext.biometricType() == .face ? S.SecurityCenter.Cells.faceIdTitle : S.SecurityCenter.Cells.touchIdTitle, descriptionText: S.SecurityCenter.Cells.touchIdDescription)
-    private let paperKeyCell = SecurityCenterCell(title: S.SecurityCenter.Cells.paperKeyTitle, descriptionText: S.SecurityCenter.Cells.paperKeyDescription)
+    private let recoveryPhraseCell = SecurityCenterCell(title: S.SecurityCenter.Cells.recoveryPhraseTitle, descriptionText: S.SecurityCenter.Cells.recoveryPhraseDescription)
     private let separator = UIView(color: .secondaryShadow)
     private let walletManager: WalletManager
     fileprivate var didViewAppear = false
@@ -110,7 +110,7 @@ class SecurityCenterViewController : UIViewController, Subscriber {
         Store.subscribe(self, selector: { $0.isBiometricsEnabled != $1.isBiometricsEnabled }, callback: {
             self.biometricsCell.isCheckHighlighted = $0.isBiometricsEnabled
         })
-        Store.subscribe(self, selector: { $1.alert == .paperKeySet(callback: {})
+        Store.subscribe(self, selector: { $1.alert == .recoveryPhraseSet(callback: {})
         }, callback: { _ in
             self.setPinAndPhraseChecks() //When paper phrase is confirmed, we need to update the check mark status
         })
@@ -123,7 +123,7 @@ class SecurityCenterViewController : UIViewController, Subscriber {
         headerBackground.addSubview(shield)
         scrollView.addSubview(pinCell)
         scrollView.addSubview(biometricsCell)
-        scrollView.addSubview(paperKeyCell)
+        scrollView.addSubview(recoveryPhraseCell)
         scrollView.addSubview(info)
     }
 
@@ -165,11 +165,11 @@ class SecurityCenterViewController : UIViewController, Subscriber {
             biometricsCell.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             biometricsCell.topAnchor.constraint(equalTo: pinCell.bottomAnchor),
             biometricsCell.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor) ])
-        paperKeyCell.constrain([
-            paperKeyCell.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            paperKeyCell.topAnchor.constraint(equalTo: biometricsCell.bottomAnchor),
-            paperKeyCell.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            paperKeyCell.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -C.padding[2]) ])
+        recoveryPhraseCell.constrain([
+            recoveryPhraseCell.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            recoveryPhraseCell.topAnchor.constraint(equalTo: biometricsCell.bottomAnchor),
+            recoveryPhraseCell.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            recoveryPhraseCell.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -C.padding[2]) ])
 
         if !LAContext.isBiometricsAvailable {
             biometricsCell.constrain([biometricsCell.heightAnchor.constraint(equalToConstant: 0.0)])
@@ -178,7 +178,7 @@ class SecurityCenterViewController : UIViewController, Subscriber {
 
     private func setPinAndPhraseChecks() {
         pinCell.isCheckHighlighted = Store.state.pinLength == 6
-        paperKeyCell.isCheckHighlighted = !UserDefaults.walletRequiresBackup
+        recoveryPhraseCell.isCheckHighlighted = !UserDefaults.walletRequiresBackup
     }
 
     required init?(coder aDecoder: NSCoder) {

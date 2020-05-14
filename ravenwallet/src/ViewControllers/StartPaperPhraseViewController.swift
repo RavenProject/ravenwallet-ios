@@ -18,7 +18,7 @@ class StartPaperPhraseViewController : UIViewController {
     }
 
     private let button: ShadowButton
-    private let illustration = UIImageView(image: #imageLiteral(resourceName: "PaperKey"))
+    private let illustration = UIImageView(image: #imageLiteral(resourceName: "RecoveryPhrase"))
     private let pencil = UIImageView(image: #imageLiteral(resourceName: "Pencil"))
     private let subHeader = OrangeGradientHeader()
 //    private let invisibleView = UIView()

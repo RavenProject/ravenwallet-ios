@@ -152,7 +152,7 @@ enum S {
         static let subheader = NSLocalizedString("UnlockScreen.subheader", value:"Enter PIN", comment: "Unlock Screen sub-header")
         static let unlocked = NSLocalizedString("UnlockScreen.unlocked", value:"Wallet Unlocked", comment: "Wallet unlocked message")
         static let disabled = NSLocalizedString("UnlockScreen.disabled", value:"Disabled until: %1$@", comment: "Disabled until date")
-        static let resetPin = NSLocalizedString("UnlockScreen.resetPin", value:"Reset PIN", comment: "Reset PIN with Paper Key button label.")
+        static let resetPin = NSLocalizedString("UnlockScreen.resetPin", value:"Reset PIN", comment: "Reset PIN with Recovery Phrase button label.")
         static let faceIdText = NSLocalizedString("UnlockScreen.faceIdText", value:"Unlock with FaceID", comment: "Unlock with FaceID accessibility label")
     }
     
@@ -226,8 +226,8 @@ enum S {
             static let pinDescription = NSLocalizedString("SecurityCenter.pinDescription", value:"Protects your RVN Wallet from unauthorized users.", comment: "PIN button description")
             static let touchIdTitle = NSLocalizedString("SecurityCenter.touchIdTitle", value:"Touch ID", comment: "Touch ID button title")
             static let touchIdDescription = NSLocalizedString("SecurityCenter.touchIdDescription", value:"Conveniently unlock your RVN Wallet and send money up to a set limit.", comment: "Touch ID/FaceID button description")
-            static let paperKeyTitle = NSLocalizedString("SecurityCenter.paperKeyTitle", value:"Paper Key", comment: "Paper Key button title")
-            static let paperKeyDescription = NSLocalizedString("SecurityCenter.paperKeyDescription", value:"The only way to access your Ravencoin if you lose or upgrade your phone.", comment: "Paper Key button description")
+            static let recoveryPhraseTitle = NSLocalizedString("SecurityCenter.recoveryPhraseTitle", value:"Recovery Phrase", comment: "Recovery Phrase button title")
+            static let recoveryPhraseDescription = NSLocalizedString("SecurityCenter.recoveryPhraseDescription", value:"The only way to access your Ravencoin if you lose or upgrade your phone.", comment: "Recovery Phrase button description")
             static let faceIdTitle = NSLocalizedString("SecurityCenter.faceIdTitle", value:"Face ID", comment: "Face ID button title")
         }
     }
@@ -308,42 +308,42 @@ enum S {
     
     enum RecoverWallet {
         static let next = NSLocalizedString("RecoverWallet.next", value:"Next", comment: "Next button label")
-        static let intro = NSLocalizedString("RecoverWallet.intro", value:"Recover your RVN Wallet with your paper key.", comment: "Recover wallet intro")
+        static let intro = NSLocalizedString("RecoverWallet.intro", value:"Recover your RVN Wallet with your recovery phrase.", comment: "Recover wallet intro")
         static let leftArrow = NSLocalizedString("RecoverWallet.leftArrow", value:"Left Arrow", comment: "Previous button accessibility label")
         static let rightArrow = NSLocalizedString("RecoverWallet.rightArrow", value:"Right Arrow", comment: "Next button accessibility label")
         static let done = NSLocalizedString("RecoverWallet.done", value:"Done", comment: "Done button text")
-        static let instruction = NSLocalizedString("RecoverWallet.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
+        static let instruction = NSLocalizedString("RecoverWallet.instruction", value:"Enter Recovery Phrase", comment: "Enter recovery phrase instruction")
         static let header = NSLocalizedString("RecoverWallet.header", value:"Recover Wallet", comment: "Recover wallet header")
-        static let subheader = NSLocalizedString("RecoverWallet.subheader", value:"Enter the paper key for the wallet you want to recover.", comment: "Recover wallet sub-header")
+        static let subheader = NSLocalizedString("RecoverWallet.subheader", value:"Enter the recovery phrase for the wallet you want to recover.", comment: "Recover wallet sub-header")
         
-        static let headerResetPin = NSLocalizedString("RecoverWallet.header_reset_pin", value:"Reset PIN", comment: "Reset PIN with paper key: header")
-        static let subheaderResetPin = NSLocalizedString("RecoverWallet.subheader_reset_pin", value:"To reset your PIN, enter the words from your paper key into the boxes below.", comment: "Reset PIN with paper key: sub-header")
-        static let resetPinInfo = NSLocalizedString("RecoverWallet.reset_pin_more_info", value:"Tap here for more information.", comment: "Reset PIN with paper key: more information button.")
-        static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
+        static let headerResetPin = NSLocalizedString("RecoverWallet.header_reset_pin", value:"Reset PIN", comment: "Reset PIN with recovery phrase: header")
+        static let subheaderResetPin = NSLocalizedString("RecoverWallet.subheader_reset_pin", value:"To reset your PIN, enter the words from your 12-word recovery phrase into the boxes below.", comment: "Reset PIN with recovery phrase: sub-header")
+        static let resetPinInfo = NSLocalizedString("RecoverWallet.reset_pin_more_info", value:"Tap here for more information.", comment: "Reset PIN with recovery phrase: more information button.")
+        static let invalid = NSLocalizedString("RecoverWallet.invalid", value:"The recovery phrase you entered is invalid. Please double-check each word and try again.", comment: "Invalid recovery phrase message")
     }
     
     enum ImportUtxos {
         static let header = NSLocalizedString("ImportUtxos.header", value:"Import UTXOS", comment: "Import utxos header")
         static let title = NSLocalizedString("ImportUtxos.title", value: "Import UTXOS for BIP44 Migration", comment: "Import UTXOS navigation item title.")
-        static let instruction = NSLocalizedString("ImportUtxos.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
+        static let instruction = NSLocalizedString("ImportUtxos.instruction", value:"Enter Recovery Phrase", comment: "Enter recovery phrase instruction")
     }
     
     enum OneTimeWipe {
         static let next = NSLocalizedString("OneTimeWipe.next", value:"Start Wipping Process", comment: "Next button label")
-        static let intro = NSLocalizedString("OneTimeWipe.intro", value:"Recover your RVN Wallet with your paper key.", comment: "Recover wallet intro")
+        static let intro = NSLocalizedString("OneTimeWipe.intro", value:"Recover your RVN Wallet with your recovery phrase.", comment: "Recover wallet intro")
         static let leftArrow = NSLocalizedString("OneTimeWipe.leftArrow", value:"Left Arrow", comment: "Previous button accessibility label")
         static let rightArrow = NSLocalizedString("OneTimeWipe.rightArrow", value:"Right Arrow", comment: "Next button accessibility label")
         static let done = NSLocalizedString("OneTimeWipe.done", value:"Done", comment: "Done button text")
-        static let instruction = NSLocalizedString("OneTimeWipe.instruction", value:"Enter Paper Key", comment: "Enter paper key instruction")
+        static let instruction = NSLocalizedString("OneTimeWipe.instruction", value:"Enter Recovery Phrase", comment: "Enter recovery phrase instruction")
         static let header = NSLocalizedString("OneTimeWipe.header", value:"Recover Wallet", comment: "Recover wallet header")
-        static let subheader = NSLocalizedString("OneTimeWipe.subheader", value:"Enter the paper key for the wallet you want to recover.", comment: "Recover wallet sub-header")
+        static let subheader = NSLocalizedString("OneTimeWipe.subheader", value:"Enter the recovery phrase for the wallet you want to recover.", comment: "Recover wallet sub-header")
         
-        static let headerResetPin = NSLocalizedString("OneTimeWipe.header_reset_pin", value:"Reset PIN", comment: "Reset PIN with paper key: header")
-        static let subheaderResetPin = NSLocalizedString("OneTimeWipe.subheader_reset_pin", value:"To reset your PIN, enter the words from your paper key into the boxes below.", comment: "Reset PIN with paper key: sub-header")
-        static let resetPinInfo = NSLocalizedString("OneTimeWipe.reset_pin_more_info", value:"Tap here for more information.", comment: "Reset PIN with paper key: more information button.")
-        static let invalid = NSLocalizedString("OneTimeWipe.invalid", value:"The paper key you entered is invalid. Please double-check each word and try again.", comment: "Invalid paper key message")
-        static let startMessage = NSLocalizedString("OneTimeWipe.startMessage", value: "Wipping your current wallet, will allow you to create a new one that support the new BIP44 convention", comment: "Start wipe wallet view message")
-        static let startWarning = NSLocalizedString("OneTimeWipe.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore your coins, you will need to visit http://ravenwallet.org/bip-39 and enter your Paper Key to retrieve your private keys.", comment: "Start wipe wallet view warning")
+        static let headerResetPin = NSLocalizedString("OneTimeWipe.header_reset_pin", value:"Reset PIN", comment: "Reset PIN with recovery phrase: header")
+        static let subheaderResetPin = NSLocalizedString("OneTimeWipe.subheader_reset_pin", value:"To reset your PIN, enter the words from your recovery phrase into the boxes below.", comment: "Reset PIN with recovery phrase: sub-header")
+        static let resetPinInfo = NSLocalizedString("OneTimeWipe.reset_pin_more_info", value:"Tap here for more information.", comment: "Reset PIN with recovery phrase: more information button.")
+        static let invalid = NSLocalizedString("OneTimeWipe.invalid", value:"The recovery phrase you entered is invalid. Please double-check each word and try again.", comment: "Invalid recovery phrase message")
+        static let startMessage = NSLocalizedString("OneTimeWipe.startMessage", value: "Wiping your current wallet, will allow you to create a new one that support the new BIP44 convention", comment: "Start wipe wallet view message")
+        static let startWarning = NSLocalizedString("OneTimeWipe.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore your coins, you will need to visit http://ravenwallet.org/bip-39 and enter your Recovery Phrase to retrieve your private keys.", comment: "Start wipe wallet view warning")
         static let title = NSLocalizedString("OneTimeWipe.title", value: "Wipe your wallet for BIP44 Migration", comment: "Wipe wallet navigation item title.")
     }
     
@@ -492,20 +492,20 @@ enum S {
     
     enum ConfirmPaperPhrase {
         static let word = NSLocalizedString("ConfirmPaperPhrase.word", value:"Word #%1$@", comment: "Word label eg. Word #1, Word #2")
-        static let label = NSLocalizedString("ConfirmPaperPhrase.label", value:"To make sure everything was written down correctly, please enter the following words from your paper key.", comment: "Confirm paper phrase view label.")
-        static let error = NSLocalizedString("ConfirmPaperPhrase.error", value: "The words entered do not match your paper key. Please try again.", comment: "Confirm paper phrase error message")
+        static let label = NSLocalizedString("ConfirmPaperPhrase.label", value:"To make sure everything was written down correctly, please enter the following words from your recovery phrase.", comment: "Confirm paper phrase view label.")
+        static let error = NSLocalizedString("ConfirmPaperPhrase.error", value: "The words entered do not match your recovery phrase. Please try again.", comment: "Confirm recovery phrase error message")
     }
     
     enum StartPaperPhrase {
-        static let body = NSLocalizedString("StartPaperPhrase.body", value:"Your paper key is the only way to restore your RVN Wallet if your phone is lost, stolen, broken, or upgraded.\n\nWe will show you a list of words to write down on a piece of paper and keep safe.", comment: "Paper key explanation text.")
+        static let body = NSLocalizedString("StartPaperPhrase.body", value:"Your recovery phrase is the only way to restore your RVN Wallet if your phone is lost, stolen, broken, or upgraded.\n\nWe will show you a list of words to write down on a piece of paper and keep safe.", comment: "Recovery Phrase explanation text.")
         static let important = NSLocalizedString("StartPaperPhrase.important", value:"IMPORTANT:", comment: "Important notice")
-        static let buttonTitle = NSLocalizedString("StartPaperPhrase.buttonTitle", value:"Write Down Paper Key", comment: "button label")
-        static let againButtonTitle = NSLocalizedString("StartPaperPhrase.againButtonTitle", value:"Write Down Paper Key Again", comment: "button label")
-        static let date = NSLocalizedString("StartPaperPhrase.date", value:"You last wrote down your paper key on %1$@", comment: "Argument is date")
+        static let buttonTitle = NSLocalizedString("StartPaperPhrase.buttonTitle", value:"Write Down Recovery Phrase", comment: "button label")
+        static let againButtonTitle = NSLocalizedString("StartPaperPhrase.againButtonTitle", value:"Write Down Recovery Phrase Again", comment: "button label")
+        static let date = NSLocalizedString("StartPaperPhrase.date", value:"You last wrote down your recovery phrase on %1$@", comment: "Argument is date")
     }
     
     enum WritePaperPhrase {
-        static let instruction = NSLocalizedString("WritePaperPhrase.instruction", value:"Write down each word in order and store it in a safe place.", comment: "Paper key instructions.")
+        static let instruction = NSLocalizedString("WritePaperPhrase.instruction", value:"Write down each word in order and store it in a safe place.", comment: "Recovery phrase instructions.")
         static let step = NSLocalizedString("WritePaperPhrase.step", value:"%1$d of %2$d", comment: "1 of 3")
         static let next = NSLocalizedString("WritePaperPhrase.next", value:"Next", comment: "button label")
         static let previous = NSLocalizedString("WritePaperPhrase.previous", value:"Previous", comment: "button label")
@@ -518,7 +518,7 @@ enum S {
     
     enum Alerts {
         static let pinSet = NSLocalizedString("Alerts.pinSet", value:"PIN Set", comment: "Alert Header label (the PIN was set)")
-        static let paperKeySet = NSLocalizedString("Alerts.paperKeySet", value:"Paper Key Set", comment: "Alert Header Label (the paper key was set)")
+        static let recoveryPhraseSet = NSLocalizedString("Alerts.recoveryPhraseSet", value:"Recovery Phrase Set", comment: "Alert Header Label (the recovery phrase was set)")
         static let sendSuccess = NSLocalizedString("Alerts.sendSuccess", value:"Send Confirmation", comment: "Send success alert header label (confirmation that the send happened)")
         static let sendAssetSuccess = NSLocalizedString("Alerts.sendAssetSuccess", value:"Transfer Confirmation", comment: "Send success alert header label (confirmation that the send happened)")
         static let reissueAssetSuccess = NSLocalizedString("Alerts.reissueAssetSuccess", value:"Reissue Confirmation", comment: "Reissue success alert header label (confirmation that the send happened)")
@@ -528,7 +528,7 @@ enum S {
         static let getDataAssetSuccess = NSLocalizedString("Alerts.getDataAssetSuccess", value:"Get Data %@ Success", comment: "get asset data success")
         static let getDataAssetError = NSLocalizedString("Asset.getDataAssetError", value:" %@ Data Not Found", comment: "get data asset Error message")
         static let sendFailure = NSLocalizedString("Alerts.sendFailure", value:"Send failed", comment: "Send failure alert header label (the send failed to happen)")
-        static let paperKeySetSubheader = NSLocalizedString("Alerts.paperKeySetSubheader", value:"Awesome!", comment: "Alert Subheader label (playfully positive)")
+        static let recoveryPhraseSetSubheader = NSLocalizedString("Alerts.recoveryPhraseSetSubheader", value:"Awesome!", comment: "Alert Subheader label (playfully positive)")
         static let sendSuccessSubheader = NSLocalizedString("Alerts.sendSuccessSubheader", value:"RVN Sent!", comment: "Send success alert subheader label (e.g. the money was sent)")
         static let sendAssetSuccessSubheader = NSLocalizedString("Alerts.sendAssetSuccessSubheader", value:"Asset Transferred!", comment: "Send asset success alert subheader label (e.g. the money was sent)")
         static let burnAssetSuccessSubheader = NSLocalizedString("Alerts.burnAssetSuccessSubheader", value:"Asset Burnt!", comment: "Burn asset success alert subheader label (e.g. the money was sent)")
@@ -593,9 +593,9 @@ enum S {
             static let title = NSLocalizedString("Prompts.TouchId.title", value: "Enable Touch ID", comment: "Enable touch ID prompt title")
             static let body = NSLocalizedString("Prompts.TouchId.body", value: "Tap Continue to enable Touch ID", comment: "Enable touch ID prompt body")
         }
-        enum PaperKey {
-            static let title = NSLocalizedString("Prompts.PaperKey.title", value: "Action Required", comment: "An action is required (You must do this action).")
-            static let body = NSLocalizedString("Prompts.PaperKey.body", value: "Your Paper Key must be saved in case you ever lose or change your phone.", comment: "Warning about paper key.")
+        enum RecoveryPhrase {
+            static let title = NSLocalizedString("Prompts.RecoveryPhrase.title", value: "Action Required", comment: "An action is required (You must do this action).")
+            static let body = NSLocalizedString("Prompts.RecoveryPhrase.body", value: "Your Recovery Phrase must be saved in case you ever lose or change your phone.", comment: "Warning about recovery phrase.")
         }
         enum RescanBlockChain {
             static let title = NSLocalizedString("Prompts.RescanBlockChain.title", value: "Action Required", comment: "An action is required (You must do this action).")
@@ -721,9 +721,9 @@ enum S {
         static let wiping = NSLocalizedString("WipeWallet.wiping", value: "Resetting...", comment: "Wiping activity message")
         static let failedTitle = NSLocalizedString("WipeWallet.failedTitle", value: "Failed", comment: "Failed wipe wallet alert title")
         static let failedMessage = NSLocalizedString("WipeWallet.failedMessage", value: "Failed to reset wallet.", comment: "Failed wipe wallet alert message")
-        static let instruction = NSLocalizedString("WipeWallet.instruction", value: "To start a new wallet or restore an existing wallet, you must first erase the wallet that is currently installed. To continue, enter the current wallet's Paper Key.", comment: "Enter key to wipe wallet instruction.")
+        static let instruction = NSLocalizedString("WipeWallet.instruction", value: "To start a new wallet or restore an existing wallet, you must first erase the wallet that is currently installed. To continue, enter the current wallet's Recovery Phrase.", comment: "Enter key to wipe wallet instruction.")
         static let startMessage = NSLocalizedString("WipeWallet.startMessage", value: "Starting or recovering another wallet allows you to access and manage a different RVN Wallet on this device.", comment: "Start wipe wallet view message")
-        static let startWarning = NSLocalizedString("WipeWallet.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore it in the future, you will need to enter your Paper Key.", comment: "Start wipe wallet view warning")
+        static let startWarning = NSLocalizedString("WipeWallet.startWarning", value: "Your current wallet will be removed from this device. If you wish to restore it in the future, you will need to enter your Recovery Phrase.", comment: "Start wipe wallet view warning")
     }
     
     enum FeeSelector {
