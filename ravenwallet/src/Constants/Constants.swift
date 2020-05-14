@@ -108,7 +108,7 @@ struct C {
     
     //fetch Utxos urls
     static var fetchRvnUtxosPath: String {
-        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/utxo" : "https://api.ravencoin.com/api/addr/%@/utxo"
+        return E.isTestnet ? "https://api.testnet.ravencoin.org/api/addr/%@/utxo" : "https://api.ravencoin.org/api/addr/%@/utxo"
     }
     
     static var fetchAssetUtxosPath:String {
