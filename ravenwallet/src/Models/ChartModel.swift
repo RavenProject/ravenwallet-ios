@@ -44,7 +44,9 @@ class ChartModel {
                     }
                     else {
                         let message: String = convertedJsonIntoDict.object(forKey: "message") as! String
-                        self.showErrorMessage(message)
+                        DispatchQueue.main.async {
+                            self.showErrorMessage(message)
+                        }
                     }
                 }
             } catch let error as NSError {
