@@ -62,14 +62,16 @@ extension BRAPIClient {
                 if error == nil,
                     let data = data,
                     let parsedData = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any]  {
-                    let lastTradeRate = parsedData["lastTradeRate"] as! String
-                    //print("lastTradeRate \(lastTradeRate)")
-                    guard let ratio : Double = Double(lastTradeRate) else {
-                        return handler(0.00, "Error getting RVN rate in BTC")
-                    }
+                    
+                    if let lastTradeRate = parsedData["lastTradeRate"] as? String {
+                        //print("lastTradeRate \(lastTradeRate)")
+                        guard let ratio: Double = Double(lastTradeRate) else {
+                            return handler(0.00, "Error getting RVN rate in BTC")
+                        }
 
-                    print("Bittrex Ratio of BTC to RVN\(ratio)");
-                    return handler(ratio, nil)
+                        print("Bittrex Ratio of BTC to RVN\(ratio)");
+                        return handler(ratio, nil)
+                    }
                 } else {
                     return handler(0.00, "Error fetching Ravencoin BTC price from Bittrex.")
                 }
