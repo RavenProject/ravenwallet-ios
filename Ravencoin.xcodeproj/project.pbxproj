@@ -70,6 +70,13 @@
 		22C431341DF89DFE0017CAEA /* BRCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C431331DF89DFE0017CAEA /* BRCoderTests.swift */; };
 		22C431361DF8A6DF0017CAEA /* BRAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C431351DF8A6DF0017CAEA /* BRAPIClientTests.swift */; };
 		22E773041EE7813000397E0E /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E773031EE7813000397E0E /* Bonjour.swift */; };
+		326F8C262471A87A005D91EA /* CoreDatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326F8C252471A87A005D91EA /* CoreDatabaseTest.swift */; };
+		32D2F9FA24721CC30075AF0B /* AssetManagerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2F9F924721CC30075AF0B /* AssetManagerTest.swift */; };
+		32D2F9FC24723FA70075AF0B /* AssetFilterTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2F9FB24723FA60075AF0B /* AssetFilterTableVC.swift */; };
+		32D2F9FE24724CCF0075AF0B /* AssetFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2F9FD24724CCF0075AF0B /* AssetFilterCell.swift */; };
+		32D2FA00247391A30075AF0B /* AssetFilterAdapterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2F9FF247391A30075AF0B /* AssetFilterAdapterProtocol.swift */; };
+		32D2FA03247392210075AF0B /* WhitelistAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FA02247392210075AF0B /* WhitelistAdapter.swift */; };
+		32D2FA0524745F1F0075AF0B /* BlacklistAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FA0424745F1F0075AF0B /* BlacklistAdapter.swift */; };
 		4106E6C8220D892200C29B86 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4106E6C6220D892100C29B86 /* Fabric.framework */; };
 		4106E6C9220D892200C29B86 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4106E6C7220D892100C29B86 /* Crashlytics.framework */; };
 		41085231216965F30027DB2A /* AddressBookFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41085230216965F30027DB2A /* AddressBookFooterView.swift */; };
@@ -810,6 +817,13 @@
 		22C431331DF89DFE0017CAEA /* BRCoderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRCoderTests.swift; sourceTree = "<group>"; };
 		22C431351DF8A6DF0017CAEA /* BRAPIClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRAPIClientTests.swift; sourceTree = "<group>"; };
 		22E773031EE7813000397E0E /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
+		326F8C252471A87A005D91EA /* CoreDatabaseTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDatabaseTest.swift; sourceTree = "<group>"; };
+		32D2F9F924721CC30075AF0B /* AssetManagerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetManagerTest.swift; sourceTree = "<group>"; };
+		32D2F9FB24723FA60075AF0B /* AssetFilterTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetFilterTableVC.swift; sourceTree = "<group>"; };
+		32D2F9FD24724CCF0075AF0B /* AssetFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AssetFilterCell.swift; path = src/Views/AssetFilterCell.swift; sourceTree = "<group>"; };
+		32D2F9FF247391A30075AF0B /* AssetFilterAdapterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetFilterAdapterProtocol.swift; sourceTree = "<group>"; };
+		32D2FA02247392210075AF0B /* WhitelistAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhitelistAdapter.swift; sourceTree = "<group>"; };
+		32D2FA0424745F1F0075AF0B /* BlacklistAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacklistAdapter.swift; sourceTree = "<group>"; };
 		4106E6C6220D892100C29B86 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		4106E6C7220D892100C29B86 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		41085230216965F30027DB2A /* AddressBookFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AddressBookFooterView.swift; path = src/Views/AddressBookFooterView.swift; sourceTree = "<group>"; };
@@ -2158,6 +2172,16 @@
 			path = libbz2;
 			sourceTree = "<group>";
 		};
+		32D2FA012473920C0075AF0B /* adapters */ = {
+			isa = PBXGroup;
+			children = (
+				32D2F9FF247391A30075AF0B /* AssetFilterAdapterProtocol.swift */,
+				32D2FA02247392210075AF0B /* WhitelistAdapter.swift */,
+				32D2FA0424745F1F0075AF0B /* BlacklistAdapter.swift */,
+			);
+			path = adapters;
+			sourceTree = "<group>";
+		};
 		4106E6C5220D892100C29B86 /* Crashlytics */ = {
 			isa = PBXGroup;
 			children = (
@@ -2215,11 +2239,13 @@
 		41358D032175DDB500B86443 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				32D2FA012473920C0075AF0B /* adapters */,
 				41EA80DC217B751F00B67A78 /* AllAssetVC.swift */,
 				41EA80DB217B751E00B67A78 /* AllAssetTableVC.swift */,
 				41358D042175DDB500B86443 /* ManageAssetDisplayVC.swift */,
 				41358D1C21761BD800B86443 /* ManageAssetTableVC.swift */,
 				41B6061A217BC6840050DB58 /* FeeAmountVC.swift */,
+				32D2F9FB24723FA60075AF0B /* AssetFilterTableVC.swift */,
 			);
 			name = Assets;
 			path = src/ViewControllers/Assets;
@@ -3218,6 +3244,8 @@
 				CEEC70871E943DC900EF788E /* TouchIdEnabledTests.swift */,
 				CEEC70971E96BF8800EF788E /* DefaultCurrencyTests.swift */,
 				41FB22452211F0AC00C072A5 /* TransferAssetTest.swift */,
+				326F8C252471A87A005D91EA /* CoreDatabaseTest.swift */,
+				32D2F9F924721CC30075AF0B /* AssetManagerTest.swift */,
 			);
 			path = ravenwalletTests;
 			sourceTree = "<group>";
@@ -3591,6 +3619,7 @@
 				412CAB5421EFBA26000C393D /* AllAddressesListCell.swift */,
 				41743A1D2174B4BA00624970 /* AssetHomeCell.swift */,
 				41358D1E2176288B00B86443 /* AssetManageCell.swift */,
+				32D2F9FD24724CCF0075AF0B /* AssetFilterCell.swift */,
 				CE6BCF5C1EE9E89A0029849C /* CustomTitleView.swift */,
 				CED341321EF5A5C00014912A /* InAppAlert.swift */,
 				411281CF217DD29F002A6205 /* AssetCell */,
@@ -4619,6 +4648,7 @@
 				413204FA21D9622A006ADCAE /* NameAssetCell.swift in Sources */,
 				419BD11621B6DDE60070B2C8 /* AAOptionsConstructor.swift in Sources */,
 				CEC6AA3B1DEE4EB000EE5AFD /* CGRect+Additions.swift in Sources */,
+				32D2FA03247392210075AF0B /* WhitelistAdapter.swift in Sources */,
 				7C5AC8A6203B93D3001B221E /* TxListCell.swift in Sources */,
 				1042439F2405592900FF8DDF /* AAColor.swift in Sources */,
 				CEE659E71F65A936001FF29D /* RetryTimer.swift in Sources */,
@@ -4669,6 +4699,7 @@
 				410C3EC721933972002B5208 /* TermsUseBtnCell.swift in Sources */,
 				CEA05CC31F21B53C00D850F0 /* FeeSelector.swift in Sources */,
 				417C680F216B51E10090710E /* AddressBookListCell.swift in Sources */,
+				32D2F9FC24723FA70075AF0B /* AssetFilterTableVC.swift in Sources */,
 				CE20C8F21DBAF71500C8397A /* ApplicationController.swift in Sources */,
 				CEC4CF071F0C48DD00E5C82E /* StartWipeWalletViewController.swift in Sources */,
 				41743A202174BCE400624970 /* WalletListViewModel.swift in Sources */,
@@ -4698,6 +4729,7 @@
 				CE44BA1B1F33BFC500392A1A /* NodeSelectorViewController.swift in Sources */,
 				CE36454A1E7B426B0079D0CF /* ClearNumberPad.swift in Sources */,
 				CE124D001E69170900DFA146 /* SyncingView.swift in Sources */,
+				32D2FA00247391A30075AF0B /* AssetFilterAdapterProtocol.swift in Sources */,
 				CE20C90E1DBE52B000C8397A /* UIView+BRWAdditions.swift in Sources */,
 				411DF576216F59D70003A8BA /* Checkbox.swift in Sources */,
 				8B12807420FFB501002A139F /* Circle.swift in Sources */,
@@ -4847,6 +4879,7 @@
 				22A9A9561DF61945000F0016 /* BRWalletPlugin.swift in Sources */,
 				4CD96FDA243F8EA900F0DC46 /* keccakf1600.c in Sources */,
 				CE6B829A1FE3A7B6007A41B9 /* UIScrollView+Additions.swift in Sources */,
+				32D2F9FE24724CCF0075AF0B /* AssetFilterCell.swift in Sources */,
 				8B137EB320F90F63006DEB3A /* sha256.cpp in Sources */,
 				CEF3E8361DE60222007C0A9E /* ModalNavigationController.swift in Sources */,
 				CED811E21EB302DD003A8D1E /* WatchTransaction.swift in Sources */,
@@ -4902,6 +4935,7 @@
 				41358D072175DDB500B86443 /* ManageAssetDisplayVC.swift in Sources */,
 				CE20C90C1DBC59E600C8397A /* StartFlowPresenter.swift in Sources */,
 				CE20C8FC1DBB0F3A00C8397A /* UIColor+BRWAdditions.swift in Sources */,
+				32D2FA0524745F1F0075AF0B /* BlacklistAdapter.swift in Sources */,
 				CEA3626A1E01150D0061FC0E /* CGContext+Additions.swift in Sources */,
 				7C6ACCB41FEB34470028ABFA /* TxLabelCell.swift in Sources */,
 				7C35E71B200AF8170064808F /* RvnTransaction.swift in Sources */,
@@ -4947,10 +4981,12 @@
 			files = (
 				22C4312E1DF89D970017CAEA /* BRHTTPServerTests.swift in Sources */,
 				CE6DCC2B1E63D6290044257B /* WalletCreationTests.swift in Sources */,
+				32D2F9FA24721CC30075AF0B /* AssetManagerTest.swift in Sources */,
 				CEC6F8471E8878B6000795B8 /* PaymentRequestTests.swift in Sources */,
 				22C431361DF8A6DF0017CAEA /* BRAPIClientTests.swift in Sources */,
 				CEDD8F101E575DD4007A4123 /* WalletAuthenticationTests.swift in Sources */,
 				CEF3D2D71E8AB9980070178E /* SpendingLimitTests.swift in Sources */,
+				326F8C262471A87A005D91EA /* CoreDatabaseTest.swift in Sources */,
 				22C431321DF89DDC0017CAEA /* NSDataExtensionTests.swift in Sources */,
 				CE6DCC291E63D0280044257B /* PhraseTests.swift in Sources */,
 				CEEC70881E943DC900EF788E /* TouchIdEnabledTests.swift in Sources */,

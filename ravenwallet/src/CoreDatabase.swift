@@ -24,6 +24,13 @@ private func SafeSqlite3ColumnBlob<T>(statement: OpaquePointer, iCol: Int32) -> 
 
 class CoreDatabase {
     
+    enum Table {
+        enum Asset: String {
+            case whitelist = "ZBRAssetWhitelist"
+            case blacklist = "ZBRAssetBlacklist"
+        }
+    }
+    
     private let dbPath: String
     private var db: OpaquePointer? = nil
     private var txEnt: Int32 = 0
@@ -149,7 +156,17 @@ class CoreDatabase {
             "Z_SORT integer)", nil, nil, nil)
         if sqlite3_errcode(db) != SQLITE_OK { print(String(cString: sqlite3_errmsg(db))) }
         
-        // Asset Table
+        // Asset Whitelist Table
+        let whitelistQuery = "create table if not exists \(Table.Asset.whitelist.rawValue) (Z_ID integer PRIMARY KEY AUTOINCREMENT, Z_NAME VARCHAR NOT NULL)"
+        sqlite3_exec(db, whitelistQuery, nil, nil, nil)
+        if sqlite3_errcode(db) != SQLITE_OK { print(String(cString: sqlite3_errmsg(db))) }
+        
+        // Asset Blackelist Table
+        let blackListQuery = "create table if not exists \(Table.Asset.blacklist.rawValue) (Z_ID integer PRIMARY KEY AUTOINCREMENT, Z_NAME VARCHAR NOT NULL)"
+        sqlite3_exec(db, blackListQuery, nil, nil, nil)
+        if sqlite3_errcode(db) != SQLITE_OK { print(String(cString: sqlite3_errmsg(db))) }
+        
+        // Asset Name Table
         sqlite3_exec(db, "create table if not exists ZBRASSET_NAME (" +
             "Z_ID integer PRIMARY KEY AUTOINCREMENT," +
             "Z_ASSET_NAME VARCHAR NOT NULL," +
@@ -719,39 +736,204 @@ class CoreDatabase {
         }
     }
     
-    //Asset
+    //MARK: - Assets
+    
+    func blockingLoadAssets() -> [Asset] {
+        var assets = [Asset]()
+        var sql: OpaquePointer? = nil
+        sqlite3_prepare_v2(self.db, "select Z_ID, Z_NAME, Z_AMOUNT, Z_UNITS, Z_REISSUBALE, Z_HAS_IPFS, Z_IPFS_HASH, Z_OWNERSHIP, Z_ISHIDDEN, Z_SORT from ZBRAsset  where (Z_AMOUNT != 0 OR (Z_AMOUNT == 0 AND Z_OWNERSHIP = 1) ) ORDER BY Z_SORT DESC", -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        while sqlite3_step(sql) == SQLITE_ROW {
+            let idAsset = Int(sqlite3_column_int(sql, 0))
+            let name = String(cString: sqlite3_column_text(sql, 1))
+            let intAmount = sqlite3_column_int64(sql, 2)
+            let amount = intAmount >= 0 ? UInt64(sqlite3_column_int64(sql, 2)) : 0 //Todo : should never be 0
+            let units = UInt8(sqlite3_column_int(sql, 3))
+            let reissubale = UInt8(sqlite3_column_int(sql, 4))
+            let hasIpfs = UInt8(sqlite3_column_int(sql, 5))
+            let ipfsHash = String(cString: sqlite3_column_text(sql, 6))
+            let ownerShip = Int(sqlite3_column_int(sql, 7))
+            let hidden = Int(sqlite3_column_int(sql, 8))
+            let sort = Int(sqlite3_column_int(sql, 9))
+            
+            let p = Asset(idAsset: idAsset, name: name, amount: Satoshis(amount), units: units, reissubale: reissubale, hasIpfs: hasIpfs, ipfsHash: ipfsHash, ownerShip: ownerShip, hidden: hidden, sort: sort)
+            assets.append(p)
+        }
+        
+        if sqlite3_errcode(self.db) != SQLITE_DONE {
+            print("BMEX database loadAsset error")
+            print(String(cString: sqlite3_errmsg(self.db)))
+        }
+        
+        return assets
+    }
     
     func loadAssets(callback: @escaping ([Asset])->Void) {
-        queue.async {
-            var assets = [Asset]()
-            var sql: OpaquePointer? = nil
-            sqlite3_prepare_v2(self.db, "select Z_ID, Z_NAME, Z_AMOUNT, Z_UNITS, Z_REISSUBALE, Z_HAS_IPFS, Z_IPFS_HASH, Z_OWNERSHIP, Z_ISHIDDEN, Z_SORT from ZBRAsset  where (Z_AMOUNT != 0 OR (Z_AMOUNT == 0 AND Z_OWNERSHIP = 1) ) ORDER BY Z_SORT DESC", -1, &sql, nil)
-            defer { sqlite3_finalize(sql) }
-            
-            while sqlite3_step(sql) == SQLITE_ROW {
-                let idAsset = Int(sqlite3_column_int(sql, 0))
-                let name = String(cString: sqlite3_column_text(sql, 1))
-                let intAmount = sqlite3_column_int64(sql, 2)
-                let amount = intAmount >= 0 ? UInt64(sqlite3_column_int64(sql, 2)) : 0 //Todo : should never be 0
-                let units = UInt8(sqlite3_column_int(sql, 3))
-                let reissubale = UInt8(sqlite3_column_int(sql, 4))
-                let hasIpfs = UInt8(sqlite3_column_int(sql, 5))
-                let ipfsHash = String(cString: sqlite3_column_text(sql, 6))
-                let ownerShip = Int(sqlite3_column_int(sql, 7))
-                let hidden = Int(sqlite3_column_int(sql, 8))
-                let sort = Int(sqlite3_column_int(sql, 9))
-                
-                let p = Asset(idAsset: idAsset, name: name, amount: Satoshis(amount), units: units, reissubale: reissubale, hasIpfs: hasIpfs, ipfsHash: ipfsHash, ownerShip: ownerShip, hidden: hidden, sort: sort)
-                assets.append(p)
-            }
-            
-            if sqlite3_errcode(self.db) != SQLITE_DONE {
-                print("BMEX database loadAsset error")
-                print(String(cString: sqlite3_errmsg(self.db)))
-            }
+        queue.async { [weak self] in
+            guard let assets = self?.blockingLoadAssets() else { return }
             DispatchQueue.main.async {
                 callback(assets)
             }
+        }
+    }
+    
+    private func existing(assetName: String, in tableName: Table.Asset) -> Bool {
+        
+        var isExiste = false
+        var sql: OpaquePointer? = nil
+        let req = "select * from \(tableName.rawValue) where Z_NAME = '\(assetName)'"
+        sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        while sqlite3_step(sql) == SQLITE_ROW {
+            isExiste = true
+            break
+        }
+        
+        if sqlite3_errcode(self.db) != SQLITE_DONE {
+            print(String(cString: sqlite3_errmsg(self.db)))
+        }
+        return isExiste
+    }
+    
+    private func clear(table tableName: Table.Asset) {
+        var sql: OpaquePointer? = nil
+        let req = "delete from \(tableName.rawValue)"
+        sqlite3_prepare_v2(self.db, req, -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        guard sqlite3_step(sql) == SQLITE_DONE else {
+            print(String(cString: sqlite3_errmsg(self.db)))
+            return
+        }
+    }
+    
+    private func loadAssetNames(from table: Table.Asset) -> [String] {
+        var assetNames: [String] = []
+        
+        var sql: OpaquePointer? = nil
+        sqlite3_prepare_v2(self.db, "select Z_ID, Z_NAME from \(table.rawValue) ORDER BY Z_NAME ASC", -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        while sqlite3_step(sql) == SQLITE_ROW {
+            let _ = Int(sqlite3_column_int(sql, 0))
+            let name = String(cString: sqlite3_column_text(sql, 1))
+            
+            assetNames.append(name)
+        }
+        
+        let errCode = sqlite3_errcode(self.db)
+        
+        if errCode != SQLITE_DONE {
+            print("Error loading asset names from \(table.rawValue)")
+            print(String(cString: sqlite3_errmsg(self.db)))
+        }
+        
+        return assetNames
+    }
+    
+    private func addAsset(name assetName: String, to table: Table.Asset) -> Bool {
+        guard !self.existing(assetName: assetName, in: table) else { return false }
+
+        let query = "insert or rollback into \(table.rawValue) (Z_NAME) values ('\(assetName)')"
+        var sql: OpaquePointer? = nil
+        
+        sqlite3_prepare_v2(self.db, query, -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        guard sqlite3_step(sql) == SQLITE_DONE else {
+            print("BMEX database assetAdded error")
+            print(String(cString: sqlite3_errmsg(self.db)))
+
+            return false
+        }
+        
+        //commit querys
+        sqlite3_exec(self.db, "commit", nil, nil, nil)
+        self.setDBFileAttributes()
+        
+        return true
+    }
+    
+    private func removeAsset(name assetName: String, from table: Table.Asset) {
+        var sql: OpaquePointer? = nil
+        let query = "delete from \(table.rawValue) where Z_NAME = '\(assetName)'"
+        sqlite3_prepare_v2(self.db, query, -1, &sql, nil)
+        defer { sqlite3_finalize(sql) }
+        
+        guard sqlite3_step(sql) == SQLITE_DONE else {
+            print(String(cString: sqlite3_errmsg(self.db)))
+            return
+        }
+    }
+    
+    //MARK: Asset Whitelist
+    
+    func loadWhitelistBlocking() -> [String] {
+        return self.loadAssetNames(from: .whitelist)
+    }
+    
+    func loadWhitelist(callback: @escaping ([String]) -> Void) {
+        queue.async {
+            let whitelist = self.loadAssetNames(from: .whitelist)
+            
+            callback(whitelist)
+        }
+    }
+    
+    func addToWhitelist(assetName: String, _ callback: ((Bool) -> Void)? = nil) {
+        queue.async {
+            let sucess = self.addAsset(name: assetName, to: .whitelist)
+            callback?(sucess)
+        }
+    }
+    
+    func removeFromWhitelist(assetName: String, _ callback: (()->Void)? = nil) {
+        queue.async {
+            self.removeAsset(name: assetName, from: .whitelist)
+            callback?()
+        }
+    }
+    
+    func clearWhitelist(callback: (() -> Void)? = nil) {
+        queue.async {
+            self.clear(table: .whitelist)
+            callback?()
+        }
+    }
+    
+    //MARK: Asset Blacklist
+    
+    func loadBlacklist(callback: @escaping ([String]) -> Void) {
+        queue.async {
+            let list = self.loadAssetNames(from: .blacklist)
+            callback(list)
+        }
+    }
+    
+    func loadBlacklistBlocking() -> [String] {
+        return self.loadAssetNames(from: .blacklist)
+    }
+    
+    func addToBlacklist(assetName: String, callback: ((Bool) -> Void)? = nil) {
+        queue.async {
+            let success = self.addAsset(name: assetName, to: .blacklist)
+            callback?(success)
+        }
+    }
+    
+    func removeFromBlacklist(assetName: String, _ callback: (()->Void)? = nil) {
+        queue.async {
+            self.removeAsset(name: assetName, from: .blacklist)
+            callback?()
+        }
+    }
+    
+    func clearBlacklist(callback: (() -> Void)? = nil){
+        queue.async {
+            self.clear(table: .blacklist)
+            callback?()
         }
     }
     
