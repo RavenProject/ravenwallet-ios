@@ -696,6 +696,7 @@ enum S {
             static let notValid = NSLocalizedString("Import.Error.notValid", value: "Not a valid private key", comment: "Not a valid private key error message")
             static let duplicate = NSLocalizedString("Import.Error.duplicate", value: "This private key is already in your wallet.", comment: "Duplicate key error message")
             static let empty = NSLocalizedString("Import.Error.empty", value: "This private key does not contain RVN.", comment: "empty private key error message")
+            static let emptyasset = NSLocalizedString("Import.Error.emptyasset", value: "No assets to sweep.", comment: "No assets to sweep message")
             static let highFees = NSLocalizedString("Import.Error.highFees", value: "Transaction fees would cost more than the funds available on this private key.", comment: "High fees error message")
             static let signing = NSLocalizedString("Import.Error.signing", value: "Error signing transaction", comment: "Import signing error message")
         }

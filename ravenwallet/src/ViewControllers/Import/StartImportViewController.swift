@@ -293,7 +293,12 @@ class StartImportViewController : UIViewController, Subscriber {
         let fee = wallet.feeForTxSize(tx.size + 34 + (pubKeyLength - 34)*tx.inputs.count)
         balanceActivity.dismiss(animated: true, completion: {
             guard outputs.count > 0 && balance > 0 else {
-                return self.showErrorMessage(S.Import.Error.empty, callBack: callBack)
+                if isAsset {
+                    return self.showErrorMessage(S.Import.Error.emptyasset, callBack: callBack)
+                }
+                else {
+                    return self.showErrorMessage(S.Import.Error.empty, callBack: callBack)
+                }
             }
             if isAsset {
                 guard fee + wallet.minOutputAmount <= self.walletBalance else {
