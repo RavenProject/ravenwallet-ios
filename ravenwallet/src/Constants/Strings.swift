@@ -684,6 +684,7 @@ enum S {
         static let title = NSLocalizedString("Import.title", value: "Import Wallet", comment: "Import Wallet screen title")
         static let importing = NSLocalizedString("Import.importing", value: "Importing Wallet", comment: "Importing wallet progress view label")
         static let confirm = NSLocalizedString("Import.confirm", value: "Send %1$@ from this private key into your wallet? The Ravencoin network will receive a fee of %2$@.", comment: "Sweep private key confirmation message")
+        static let confirmAsset = NSLocalizedString("Import.confirmAsset", value: "Send %1$@ of %2$@ from this private key into your wallet?", comment: "Sweep asset with private key confirmation message")
         static let checking = NSLocalizedString("Import.checking", value: "Checking private key balance...", comment: "Checking private key balance progress view text")
         static let password = NSLocalizedString("Import.password", value: "This private key is password protected.", comment: "Enter password alert view title")
         static let passwordPlaceholder = NSLocalizedString("Import.passwordPlaceholder", value: "password", comment: "password textfield placeholder")
@@ -695,7 +696,8 @@ enum S {
         enum Error {
             static let notValid = NSLocalizedString("Import.Error.notValid", value: "Not a valid private key", comment: "Not a valid private key error message")
             static let duplicate = NSLocalizedString("Import.Error.duplicate", value: "This private key is already in your wallet.", comment: "Duplicate key error message")
-            static let empty = NSLocalizedString("Import.Error.empty", value: "This private key is empty.", comment: "empty private key error message")
+            static let empty = NSLocalizedString("Import.Error.empty", value: "This private key does not contain RVN.", comment: "empty private key error message")
+            static let emptyasset = NSLocalizedString("Import.Error.emptyasset", value: "No assets to sweep.", comment: "No assets to sweep message")
             static let highFees = NSLocalizedString("Import.Error.highFees", value: "Transaction fees would cost more than the funds available on this private key.", comment: "High fees error message")
             static let signing = NSLocalizedString("Import.Error.signing", value: "Error signing transaction", comment: "Import signing error message")
         }

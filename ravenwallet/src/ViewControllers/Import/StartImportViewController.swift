@@ -268,13 +268,29 @@ class StartImportViewController : UIViewController, Subscriber {
         present(balanceActivity, animated: true, completion: {
             self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: isAsset, completion: { data in
                 guard let data = data else { return }
+
+               // self.filterAssetOutputs(data: data, isAsset: isAsset, callBack: callBack)
                 self.handleData(data: data, key: key, isAsset: isAsset, callBack: callBack)
             })
         })
     }
     
+
+    
+    private func filterAssetOutputs(outputs: inout [SimpleUTXO]) -> Int {
+        if outputs.count == 0 {return 0}
+        let remainingAssets = outputs.count - 1
+        
+        //Remove all but one asset
+        let a_range = CountableRange<Int>(uncheckedBounds: (lower: 1, upper: outputs.count))
+        outputs.removeSubrange(a_range)
+        
+        return(remainingAssets)
+    }
+    
     private func handleData(data: [[String: Any]], key: BRKey, isAsset:Bool, callBack:(()->Void)? = nil) {
         var key = key
+        var remainingAssets = 0
         guard let tx = UnsafeMutablePointer<BRTransaction>() else { return }
         guard let wallet = walletManager.wallet else { return }
         guard let address = key.address() else { return }
@@ -282,7 +298,10 @@ class StartImportViewController : UIViewController, Subscriber {
         guard !wallet.containsAddress(address) else {
             return showErrorMessage(S.Import.Error.duplicate)
         }
-        let outputs = data.compactMap { SimpleUTXO(json: $0) }
+        var outputs = data.compactMap { SimpleUTXO(json: $0) }
+        if isAsset {
+            remainingAssets = filterAssetOutputs(outputs: &outputs)
+        }
         let balance = outputs.map { $0.satoshis }.reduce(0, +)
         outputs.forEach { output in
             tx.addInput(txHash: output.hash, index: output.index, amount: output.satoshis, script: output.script)
@@ -293,7 +312,12 @@ class StartImportViewController : UIViewController, Subscriber {
         let fee = wallet.feeForTxSize(tx.size + 34 + (pubKeyLength - 34)*tx.inputs.count)
         balanceActivity.dismiss(animated: true, completion: {
             guard outputs.count > 0 && balance > 0 else {
-                return self.showErrorMessage(S.Import.Error.empty, callBack: callBack)
+                if isAsset {
+                    return self.showErrorMessage(S.Import.Error.emptyasset, callBack: callBack)
+                }
+                else {
+                    return self.showErrorMessage(S.Import.Error.empty, callBack: callBack)
+                }
             }
             if isAsset {
                 guard fee + wallet.minOutputAmount <= self.walletBalance else {
@@ -309,7 +333,7 @@ class StartImportViewController : UIViewController, Subscriber {
             let feeAmount = Amount(amount: fee, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
             let balanceText = self.getBalanceMessage(outputs: outputs, isAsset: isAsset, rate: rate)
             let feeText = Store.state.isSwapped ? feeAmount.localCurrency : feeAmount.bits
-            let message = String(format: S.Import.confirm, balanceText, feeText)
+            let message = String(format: S.Import.confirm, balanceText, feeText) + self.getMoreAssetsMessage(isAsset:isAsset, remainingAssets: remainingAssets)
             let alert = UIAlertController(title: S.Import.title, message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: {_ in
                 callBack?()
@@ -320,7 +344,18 @@ class StartImportViewController : UIViewController, Subscriber {
             self.present(alert, animated: true, completion: nil)
         })
     }
-    
+
+    func getMoreAssetsMessage(isAsset:Bool, remainingAssets:Int) -> String {
+        if isAsset {
+            if (remainingAssets > 0) {
+                let msg = " " + String(remainingAssets) + " asset(s) remaining. Wait a few minutes and sweep this address again."
+                return(msg)
+            }
+        }
+
+        return("")
+    }
+
     func getBalanceMessage(outputs:[SimpleUTXO], isAsset:Bool, rate:Rate) -> String {
         if isAsset {
             var balanceMessage = ""
@@ -331,6 +366,8 @@ class StartImportViewController : UIViewController, Subscriber {
                 balanceMessage = balanceMessage + String(output.satoshis) + " " + output.assetName!
                 index = index + 1
             }
+            
+            
             return balanceMessage
         }
         else {
