@@ -268,9 +268,18 @@ class StartImportViewController : UIViewController, Subscriber {
         present(balanceActivity, animated: true, completion: {
             self.walletManager.apiClient?.fetchUTXOS(address: address, isAsset: isAsset, completion: { data in
                 guard let data = data else { return }
+
+               // self.filterAssetOutputs(data: data, isAsset: isAsset, callBack: callBack)
                 self.handleData(data: data, key: key, isAsset: isAsset, callBack: callBack)
             })
         })
+    }
+    
+
+    
+    private func filterAssetOutputs(outputs: inout [SimpleUTXO]) {
+        let a_range = CountableRange<Int>(uncheckedBounds: (lower: 1, upper: outputs.count))
+        outputs.removeSubrange(a_range)
     }
     
     private func handleData(data: [[String: Any]], key: BRKey, isAsset:Bool, callBack:(()->Void)? = nil) {
@@ -282,7 +291,10 @@ class StartImportViewController : UIViewController, Subscriber {
         guard !wallet.containsAddress(address) else {
             return showErrorMessage(S.Import.Error.duplicate)
         }
-        let outputs = data.compactMap { SimpleUTXO(json: $0) }
+        var outputs = data.compactMap { SimpleUTXO(json: $0) }
+        if isAsset {
+            filterAssetOutputs(outputs: &outputs)
+        }
         let balance = outputs.map { $0.satoshis }.reduce(0, +)
         outputs.forEach { output in
             tx.addInput(txHash: output.hash, index: output.index, amount: output.satoshis, script: output.script)

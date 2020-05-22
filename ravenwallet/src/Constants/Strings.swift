@@ -684,6 +684,7 @@ enum S {
         static let title = NSLocalizedString("Import.title", value: "Import Wallet", comment: "Import Wallet screen title")
         static let importing = NSLocalizedString("Import.importing", value: "Importing Wallet", comment: "Importing wallet progress view label")
         static let confirm = NSLocalizedString("Import.confirm", value: "Send %1$@ from this private key into your wallet? The Ravencoin network will receive a fee of %2$@.", comment: "Sweep private key confirmation message")
+        static let confirmAsset = NSLocalizedString("Import.confirmAsset", value: "Send %1$@ of %2$@ from this private key into your wallet?", comment: "Sweep asset with private key confirmation message")
         static let checking = NSLocalizedString("Import.checking", value: "Checking private key balance...", comment: "Checking private key balance progress view text")
         static let password = NSLocalizedString("Import.password", value: "This private key is password protected.", comment: "Enter password alert view title")
         static let passwordPlaceholder = NSLocalizedString("Import.passwordPlaceholder", value: "password", comment: "password textfield placeholder")
