@@ -277,13 +277,20 @@ class StartImportViewController : UIViewController, Subscriber {
     
 
     
-    private func filterAssetOutputs(outputs: inout [SimpleUTXO]) {
+    private func filterAssetOutputs(outputs: inout [SimpleUTXO]) -> Int {
+        if outputs.count == 0 {return 0}
+        let remainingAssets = outputs.count - 1
+        
+        //Remove all but one asset
         let a_range = CountableRange<Int>(uncheckedBounds: (lower: 1, upper: outputs.count))
         outputs.removeSubrange(a_range)
+        
+        return(remainingAssets)
     }
     
     private func handleData(data: [[String: Any]], key: BRKey, isAsset:Bool, callBack:(()->Void)? = nil) {
         var key = key
+        var remainingAssets = 0
         guard let tx = UnsafeMutablePointer<BRTransaction>() else { return }
         guard let wallet = walletManager.wallet else { return }
         guard let address = key.address() else { return }
@@ -293,7 +300,7 @@ class StartImportViewController : UIViewController, Subscriber {
         }
         var outputs = data.compactMap { SimpleUTXO(json: $0) }
         if isAsset {
-            filterAssetOutputs(outputs: &outputs)
+            remainingAssets = filterAssetOutputs(outputs: &outputs)
         }
         let balance = outputs.map { $0.satoshis }.reduce(0, +)
         outputs.forEach { output in
@@ -326,7 +333,7 @@ class StartImportViewController : UIViewController, Subscriber {
             let feeAmount = Amount(amount: fee, rate: rate, maxDigits: Currencies.rvn.state.maxDigits, currency: Currencies.rvn)
             let balanceText = self.getBalanceMessage(outputs: outputs, isAsset: isAsset, rate: rate)
             let feeText = Store.state.isSwapped ? feeAmount.localCurrency : feeAmount.bits
-            let message = String(format: S.Import.confirm, balanceText, feeText)
+            let message = String(format: S.Import.confirm, balanceText, feeText) + self.getMoreAssetsMessage(isAsset:isAsset, remainingAssets: remainingAssets)
             let alert = UIAlertController(title: S.Import.title, message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: S.Button.cancel, style: .cancel, handler: {_ in
                 callBack?()
@@ -337,7 +344,18 @@ class StartImportViewController : UIViewController, Subscriber {
             self.present(alert, animated: true, completion: nil)
         })
     }
-    
+
+    func getMoreAssetsMessage(isAsset:Bool, remainingAssets:Int) -> String {
+        if isAsset {
+            if (remainingAssets > 0) {
+                let msg = " " + String(remainingAssets) + " asset(s) remaining. Wait a few minutes and sweep this address again."
+                return(msg)
+            }
+        }
+
+        return("")
+    }
+
     func getBalanceMessage(outputs:[SimpleUTXO], isAsset:Bool, rate:Rate) -> String {
         if isAsset {
             var balanceMessage = ""
@@ -348,6 +366,8 @@ class StartImportViewController : UIViewController, Subscriber {
                 balanceMessage = balanceMessage + String(output.satoshis) + " " + output.assetName!
                 index = index + 1
             }
+            
+            
             return balanceMessage
         }
         else {
