@@ -322,3 +322,19 @@ extension UserDefaults {
         defaults.set(date, forKey: shouldReloadChartKey)
     }
 }
+
+//MARK: - Asset Data
+extension UserDefaults {
+    
+    static var assetFilter: AssetManager.AssetFilter? {
+        get {
+            guard let filterString = defaults.string(forKey: "assetFilter") else { return nil }
+            
+            return AssetManager.AssetFilter(rawValue: filterString)
+        }
+        set {
+            let value = newValue?.rawValue
+            defaults.set(value, forKey: "assetFilter")
+        }
+    }
+}

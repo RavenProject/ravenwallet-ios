@@ -243,6 +243,7 @@ enum S {
         static let confirmButton = NSLocalizedString("TermsOfUse.confirmButton", value:"Confirm & Finish", comment: "Share via email button label")
     }
     
+    //MARK: Asset
     enum Asset {
         static let settingTitle = NSLocalizedString("Asset.settingTitle", value:"Asset Display Settings", comment: "Asset Display title")
         static let emptyMessage = NSLocalizedString("Asset.emptyMessage", value:"Your assets will appear here.", comment: "Empty assets list message.")
@@ -290,6 +291,14 @@ enum S {
         static let insufficientAssetFunds = NSLocalizedString("Asset.insufficientAssetFunds", value: "Insufficient Asset Funds", comment: "Insufficient asset funds error")
         static let verifyLabel = NSLocalizedString("Asset.verifyLabel", value:"Check Availabilty", comment: "Verify button label")
         static let notVerifiedName = NSLocalizedString("Asset.notVerifiedName", value:"Operation timeout: not connected to a node that accept getAssetData MSG protocol.", comment: "Not verified asset name error")
+        static let whitelist = NSLocalizedString("Asset.whitelist", value:"Whitelist", comment: "Title for selector indicating whitelist filtering")
+        static let whitelistTitle = NSLocalizedString("Asset.whitelistTitle", value:"Whitelisted Assets", comment: "Title for section displaying assets that are included in the asset whitelist")
+        static let whitelistEmpty = NSLocalizedString("Asset.whitelistEmpty", value:"No assets in whitelist", comment: "Message letting the user know that their asset whitelist is empty")
+        static let blacklist = NSLocalizedString("Asset.blacklist", value:"Blacklist", comment: "Title for selector indicating blacklist filtering")
+        static let blacklistTitle = NSLocalizedString("Asset.blacklistTitle", value:"Blacklisted Assets", comment: "Title for section displaying assets that are included in the asset blacklist")
+        static let blacklistEmpty = NSLocalizedString("Asset.blacklistEmpty", value:"No assets in blacklist", comment: "Message letting the user know that their asset blacklist is empty")
+        static let availableAssets = NSLocalizedString("Asset.availableAssets", value:"Available Assets", comment: "Message letting the user know what assets are available for adding to a whitelist/blacklist")
+        static let none = NSLocalizedString("Asset.none", value:"None", comment: "Message letting the user know there are no assets left")
 
     }
     

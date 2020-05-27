@@ -18,14 +18,15 @@ class TransactionsTableViewController : UITableViewController, Subscriber {
         self.didSelectTransaction = didSelectTransaction
         self.isSwapped = Store.state.isSwapped
         super.init(nibName: nil, bundle: nil)
+        
+        filters.append(AssetManager.shared.transactionFilter(_:))
     }
 
     let didSelectTransaction: ([Transaction], Int) -> Void
 
     var filters: [TransactionFilter] = [] {
         didSet {
-            transactions = filters.reduce(allTransactions, { $0.filter($1) })
-            tableView.reloadData()
+            filterTransactions()
         }
     }
 
@@ -37,7 +38,7 @@ class TransactionsTableViewController : UITableViewController, Subscriber {
     private let transactionCellIdentifier = "TransactionCellIdentifier"
     private var transactions: [Transaction] = []
     private var allTransactions: [Transaction] = [] {
-        didSet { transactions = allTransactions }
+        didSet { filterTransactions() }
     }
     private var isSwapped: Bool {
         didSet { reload() }
@@ -125,6 +126,11 @@ class TransactionsTableViewController : UITableViewController, Subscriber {
                 }
             }
         }
+    }
+    
+    private func filterTransactions() {
+        transactions = filters.reduce(allTransactions, { $0.filter($1) })
+        reload()
     }
 
     // MARK: - Table view data source
@@ -224,5 +230,23 @@ extension TransactionsTableViewController {
                                            isSyncing: currency.state.syncState != .success)
         }
         return cell
+    }
+}
+
+extension AssetManager {
+    func transactionFilter(_ transaction: Transaction) -> Bool {
+        guard
+            let rvnTx = transaction as? RvnTransaction,
+            let asset = rvnTx.asset
+        else { return true }
+
+        let assetName = asset.pointee.nameString
+        
+        switch assetFilter {
+        case .whitelist:
+            return whitelist.contains(assetName)
+        case .blacklist:
+            return !blacklist.contains(assetName)
+        }
     }
 }
