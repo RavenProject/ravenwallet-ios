@@ -294,6 +294,7 @@ enum S {
         static let whitelist = NSLocalizedString("Asset.whitelist", value:"Whitelist", comment: "Title for selector indicating whitelist filtering")
         static let whitelistTitle = NSLocalizedString("Asset.whitelistTitle", value:"Whitelisted Assets", comment: "Title for section displaying assets that are included in the asset whitelist")
         static let whitelistEmpty = NSLocalizedString("Asset.whitelistEmpty", value:"No assets in whitelist", comment: "Message letting the user know that their asset whitelist is empty")
+        static let whitelistEmptyWarningMessage = NSLocalizedString("Asset.whitelistEmptyWarningMessage", value:"Leaving the whitelist empty will hide all assets", comment: "Message letting the user know that their asset whitelist is empty")
         static let blacklist = NSLocalizedString("Asset.blacklist", value:"Blacklist", comment: "Title for selector indicating blacklist filtering")
         static let blacklistTitle = NSLocalizedString("Asset.blacklistTitle", value:"Blacklisted Assets", comment: "Title for section displaying assets that are included in the asset blacklist")
         static let blacklistEmpty = NSLocalizedString("Asset.blacklistEmpty", value:"No assets in blacklist", comment: "Message letting the user know that their asset blacklist is empty")

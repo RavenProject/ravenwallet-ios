@@ -12,6 +12,8 @@ class WhitelistAdapter: AssetFilterAdapterProtocol {
     
     private var assetManager: AssetManager
     
+    var delegate: AssetFilterAdapterDelegate?
+    
     var includedList: [String] = []
     var excludedList: [String] = []
     
@@ -38,6 +40,7 @@ class WhitelistAdapter: AssetFilterAdapterProtocol {
     func removeFromList(_ assetName: String) {
         assetManager.removeFromWhitelist(assetName: assetName)
         updateLists()
+        delegate?.didRemoveFromList(self)
     }
     
     func titleForList() -> String {

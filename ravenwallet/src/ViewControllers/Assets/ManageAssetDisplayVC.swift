@@ -52,6 +52,9 @@ class ManageAssetDisplayVC : UIViewController, Subscriber {
         
         super.init(nibName: nil, bundle: nil)
         
+        self.whitelistAdapter.delegate = self
+        self.blacklistAdapter.delegate = self
+        
         let assetFilter = AssetManager.shared.assetFilter
         filterSelectorControl.selectedSegmentIndex = filters.firstIndex(of: assetFilter)!
         filterSelectorControl.valueChanged = filterSelectorDidChange
@@ -74,6 +77,11 @@ extension ManageAssetDisplayVC {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         shouldShowStatusBar = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        checkForEmptyWhitelist()
     }
 }
 
@@ -144,9 +152,34 @@ extension ManageAssetDisplayVC {
         switch filter {
         case .whitelist:
             self.assetFilterListVC.adapter = self.whitelistAdapter
+            
+            checkForEmptyWhitelist()
+            
         case .blacklist:
             self.assetFilterListVC.adapter = self.blacklistAdapter
         }
+    }
+    
+    private func checkForEmptyWhitelist() {
+        // Check that the adapter is the whitelist adapter, we don't care about whether or not the blacklist is empty
+        guard let adapter = assetFilterListVC.adapter as? WhitelistAdapter else { return }
+        
+        if adapter.includedList.count == 0 {
+            showEmptyWhitelistAlert()
+        }
+    }
+    
+    func showEmptyWhitelistAlert() {
+        
+        let alertVc = UIAlertController(
+            title: S.Alert.warning,
+            message: S.Asset.whitelistEmptyWarningMessage,
+            preferredStyle: .alert)
+        
+        let dismissAction = UIAlertAction(title: S.Button.dismiss, style: .default, handler: nil)
+        alertVc.addAction(dismissAction)
+        
+        present(alertVc, animated: false)
     }
 }
 
@@ -160,5 +193,11 @@ extension ManageAssetDisplayVC {
         AssetManager.shared.setAssetFilter(filter)
         
         showFilterList(filter)
+    }
+}
+
+extension ManageAssetDisplayVC: AssetFilterAdapterDelegate {
+    func didRemoveFromList(_ adapter: AssetFilterAdapterProtocol) {
+        checkForEmptyWhitelist()
     }
 }
