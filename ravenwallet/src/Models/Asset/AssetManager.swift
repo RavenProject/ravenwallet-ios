@@ -118,6 +118,7 @@ class AssetManager {
         }
     }
     
+    @available(*, deprecated, message: "Will be removed in favor of using the blacklist/whitelist functionality" )
     func hideAsset(asset:Asset, where idOldValue:Int, callback: ((Bool)->Void)? = nil) {
         db?.updateHideAsset(asset, where: idOldValue, callback: callback)
     }
