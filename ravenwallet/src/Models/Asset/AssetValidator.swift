@@ -23,8 +23,8 @@ let MAX_IPFSHASH_LENGTH = 46;
 
 let ROOT_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]{3,}$", options: [])
 let SUB_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
-let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()\\{}_.?:]+$", options: [])
-let CHANNEL_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
+let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()[\\]{}_.?:]+$", options: [])
+let CHANNEL_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Za-z0-9_]+$", options: [])
 
 let DOUBLE_PUNCTUATION = try? NSRegularExpression(pattern: "^.*[._]{2,}.*$", options: [])
 let LEADING_PUNCTUATION = try? NSRegularExpression(pattern: "^[._].*$", options: [])
