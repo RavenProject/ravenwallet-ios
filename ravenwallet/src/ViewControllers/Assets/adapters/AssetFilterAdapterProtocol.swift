@@ -10,6 +10,8 @@ import Foundation
 
 protocol AssetFilterAdapterProtocol {
     
+    var delegate: AssetFilterAdapterDelegate? {get set}
+    
     var includedList: [String] {get}
     var excludedList: [String] {get}
     
@@ -17,4 +19,8 @@ protocol AssetFilterAdapterProtocol {
     func removeFromList(_ assetName: String)
     func titleForList() -> String
     func emptyListText() -> String
+}
+
+protocol AssetFilterAdapterDelegate {
+    func didRemoveFromList(_ adapter: AssetFilterAdapterProtocol)
 }

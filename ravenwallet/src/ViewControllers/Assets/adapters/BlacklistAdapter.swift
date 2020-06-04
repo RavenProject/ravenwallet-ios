@@ -12,6 +12,8 @@ class BlacklistAdapter: AssetFilterAdapterProtocol {
     
     private var assetManager: AssetManager
     
+    var delegate: AssetFilterAdapterDelegate?
+    
     var includedList: [String] = []
     var excludedList: [String] = []
     
@@ -38,6 +40,7 @@ class BlacklistAdapter: AssetFilterAdapterProtocol {
     func removeFromList(_ assetName: String) {
         assetManager.removeFromBlacklist(assetName: assetName)
         updateLists()
+        delegate?.didRemoveFromList(self)
     }
     
     func titleForList() -> String {
