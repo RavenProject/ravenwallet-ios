@@ -54,7 +54,7 @@ extension BRAPIClient {
     //        task.resume()
     //    }
     
-    func ravenMultiplier(_ handler: @escaping (_ mult: Double, _ error: String?) -> Void) {
+    func ravenMultiplier(_ handler: @escaping (_ mult: Optional<Double>, _ error: String?) -> Void) {
         print("Getting rate from ravenMultiplierURL")
         let request = URLRequest(url: URL(string: ravenMultiplierURL)!)
         let task = dataTaskWithRequest(request) { (data, response, error) in

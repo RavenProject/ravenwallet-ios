@@ -27,8 +27,8 @@ class ExchangeUpdater : Subscriber {
     func refresh(completion: @escaping () -> Void) {
         
         walletManager.apiClient?.ravenMultiplier{multiplier, error in
-            guard let ratio_to_btc : Double = multiplier else { completion(); return }
-            self.walletManager.apiClient?.exchangeRates(code: self.currency.code, isFallback: false, ratio_to_btc, { rates,
+            guard let ratio_to_btc : Optional<Double> = multiplier else { completion(); return }
+            self.walletManager.apiClient?.exchangeRates(code: self.currency.code, isFallback: false, ratio_to_btc!, { rates,
                 ratio_to_btc, error in
                 
                 guard let currentRate = rates.first( where: { $0.code == Store.state.defaultCurrencyCode })
