@@ -23,8 +23,8 @@ let MAX_IPFSHASH_LENGTH = 46;
 
 let ROOT_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]{3,}$", options: [])
 let SUB_NAME_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
-let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()\\{}_.?:]+$", options: [])
-let CHANNEL_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Z0-9._]+$", options: [])
+let UNIQUE_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[-A-Za-z0-9@$%&*()[\\]{}_.?:]+$", options: [])
+let MSG_CHANNEL_TAG_CHARACTERS = try? NSRegularExpression(pattern: "^[A-Za-z0-9_]+$", options: [])
 
 let DOUBLE_PUNCTUATION = try? NSRegularExpression(pattern: "^.*[._]{2,}.*$", options: [])
 let LEADING_PUNCTUATION = try? NSRegularExpression(pattern: "^[._].*$", options: [])
@@ -32,11 +32,11 @@ let TRAILING_PUNCTUATION = try? NSRegularExpression(pattern: "^.*[._]$", options
 
 let SUB_NAME_DELIMITER = try? NSRegularExpression(pattern: "/", options: [])
 let UNIQUE_TAG_DELIMITER = try? NSRegularExpression(pattern: "#", options: [])
-let CHANNEL_TAG_DELIMITER = try? NSRegularExpression(pattern: "~", options: [])
+let MSG_CHANNEL_TAG_DELIMITER = try? NSRegularExpression(pattern: "~", options: [])
 
-let UNIQUE_INDICATOR = try? NSRegularExpression(pattern: "^[^#]+#[^#]+$", options: [])
-let CHANNEL_INDICATOR = try? NSRegularExpression(pattern: "^[^~]+~[^~]+$", options: [])
-let OWNER_INDICATOR = try? NSRegularExpression(pattern: "^[^!]+!$", options: [])
+let UNIQUE_INDICATOR = try? NSRegularExpression(pattern: "^[^^~#!]+#[^~#!\\/]+$", options: [])
+let MSG_CHANNEL_INDICATOR = try? NSRegularExpression(pattern: "^[^^~#!]+~[^~#!\\/]+$", options: [])
+let OWNER_INDICATOR = try? NSRegularExpression(pattern: "^[^^~#!]+!$", options: [])
 
 let RAVEN_NAMES = try? NSRegularExpression(pattern: "^RVN$|^RAVEN$|^RAVENCOIN$|^RAVENC0IN$|^RAVENCO1N$|^RAVENC01N$", options: [])
 
@@ -73,7 +73,7 @@ class AssetValidator {
     }
     
     func IsChannelTagValid(tag:String) -> Bool {
-        let res1 = CHANNEL_TAG_CHARACTERS?.firstMatch(in: tag, options: [], range: NSRange(location: 0, length: tag.count)) != nil
+        let res1 = MSG_CHANNEL_TAG_CHARACTERS?.firstMatch(in: tag, options: [], range: NSRange(location: 0, length: tag.count)) != nil
         let res2 = DOUBLE_PUNCTUATION?.firstMatch(in: tag, options: [], range: NSRange(location: 0, length: tag.count)) != nil
         let res3 = LEADING_PUNCTUATION?.firstMatch(in: tag, options: [], range: NSRange(location: 0, length: tag.count)) != nil
         let res4 = TRAILING_PUNCTUATION?.firstMatch(in: tag, options: [], range: NSRange(location: 0, length: tag.count)) != nil
@@ -132,12 +132,12 @@ class AssetValidator {
             assetType = .UNIQUE
             return(true, assetType)
         }
-        else if CHANNEL_INDICATOR?.firstMatch(in: name, options: [], range: NSRange(location: 0, length: name.count)) != nil {
+        else if MSG_CHANNEL_INDICATOR?.firstMatch(in: name, options: [], range: NSRange(location: 0, length: name.count)) != nil {
             if(name.count > MAX_NAME_LENGTH)
             {
                 return (false, assetType)
             }
-            let parts = name.components(separatedBy: CharacterSet.init(charactersIn: (CHANNEL_TAG_DELIMITER?.pattern)!))
+            let parts = name.components(separatedBy: CharacterSet.init(charactersIn: (MSG_CHANNEL_TAG_DELIMITER?.pattern)!))
             let valid:Bool = IsNameValidBeforeTag(name: parts.first!) && IsChannelTagValid(tag: parts.last!)
             if !valid {
                 return (false, assetType)
